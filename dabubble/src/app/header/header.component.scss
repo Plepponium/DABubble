@@ -9,12 +9,23 @@
     position: absolute;
     top: 25px;
     left: 45px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 24px;
+
+    img {
+        height: 70px;
+    }
 }
 
 .searchBar {
-    width: 989px;
+    width: 100%;
+    max-width: 989px;
+    height: 70px;
     box-sizing: border-box;
     margin-left: 406px;
+    margin-right: 526px;
     padding: 17.5px 45px;
     border-radius: 42px;
     border: none;
@@ -24,4 +35,12 @@
     position: absolute;
     top: 25px;
     right: 45px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    img {
+        width: 70px;
+        border-radius: 42px;
+    }
 }

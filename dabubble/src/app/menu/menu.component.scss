@@ -47,13 +47,20 @@
 button {
     border: none;
     width: 100%;
-    text-align: left;
+    height: 58px;
+    box-sizing: border-box;
     color: black;
+    display: flex;
+    // align-items: center;
+
+    img {
+        width: 50px;
+        border-radius: 30px;
+    }
 }
 
 .mat-mdc-outlined-button:not(:disabled) {
     color: black;
-    // color: var(--mdc-outlined-button-label-text-color, var(--mat-sys-primary));
 }
 
 .mdc-button {
