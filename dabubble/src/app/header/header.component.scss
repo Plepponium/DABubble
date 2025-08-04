@@ -1,0 +1,27 @@
+.header {
+    width: 100%;
+    // background-color: #eceefe;
+    padding-top: 25px;
+    display: flex;
+}
+
+.logo {
+    position: absolute;
+    top: 25px;
+    left: 45px;
+}
+
+.searchBar {
+    width: 989px;
+    box-sizing: border-box;
+    margin-left: 406px;
+    padding: 17.5px 45px;
+    border-radius: 42px;
+    border: none;
+}
+
+.user {
+    position: absolute;
+    top: 25px;
+    right: 45px;
+}
