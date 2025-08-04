@@ -1,3 +1,7 @@
+$purple1: #444df2;
+$purple2: #797ef3;
+$purple3: #525af0;
+
 // .intro {
 //   height: 100vh;
 //   display: flex;
@@ -11,6 +15,12 @@
   box-sizing: border-box;
   margin: 0;
   scroll-behavior: smooth;
+  font-family: "Nunito";
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url("/assets/fonts/nunito.ttf");
 }
 
 .login {
@@ -33,10 +43,62 @@
     flex-direction: column;
     gap: 30px;
     margin-bottom: 30px;
-  }
 
-  mat-card-content {
+    h1 {
+      font-size: 46px;
+      color: #444df2;
+    }
+
+    span {
+      font-size: 20px;
+    }
+  }
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+  .input-item {
     display: flex;
-    flex-direction: column;
+    background-color: #eceefe;
+    border-radius: 100px;
+    padding: 18px 32px;
+    gap: 32px;
+    transition: box-shadow 125ms ease-in-out;
+
+    &:hover {
+      box-shadow: 0 0 0 1px #686868;
+    }
+
+    input {
+      width: 100%;
+      border: none;
+      background-color: transparent;
+      &:focus {
+        outline: none;
+      }
+    }
+
+    &:has(input:focus) {
+      box-shadow: 0 0 0 1px $purple3;
+
+      img {
+        filter: brightness(0);
+        transition: filter 125ms ease;
+      }
+    }
+  }
+}
+
+.forgot-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+
+  button {
+    font-weight: 400;
+    font-size: 18px;
   }
 }

@@ -8,15 +8,17 @@
                 verwendest.
             </span>
         </div>
-        <mat-card-content>
-            <mat-form-field>
-                <input matInput placeholder="beispielname@email.com">
-            </mat-form-field>
-            <mat-form-field>
-                <input matInput placeholder="Passwort">
-            </mat-form-field>
+        <mat-card-content class="input-group">
+            <div class="input-item">
+                <img src="/assets/icons/login-mail.svg" alt="">
+                <input type="email" placeholder="beispielname@email.com">
+            </div>
+            <div class="input-item">
+                <img src="/assets/icons/login-lock.svg" alt="">
+                <input type="text" placeholder="Passwort">
+            </div>
         </mat-card-content>
-        <mat-card-actions>
+        <mat-card-actions class="forgot-container">
             <button mat-button>Passwort vergessen?</button>
         </mat-card-actions>
     </mat-card>
