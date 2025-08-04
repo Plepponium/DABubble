@@ -2,6 +2,7 @@ $purple1: #444df2;
 $purple2: #797ef3;
 $purple3: #525af0;
 $lightpurple: #adb0d9;
+$lightblue: #eceefe;
 
 // .intro {
 //   height: 100vh;
@@ -59,10 +60,12 @@ $lightpurple: #adb0d9;
 
 .login {
   height: 100vh;
-  background-color: #eceefe;
+  background-color: $lightblue;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 32px;
   padding: 35px 20px;
 }
 
@@ -97,7 +100,7 @@ $lightpurple: #adb0d9;
 
   .input-item {
     display: flex;
-    background-color: #eceefe;
+    background-color: $lightblue;
     border-radius: 100px;
     padding: 18px 32px;
     gap: 32px;
@@ -134,9 +137,22 @@ $lightpurple: #adb0d9;
   margin-top: 32px;
 
   button {
+    padding: 5px 15px;
+    border-radius: 30px;
+    border: none;
+    background-color: transparent;
+    color: $purple2;
     font-family: "Nunito";
     font-weight: 400;
     font-size: 18px;
+    transition: all 125ms ease-in-out;
+    cursor: pointer;
+
+    &:hover {
+      font-weight: 500;
+      color: $purple1;
+      background-color: $lightblue;
+    }
   }
 }
 
@@ -161,7 +177,7 @@ $lightpurple: #adb0d9;
   justify-content: center;
   align-items: center;
   gap: 20px;
-  background-color: #eceefe;
+  background-color: $lightblue;
   border: none;
   border-radius: 100px;
   padding: 11px 32px;
@@ -207,5 +223,16 @@ $lightpurple: #adb0d9;
       color: white;
       background-color: $purple1;
     }
+  }
+}
+
+.legal-links {
+  display: flex;
+  gap: 16px;
+  font-size: 18px;
+
+  a {
+    text-decoration: none;
+    color: $purple2;
   }
 }
