@@ -1,3 +1,23 @@
 <div class="login">
-    <img src="assets/img/login-logo.svg">
+
+    <mat-card class="login-card">
+        <div class="login-header">
+            <h1>Anmeldung</h1>
+            <span>
+                Wir empfehlen dir, die E-Mail-Adresse zu nutzen, die du bei der Arbeit
+                verwendest.
+            </span>
+        </div>
+        <mat-card-content>
+            <mat-form-field>
+                <input matInput placeholder="beispielname@email.com">
+            </mat-form-field>
+            <mat-form-field>
+                <input matInput placeholder="Passwort">
+            </mat-form-field>
+        </mat-card-content>
+        <mat-card-actions>
+            <button mat-button>Passwort vergessen?</button>
+        </mat-card-actions>
+    </mat-card>
 </div>
