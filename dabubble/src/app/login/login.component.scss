@@ -1,6 +1,7 @@
 $purple1: #444df2;
 $purple2: #797ef3;
 $purple3: #525af0;
+$lightpurple: #adb0d9;
 
 // .intro {
 //   height: 100vh;
@@ -21,6 +22,39 @@ $purple3: #525af0;
 @font-face {
   font-family: "Nunito";
   src: url("/assets/fonts/nunito.ttf");
+}
+
+#logo {
+  position: absolute;
+  top: 75px;
+  left: 75px;
+}
+
+.register {
+  font-size: 18px;
+  position: absolute;
+  top: 75px;
+  right: 75px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  button {
+    padding: 10px 15px;
+    margin-left: 16px;
+    font-size: 18px;
+    color: $purple2;
+    background-color: transparent;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: box-shadow 125ms ease-in-out, color 125ms ease-in-out;
+
+    &:hover {
+      color: $purple1;
+      box-shadow: 0 0 0 1px $lightpurple;
+    }
+  }
 }
 
 .login {
@@ -73,6 +107,7 @@ $purple3: #525af0;
     }
 
     input {
+      font-size: 18px;
       width: 100%;
       border: none;
       background-color: transparent;
