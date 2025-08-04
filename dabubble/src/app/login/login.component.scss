@@ -93,6 +93,7 @@ $lightpurple: #adb0d9;
   display: flex;
   flex-direction: column;
   gap: 32px;
+  padding: 0;
 
   .input-item {
     display: flex;
@@ -133,7 +134,78 @@ $lightpurple: #adb0d9;
   margin-top: 32px;
 
   button {
+    font-family: "Nunito";
     font-weight: 400;
     font-size: 18px;
+  }
+}
+
+.separator {
+  margin: 32px 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+
+  .line {
+    width: 100%;
+    height: 1px;
+    background-color: $lightpurple;
+  }
+}
+
+.google-login {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  background-color: #eceefe;
+  border: none;
+  border-radius: 100px;
+  padding: 11px 32px;
+  font-size: 18px;
+
+  color: $purple1;
+  transition: box-shadow 125ms ease-in-out, font-weight 125ms ease-in-out;
+
+  &:hover {
+    box-shadow: 0 0 0 1px $purple1;
+    font-weight: 700;
+  }
+}
+
+.button-group {
+  margin-top: 32px;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+
+  button {
+    cursor: pointer;
+    padding: 12px 24px;
+    border-radius: 25px;
+    border: 1px solid $purple2;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  button:nth-child(1) {
+    background-color: $purple1;
+    color: white;
+    transition: filter 125ms ease-in-out;
+    &:hover {
+      filter: opacity(80%);
+    }
+  }
+  button:nth-child(2) {
+    background-color: transparent;
+    color: $purple1;
+    transition: color 125ms ease-in-out, background-color 125ms ease-in-out;
+    &:hover {
+      color: white;
+      background-color: $purple1;
+    }
   }
 }
