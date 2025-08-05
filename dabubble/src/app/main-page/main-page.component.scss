@@ -49,9 +49,15 @@
 .toggle-btn-container {
     transform: rotate(-90deg);
     display: flex;
+    align-items: center;
     gap: 8px;
+
+    img {
+        transform: rotate(90deg);
+    }
 }
 
 .toggle-btn-text {
     white-space: nowrap;
+    color: black;
 }

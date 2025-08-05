@@ -15,8 +15,6 @@ mat-toolbar {
     justify-content: space-between;
     padding: 0;
     background-color: #ffffff;
-    font-size: 24px;
-    font-weight: 700;
 }
 
 .toolbar-header {
@@ -42,8 +40,6 @@ mat-toolbar {
     align-items: center;
     gap: 15px;
     padding: 5px 10px 5px 0;
-    font-size: 20px;
-    font-weight: 700;
     cursor: pointer;
 
     &:hover {

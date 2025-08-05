@@ -5,5 +5,102 @@
     box-sizing: border-box;
     background-color: #ffffff;
     border-radius: 30px;
-    padding: 32px 30px;
+    // padding: 32px 30px;
+}
+
+.header {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    padding: 25px 45px;
+}
+
+.header-left, .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.channel-name-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-section {
+    display: flex;
+    gap: 30px;
+    padding: 10px 45px;
+}
+
+.chat-section.reverse{
+    flex-direction: row-reverse;
+}
+
+.chat-user-img {
+    width: 70px;
+    height: 70px;
+    border-radius: 40px;
+}
+
+.chat-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.chat-start {
+    display: flex;
+    gap: 20px;
+}
+
+.chat-start.reverse {
+    justify-content: end;
+}
+
+.chat-message {
+    padding: 15px;
+    border-bottom-right-radius: 30px;
+    border-bottom-left-radius: 30px;
+}
+
+.chat-message.left {
+    border-top-right-radius: 30px;
+}
+
+.chat-message.right {
+    border-top-left-radius: 30px;
+    background-color: #797EF3;
+    color: #ffffff;
+}
+
+.chat-answered {
+    display: flex;
+    justify-content: space-between;
+}
+
+.answers {
+    display: flex;
+    gap: 20px;
+}
+
+.reactions {
+    display: flex;
+    gap: 10px;
+}
+
+.reaction-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #ADB0D9;
+    border-radius: 20px;
+    padding: 5px 10px;
+
+    img {
+        width: 24px;
+        height: 24px;
+        border-radius: none !important;
+    }
 }
