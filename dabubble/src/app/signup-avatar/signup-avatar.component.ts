@@ -19,7 +19,7 @@ export class SignupAvatarComponent {
     'assets/user-icons/icon6.svg'
   ];
 
-  selectedAvatar: string = 'assets/img/default-user.svg';
+  selectedAvatar: string = 'assets/user-icons/default-user.svg';
 
   selectAvatar(avatar: string): void {
     this.selectedAvatar = avatar;
