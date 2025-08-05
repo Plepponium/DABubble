@@ -1,12 +1,12 @@
 import {ChangeDetectionStrategy, Component, signal} from '@angular/core';
-import {MatExpansionModule} from '@angular/material/expansion';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
-import {MatDividerModule} from '@angular/material/divider';
+import {MatToolbarModule} from '@angular/material/toolbar';
+import {MatSidenavModule} from '@angular/material/sidenav';
 
 @Component({
   selector: 'app-menu',
-  imports: [MatExpansionModule, MatIconModule, MatButtonModule, MatDividerModule],
+  imports: [MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

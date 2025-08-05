@@ -1,8 +1,28 @@
 <div class="main-page">
     <app-header></app-header>
-    <div class="content">
+
+    <mat-drawer-container class="container" autosize>
+        <mat-drawer #drawer class="sidenav" mode="side">
+            <app-menu></app-menu>
+        </mat-drawer>
+
+        <div class="content">
+            <app-chats class="chats"></app-chats>
+            <app-thread></app-thread>
+            
+        </div>
+    </mat-drawer-container>
+
+    <button class="toggle-menu-btn" type="button" mat-button (click)="drawer.toggle()">
+        <div class="toggle-btn-container">
+            <div class="toggle-btn-text">Workspace-Menü schließen</div>
+            <div>Bild</div>
+        </div>
+    </button>
+
+    <!-- <div class="content">
         <app-menu></app-menu>
         <app-chats class="chats"></app-chats>
         <app-thread></app-thread>
-    </div>
+    </div> -->
 </div>

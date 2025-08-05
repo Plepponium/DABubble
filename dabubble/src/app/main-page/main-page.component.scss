@@ -1,15 +1,57 @@
 .main-page {
     width: 100%;
-    height: 100%;
+    height: 100vh;
     background-color: #eceefe;
+    overflow: hidden;
+}
+
+.container {
+    background-color: #eceefe;
+}
+
+.mat-drawer {
+    background-color: unset;
+}
+
+.sidenav {
+    width: 366px+20px;
+    top: 25px;
+    left: 20px;
 }
 
 .content {
     display: flex;
     gap: 20px;
+    left: 25px;
     padding: 25px 20px;
 }
 
 .chats {
     flex-grow: 1;
+}
+
+.toggle-menu-btn {
+    width: 56px !important;
+    height: 347px;
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    border-radius: initial;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    padding: 20px 12px;
+    background-color: #ffffff;
+    box-shadow: 4px 4px 7px 0px rgba(0, 0, 0, 0.2);
+    z-index: 3;
+}
+
+.toggle-btn-container {
+    transform: rotate(-90deg);
+    display: flex;
+    gap: 8px;
+}
+
+.toggle-btn-text {
+    white-space: nowrap;
 }
