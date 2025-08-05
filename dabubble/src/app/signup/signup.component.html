@@ -1,1 +1,35 @@
-<p>signup works!</p>
+<app-auth-layout>
+
+    <button [routerLink]="['/']" class="arrow-back">
+        <img src="/assets/icons/arrow_back.svg">
+    </button>
+
+
+    <div class="login-header">
+        <h1>Konto erstellen</h1>
+        <span>Mit deinem Namen und deiner E-Mail-Adresse hast du dein neues DABubble-Konto</span>
+    </div>
+
+    <mat-card-content class="input-group">
+        <div class="input-item">
+            <img src="/assets/icons/login-person.svg">
+            <input type="text" placeholder="Name und Nachname">
+        </div>
+        <div class="input-item">
+            <img src="/assets/icons/login-mail.svg">
+            <input type="email" placeholder="beispielname@email.com">
+        </div>
+        <div class="input-item">
+            <img src="/assets/icons/login-lock.svg">
+            <input type="password" placeholder="Passwort">
+        </div>
+        <div class="agree">
+            <input type="checkbox" name="checkbox" id="checkbox">
+            <label for="checkbox" class="custom-checkbox"></label>
+            <p>Ich stimme der<a routerLink="/privacy">Datenschutzerklärung</a>zu.</p>
+        </div>
+    </mat-card-content>
+    <div class="continue">
+        <button type="submit">Weiter</button>
+    </div>
+</app-auth-layout>

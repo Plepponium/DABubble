@@ -1,17 +1,4 @@
-$purple1: #444df2;
-$purple2: #797ef3;
-$purple3: #525af0;
-$lightpurple: #adb0d9;
-$lightblue: #eceefe;
-
-// .intro {
-//   height: 100vh;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   background-image: linear-gradient(#797ef3, #525af0, #444df2);
-//   display: none;
-// }
+@use "../../styles/variables" as *;
 
 * {
   box-sizing: border-box;
@@ -20,75 +7,20 @@ $lightblue: #eceefe;
   font-family: "Nunito";
 }
 
-@font-face {
-  font-family: "Nunito";
-  src: url("/assets/fonts/nunito.ttf");
-}
-
-#logo {
-  position: absolute;
-  top: 75px;
-  left: 75px;
-}
-
-.register {
-  font-size: 18px;
-  position: absolute;
-  top: 75px;
-  right: 75px;
+.login-header {
+  text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 30px;
+  margin-bottom: 30px;
 
-  button {
-    padding: 10px 15px;
-    margin-left: 16px;
-    font-size: 18px;
-    color: $purple2;
-    background-color: transparent;
-    border: none;
-    border-radius: 100px;
-    cursor: pointer;
-    transition: box-shadow 125ms ease-in-out, color 125ms ease-in-out;
-
-    &:hover {
-      color: $purple1;
-      box-shadow: 0 0 0 1px $lightpurple;
-    }
+  h1 {
+    font-size: 46px;
+    color: #444df2;
   }
-}
 
-.login {
-  height: 100vh;
-  background-color: $lightblue;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 32px;
-  padding: 35px 20px;
-}
-
-.login-card {
-  background-color: white;
-  max-width: 606px;
-  padding: 50px 60px;
-
-  .login-header {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    margin-bottom: 30px;
-
-    h1 {
-      font-size: 46px;
-      color: #444df2;
-    }
-
-    span {
-      font-size: 20px;
-    }
+  span {
+    font-size: 20px;
   }
 }
 
@@ -223,16 +155,5 @@ $lightblue: #eceefe;
       color: white;
       background-color: $purple1;
     }
-  }
-}
-
-.legal-links {
-  display: flex;
-  gap: 16px;
-  font-size: 18px;
-
-  a {
-    text-decoration: none;
-    color: $purple2;
   }
 }

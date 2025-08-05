@@ -1,0 +1,164 @@
+@use "../../styles/variables" as *;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  scroll-behavior: smooth;
+  font-family: "Nunito";
+}
+
+.arrow-back {
+  position: absolute;
+  top: 45px;
+  left: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50px;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  padding: 8px;
+  transition: background-color 75ms ease-in-out;
+
+  &:hover {
+    background-color: $lightblue;
+
+    img {
+      filter: none;
+    }
+  }
+
+  img {
+    filter: brightness(0);
+    transition: filter 75ms ease-in-out;
+  }
+}
+
+.login-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 30px;
+
+  h1 {
+    font-size: 46px;
+    color: #444df2;
+  }
+
+  span {
+    font-size: 20px;
+  }
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 0;
+
+  .input-item {
+    display: flex;
+    background-color: $lightblue;
+    border-radius: 100px;
+    padding: 18px 32px;
+    gap: 32px;
+    transition: box-shadow 125ms ease-in-out;
+
+    &:hover {
+      box-shadow: 0 0 0 1px #686868;
+    }
+
+    input {
+      font-size: 18px;
+      width: 100%;
+      border: none;
+      background-color: transparent;
+      &:focus {
+        outline: none;
+      }
+    }
+
+    &:has(input:focus) {
+      box-shadow: 0 0 0 1px $purple3;
+
+      img {
+        filter: brightness(0);
+        transition: filter 125ms ease;
+      }
+    }
+  }
+}
+
+.agree {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  p {
+    font-size: 16px;
+    a {
+      font-size: 18px;
+      color: $purple2;
+      text-decoration: none;
+      padding: 4px;
+      border-radius: 20px;
+
+      &:hover {
+        color: $purple1;
+        font-weight: 600;
+        background-color: $lightblue;
+      }
+    }
+  }
+
+  input[type="checkbox"] {
+    opacity: 0;
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    z-index: 2;
+    cursor: pointer;
+
+    &:hover + .custom-checkbox {
+      background-color: $lightblue;
+    }
+  }
+  .custom-checkbox {
+    width: 24px;
+    height: 24px;
+    background-image: url("/assets/icons/unchecked.svg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    transition: all 125ms ease-in-out;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  input[type="checkbox"]:checked + .custom-checkbox {
+    background-image: url("/assets/icons/checked.svg");
+  }
+}
+
+.continue {
+  margin-top: 32px;
+  display: flex;
+  justify-content: flex-end;
+
+  button {
+    cursor: pointer;
+    padding: 12px 24px;
+    border-radius: 25px;
+    border: 1px solid $purple2;
+    font-size: 18px;
+    font-weight: 700;
+    background-color: $purple1;
+    color: white;
+    transition: filter 125ms ease-in-out;
+    &:hover {
+      filter: opacity(80%);
+    }
+  }
+}

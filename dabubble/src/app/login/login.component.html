@@ -1,47 +1,35 @@
-<div class="login">
-    <img src="/assets/img/login-logo-small.svg" id="logo">
-    <div class="register">
-        <span>Neu bei DABubble?</span>
-        <button [routerLink]="['/signup']">Konto erstellen</button>
+<app-auth-layout [showRegister]="true">
+    <div class="login-header">
+        <h1>Anmeldung</h1>
+        <span>
+            Wir empfehlen dir, die E-Mail-Adresse zu nutzen, die du bei der Arbeit
+            verwendest.
+        </span>
     </div>
-
-    <mat-card class="login-card">
-        <div class="login-header">
-            <h1>Anmeldung</h1>
-            <span>
-                Wir empfehlen dir, die E-Mail-Adresse zu nutzen, die du bei der Arbeit
-                verwendest.
-            </span>
+    <mat-card-content class="input-group">
+        <div class="input-item">
+            <img src="/assets/icons/login-mail.svg" alt="">
+            <input type="email" placeholder="beispielname@email.com">
         </div>
-        <mat-card-content class="input-group">
-            <div class="input-item">
-                <img src="/assets/icons/login-mail.svg" alt="">
-                <input type="email" placeholder="beispielname@email.com">
-            </div>
-            <div class="input-item">
-                <img src="/assets/icons/login-lock.svg" alt="">
-                <input type="text" placeholder="Passwort">
-            </div>
-        </mat-card-content>
-        <mat-card-actions class="forgot-container">
-            <button>Passwort vergessen?</button>
-        </mat-card-actions>
-        <div class="separator">
-            <div class="line"></div>
-            <span>ODER</span>
-            <div class="line"></div>
+        <div class="input-item">
+            <img src="/assets/icons/login-lock.svg" alt="">
+            <input placeholder="Passwort">
         </div>
-        <button class="google-login">
-            <img src="/assets/icons/google.svg">
-            <span>Anmelden mit Google</span>
-        </button>
-        <div class="button-group">
-            <button>Anmelden</button>
-            <button>Gäste-Login</button>
-        </div>
-    </mat-card>
-    <div class="legal-links">
-        <a routerLink="/imprint">Impressum</a>
-        <a routerLink="/privacy">Datenschutz</a>
+    </mat-card-content>
+    <mat-card-actions class="forgot-container">
+        <button>Passwort vergessen?</button>
+    </mat-card-actions>
+    <div class="separator">
+        <div class="line"></div>
+        <span>ODER</span>
+        <div class="line"></div>
     </div>
-</div>
+    <button class="google-login">
+        <img src="/assets/icons/google.svg">
+        <span>Anmelden mit Google</span>
+    </button>
+    <div class="button-group">
+        <button>Anmelden</button>
+        <button>Gäste-Login</button>
+    </div>
+</app-auth-layout>

@@ -1,0 +1,92 @@
+@use "../../../styles/variables" as *;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  scroll-behavior: smooth;
+  font-family: "Nunito";
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url("/assets/fonts/nunito.ttf");
+}
+
+// .intro {
+//   height: 100vh;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   background-image: linear-gradient(#797ef3, #525af0, #444df2);
+//   display: none;
+// }
+
+.logo {
+  position: absolute;
+  top: 75px;
+  left: 75px;
+}
+
+.register {
+  font-size: 18px;
+  position: absolute;
+  top: 75px;
+  right: 75px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  button {
+    padding: 10px 15px;
+    margin-left: 16px;
+    font-size: 18px;
+    color: $purple2;
+    background-color: transparent;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: box-shadow 125ms ease-in-out, color 125ms ease-in-out;
+
+    &:hover {
+      color: $purple1;
+      box-shadow: 0 0 0 1px $lightpurple;
+    }
+  }
+}
+
+.login {
+  height: 100vh;
+  background-color: $lightblue;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 35px 20px;
+}
+
+.login-card {
+  position: relative;
+  background-color: white;
+  max-width: 606px;
+  padding: 40px 50px;
+}
+
+.legal-links {
+  display: flex;
+  gap: 16px;
+  font-size: 18px;
+
+  a {
+    text-decoration: none;
+    color: $purple2;
+    padding: 10px 15px;
+    border-radius: 100px;
+    transition: box-shadow 125ms ease-in-out, color 125ms ease-in-out;
+
+    &:hover {
+      color: $purple1;
+      box-shadow: 0 0 0 1px $lightpurple;
+    }
+  }
+}
