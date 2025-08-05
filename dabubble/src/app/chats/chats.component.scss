@@ -28,6 +28,13 @@
     gap: 10px;
 }
 
+.chat-date {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 25px 0;
+}
+
 .chat-section {
     display: flex;
     gap: 30px;
@@ -87,6 +94,7 @@
 
 .reactions {
     display: flex;
+    align-items: center;
     gap: 10px;
 }
 
@@ -103,4 +111,9 @@
         height: 24px;
         border-radius: none !important;
     }
+}
+
+.add-reaction {
+    width: 24px;
+    height: 24px;
 }
