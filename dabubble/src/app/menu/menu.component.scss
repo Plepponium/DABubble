@@ -5,16 +5,116 @@
     background-color: #ffffff;
     border-radius: 30px;
     padding: 32px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
 }
 
 mat-toolbar {
     display: flex;
     justify-content: space-between;
     padding: 0;
+    background-color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
 }
 
 .toolbar-header {
     display: flex;
     align-items: center;
     gap: 15px;
+}
+
+.menu-section {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.list-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 5px 10px 5px 0;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #eceefe;
+        color: #535AF1;
+        border-radius: 30px;
+    }
+}
+
+button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.arrow-img {
+    width: 30px;
+    height: 30px;
+}
+
+.list-headline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.channel-list, .user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding-left: 25px;
+    
+    img {
+        width: 50px;
+        border-radius: 30px;
+    }
+}
+
+
+.channel, .user {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 4px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #eceefe;
+        color: #535AF1;
+    }
+}
+
+.channel.active {
+    background-color: #eceefe;
+    color: #535AF1;
+}
+
+.sub-section {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 25px;
+    margin-bottom: 25px;
+    padding: 4px 10px;
+    border-radius: 30px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #eceefe;
+        color: #535AF1;
+    }
 }
