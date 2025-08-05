@@ -157,8 +157,15 @@
     background-color: $purple1;
     color: white;
     transition: filter 125ms ease-in-out;
+
     &:hover {
       filter: opacity(80%);
+    }
+
+    &:disabled {
+      background-color: #686868;
+      border-color: #686868;
+      pointer-events: none;
     }
   }
 }

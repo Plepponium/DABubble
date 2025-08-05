@@ -1,0 +1,25 @@
+<app-auth-layout>
+
+    <button [routerLink]="['/signup']" class="arrow-back">
+        <img src="/assets/icons/arrow_back.svg">
+    </button>
+
+    <div class="login-header">
+        <h1>Wähle deinen Avatar</h1>
+    </div>
+
+    <div class="preview">
+        <img [src]="selectedAvatar">
+        <h2 class="font-32">Frederick Beck</h2>
+    </div>
+    <span class="font-20">Aus der Liste wählen</span>
+    <div class="preview-images">
+        <div class="avatar-wrapper" *ngFor="let avatar of avatarImages" (click)="selectAvatar(avatar)"
+            [class.selected]="selectedAvatar === avatar">
+            <img [src]="avatar">
+        </div>
+    </div>
+    <div class="continue">
+        <button>Weiter</button>
+    </div>
+</app-auth-layout>

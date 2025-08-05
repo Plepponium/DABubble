@@ -1,0 +1,116 @@
+@use "../../styles/variables" as *;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  scroll-behavior: smooth;
+  font-family: "Nunito";
+}
+
+.arrow-back {
+  position: absolute;
+  top: 45px;
+  left: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50px;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  padding: 8px;
+  transition: background-color 75ms ease-in-out;
+
+  &:hover {
+    background-color: $lightblue;
+
+    img {
+      filter: none;
+    }
+  }
+
+  img {
+    filter: brightness(0);
+    transition: filter 75ms ease-in-out;
+  }
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+
+  h1 {
+    font-size: 46px;
+    color: #444df2;
+  }
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 8px;
+
+  img {
+    width: 168px;
+    height: 168px;
+    border-radius: 50%;
+  }
+}
+
+.preview-images {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.avatar-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background-color 125ms ease-in-out;
+
+  &:hover {
+    background-color: $lightblue;
+  }
+
+  &.selected {
+    background-color: $lightblue;
+  }
+
+  img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+  }
+}
+
+.continue {
+  margin-top: 48px;
+  display: flex;
+  justify-content: flex-end;
+
+  button {
+    cursor: pointer;
+    padding: 12px 24px;
+    border-radius: 25px;
+    border: 1px solid $purple2;
+    font-size: 18px;
+    font-weight: 700;
+    background-color: $purple1;
+    color: white;
+    transition: filter 125ms ease-in-out;
+
+    &:hover {
+      filter: opacity(80%);
+    }
+  }
+}

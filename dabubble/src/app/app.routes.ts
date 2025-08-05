@@ -4,11 +4,13 @@ import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
 import { ImprintComponent } from './imprint/imprint.component';
 import { PrivacyComponent } from './privacy/privacy.component';
+import { SignupAvatarComponent } from './signup-avatar/signup-avatar.component';
 
 export const routes: Routes = [
     { path: '', component: LoginComponent },
     { path: 'main', component: MainPageComponent, },
     { path: 'signup', component: SignupComponent, },
+    { path: 'signup/avatar', component: SignupAvatarComponent, },
     { path: 'imprint', component: ImprintComponent, },
     { path: 'privacy', component: PrivacyComponent, },
 
