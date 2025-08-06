@@ -56,6 +56,14 @@ button {
     height: 30px;
 }
 
+.arrow-img {
+  transition: transform 0.3s ease;
+}
+
+.arrow-img.rotated {
+  transform: rotate(-90deg);
+}
+
 .list-headline {
     display: flex;
     align-items: center;
@@ -65,6 +73,12 @@ button {
 .add-channel-btn {
     width: 30px;
     height: 30px;
+}
+
+.channel-section {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
 }
 
 .channel-list, .user-list {

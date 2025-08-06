@@ -15,54 +15,54 @@
     <div class="menu-content">
         <div class="menu-section">
             <div class="list-header-container">
-                <div class="list-header font-20">
-                    <img class="arrow-img" src="assets/icons/arrow_drop_down.svg" alt="">
+                <div (click)="toggleChannels()" class="list-header font-20">
+                    <img class="arrow-img" src="assets/icons/arrow_drop_down.svg" [class.rotated]="!channelsExpanded" alt="">
                     <div class="list-headline font-w-700">
                         <img src="assets/icons/workspaces.svg" alt="">
                         Channels
                     </div>
                 </div>
 
-                <button mat-icon-button class="add-channel-btn" aria-label="Example icon-button with share icon">
+                <button mat-icon-button class="add-channel-btn" (click)="addChannel($event)" aria-label="Example icon-button with share icon">
                     <img class="add-channel" src="assets/icons/add.svg" alt="">
                 </button>
             </div>
 
-            <div class="channel-list">
-                <div class="channel">
-                    <div>#</div>
-                    <div>Entwickler-Team</div>
-                </div>
-                <div class="channel active">
-                    <div>#</div>
-                    <div>Office-Team</div>
-                </div>
-            </div>
 
-            <div class="sub-section">
-                <!-- <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon"> -->
-                    <img src="assets/icons/add_circle.svg" alt="">
-                <!-- </button> -->
-                Channel hinzufügen
+            <div class="channel-section" *ngIf="channelsExpanded">
+                <div class="channel-list">
+                    <div class="channel">
+                        <div>#</div>
+                        <div>Entwickler-Team</div>
+                    </div>
+                    <div class="channel active">
+                        <div>#</div>
+                        <div>Office-Team</div>
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <!-- <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon"> -->
+                        <img src="assets/icons/add_circle.svg" alt="">
+                    <!-- </button> -->
+                    Channel hinzufügen
+                </div>
             </div>
+            
         </div>
         
         <div class="menu-section">
             <div class="list-header-container">
-                <div class="list-header font-20">
-                    <img class="arrow-img" src="assets/icons/arrow_drop_down.svg" alt="">
+                <div (click)="toggleUsers()" class="list-header font-20">
+                    <img class="arrow-img" src="assets/icons/arrow_drop_down.svg" [class.rotated]="!usersExpanded" alt="">
                     <div class="list-headline font-w-700">
                         <img src="assets/icons/account_circle.svg" alt="">
                         Direktnachrichten
                     </div>
                 </div>
-                
-                <!-- <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon">
-                    <mat-icon>edit_square</mat-icon>
-                </button> -->
             </div>
 
-            <div class="user-list">
+            <div class="user-list" *ngIf="usersExpanded">
                 <div class="user">
                     <img src="assets/user-icons/icon3.svg" alt=""> 
                     Frederick Beck (Du)

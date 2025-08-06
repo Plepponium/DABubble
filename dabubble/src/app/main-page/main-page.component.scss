@@ -32,7 +32,7 @@
 }
 
 .toggle-menu-btn {
-    width: 56px !important;
+    width: 56px !important; //funktioniert nicht
     height: 347px;
     box-sizing: border-box;
     position: absolute;
@@ -45,6 +45,12 @@
     background-color: #ffffff;
     box-shadow: 4px 4px 7px 0px rgba(0, 0, 0, 0.2);
     z-index: 3;
+
+    // &:hover {
+    //     // background-color: none;
+    //     // background-color: #eceefe !important;
+    //     // --mat-text-button-state-layer-color: #eceefe !important;
+    // }
 }
 
 .toggle-btn-container {
