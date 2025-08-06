@@ -21,7 +21,7 @@
 
 .searchBar {
     width: 100%;
-    max-width: 989px;
+    // max-width: 989px;
     height: 70px;
     box-sizing: border-box;
     margin-left: 406px;
@@ -42,5 +42,18 @@
     img {
         width: 70px;
         border-radius: 42px;
+    }
+}
+
+@media(max-width: 1445px) {
+    .searchBar {
+        width: 514px;
+        margin-right: 250px;
+    }
+}
+
+@media(max-width: 940px) {
+    .searchBar {
+        margin-left: 260px;
     }
 }

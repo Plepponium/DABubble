@@ -19,7 +19,9 @@
         <div class="chat-history">
 
             <div class="chat-day-section">
-                <div class="chat-date">Dienstag, 14. Januar</div>
+                <div class="chat-date-section">
+                    <div class="chat-date">Dienstag, 14. Januar</div>
+                </div>
 
                 <div class="chat-section">
                     <img class="chat-user-img" src="assets/user-icons/icon4.svg" alt="">
@@ -33,7 +35,7 @@
                         <div class="chat-answered">
                             <div class="answers">
                                 <div>Antworten</div>
-                                <div>letzte Antwort</div>
+                                <div class="font-14">letzte Antwort</div>
                             </div>
                             <div class="reactions">
                                 <div class="reaction-btn">
@@ -52,7 +54,9 @@
             </div>
 
             <div class="chat-day-section">
-                <div class="chat-date">Freitag, 1.September</div>
+                <div class="chat-date-section">
+                    <div class="chat-date">Freitag, 1.September</div>
+                </div>
                 
                 <div class="chat-section reverse">
                     <img class="chat-user-img" src="assets/user-icons/icon3.svg" alt="">
@@ -66,7 +70,7 @@
                         <div class="chat-answered">
                             <div class="answers">
                                 <div>Antworten</div>
-                                <div>letzte Antwort</div>
+                                <div class="font-14">letzte Antwort</div>
                             </div>
                             <div class="reactions">
                                 <div class="reaction-btn">
@@ -87,8 +91,32 @@
         </div>
         
 
+        <form class="form">
+            <!-- <mat-form-field class="form-field full-width" appearance="outline">
+                <mat-label>Nachricht an #Entwicklerteam</mat-label>
+                <span matTextPrefix>+1 &nbsp;</span>
+                <input class="input" type="tel" matInput placeholder="...">
+                <mat-icon matSuffix>mode_edit</mat-icon>
+            </mat-form-field> -->
 
-        <div>Eingabefeld</div>
+            <mat-form-field class="form-field" appearance="outline">
+                <mat-label>Nachricht an #Entwicklerteam</mat-label>
+
+                    <span class="form-prefix" matTextPrefix>+1 &nbsp;</span>
+                    <mat-icon class="form-prefix">sentiment_very_satisfied</mat-icon>
+                
+                <input class="input" matInput type="text" [(ngModel)]="value" placeholder="Placeholder">
+                <!-- <mat-icon class="form-icon" matSuffix>send</mat-icon> -->
+                <mat-icon class="form-icon">send</mat-icon>
+                
+                <!-- @if (value) {
+                    <button matSuffix mat-icon-button aria-label="Clear" (click)="value=''">
+                        <mat-icon>send</mat-icon>
+                    </button>
+                } -->
+            </mat-form-field>
+        </form>
+
     </div>
     
 </div>
