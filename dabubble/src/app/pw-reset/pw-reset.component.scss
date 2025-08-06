@@ -1,0 +1,126 @@
+@use "../../styles/variables" as *;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  scroll-behavior: smooth;
+  font-family: "Nunito";
+}
+
+.arrow-back {
+  position: absolute;
+  top: 45px;
+  left: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50px;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  padding: 8px;
+  transition: background-color 75ms ease-in-out;
+
+  &:hover {
+    background-color: $lightblue;
+
+    img {
+      filter: none;
+    }
+  }
+
+  img {
+    filter: brightness(0);
+    transition: filter 75ms ease-in-out;
+  }
+}
+
+.login-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 30px;
+
+  h1 {
+    font-size: 46px;
+    color: $purple1;
+  }
+
+  span {
+    font-size: 20px;
+  }
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 0;
+
+  .input-item {
+    display: flex;
+    background-color: $lightblue;
+    border-radius: 100px;
+    padding: 18px 32px;
+    gap: 32px;
+    transition: box-shadow 125ms ease-in-out;
+
+    &:hover {
+      box-shadow: 0 0 0 1px $gray;
+    }
+
+    input {
+      font-size: 18px;
+      width: 100%;
+      border: none;
+      background-color: transparent;
+      &:focus {
+        outline: none;
+      }
+    }
+
+    &:has(input:focus) {
+      box-shadow: 0 0 0 1px $purple3;
+
+      img {
+        filter: brightness(0);
+        transition: filter 125ms ease;
+      }
+    }
+  }
+
+  span {
+    text-align: center;
+    margin: 0px 65px;
+    color: $gray;
+  }
+}
+
+.continue {
+  margin-top: 32px;
+  display: flex;
+  justify-content: flex-end;
+
+  button {
+    cursor: pointer;
+    padding: 12px 24px;
+    border-radius: 25px;
+    border: 1px solid $purple2;
+    font-size: 18px;
+    font-weight: 700;
+    background-color: $purple1;
+    color: white;
+    transition: filter 125ms ease-in-out;
+
+    &:hover {
+      filter: opacity(80%);
+    }
+
+    &:disabled {
+      background-color: $gray;
+      border-color: $gray;
+      pointer-events: none;
+    }
+  }
+}

@@ -1,0 +1,19 @@
+<app-auth-layout>
+    <button [routerLink]="['/']" class="arrow-back">
+        <img src="/assets/icons/arrow_back.svg">
+    </button>
+    <div class="login-header">
+        <h1>Passwort zurücksetzen</h1>
+        <span>Bitte geben Sie Ihre E-Mail-Adresse ein.</span>
+    </div>
+    <mat-card-content class="input-group">
+        <div class="input-item">
+            <img src="/assets/icons/login-mail.svg" alt="">
+            <input type="email" placeholder="beispielname@email.com">
+        </div>
+        <span class="font-20">Wir senden Ihnen eine E-Mail, über die Sie Ihr Passwort ändern können.</span>
+    </mat-card-content>
+    <div class="continue">
+        <button>E-Mail senden</button>
+    </div>
+</app-auth-layout>
