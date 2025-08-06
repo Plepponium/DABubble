@@ -2,16 +2,29 @@
     <div class="header">
         <div class="header-left">
             <div class="channel-name-container">
-                <img src="assets/icons/tag.svg" alt="">
-                <div class="font-24">Channel</div>
+                <img class="tag" src="assets/icons/tag.svg" alt="">
+                <img class="tag-purple" src="assets/icons/tag1.svg" alt="">
+                <!-- <mat-icon class="icon-30">tag</mat-icon>
+                <div class="font-24">#</div> -->
+                <div class="font-24">Entwicklerteam</div>
             </div>
-            <div class="arrow">pfeil</div>
+            <mat-icon class="icon-30">keyboard_arrow_down</mat-icon>
+            <!-- <img src="assets/icons/keyboard_arrow_down.svg" alt=""> -->
         </div>
 
         <div class="header-right">
-            <div>user</div>
-            <div>counter</div>
-            <div>add</div>
+            <div class="users-display">
+                <div class="user-pics">
+                    <img src="assets/user-icons/icon3.svg" alt="">
+                    <img src="assets/user-icons/icon5.svg" alt="">
+                    <img src="assets/user-icons/icon4.svg" alt="">
+                </div>
+                <div class="user-counter">3</div>
+            </div>
+            
+            <button mat-icon-button class="add-user-btn" aria-label="Example icon-button with share icon">
+                <img src="assets/icons/person_add.svg" alt="">
+            </button>
         </div>
     </div>
 
@@ -28,13 +41,13 @@
 
                     <div class="chat-info-container">
                         <div class="chat-start">
-                            <div>Name</div> 
-                            <div>Uhrzeit</div>
+                            <div class="font-w-700">Noah Braun</div> 
+                            <div class="font-14 t-gray">14:25 Uhr</div>
                         </div>
                         <div class="chat-message left bg-color-1">Chat</div>
                         <div class="chat-answered">
                             <div class="answers">
-                                <div>Antworten</div>
+                                <div class="answer">Antworten</div>
                                 <div class="font-14">letzte Antwort</div>
                             </div>
                             <div class="reactions">
@@ -46,7 +59,10 @@
                                     <img src="assets/reaction-icons/51. Emojis (1).svg" alt="">
                                     <div>1</div>
                                 </div>
-                                <img class="add-reaction" src="assets/reaction-icons/add_reaction.svg" alt="">
+                                <button mat-icon-button aria-label="add-reaction-btn">
+                                    <!-- <mat-icon class="t-dark-purple">send</mat-icon> -->
+                                    <img class="add-reaction" src="assets/reaction-icons/add_reaction.svg" alt="">
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -63,13 +79,13 @@
 
                     <div class="chat-info-container">
                         <div class="chat-start reverse">
-                            <div>Name</div> 
-                            <div>Uhrzeit</div>
+                            <div class="font-w-700">Frederik Beck</div> 
+                            <div class="font-14 t-gray">15:06 Uhr</div>
                         </div>
                         <div class="chat-message right">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore perspiciatis aliquid dolorem, porro maiores asperiores libero omnis. Est omnis hic placeat, at eos pariatur corporis eaque quia quasi? Eos, quibusdam?</div>
                         <div class="chat-answered">
                             <div class="answers">
-                                <div>Antworten</div>
+                                <div class="answer">Antworten</div>
                                 <div class="font-14">letzte Antwort</div>
                             </div>
                             <div class="reactions">
@@ -81,7 +97,10 @@
                                     <img src="assets/reaction-icons/51. Emojis (1).svg" alt="">
                                     <div>1</div>
                                 </div>
-                                <img class="add-reaction" src="assets/reaction-icons/add_reaction.svg" alt="">
+                                <button mat-icon-button aria-label="add-reaction-btn">
+                                    <img class="add-reaction" src="assets/reaction-icons/add_reaction.svg" alt="">
+                                </button>
+                                
                             </div>
                         </div>
                     </div>
@@ -91,7 +110,7 @@
         </div>
         
 
-        <form class="form">
+        <!-- <form class="form"> -->
             <!-- <mat-form-field class="form-field full-width" appearance="outline">
                 <mat-label>Nachricht an #Entwicklerteam</mat-label>
                 <span matTextPrefix>+1 &nbsp;</span>
@@ -99,24 +118,46 @@
                 <mat-icon matSuffix>mode_edit</mat-icon>
             </mat-form-field> -->
 
-            <mat-form-field class="form-field" appearance="outline">
+            <!-- <mat-form-field class="form-field" appearance="outline">
                 <mat-label>Nachricht an #Entwicklerteam</mat-label>
 
                     <span class="form-prefix" matTextPrefix>+1 &nbsp;</span>
                     <mat-icon class="form-prefix">sentiment_very_satisfied</mat-icon>
                 
                 <input class="input" matInput type="text" [(ngModel)]="value" placeholder="Placeholder">
-                <!-- <mat-icon class="form-icon" matSuffix>send</mat-icon> -->
-                <mat-icon class="form-icon">send</mat-icon>
                 
-                <!-- @if (value) {
+                <mat-icon class="form-icon">send</mat-icon>
+
+                @if (value) {
                     <button matSuffix mat-icon-button aria-label="Clear" (click)="value=''">
                         <mat-icon>send</mat-icon>
                     </button>
-                } -->
-            </mat-form-field>
-        </form>
+                }
+            </mat-form-field> -->
+        <!-- </form> -->
 
+        <form class="form">
+            <div class="form-field full-width">
+                <label for="message" class="floating-label t-gray">Nachricht an #Entwicklerteam</label>
+                <input id="message" class="input" type="text" placeholder="" autocomplete="off">
+
+                <div class="input-icon-bar">
+                    <div class="icon-bar t-gray">
+                        <button mat-icon-button aria-label="Example icon-button with share icon">
+                            <mat-icon>sentiment_very_satisfied</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="Example icon-button with share icon">
+                            <mat-icon>alternate_email</mat-icon>
+                        </button>
+                    </div>
+                    
+                    <button mat-icon-button aria-label="Example icon-button with share icon">
+                        <mat-icon class="t-dark-purple">send</mat-icon>
+                    </button>
+                </div>
+                
+            </div>
+        </form>
     </div>
     
 </div>

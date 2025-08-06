@@ -38,17 +38,28 @@
     display: flex;
     align-items: center;
     gap: 20px;
+}
 
-    img {
-        width: 70px;
-        border-radius: 42px;
-    }
+.user-img {
+    width: 70px;
+    border-radius: 42px;
+}
+
+.arrow-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.arrow {
+    width: 30px;
+    height: 30px;
 }
 
 @media(max-width: 1445px) {
     .searchBar {
         width: 514px;
-        margin-right: 250px;
+        margin-right: 350px;
     }
 }
 

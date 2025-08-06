@@ -20,13 +20,67 @@
 .header-left, .header-right {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
+}
+
+.header-left {
+    width: 278px;
+    padding: 6px 10px;
+    border-radius: 100px;
+
+    &:hover {
+        background-color: #eceefe;
+        color: #535AF1;
+        .tag {
+            display: none;
+        }
+        .tag-purple {
+            display: block;
+        }
+    }
 }
 
 .channel-name-container {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.tag-purple {
+    display: none;
+}
+
+.users-display {
+    height: 46px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-pics {
+    width: 100px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+
+    img {
+        width: 40px;
+        height: 40px;
+        border-radius: 30px;
+        border: 2px solid #ffffff;
+        margin-right: -12px;
+        box-sizing: content-box;
+    }
+
+    img:first-child {
+        margin-right: 0;
+    }
+}
+
+.add-user-btn {
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .chat-content {
@@ -105,10 +159,12 @@
 
 .chat-start {
     display: flex;
+    align-items: center;
     gap: 20px;
 }
 
 .chat-start.reverse {
+    flex-direction: row-reverse;
     justify-content: end;
 }
 
@@ -131,12 +187,17 @@
 .chat-answered {
     display: flex;
     justify-content: space-between;
+    gap: 20px;
 }
 
 .answers {
     display: flex;
     align-items: center;
     gap: 20px;
+}
+
+.answer {
+    cursor: pointer;
 }
 
 .reactions {
@@ -146,12 +207,16 @@
 }
 
 .reaction-btn {
+    width: 64px;
+    height: 34px;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     gap: 10px;
     border: 1px solid #ADB0D9;
     border-radius: 20px;
     padding: 5px 10px;
+    cursor: pointer;
 
     img {
         width: 24px;
@@ -160,52 +225,107 @@
     }
 }
 
+// .add-reaction-btn {
+//     width: 36px !important;
+//     height: 34px;
+//     box-sizing: border-box;
+// }
+
 .add-reaction {
     width: 24px;
     height: 24px;
+    cursor: pointer;
 }
 
 .form {
     width: 100%;
     box-sizing: border-box;
-    padding: 0 45px;
+    padding: 0 35px;
+    margin-top: 35px;
 }
 
 .form-field {
     width: 100%;
     height: 145px;
     // box-sizing: border-box;
-    
     // padding: 20px;
 }
 
-.input {
+
+.form-field {
+    position: relative;
     width: 100%;
     height: 145px;
     border: 1px solid #ADB0D9;
     border-radius: 20px;
+    background-color: #ffffff;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 }
-.mat-mdc-form-field-infix {
-    width: 180px;
-    height: 145px;
-}
 
-
-
-.form-prefix {
+// FLOTIERENDES LABEL
+.floating-label {
     position: absolute;
     left: 20px;
-    bottom: 14px;
-    color: #3bcfb6;
-    font-size: 1.2rem;
-    pointer-events: none;
+    top: 20px;
+    color: #888;
+//   pointer-events: none;
+    background: #fff;
+    padding: 0 4px;
+    transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.form-icon {
+// WENN INPUT FOKUS ODER WERT HAT → LABEL FLOATET
+.input:focus + .floating-label,
+.input:not(:placeholder-shown) + .floating-label {
+    top: 10px;
+    left: 30px;
+    font-size: 0.8rem;
+    color: #3bcfb6;
+}
+
+// INPUT-STYLING
+.input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 1.1rem;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    height: 2.2em;
+}
+
+.input:focus {
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+.input-icon-bar {
+    width: calc(100% - 40px);
+    // box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
     position: absolute;
-    right: 20px;
-    bottom: 20px;
-    color: #ADB0D9;
-    font-size: 1.8rem;
-    pointer-events: none;
+    bottom: 14px;
+}
+
+.icon-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon-30 {
+    width: 30px;
+    height: 30px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
