@@ -1,3 +1,150 @@
 <div class="thread">
-    thread
+    <div class="header">
+        <div class="headline-container">
+            <div class="headline font-24 font-w-700">Thread</div>
+            <div class="channel-name-container">
+                <img src="assets/icons/tag-small-purple.svg" alt="">
+                <div class="channel-name font-14 t-middle-purple">Entwicklerteam</div>
+            </div>
+        </div>
+        <button mat-icon-button class="add-channel-btn" aria-label="Example icon-button with share icon">
+            <img src="assets/icons/close.svg" alt="">
+        </button>
+    </div>
+
+    <div class="chat-content">
+        <div class="chat-history">
+
+            <div class="chat-day-section">
+                <!-- <div class="chat-date-section">
+                    <div class="chat-date">Dienstag, 14. Januar</div>
+                </div> -->
+
+                <div class="chat-section">
+                    <img class="chat-user-img" src="assets/user-icons/icon4.svg" alt="">
+
+                    <div class="chat-info-container">
+                        <div class="chat-start">
+                            <div class="font-w-700">Noah Braun</div> 
+                            <div class="font-14 t-gray">14:25 Uhr</div>
+                        </div>
+                        <div class="chat-message left bg-light-purple">Chat</div>
+                        <div class="chat-answered">
+                            <!-- <div class="reactions">
+                                <div class="reaction-btns">
+                                    <div class="reaction-btn">
+                                        <img src="assets/reaction-icons/51. Emojis.svg" alt="">
+                                        <div>2</div>
+                                    </div>
+                                    <div class="reaction-btn">
+                                        <img src="assets/reaction-icons/51. Emojis (1).svg" alt="">
+                                        <div>1</div>
+                                    </div>
+                                </div>
+
+                                <button mat-icon-button aria-label="add-reaction-btn">
+                                    <img class="add-reaction" src="assets/reaction-icons/add_reaction.svg" alt="">
+                                </button>
+                            </div> -->
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hidden-answers-line">
+                    <div class="hidden-answers t-light-purple">2 Antworten</div>
+                    <div class="line"></div>
+                </div>
+            </div>
+
+            <div class="chat-day-section">
+                <!-- <div class="chat-date-section">
+                    <div class="chat-date">Dienstag, 14. Januar</div>
+                </div> -->
+
+                <div class="chat-section">
+                    <img class="chat-user-img" src="assets/user-icons/icon5.svg" alt="">
+
+                    <div class="chat-info-container">
+                        <div class="chat-start">
+                            <div class="font-w-700">Sofia Müller</div> 
+                            <div class="font-14 t-gray">14:25 Uhr</div>
+                        </div>
+                        <div class="chat-message left bg-light-purple">Chat</div>
+                        <div class="chat-answered">
+                            <div class="reactions">
+                                <div class="reaction-btns">
+                                    <div class="reaction-btn">
+                                        <img src="assets/reaction-icons/51. Emojis.svg" alt="">
+                                        <div>2</div>
+                                    </div>
+                                    <div class="reaction-btn">
+                                        <img src="assets/reaction-icons/51. Emojis (1).svg" alt="">
+                                        <div>1</div>
+                                    </div>
+                                </div>
+
+                                <button mat-icon-button aria-label="add-reaction-btn">
+                                    <img class="add-reaction" src="assets/reaction-icons/add_reaction.svg" alt="">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-day-section">
+                <!-- <div class="chat-date-section">
+                    <div class="chat-date">Freitag, 1.September</div>
+                </div> -->
+                
+                <div class="chat-section reverse">
+                    <img class="chat-user-img" src="assets/user-icons/icon3.svg" alt="">
+
+                    <div class="chat-info-container">
+                        <div class="chat-start reverse">
+                            <div class="font-w-700">Frederik Beck</div> 
+                            <div class="font-14 t-gray">14:56 Uhr</div>
+                        </div>
+                        <div class="chat-message right">Ja... </div>
+                        <div class="chat-answered right">
+                            <div class="reactions">
+                                <div class="reaction-btn">
+                                    <img src="assets/reaction-icons/51. Emojis (1).svg" alt="">
+                                    <div>1</div>
+                                </div>
+                                <button mat-icon-button aria-label="add-reaction-btn">
+                                    <img class="add-reaction" src="assets/reaction-icons/add_reaction.svg" alt="">
+                                </button>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form class="form">
+            <div class="form-field full-width">
+                <label for="message" class="floating-label t-gray">Antworten...</label>
+                <input id="message" class="input" type="text" placeholder="" autocomplete="off">
+
+                <div class="input-icon-bar">
+                    <div class="icon-bar t-gray">
+                        <button mat-icon-button aria-label="Example icon-button with share icon">
+                            <mat-icon>sentiment_very_satisfied</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="Example icon-button with share icon">
+                            <mat-icon>alternate_email</mat-icon>
+                        </button>
+                    </div>
+                    
+                    <button mat-icon-button aria-label="Example icon-button with share icon">
+                        <mat-icon class="t-dark-purple">send</mat-icon>
+                    </button>
+                </div>
+                
+            </div>
+        </form>
+    </div>
 </div>
