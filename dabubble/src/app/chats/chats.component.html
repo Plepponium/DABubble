@@ -48,7 +48,7 @@
                         <div class="chat-answered">
                             <div class="answers">
                                 <div class="answer t-purple">2 Antworten</div>
-                                <div class="font-14 t-gray">Letzte Antwort 14:56</div>
+                                <div class="last-answer font-14 t-gray">Letzte Antwort 14:56</div>
                             </div>
                             <div class="reactions">
                                 <div class="reaction-btns">
@@ -89,7 +89,7 @@
                         <div class="chat-answered ">
                             <div class="answers">
                                 <div class="answer t-purple">Antworten</div>
-                                <div class="font-14 t-gray">letzte Antwort</div>
+                                <div class="last-answer font-14 t-gray">letzte Antwort</div>
                             </div>
                             <div class="reactions">
                                 <div class="reaction-btns">
@@ -111,41 +111,13 @@
                     </div>
                 </div>
             </div>
-
         </div>
-        
-
-        <!-- <form class="form"> -->
-            <!-- <mat-form-field class="form-field full-width" appearance="outline">
-                <mat-label>Nachricht an #Entwicklerteam</mat-label>
-                <span matTextPrefix>+1 &nbsp;</span>
-                <input class="input" type="tel" matInput placeholder="...">
-                <mat-icon matSuffix>mode_edit</mat-icon>
-            </mat-form-field> -->
-
-            <!-- <mat-form-field class="form-field" appearance="outline">
-                <mat-label>Nachricht an #Entwicklerteam</mat-label>
-
-                    <span class="form-prefix" matTextPrefix>+1 &nbsp;</span>
-                    <mat-icon class="form-prefix">sentiment_very_satisfied</mat-icon>
-                
-                <input class="input" matInput type="text" [(ngModel)]="value" placeholder="Placeholder">
-                
-                <mat-icon class="form-icon">send</mat-icon>
-
-                @if (value) {
-                    <button matSuffix mat-icon-button aria-label="Clear" (click)="value=''">
-                        <mat-icon>send</mat-icon>
-                    </button>
-                }
-            </mat-form-field> -->
-        <!-- </form> -->
 
         <form class="form">
             <div class="form-field full-width">
+                <!-- <input id="message" class="input" type="text" placeholder="" autocomplete="off"> -->
+                <textarea id="message" class="input" name="" type="text" placeholder=" "></textarea>
                 <label for="message" class="floating-label t-gray">Nachricht an #Entwicklerteam</label>
-                <input id="message" class="input" type="text" placeholder="" autocomplete="off">
-
                 <div class="input-icon-bar">
                     <div class="icon-bar t-gray">
                         <button mat-icon-button aria-label="Example icon-button with share icon">

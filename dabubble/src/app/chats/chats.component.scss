@@ -216,7 +216,12 @@
 }
 
 .answer {
+    white-space: nowrap;
     cursor: pointer;
+}
+
+.last-answer {
+    white-space: nowrap;
 }
 
 .reactions {
@@ -250,12 +255,6 @@
     }
 }
 
-// .add-reaction-btn {
-//     width: 36px !important;
-//     height: 34px;
-//     box-sizing: border-box;
-// }
-
 .add-reaction {
     width: 24px;
     height: 24px;
@@ -268,12 +267,6 @@
     padding: 0 35px;
     margin-top: 35px;
 }
-
-.form-field {
-    width: 100%;
-    height: 145px;
-}
-
 
 .form-field {
     position: relative;
@@ -295,24 +288,24 @@
     left: 20px;
     top: 20px;
     color: #888;
-//   pointer-events: none;
+    // pointer-events: none;
     background: #fff;
-    padding: 0 4px;
     transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // WENN INPUT FOKUS ODER WERT HAT → LABEL FLOATET
 .input:focus + .floating-label,
 .input:not(:placeholder-shown) + .floating-label {
-    top: 10px;
-    left: 30px;
+    top: -8px;
+    left: 20px;
+    padding: 0 4px;
     font-size: 0.8rem;
-    color: #3bcfb6;
+    color: #535AF1;
 }
 
-// INPUT-STYLING
 .input {
     width: 100%;
+    height: calc(100% - 30px);
     border: none;
     outline: none;
     font-size: 1.1rem;
@@ -320,18 +313,19 @@
     padding: 0;
     margin: 0;
     box-shadow: none;
-    height: 2.2em;
+    overflow-y: auto;
+    font-family: Nunito, "Helvetica Neue", sans-serif;
+    resize: none;
 }
 
-.input:focus {
-    border: none;
-    outline: none;
-    box-shadow: none;
-}
+// .input:focus {
+//     border: none;
+//     outline: none;
+//     box-shadow: none;
+// }
 
 .input-icon-bar {
     width: calc(100% - 40px);
-    // box-sizing: border-box;
     display: flex;
     justify-content: space-between;
     position: absolute;
