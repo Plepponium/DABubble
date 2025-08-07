@@ -23,11 +23,11 @@ mat-toolbar {
     gap: 15px;
 }
 
-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+// button {
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+// }
 
 .menu-section {
     display: flex;
@@ -49,7 +49,21 @@ button {
     padding: 5px 10px 5px 0;
     border-radius: 30px;
     cursor: pointer;
+
+    &:hover {
+        color: #535AF1; 
+        .hover-icon {
+            display: none;
+        } 
+        .hover-icon-purple {
+            display: block;
+        }    
+    }
 }
+
+.hover-icon-purple {
+    display: none;
+} 
 
 .arrow-img {
     width: 30px;
@@ -73,6 +87,27 @@ button {
 .add-channel-btn {
     width: 30px;
     height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 30px;
+    border: none;
+    background-color: #ffffff;
+
+    &:hover {
+        background-color: #eceefe;
+
+        .add-channel {
+            display: none;
+        }
+        .add-channel-purple {
+            display: block;
+        }
+    }
+}
+
+.add-channel-purple {
+    display: none;
 }
 
 .channel-section {
@@ -101,10 +136,24 @@ button {
     padding: 4px 20px;
     border-radius: 30px;
     cursor: pointer;
+
+    &:hover {
+        background-color: #eceefe;
+    }
+}
+
+.channel {
+    &:hover {
+        .channel-icon {
+            color: #535AF1;
+        }
+    }
 }
 
 .sub-section {
     width: fit-content;
+    height: 33px;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -113,12 +162,16 @@ button {
     padding: 4px 10px;
     border-radius: 30px;
     cursor: pointer;
-}
 
-.list-header, .channel, .user, .sub-section {
     &:hover {
         background-color: #eceefe;
         color: #535AF1;
+        .hover-icon {
+            display: none;
+        }
+        .hover-icon-purple {
+            display: block;
+        }
     }
 }
 

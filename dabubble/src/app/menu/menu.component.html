@@ -16,15 +16,18 @@
         <div class="menu-section">
             <div class="list-header-container">
                 <div (click)="toggleChannels()" class="list-header font-20">
-                    <img class="arrow-img" src="assets/icons/arrow_drop_down.svg" [class.rotated]="!channelsExpanded" alt="">
+                    <img class="arrow-img hover-icon" src="assets/icons/arrow_drop_down.svg" [class.rotated]="!channelsExpanded" alt="">
+                    <img class="arrow-img hover-icon-purple" src="assets/icons/arrow_drop_down-purple.svg" [class.rotated]="!channelsExpanded" alt="">
                     <div class="list-headline font-w-700">
-                        <img src="assets/icons/workspaces.svg" alt="">
+                        <img class="hover-icon" src="assets/icons/workspaces.svg" alt="">
+                        <img class="hover-icon-purple" src="assets/icons/workspaces-purple.svg" alt="">
                         Channels
                     </div>
                 </div>
 
-                <button mat-icon-button class="add-channel-btn" (click)="addChannel($event)" aria-label="Example icon-button with share icon">
+                <button class="add-channel-btn" (click)="addChannel($event)">
                     <img class="add-channel" src="assets/icons/add.svg" alt="">
+                    <img class="add-channel-purple" src="assets/icons/add-purple.svg" alt="">
                 </button>
             </div>
 
@@ -32,7 +35,7 @@
             <div class="channel-section" *ngIf="channelsExpanded">
                 <div class="channel-list">
                     <div class="channel">
-                        <div>#</div>
+                        <div class="channel-icon">#</div>
                         <div>Entwickler-Team</div>
                     </div>
                     <div class="channel active">
@@ -41,9 +44,10 @@
                     </div>
                 </div>
 
-                <div class="sub-section">
+                <div class="sub-section"  (click)="addChannel($event)">
                     <!-- <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon"> -->
-                        <img src="assets/icons/add_circle.svg" alt="">
+                        <img class="hover-icon" src="assets/icons/add_circle.svg" alt="">
+                        <img class="hover-icon-purple" src="assets/icons/add_circle-purple.svg" alt="">
                     <!-- </button> -->
                     Channel hinzufügen
                 </div>
@@ -54,9 +58,11 @@
         <div class="menu-section">
             <div class="list-header-container">
                 <div (click)="toggleUsers()" class="list-header font-20">
-                    <img class="arrow-img" src="assets/icons/arrow_drop_down.svg" [class.rotated]="!usersExpanded" alt="">
+                    <img class="arrow-img hover-icon" src="assets/icons/arrow_drop_down.svg" [class.rotated]="!usersExpanded" alt="">
+                    <img class="arrow-img hover-icon-purple" src="assets/icons/arrow_drop_down-purple.svg" [class.rotated]="!usersExpanded" alt="">
                     <div class="list-headline font-w-700">
-                        <img src="assets/icons/account_circle.svg" alt="">
+                        <img class="hover-icon" src="assets/icons/account_circle.svg" alt="">
+                        <img class="hover-icon-purple" src="assets/icons/account_circle-purple.svg" alt="">
                         Direktnachrichten
                     </div>
                 </div>
