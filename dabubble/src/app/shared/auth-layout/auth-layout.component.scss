@@ -1,25 +1,80 @@
 @use "../../../styles/variables" as *;
+@use "../../../styles/shared-classes";
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  scroll-behavior: smooth;
-  font-family: "Nunito";
+.intro-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient($purple2, $purple3, $purple1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeOutBg 1s ease forwards;
+  animation-delay: 4.5s; // Zeit, bis Hintergrund transparent wird
+
+  .logo-wrapper {
+    display: flex;
+    align-items: center;
+    animation: moveToCorner 1s ease forwards;
+    animation-delay: 4s; // Logo + Text schrumpfen & verschieben
+
+    img {
+      animation: logoShift 0.6s ease forwards;
+      animation-delay: 1s; // leicht nach links verschieben
+    }
+
+    .text {
+      opacity: 0;
+      transform: translateX(-20px);
+      animation: textFadeIn 0.8s ease forwards;
+      animation-delay: 1.3s; // kurz nach Logo-Shift
+      white-space: nowrap;
+      font-size: 88px;
+      font-weight: 700;
+      color: #fff;
+    }
+  }
 }
 
-@font-face {
-  font-family: "Nunito";
-  src: url("/assets/fonts/nunito.ttf");
+/* Schritt 1 → Logo verschiebt sich leicht */
+@keyframes logoShift {
+  to {
+    transform: translateX(-100px);
+  }
 }
 
-// .intro {
-//   height: 100vh;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   background-image: linear-gradient(#797ef3, #525af0, #444df2);
-//   display: none;
-// }
+/* Schritt 1.5 → Text fädelt von links nach rechts ein */
+@keyframes textFadeIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Schritt 2 → Logo + Text schrumpfen & nach links oben */
+@keyframes moveToCorner {
+  to {
+    transform: translate(-40vw, -40vh) scale(0.4);
+  }
+}
+
+/* Schritt 3 → Hintergrund transparent machen */
+@keyframes fadeOutBg {
+  0% {
+    opacity: 1;
+  }
+  70% {
+    background: transparent;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
 
 .logo {
   position: absolute;

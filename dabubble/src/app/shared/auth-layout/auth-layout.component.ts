@@ -11,4 +11,5 @@ import { RouterLink } from '@angular/router';
 })
 export class AuthLayoutComponent {
   @Input() showRegister: boolean = false;
+  @Input() showIntro: boolean = false;
 }
