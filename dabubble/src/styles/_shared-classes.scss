@@ -55,38 +55,50 @@
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 40px;
   padding: 0;
 
-  .input-item {
-    display: flex;
-    background-color: $lightblue;
-    border-radius: 100px;
-    padding: 18px 32px;
-    gap: 32px;
-    transition: box-shadow 125ms ease-in-out;
+  .input-wrapper {
+    position: relative;
 
-    &:hover {
-      box-shadow: 0 0 0 1px $gray;
-    }
+    .input-item {
+      display: flex;
+      background-color: $lightblue;
+      border-radius: 100px;
+      padding: 18px 32px;
+      gap: 32px;
+      transition: box-shadow 125ms ease-in-out;
 
-    input {
-      font-size: 18px;
-      width: 100%;
-      border: none;
-      background-color: transparent;
-      &:focus {
-        outline: none;
+      &:hover {
+        box-shadow: 0 0 0 1px $gray;
+      }
+
+      input {
+        font-size: 18px;
+        width: 100%;
+        border: none;
+        background-color: transparent;
+
+        &:focus {
+          outline: none;
+        }
+      }
+
+      &:has(input:focus) {
+        box-shadow: 0 0 0 1px $purple3;
+
+        img {
+          filter: brightness(0);
+          transition: filter 125ms ease;
+        }
       }
     }
-
-    &:has(input:focus) {
-      box-shadow: 0 0 0 1px $purple3;
-
-      img {
-        filter: brightness(0);
-        transition: filter 125ms ease;
-      }
+    .error {
+      position: absolute;
+      left: 0;
+      bottom: -24px;
+      font-size: 14px;
+      color: $rose;
     }
   }
 }

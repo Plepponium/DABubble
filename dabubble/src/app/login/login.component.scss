@@ -46,6 +46,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  justify-self: center;
+  width: 100%;
   gap: 20px;
   background-color: $lightblue;
   border: none;

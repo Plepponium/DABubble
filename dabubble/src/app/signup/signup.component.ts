@@ -1,16 +1,70 @@
 import { Component } from '@angular/core';
 import { AuthLayoutComponent } from '../shared/auth-layout/auth-layout.component';
 import { MatCardModule } from '@angular/material/card';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-signup',
-  imports: [AuthLayoutComponent, MatCardModule, RouterLink],
+  imports: [AuthLayoutComponent, MatCardModule, RouterLink, ReactiveFormsModule],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss'
 })
 export class SignupComponent {
+  signupForm: FormGroup;
+  submitted = false;
 
-  continue() {
+  constructor(private fb: FormBuilder, private router: Router) {
+    this.signupForm = this.fb.group({
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^[a-zA-Z]+ [a-zA-Z]+$/),
+        ]
+      ],
+      email: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+          )
+        ]
+      ],
+      password: [
+        '',
+        [
+          Validators.required,
+        ]
+      ],
+      agree: [false, Validators.requiredTrue],
+    });
   }
+
+  get name() {
+    return this.signupForm.get('name');
+  }
+
+  get email() {
+    return this.signupForm.get('email');
+  }
+
+  get password() {
+    return this.signupForm.get('password');
+  }
+  get agree() {
+    return this.signupForm.get('agree');
+  }
+
+  onSubmit(): void {
+    this.submitted = true;
+
+    if (this.signupForm.valid) {
+      this.router.navigate(['/signup/avatar']);
+    } else {
+      this.signupForm.markAllAsTouched();
+    }
+  }
+
 }
