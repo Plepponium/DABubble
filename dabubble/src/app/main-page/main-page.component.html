@@ -7,8 +7,8 @@
         </mat-drawer>
 
         <div class="content">
-            <app-chats class="chats"></app-chats>
-            <app-thread></app-thread>
+            <app-chats id="chats" class="chats"></app-chats>
+            <app-thread [hidden]="!isThreadVisible" (click)="closeThread()" id="thread" class="thread"></app-thread>
             
         </div>
     </mat-drawer-container>
@@ -19,10 +19,4 @@
             <img src="assets/icons/Show menu.svg" alt="">
         </div>
     </button>
-
-    <!-- <div class="content">
-        <app-menu></app-menu>
-        <app-chats class="chats"></app-chats>
-        <app-thread></app-thread>
-    </div> -->
 </div>

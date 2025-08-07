@@ -1,6 +1,5 @@
 .header {
     width: 100%;
-    // background-color: #eceefe;
     padding-top: 25px;
     display: flex;
 }
@@ -19,16 +18,47 @@
     }
 }
 
-.searchBar {
+.searchbar-container {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    margin-left: 406px;
+    margin-right: 526px;
+}
+
+.searchbar {
     width: 100%;
     // max-width: 989px;
     height: 70px;
     box-sizing: border-box;
-    margin-left: 406px;
-    margin-right: 526px;
     padding: 17.5px 45px;
     border-radius: 42px;
     border: none;
+
+    &:focus {
+        border: none;
+        outline: none; 
+        box-shadow: none; 
+    }
+}
+
+.searchbar-container button {
+    position: absolute;
+    right: 20px; 
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.searchbar-container button img {
+  width: 35px;
+  height: 35px;
 }
 
 .user {

@@ -15,5 +15,9 @@ import {MatSidenavModule} from '@angular/material/sidenav';
   styleUrl: './main-page.component.scss'
 })
 export class MainPageComponent {
+  isThreadVisible = true;
 
+  closeThread() {
+    this.isThreadVisible = false;
+  }
 }
