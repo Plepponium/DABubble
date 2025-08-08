@@ -297,7 +297,6 @@
 
 .add-reaction-btn.reverse {
     display: none;
-    position: relative;
 }
 
 .add-reaction {
@@ -310,7 +309,7 @@
     height: 46px;
     position: absolute;
     right: 45px;
-    top: -20px;
+    top: -16px;
     background-color: #ffffff;
     border: 1px solid #ADB0D9;
     border-top-left-radius: 25px;
@@ -321,18 +320,23 @@
     align-items: center;
     box-sizing: border-box;
     padding: 3px 15px 3px 20px;
-    // display: none;
+    display: none;
 }
 
 .chat-dialogue.reverse {
     right: unset;
     left: 45px;
-}
 
-.chat-dialogue.reverse {
     .add-reaction-btn.reverse {
         display: flex;
     }
+    .edit-comment-dialogue {
+        display: flex;
+    }
+}
+
+.edit-comment-container {
+    position: relative;
 }
 
 .edit-comment-dialogue {
@@ -344,6 +348,22 @@
     border-bottom-left-radius: 30px;
     border-bottom-right-radius: 30px;
     padding: 10px 20px;
+    box-shadow: 0 6px 14px 0 rgba(0,0,0,0.20);
+    font-size: 20px;
+    white-space: nowrap;
+    z-index: 1;
+    display: none;
+    cursor: pointer;
+}
+
+.edit-comment {
+    padding: 10px 20px;
+    border-radius: 30px;
+    &:hover {
+        background-color: #eceefe;
+        color: #535AF1;
+        font-weight: 700;
+    }
 }
 
 .hover-icon-purple {
@@ -371,7 +391,6 @@
     // justify-content: flex-end;
 }
 
-// FLOTIERENDES LABEL
 .floating-label {
     position: absolute;
     left: 20px;
@@ -382,7 +401,6 @@
     transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-// WENN INPUT FOKUS ODER WERT HAT → LABEL FLOATET
 .input:focus + .floating-label,
 .input:not(:placeholder-shown) + .floating-label {
     top: -8px;

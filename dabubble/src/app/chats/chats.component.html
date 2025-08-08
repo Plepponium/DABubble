@@ -52,10 +52,15 @@
                             <img class="hover-icon" src="assets/icons/comment.svg" alt="">
                             <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="">
                         </button>
-                        <button class="add-reaction-btn reverse">
-                            <img class="hover-icon" src="assets/reaction-icons/more_vert.svg" alt="">
-                            <img class="hover-icon-purple" src="assets/reaction-icons/more_vert-purple.svg" alt="">
-                        </button>
+                        <div class="edit-comment-container">
+                            <div class="edit-comment-dialogue">
+                                <div class="edit-comment">Nachricht bearbeiten</div>
+                            </div>
+                            <button (click)="openEditCommentDialogue()" class="add-reaction-btn reverse">
+                                <img class="hover-icon" src="assets/reaction-icons/more_vert.svg" alt="">
+                                <img class="hover-icon-purple" src="assets/reaction-icons/more_vert-purple.svg" alt="">
+                            </button>
+                        </div>
                     </div>
                     <img class="chat-user-img" src="assets/user-icons/icon4.svg" alt="">
 
@@ -112,11 +117,16 @@
                             <img class="hover-icon" src="assets/icons/comment.svg" alt="">
                             <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="">
                         </button>
-                        <button class="add-reaction-btn reverse">
-                            <div class="edit-comment-dialogue">Nachricht bearbeiten</div>
-                            <img class="hover-icon" src="assets/reaction-icons/more_vert.svg" alt="">
-                            <img class="hover-icon-purple" src="assets/reaction-icons/more_vert-purple.svg" alt="">
-                        </button>
+                        <div class="edit-comment-container">
+                            <div class="edit-comment-dialogue" *ngIf="editCommentDialogueExpanded">
+                                <div class="edit-comment">Nachricht bearbeiten</div>
+                            </div>
+                            <button (click)="openEditCommentDialogue()" class="add-reaction-btn reverse">
+                                <img class="hover-icon" src="assets/reaction-icons/more_vert.svg" alt="">
+                                <img class="hover-icon-purple" src="assets/reaction-icons/more_vert-purple.svg" alt="">
+                            </button>
+                        </div>
+                        
                     </div>
                     <img class="chat-user-img" src="assets/user-icons/icon3.svg" alt="">
 
