@@ -225,6 +225,10 @@
     gap: 20px;
 }
 
+.chat-answered.right {
+    justify-content: end;
+}
+
 .answers {
     display: flex;
     align-items: center;
