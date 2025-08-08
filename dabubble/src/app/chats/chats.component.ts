@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
@@ -14,12 +14,17 @@ import {FormsModule} from '@angular/forms';
 })
 export class ChatsComponent {
   value = 'Clear me';
-  threadOpen = false;
+  threadOpen = true;
   editCommentDialogueExpanded = false;
 
-  openThread() {
-    this.threadOpen = !this.threadOpen;
+  @Output() openThread = new EventEmitter<void>();
+
+  handleOpenThread() {
+    this.openThread.emit();
   }
+  // openThread() {
+  //   this.threadOpen = true;
+  // }
 
   openEditCommentDialogue() {
     this.editCommentDialogueExpanded = !this.editCommentDialogueExpanded;
