@@ -3,7 +3,7 @@
         <div class="header-left">
             <div class="channel-name-container">
                 <img class="tag" src="assets/icons/tag.svg" alt="">
-                <img class="tag-purple" src="assets/icons/tag1.svg" alt="">
+                <img class="tag-purple" src="assets/icons/t-purple.svg" alt="">
                 <!-- <mat-icon class="icon-30">tag</mat-icon>
                 <div class="font-24">#</div> -->
                 <div class="font-24 font-w-700">Entwicklerteam</div>
@@ -37,6 +37,26 @@
                 </div>
 
                 <div class="chat-section">
+                    <div class="chat-dialogue">
+                        <button class="add-reaction-btn">
+                            <img class="" src="assets/reaction-icons/check.svg" alt="">
+                        </button>
+                        <button class="add-reaction-btn">
+                            <img class="" src="assets/reaction-icons/thumb.svg" alt="">
+                        </button>
+                        <button class="add-reaction-btn">
+                            <img class="hover-icon" src="assets/reaction-icons/add_reaction.svg" alt="">
+                            <img class="hover-icon-purple" src="assets/reaction-icons/add_reaction-purple.svg" alt="">
+                        </button>
+                        <button class="add-reaction-btn">
+                            <img class="hover-icon" src="assets/icons/comment.svg" alt="">
+                            <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="">
+                        </button>
+                        <button class="add-reaction-btn reverse">
+                            <img class="hover-icon" src="assets/reaction-icons/more_vert.svg" alt="">
+                            <img class="hover-icon-purple" src="assets/reaction-icons/more_vert-purple.svg" alt="">
+                        </button>
+                    </div>
                     <img class="chat-user-img" src="assets/user-icons/icon4.svg" alt="">
 
                     <div class="chat-info-container">
@@ -47,24 +67,23 @@
                         <div class="chat-message left bg-light-purple">Chat</div>
                         <div class="chat-answered">
                             <div class="answers">
-                                <div class="answer t-purple">2 Antworten</div>
+                                <div (click)="openThread()" class="answer t-purple">2 Antworten</div>
                                 <div class="last-answer font-14 t-gray">Letzte Antwort 14:56</div>
                             </div>
                             <div class="reactions">
                                 <div class="reaction-btns">
                                     <!-- <div class="reaction-btn">
-                                        <img src="assets/reaction-icons/51. Emojis.svg" alt="">
+                                        <img src="assets/reaction-icons/check.svg" alt="">
                                         <div>2</div>
                                     </div> -->
                                     <div class="reaction-btn">
-                                        <img src="assets/reaction-icons/51. Emojis (1).svg" alt="">
+                                        <img src="assets/reaction-icons/thumb.svg" alt="">
                                         <div>1</div>
                                     </div>
                                 </div>
-
-                                <button mat-icon-button aria-label="add-reaction-btn">
-                                    <!-- <mat-icon class="t-dark-purple">send</mat-icon> -->
-                                    <img class="add-reaction" src="assets/reaction-icons/add_reaction.svg" alt="">
+                                <button class="add-reaction-btn">
+                                    <img class="add-reaction hover-icon" src="assets/reaction-icons/add_reaction.svg" alt="">
+                                    <img class="add-reaction hover-icon-purple" src="assets/reaction-icons/add_reaction-purple.svg" alt="">
                                 </button>
                             </div>
                         </div>
@@ -78,6 +97,27 @@
                 </div>
                 
                 <div class="chat-section reverse">
+                    <div class="chat-dialogue reverse">
+                        <button class="add-reaction-btn">
+                            <img class="" src="assets/reaction-icons/check.svg" alt="">
+                        </button>
+                        <button class="add-reaction-btn">
+                            <img class="" src="assets/reaction-icons/thumb.svg" alt="">
+                        </button>
+                        <button class="add-reaction-btn">
+                            <img class="hover-icon" src="assets/reaction-icons/add_reaction.svg" alt="">
+                            <img class="hover-icon-purple" src="assets/reaction-icons/add_reaction-purple.svg" alt="">
+                        </button>
+                        <button class="add-reaction-btn">
+                            <img class="hover-icon" src="assets/icons/comment.svg" alt="">
+                            <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="">
+                        </button>
+                        <button class="add-reaction-btn reverse">
+                            <div class="edit-comment-dialogue">Nachricht bearbeiten</div>
+                            <img class="hover-icon" src="assets/reaction-icons/more_vert.svg" alt="">
+                            <img class="hover-icon-purple" src="assets/reaction-icons/more_vert-purple.svg" alt="">
+                        </button>
+                    </div>
                     <img class="chat-user-img" src="assets/user-icons/icon3.svg" alt="">
 
                     <div class="chat-info-container">
@@ -94,17 +134,17 @@
                             <div class="reactions">
                                 <div class="reaction-btns">
                                     <div class="reaction-btn">
-                                        <img src="assets/reaction-icons/51. Emojis.svg" alt="">
+                                        <img src="assets/reaction-icons/check.svg" alt="">
                                         <div>2</div>
                                     </div>
                                     <div class="reaction-btn">
-                                        <img src="assets/reaction-icons/51. Emojis (1).svg" alt="">
+                                        <img src="assets/reaction-icons/thumb.svg" alt="">
                                         <div>1</div>
                                     </div>
                                 </div>
-                                
-                                <button mat-icon-button aria-label="add-reaction-btn">
-                                    <img class="add-reaction" src="assets/reaction-icons/add_reaction.svg" alt="">
+                                <button class="add-reaction-btn">
+                                    <img class="add-reaction hover-icon" src="assets/reaction-icons/add_reaction.svg" alt="">
+                                    <img class="add-reaction hover-icon-purple" src="assets/reaction-icons/add_reaction-purple.svg" alt="">
                                 </button>
                             </div>
                         </div>

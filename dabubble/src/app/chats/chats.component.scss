@@ -107,11 +107,17 @@
     justify-content: end;
 }
 
+.chat-history {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
 .chat-day-section {
     display: flex;
     flex-direction: column;
     justify-content: end;
-    gap: 10px;
+    gap: 16px;
 }
 
 .chat-date-section {
@@ -158,6 +164,16 @@
     display: flex;
     gap: 30px;
     padding: 10px 45px;
+    position: relative;
+    &:hover {
+        background-color: #eceefe;
+        .chat-message.left {
+            background-color: #ffffff;
+        }
+        .chat-dialogue {
+            display: flex;
+        }
+    }
 }
 
 .chat-section.reverse{
@@ -218,6 +234,9 @@
 .answer {
     white-space: nowrap;
     cursor: pointer;
+    &:hover {
+        font-weight: 600;
+    }
 }
 
 .last-answer {
@@ -246,6 +265,7 @@
     border: 1px solid #ADB0D9;
     border-radius: 20px;
     padding: 5px 10px;
+    background-color: #ffffff;
     cursor: pointer;
 
     img {
@@ -255,10 +275,79 @@
     }
 }
 
+.add-reaction-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 20px;
+    border: none;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:hover {
+        background-color: #eceefe;
+        .hover-icon {
+            display: none;
+        }
+        .hover-icon-purple {
+            display: block;
+        }
+    }
+}
+
+.add-reaction-btn.reverse {
+    display: none;
+    position: relative;
+}
+
 .add-reaction {
     width: 24px;
     height: 24px;
     cursor: pointer;
+}
+
+.chat-dialogue {
+    height: 46px;
+    position: absolute;
+    right: 45px;
+    top: -20px;
+    background-color: #ffffff;
+    border: 1px solid #ADB0D9;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 3px 15px 3px 20px;
+    // display: none;
+}
+
+.chat-dialogue.reverse {
+    right: unset;
+    left: 45px;
+}
+
+.chat-dialogue.reverse {
+    .add-reaction-btn.reverse {
+        display: flex;
+    }
+}
+
+.edit-comment-dialogue {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    background-color: #ffffff;
+    border-top-right-radius: 30px;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    padding: 10px 20px;
+}
+
+.hover-icon-purple {
+    display: none;
 }
 
 .form {

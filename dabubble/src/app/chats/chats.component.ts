@@ -13,4 +13,6 @@ import {FormsModule} from '@angular/forms';
 })
 export class ChatsComponent {
   value = 'Clear me';
+
+  openThread() {}
 }
