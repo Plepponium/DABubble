@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { AuthLayoutComponent } from '../shared/auth-layout/auth-layout.component';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 
@@ -15,11 +15,14 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
   styleUrl: './login.component.scss'
 })
 
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+  showIntro = true;
   loginForm: FormGroup;
   submitted = false;
+  showOverlay = false;
+  overlayVariant: 'login' | 'created' | 'sent' = 'login';
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
     this.loginForm = this.fb.group({
       email: [
         '',
@@ -39,6 +42,17 @@ export class LoginComponent {
     });
   }
 
+  ngOnInit() {
+    const alreadyShown = localStorage.getItem('introShown');
+
+    if (!alreadyShown) {
+      this.showIntro = true;
+      localStorage.setItem('introShown', 'true');
+    } else {
+      this.showIntro = false;
+    }
+  }
+
   get email() {
     return this.loginForm.get('email');
   }
@@ -53,7 +67,17 @@ export class LoginComponent {
       this.loginForm.markAllAsTouched();
       return;
     }
-    const { email, password } = this.loginForm.value;
-    console.log('Login-Daten:', email, password);
+    this.login();
   }
+
+  login() {
+    this.overlayVariant = 'login';
+    this.showOverlay = true;
+
+    setTimeout(() => {
+      this.showOverlay = false;
+      this.router.navigate(['/main']);
+    }, 1500);
+  }
+
 }

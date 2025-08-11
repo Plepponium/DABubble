@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthLayoutComponent } from '../shared/auth-layout/auth-layout.component';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -21,8 +21,23 @@ export class SignupAvatarComponent {
 
   selectedAvatar: string = 'assets/user-icons/default-user.svg';
 
+  showOverlay = false;
+  overlayVariant: 'login' | 'created' | 'sent' = 'created';
+
+  constructor(private router: Router) { }
+
   selectAvatar(avatar: string): void {
     this.selectedAvatar = avatar;
+  }
+
+  register() {
+    this.overlayVariant = 'created';
+    this.showOverlay = true;
+
+    setTimeout(() => {
+      this.showOverlay = false;
+      this.router.navigate(['/']);
+    }, 1500);
   }
 
 }

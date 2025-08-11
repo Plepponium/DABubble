@@ -1,4 +1,4 @@
-<app-auth-layout>
+<app-auth-layout [showOverlay]="showOverlay" [overlayVariant]="overlayVariant">
 
     <button [routerLink]="['/signup']" class="arrow-back">
         <img src="/assets/icons/arrow_back.svg">
@@ -20,6 +20,6 @@
         </div>
     </div>
     <div class="continue">
-        <button>Weiter</button>
+        <button (click)="register()">Weiter</button>
     </div>
 </app-auth-layout>

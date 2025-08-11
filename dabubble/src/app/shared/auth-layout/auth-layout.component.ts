@@ -12,4 +12,7 @@ import { RouterLink } from '@angular/router';
 export class AuthLayoutComponent {
   @Input() showRegister: boolean = false;
   @Input() showIntro: boolean = false;
+
+  @Input() showOverlay = false;
+  @Input() overlayVariant: 'login' | 'created' | 'sent' | 'changed' = 'login';
 }

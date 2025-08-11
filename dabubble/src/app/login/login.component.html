@@ -1,4 +1,5 @@
-<app-auth-layout [showRegister]="true" [showIntro]="true">
+<app-auth-layout [showRegister]="true" [showIntro]="showIntro" [showOverlay]="showOverlay"
+    [overlayVariant]="overlayVariant">
     <div class="login-header">
         <h1>Anmeldung</h1>
         <span>
@@ -47,7 +48,7 @@
         </button>
         <div class="button-group">
             <button type="submit">Anmelden</button>
-            <button type="button">Gäste-Login</button>
+            <button type="button" (click)="login()">Gäste-Login</button>
         </div>
     </form>
 </app-auth-layout>

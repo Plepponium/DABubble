@@ -5,6 +5,29 @@
   </div>
 </div>
 
+<div class="overlay-root" *ngIf="showOverlay">
+  <div class="overlay-backdrop"></div>
+
+  <div class="overlay-panel">
+    <ng-container [ngSwitch]="overlayVariant">
+      <div *ngSwitchCase="'login'">
+        <h2>Anmelden</h2>
+      </div>
+      <div *ngSwitchCase="'created'">
+        <h2>Konto erfolgreich erstellt!</h2>
+      </div>
+      <div *ngSwitchCase="'changed'">
+        <h2>Passwort geändert</h2>
+      </div>
+      <div *ngSwitchCase="'sent'">
+        <img src="/assets/icons/mail-sent.svg">
+        <h2>E-Mail gesendet</h2>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+
 <div class="login">
   <img src="/assets/img/login-logo-small.svg" class="logo" />
 

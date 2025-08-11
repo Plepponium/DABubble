@@ -1,0 +1,37 @@
+<app-auth-layout [showOverlay]="showOverlay" [overlayVariant]="overlayVariant">
+    <button [routerLink]="['/']" class="arrow-back">
+        <img src="/assets/icons/arrow_back.svg">
+    </button>
+    <div class="login-header">
+        <h1>Passwort zurücksetzen</h1>
+    </div>
+    <form [formGroup]="changeForm" (ngSubmit)="onSubmit()">
+        <mat-card-content class="input-group">
+            <div class="input-wrapper">
+                <div class="input-item">
+                    <input [type]="passwordVisible ? 'text' : 'password'" placeholder="Neues Passwort"
+                        formControlName="password" autocomplete="new-password">
+                    <img [src]="passwordVisible ? '/assets/icons/eye-closed.png' : '/assets/icons/eye-open.png'"
+                        (click)="togglePassword('password')">
+                </div>
+            </div>
+
+            <div class="input-wrapper">
+                <div class="input-item">
+                    <input [type]="confirmVisible ? 'text' : 'password'" placeholder="Neues Kennwort bestätigen"
+                        formControlName="passwordConfirm" autocomplete="new-password">
+                    <img [src]="confirmVisible ? '/assets/icons/eye-closed.png' : '/assets/icons/eye-open.png'"
+                        (click)="togglePassword('confirm')">
+                </div>
+                @if (changeForm.hasError('passwordMismatch') && (passwordConfirm?.touched || submitted)) {
+                <span class="error">
+                    Ihre Kennwörter stimmen nicht überein
+                </span>
+                }
+            </div>
+        </mat-card-content>
+        <div class="continue">
+            <button [disabled]="changeForm.invalid">Passwort ändern</button>
+        </div>
+    </form>
+</app-auth-layout>
