@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-round-btn',
@@ -7,5 +7,7 @@ import { Component } from '@angular/core';
   styleUrl: './round-btn.component.scss'
 })
 export class RoundBtnComponent {
-
+  @Input() iconSrc = '';          // normal Icon
+  @Input() iconHoverSrc = '';     // Hover Icon
+  @Input() altText = '';   
 }

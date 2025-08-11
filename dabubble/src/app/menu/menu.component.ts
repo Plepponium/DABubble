@@ -4,10 +4,11 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatSidenavModule} from '@angular/material/sidenav';
+import { RoundBtnComponent } from '../round-btn/round-btn.component';
 
 @Component({
   selector: 'app-menu',
-  imports: [CommonModule, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule],
+  imports: [CommonModule, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, RoundBtnComponent],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
