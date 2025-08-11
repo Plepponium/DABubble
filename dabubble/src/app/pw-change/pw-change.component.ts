@@ -22,7 +22,7 @@ export class PwChangeComponent {
 
   constructor(private fb: FormBuilder, private router: Router) {
     this.changeForm = this.fb.group({
-      password: this.fb.control('', Validators.required),
+      password: this.fb.control('', [Validators.required, Validators.minLength(8)]),
       passwordConfirm: this.fb.control('', Validators.required),
     }, { validators: this.passwordsMatchValidator });
   }
