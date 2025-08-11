@@ -22,16 +22,14 @@ export class PwChangeComponent {
 
   constructor(private fb: FormBuilder, private router: Router) {
     this.changeForm = this.fb.group({
-      password: ['', [Validators.required]],
-      passwordConfirm: ['', [Validators.required]]
-    },
-      { validators: this.passwordsMatchValidator });
+      password: this.fb.control('', Validators.required),
+      passwordConfirm: this.fb.control('', Validators.required),
+    }, { validators: this.passwordsMatchValidator });
   }
 
-
   private passwordsMatchValidator(group: FormGroup): ValidationErrors | null {
-    const p = group.controls['password'].value;
-    const pc = group.controls['passwordConfirm'].value;
+    const p = group.get('password')?.value;
+    const pc = group.get('passwordConfirm')?.value;
     return p === pc ? null : { passwordMismatch: true };
   }
 
