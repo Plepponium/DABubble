@@ -49,10 +49,10 @@
     &:hover {
         background-color: #eceefe;
         color: #535AF1;
-        .tag {
+        .hover-icon {
             display: none;
         }
-        .tag-purple {
+        .hover-icon-purple {
             display: block;
         }
     }
@@ -64,7 +64,7 @@
     gap: 10px;
 }
 
-.tag-purple {
+.hover-icon-purple {
     display: none;
 }
 
@@ -303,11 +303,11 @@
     display: none;
 }
 
-.add-reaction {
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-}
+// .add-reaction {
+//     width: 24px;
+//     height: 24px;
+//     cursor: pointer;
+// }
 
 .chat-dialogue {
     height: 46px;
@@ -368,10 +368,6 @@
         color: #535AF1;
         font-weight: 700;
     }
-}
-
-.hover-icon-purple {
-    display: none;
 }
 
 .form {

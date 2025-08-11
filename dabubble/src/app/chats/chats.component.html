@@ -2,14 +2,12 @@
     <div class="header">
         <div class="header-left">
             <div class="channel-name-container">
-                <img class="tag" src="assets/icons/tag.svg" alt="">
-                <img class="tag-purple" src="assets/icons/tag-purple.svg" alt="">
-                <!-- <mat-icon class="icon-30">tag</mat-icon>
-                <div class="font-24">#</div> -->
+                <img class="hover-icon" src="assets/icons/tag.svg" alt="">
+                <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
                 <div class="font-24 font-w-700">Entwicklerteam</div>
             </div>
-            <mat-icon class="icon-30">keyboard_arrow_down</mat-icon>
-            <!-- <img src="assets/icons/keyboard_arrow_down.svg" alt=""> -->
+            <img class="hover-icon" src="assets/icons/expand_more.svg" alt="">
+            <img class="hover-icon-purple" src="assets/icons/expand_more-purple.svg" alt="">
         </div>
 
         <div class="header-right">
@@ -86,10 +84,10 @@
                                         <div>1</div>
                                     </div>
                                 </div>
-                                <button class="add-reaction-btn">
-                                    <img class="add-reaction hover-icon" src="assets/reaction-icons/add_reaction.svg" alt="">
-                                    <img class="add-reaction hover-icon-purple" src="assets/reaction-icons/add_reaction-purple.svg" alt="">
-                                </button>
+                                <app-round-btn iconSrc="assets/reaction-icons/add_reaction.svg"
+                                    iconHoverSrc="assets/reaction-icons/add_reaction-purple.svg"
+                                    altText="Reaktion hinzufügen">
+                                </app-round-btn>
                             </div>
                         </div>
                     </div>
@@ -152,10 +150,10 @@
                                         <div>1</div>
                                     </div>
                                 </div>
-                                <button class="add-reaction-btn">
-                                    <img class="add-reaction hover-icon" src="assets/reaction-icons/add_reaction.svg" alt="">
-                                    <img class="add-reaction hover-icon-purple" src="assets/reaction-icons/add_reaction-purple.svg" alt="">
-                                </button>
+                                <app-round-btn iconSrc="assets/reaction-icons/add_reaction.svg"
+                                    iconHoverSrc="assets/reaction-icons/add_reaction-purple.svg"
+                                    altText="Reaktion hinzufügen">
+                                </app-round-btn>
                             </div>
                         </div>
                     </div>
@@ -171,17 +169,17 @@
                     <div class="icon-bar t-gray">
                         <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
                             iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
-                            altText="Bearbeiten">
+                            altText="Reaktion hinzufügen">
                         </app-round-btn>
                         <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
                             iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
-                            altText="Bearbeiten">
+                            altText="Mail hinzufügen">
                         </app-round-btn>
                     </div>
                     
                     <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
                         iconHoverSrc="assets/message-icons/send-purple2.svg"
-                        altText="Bearbeiten">
+                        altText="Senden">
                     </app-round-btn>
                 </div>
             </div>
