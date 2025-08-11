@@ -4,3 +4,16 @@
 .arrow-back {
   left: 15px;
 }
+
+.input-item {
+  img {
+    filter: invert(41%) sepia(14%) saturate(15%) hue-rotate(332deg)
+      brightness(95%) contrast(93%);
+  }
+  &:has(input:focus) {
+    img {
+      filter: brightness(0);
+      transition: filter 125ms ease;
+    }
+  }
+}
