@@ -132,17 +132,20 @@
                 <label for="message" class="floating-label t-gray">Antworten...</label>
                 <div class="input-icon-bar">
                     <div class="icon-bar t-gray">
-                        <button mat-icon-button aria-label="Example icon-button with share icon">
-                            <mat-icon>sentiment_very_satisfied</mat-icon>
-                        </button>
-                        <button mat-icon-button aria-label="Example icon-button with share icon">
-                            <mat-icon>alternate_email</mat-icon>
-                        </button>
+                        <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
+                            iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
+                            altText="Bearbeiten">
+                        </app-round-btn>
+                        <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
+                            iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
+                            altText="Bearbeiten">
+                        </app-round-btn>
                     </div>
                     
-                    <button mat-icon-button aria-label="Example icon-button with share icon">
-                        <mat-icon class="t-dark-purple">send</mat-icon>
-                    </button>
+                    <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
+                        iconHoverSrc="assets/message-icons/send-purple2.svg"
+                        altText="Bearbeiten">
+                    </app-round-btn>
                 </div>
             </div>
         </form>
