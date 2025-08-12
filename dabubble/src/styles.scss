@@ -1,6 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
-@use "../../styles/variables" as *;
-@use "../../styles/shared-classes";
+@font-face {
+  font-family: "Nunito";
+  src: url("/assets/fonts/nunito.ttf");
+}
 
 html,
 body {
@@ -8,7 +10,6 @@ body {
 }
 body {
   margin: 0;
-  // font-family: 'Nunito', "Helvetica Neue", sans-serif;
   font-family: 'Nunito', sans-serif;
   font-size: 18px;
 }
