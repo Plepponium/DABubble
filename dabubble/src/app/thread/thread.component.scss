@@ -101,14 +101,125 @@
     justify-content: end;
 }
 
+// .chat-section {
+//     display: flex;
+//     gap: 20px;
+//     padding: 10px 45px;
+// }
+
 .chat-section {
     display: flex;
-    gap: 20px;
+    gap: 30px;
     padding: 10px 45px;
+    position: relative;
+    &:hover {
+        background-color: #eceefe;
+        .chat-message.left {
+            background-color: #ffffff;
+        }
+        .chat-dialogue {
+            display: flex;
+        }
+    }
 }
 
 .chat-section.reverse{
     flex-direction: row-reverse;
+}
+
+.chat-dialogue {
+    height: 46px;
+    position: absolute;
+    right: 45px;
+    top: -16px;
+    background-color: #ffffff;
+    border: 1px solid #ADB0D9;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 3px 15px 3px 20px;
+    display: none;
+}
+
+.chat-dialogue.reverse {
+    right: unset;
+    left: 45px;
+
+    .add-reaction-btn.reverse {
+        display: flex;
+    }
+    .edit-comment-dialogue {
+        display: flex;
+    }
+}
+
+.add-reaction-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 20px;
+    border: none;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:hover {
+        background-color: #eceefe;
+        .hover-icon {
+            display: none;
+        }
+        .hover-icon-purple {
+            display: block;
+        }
+    }
+}
+
+.add-reaction-btn.reverse {
+    display: none;
+}
+
+// .add-reaction {
+//     width: 24px;
+//     height: 24px;
+//     cursor: pointer;
+// }
+
+.edit-comment-container {
+    position: relative;
+}
+
+.edit-comment-dialogue {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    background-color: #ffffff;
+    border-top-right-radius: 30px;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    padding: 10px 20px;
+    box-shadow: 0 6px 14px 0 rgba(0,0,0,0.20);
+    font-size: 20px;
+    white-space: nowrap;
+    z-index: 1;
+    display: none;
+    cursor: pointer;
+}
+
+.edit-comment {
+    padding: 10px 20px;
+    border-radius: 30px;
+    &:hover {
+        background-color: #eceefe;
+        color: #535AF1;
+        font-weight: 700;
+    }
+}
+
+.hover-icon-purple {
+    display: none;
 }
 
 .chat-user-img {

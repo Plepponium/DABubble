@@ -51,7 +51,7 @@
                             <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="">
                         </button>
                         <div class="edit-comment-container">
-                            <div class="edit-comment-dialogue">
+                            <div class="edit-comment-dialogue" *ngIf="editCommentDialogueExpanded">
                                 <div class="edit-comment">Nachricht bearbeiten</div>
                             </div>
                             <button (click)="openEditCommentDialogue()" class="add-reaction-btn reverse">
