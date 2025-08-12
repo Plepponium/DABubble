@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
@@ -15,6 +15,12 @@ import { RoundBtnComponent } from '../round-btn/round-btn.component';
 })
 export class ThreadComponent {
   editCommentDialogueExpanded = false;
+
+  @Output() closeThread = new EventEmitter<void>();
+
+  handleCloseThread() {
+    this.closeThread.emit();
+  }
 
   openEditCommentDialogue() {
     this.editCommentDialogueExpanded = !this.editCommentDialogueExpanded;

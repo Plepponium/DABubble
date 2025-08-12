@@ -15,7 +15,6 @@ import { RoundBtnComponent } from '../round-btn/round-btn.component';
 })
 export class ChatsComponent {
   value = 'Clear me';
-  threadOpen = true;
   editCommentDialogueExpanded = false;
 
   @Output() openThread = new EventEmitter<void>();
@@ -23,9 +22,6 @@ export class ChatsComponent {
   handleOpenThread() {
     this.openThread.emit();
   }
-  // openThread() {
-  //   this.threadOpen = true;
-  // }
 
   openEditCommentDialogue() {
     this.editCommentDialogueExpanded = !this.editCommentDialogueExpanded;

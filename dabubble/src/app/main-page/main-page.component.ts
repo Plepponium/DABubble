@@ -16,8 +16,4 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 })
 export class MainPageComponent {
   threadOpen = true;
-
-  closeThread() {
-    this.threadOpen = false;
-  }
 }
