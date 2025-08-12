@@ -68,11 +68,21 @@
     display: flex;
     align-items: center;
     gap: 20px;
+    &:hover {
+        .user-name {
+            color: #535AF1;
+        }
+        .hover-icon {
+            display: none;
+        }
+        .hover-icon-purple {
+            display: block;
+        }
+    }
 }
 
-.user-name {
-    font-size: 32px;
-    font-weight: 700;
+.hover-icon-purple {
+    display: none;
 }
 
 .user-img {
@@ -80,15 +90,9 @@
     border-radius: 42px;
 }
 
-.arrow-btn {
+.icon-container {
     display: flex;
     align-items: center;
-    justify-content: center;
-}
-
-.arrow {
-    width: 30px;
-    height: 30px;
 }
 
 @media(max-width: 1445px) {
