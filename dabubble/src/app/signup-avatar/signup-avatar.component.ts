@@ -37,12 +37,8 @@ export class SignupAvatarComponent implements OnInit {
     private firestore: Firestore
   ) { }
 
-  get draft() {
-    return this.draftService.getDraft();
-  }
-
   ngOnInit(): void {
-    const draft = this.draft
+    const draft = this.draftService.getDraft();
     if (!draft) {
       this.router.navigate(['/signup']);
       return;
@@ -51,6 +47,10 @@ export class SignupAvatarComponent implements OnInit {
     if (this.draftUser.photoURL) {
       this.selectedAvatar = this.draftUser.photoURL;
     }
+  }
+
+  get draft() {
+    return this.draftService.getDraft();
   }
 
   selectAvatar(avatar: string): void {
@@ -67,7 +67,7 @@ export class SignupAvatarComponent implements OnInit {
     this.overlayVariant = 'created';
     try {
       const usersCol = collection(this.firestore, 'users');
-      const docRef = await addDoc(usersCol, {
+      await addDoc(usersCol, {
         name: this.draftUser.name,
         email: this.draftUser.email,
         password: this.draftUser.password,
@@ -76,8 +76,8 @@ export class SignupAvatarComponent implements OnInit {
         lastSeen: serverTimestamp(),
         presence: 'offline'
       });
-      this.draftService.clear();
       setTimeout(() => {
+        this.draftService.clear();
         this.showOverlay = false;
         this.router.navigate(['/']);
       }, 1500);

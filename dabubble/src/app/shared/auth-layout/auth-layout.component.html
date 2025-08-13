@@ -29,7 +29,7 @@
 
 
 <div class="login">
-  <img src="/assets/img/login-logo-small.svg" class="logo" />
+  <img routerLink="/" src="/assets/img/login-logo-small.svg" class="logo" />
 
   <div class="register" *ngIf="showRegister">
     <span>Neu bei DABubble?</span>
@@ -41,7 +41,7 @@
   </mat-card>
 
   <div class="legal-links">
-    <a routerLink="/imprint">Impressum</a>
-    <a routerLink="/privacy">Datenschutz</a>
+    <a routerLink="/imprint" target="_blank">Impressum</a>
+    <a routerLink="/privacy" target="_blank">Datenschutz</a>
   </div>
 </div>

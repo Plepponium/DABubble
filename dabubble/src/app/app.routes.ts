@@ -9,13 +9,12 @@ import { PwResetComponent } from './pw-reset/pw-reset.component';
 import { PwChangeComponent } from './pw-change/pw-change.component';
 
 export const routes: Routes = [
-    { path: '', component: LoginComponent },
+    { path: '', component: LoginComponent, title: 'DABubble | Login' },
     { path: 'main', component: MainPageComponent, },
-    { path: 'signup', component: SignupComponent, },
-    { path: 'signup/avatar', component: SignupAvatarComponent, },
+    { path: 'signup', component: SignupComponent, title: 'DABubble | Sign Up' },
+    { path: 'signup/avatar', component: SignupAvatarComponent, title: 'DABubble | Sign Up' },
     { path: 'password/reset', component: PwResetComponent, },
     { path: 'password/change', component: PwChangeComponent, },
-    { path: 'imprint', component: ImprintComponent, },
-    { path: 'privacy', component: PrivacyComponent, },
-
+    { path: 'imprint', component: ImprintComponent, title: 'DABubble | Impressum' },
+    { path: 'privacy', component: PrivacyComponent, title: 'DABubble | Datenschutzerklärung' },
 ];

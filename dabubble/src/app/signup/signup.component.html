@@ -43,7 +43,7 @@
             <div class="agree">
                 <input type="checkbox" id="checkbox" formControlName="agree">
                 <label for="checkbox" class="custom-checkbox"></label>
-                <p>Ich stimme der <a routerLink="/privacy">Datenschutzerklärung</a> zu.</p>
+                <p>Ich stimme der <a routerLink="/privacy" target="_blank">Datenschutzerklärung</a> zu.</p>
                 @if (agree?.invalid && (agree?.touched || submitted)) {
                 <span class="error">Bitte stimmen Sie der Datenschutzerklärung zu.</span>
                 }
