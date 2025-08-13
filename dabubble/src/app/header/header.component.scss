@@ -68,6 +68,7 @@
     display: flex;
     align-items: center;
     gap: 20px;
+    cursor: pointer;
     &:hover {
         .user-name {
             color: #535AF1;

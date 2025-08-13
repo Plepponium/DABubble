@@ -19,10 +19,11 @@
                 </div>
                 <div class="user-counter">3</div>
             </div>
-            
-            <button mat-icon-button class="add-user-btn" aria-label="Example icon-button with share icon">
-                <img src="assets/icons/person_add.svg" alt="">
-            </button>
+
+            <app-round-btn style="--btn-bg: #eceefe;" iconSrc="assets/icons/person_add.svg"
+                iconHoverSrc="assets/icons/person_add-purple.svg"
+                altText="Senden">
+            </app-round-btn>
         </div>
     </div>
 
@@ -163,8 +164,8 @@
 
         <form class="form">
             <div class="form-field full-width">
-                <textarea id="message" class="input" name="" type="text" placeholder=" "></textarea>
-                <label for="message" class="floating-label t-gray">Nachricht an #Entwicklerteam</label>
+                <textarea id="chat-message" class="input" name="" type="text" placeholder=" "></textarea>
+                <label for="chat-message" class="floating-label t-gray">Nachricht an #Entwicklerteam</label>
                 <div class="input-icon-bar">
                     <div class="icon-bar t-gray">
                         <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
