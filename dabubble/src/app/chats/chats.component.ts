@@ -6,10 +6,11 @@ import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
+import { DialogueOverlayComponent } from '../dialogue-overlay/dialogue-overlay.component';
 
 @Component({
   selector: 'app-chats',
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, DialogueOverlayComponent],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.scss'
 })
