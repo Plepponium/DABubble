@@ -1,7 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthLayoutComponent } from '../shared/auth-layout/auth-layout.component';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SignupDraftService } from '../../services/signup-draft.service';
+import { User } from '../../models/user.class';
+import { Firestore } from '@angular/fire/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 @Component({
   selector: 'app-signup-avatar',
@@ -9,7 +13,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './signup-avatar.component.html',
   styleUrl: './signup-avatar.component.scss'
 })
-export class SignupAvatarComponent {
+export class SignupAvatarComponent implements OnInit {
   avatarImages: string[] = [
     'assets/user-icons/icon1.svg',
     'assets/user-icons/icon2.svg',
@@ -24,20 +28,63 @@ export class SignupAvatarComponent {
   showOverlay = false;
   overlayVariant: 'login' | 'created' | 'sent' = 'created';
 
-  constructor(private router: Router) { }
+  draftUser!: User;
+
+
+  constructor(
+    private router: Router,
+    private draftService: SignupDraftService,
+    private firestore: Firestore
+  ) { }
+
+  get draft() {
+    return this.draftService.getDraft();
+  }
+
+  ngOnInit(): void {
+    const draft = this.draft
+    if (!draft) {
+      this.router.navigate(['/signup']);
+      return;
+    }
+    this.draftUser = draft;
+    if (this.draftUser.photoURL) {
+      this.selectedAvatar = this.draftUser.photoURL;
+    }
+  }
 
   selectAvatar(avatar: string): void {
     this.selectedAvatar = avatar;
   }
 
-  register() {
-    this.overlayVariant = 'created';
+  async register(): Promise<void> {
+    if (!this.draftUser) {
+      this.router.navigate(['/signup']);
+      return;
+    }
+    this.draftUser.photoURL = this.selectedAvatar;
     this.showOverlay = true;
-
-    setTimeout(() => {
+    this.overlayVariant = 'created';
+    try {
+      const usersCol = collection(this.firestore, 'users');
+      const docRef = await addDoc(usersCol, {
+        name: this.draftUser.name,
+        email: this.draftUser.email,
+        password: this.draftUser.password,
+        photoURL: this.draftUser.photoURL,
+        createdAt: serverTimestamp(),
+        lastSeen: serverTimestamp(),
+        presence: 'offline'
+      });
+      this.draftService.clear();
+      setTimeout(() => {
+        this.showOverlay = false;
+        this.router.navigate(['/']);
+      }, 1500);
+    } catch (err) {
+      console.error('Fehler beim Anlegen des Users in Firestore:', err);
       this.showOverlay = false;
-      this.router.navigate(['/']);
-    }, 1500);
+    }
   }
 
 }
