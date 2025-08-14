@@ -1,31 +1,39 @@
 <div class="dialogue-overlay">
     <div class="dialogue-overlay-header">
-        Mitglieder
+        <div>Mitglieder</div>
         <app-round-btn (click)="closeDialogue()" iconSrc="assets/icons/close.svg"
             iconHoverSrc="assets/icons/close-purple.svg"
             altText="Schließen">
         </app-round-btn>
     </div>
-    <div class="content">
-        <div class="users">
+
+    <div class="dialogue-content">
+        <div class="selected-users">
             <div class="user">
                 <div class="img-container">
-                    <img src="" alt="">
-                    o
+                    <img class="user-img" src="assets/user-icons/icon3.svg" alt="">
+                    <div class="online-signal online"></div>
                 </div>
-                Name
+                <div class="user-name">
+                    Frederick Beck
+                </div>
             </div>
 
             <div class="user">
                 <div class="img-container">
-                    <img src="" alt="">
-                    o
+                    <img class="user-img" src="assets/user-icons/icon5.svg" alt="">
+                    <div class="online-signal offline"></div>
                 </div>
-                Name
+                <div class="user-name">
+                    Sofia Müller
+                </div>
             </div>
         </div>
-        <div>
-            <div><img src="" alt=""></div>
+        <div class="add-user">
+            <div class="add-user-icon-box">
+                <img class="hover-icon" src="assets/icons/person_add.svg" alt="">
+                <img class="hover-icon-purple" src="assets/icons/person_add-purple.svg" alt="">
+            </div>
             Mitglieder hinzufügen
         </div>
     </div>
