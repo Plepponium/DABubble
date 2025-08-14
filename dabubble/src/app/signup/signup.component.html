@@ -12,7 +12,7 @@
             <div class="input-wrapper">
                 <div class="input-item">
                     <img src="/assets/icons/login-person.svg">
-                    <input type="text" placeholder="Max Mustermann" formControlName="name" autocomplete="name">
+                    <input type="text" placeholder="Name und Nachname" formControlName="name" autocomplete="name">
                 </div>
                 @if (name?.invalid && (name?.touched || submitted)) {
                 <span class="error">Bitte schreiben Sie einen Namen.</span>
@@ -22,7 +22,8 @@
             <div class="input-wrapper">
                 <div class="input-item">
                     <img src="/assets/icons/login-mail.svg">
-                    <input type="text" placeholder="beispiel@email.com" formControlName="email" autocomplete="email">
+                    <input type="text" placeholder="beispielname@email.com" formControlName="email"
+                        autocomplete="email">
                 </div>
                 @if (email?.invalid && (email?.touched || submitted)) {
                 <span class="error">*Diese E-Mail-Adresse ist leider ungültig.</span>
