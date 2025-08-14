@@ -16,9 +16,22 @@ import { DialogueOverlayComponent } from '../dialogue-overlay/dialogue-overlay.c
 })
 export class ChatsComponent {
   value = 'Clear me';
+  showUserDialogue = false;
   editCommentDialogueExpanded = false;
 
   @Output() openThread = new EventEmitter<void>();
+  @Output() openBackdrop = new EventEmitter<void>();
+  @Output() closeBackdrop = new EventEmitter<void>();
+
+  openDialogueShowUser() {
+    this.openBackdrop.emit();
+    this.showUserDialogue = true;
+  }
+
+  closeDialogueShowUser() {
+    this.showUserDialogue = false;
+    this.closeBackdrop.emit();
+  }
 
   handleOpenThread() {
     this.openThread.emit();

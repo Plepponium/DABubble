@@ -124,6 +124,7 @@ mat-toolbar {
     
     img {
         width: 50px;
+        height: 50px;
         border-radius: 30px;
     }
 }
@@ -135,6 +136,7 @@ mat-toolbar {
     gap: 15px;
     padding: 4px 20px;
     border-radius: 30px;
+    position: relative;
     cursor: pointer;
 
     &:hover {
@@ -179,4 +181,14 @@ mat-toolbar {
     background-color: #eceefe;
     color: #535AF1;
     font-weight: 700;
+}
+
+.img-container {
+    width: 50px;
+    height: 50px;
+}
+
+.user-img {
+    width: 50px;
+    height: 50px;
 }

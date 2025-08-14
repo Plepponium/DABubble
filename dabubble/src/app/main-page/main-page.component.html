@@ -7,7 +7,12 @@
         </mat-drawer>
 
         <div class="content">
-            <app-chats id="chats" class="chats" (openThread)="threadOpen = true"></app-chats>
+            <app-chats 
+                id="chats" class="chats" 
+                (openThread)="threadOpen = true"
+                (openBackdrop)="showBackdrop = true"
+                (closeBackdrop)="showBackdrop = false">
+            </app-chats>
             <!-- <app-thread [hidden]="!threadOpen" id="thread" class="thread"></app-thread> -->
             <app-thread id="thread" class="thread" [hidden]="!threadOpen" (closeThread)="threadOpen = false"></app-thread>
         </div>
@@ -19,4 +24,11 @@
             <img src="assets/icons/Show menu.svg" alt="">
         </div>
     </button>
+
+    <div *ngIf="showBackdrop" class="dialogue-backdrop" (click)="handleCloseDialogue()">
+        <!-- <app-dialogue-overlay
+            (click)="$event.stopPropagation()"
+            (close)="closeUserDialogue()">
+        </app-dialogue-overlay> -->
+    </div>
 </div>

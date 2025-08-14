@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
 import { MenuComponent } from '../menu/menu.component';
 import { ChatsComponent } from '../chats/chats.component';
@@ -10,10 +11,15 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 
 @Component({
   selector: 'app-main-page',
-  imports: [HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule],
+  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss'
 })
 export class MainPageComponent {
   threadOpen = true;
+  showBackdrop = false;
+
+  handleCloseDialogue() {
+    this.showBackdrop = false;
+  }
 }

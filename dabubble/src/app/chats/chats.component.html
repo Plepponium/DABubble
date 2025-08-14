@@ -1,34 +1,38 @@
 <div class="chats">
     <div class="header">
-        <div class="header-left">
-            <div class="channel-name-container">
-                <img class="hover-icon" src="assets/icons/tag.svg" alt="">
-                <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
-                <div class="font-24 font-w-700">Entwicklerteam</div>
+        <div class="header-inner-container">
+            <div class="header-left">
+                <div class="channel-name-container">
+                    <img class="hover-icon" src="assets/icons/tag.svg" alt="">
+                    <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
+                    <div class="font-24 font-w-700">Entwicklerteam</div>
+                </div>
+                <img class="hover-icon" src="assets/icons/expand_more.svg" alt="">
+                <img class="hover-icon-purple" src="assets/icons/expand_more-purple.svg" alt="">
             </div>
-            <img class="hover-icon" src="assets/icons/expand_more.svg" alt="">
-            <img class="hover-icon-purple" src="assets/icons/expand_more-purple.svg" alt="">
+
+            <div class="header-right">
+                <div (click)="openDialogueShowUser()" class="users-display">
+                    <div class="user-pics">
+                        <div class="img-box"><img src="assets/user-icons/icon3.svg" alt=""></div>
+                        <div class="img-box"><img src="assets/user-icons/icon5.svg" alt=""></div>
+                        <div class="img-box"><img src="assets/user-icons/icon4.svg" alt=""></div>
+                    </div>
+                    <div class="user-counter">3</div>
+                </div>
+                
+                <app-round-btn style="--btn-bg: #eceefe;" iconSrc="assets/icons/person_add.svg"
+                    iconHoverSrc="assets/icons/person_add-purple.svg"
+                    altText="Senden">
+                </app-round-btn>
+            </div>
         </div>
 
-        <div class="header-right">
-            <div class="users-display">
-                <div class="user-pics">
-                    <div class="img-box"><img src="assets/user-icons/icon3.svg" alt=""></div>
-                    <div class="img-box"><img src="assets/user-icons/icon5.svg" alt=""></div>
-                    <div class="img-box"><img src="assets/user-icons/icon4.svg" alt=""></div>
-                </div>
-                <div class="user-counter">3</div>
-                
-                
-            </div>
-            
-            <app-round-btn style="--btn-bg: #eceefe;" iconSrc="assets/icons/person_add.svg"
-                iconHoverSrc="assets/icons/person_add-purple.svg"
-                altText="Senden">
-            </app-round-btn>
-            
-            <app-dialogue-overlay class="dialogue-overlay"></app-dialogue-overlay>
-        </div>
+        <app-dialogue-overlay 
+            *ngIf="showUserDialogue"
+            (close)="closeDialogueShowUser()" 
+            class="dialogue-overlay-show-user">
+        </app-dialogue-overlay>
     </div>
 
     <div class="chat-content">
