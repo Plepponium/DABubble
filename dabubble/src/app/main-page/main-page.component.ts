@@ -17,9 +17,5 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 })
 export class MainPageComponent {
   threadOpen = true;
-  showBackdrop = false;
 
-  handleCloseDialogue() {
-    this.showBackdrop = false;
-  }
 }

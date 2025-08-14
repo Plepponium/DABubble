@@ -20,17 +20,13 @@ export class ChatsComponent {
   editCommentDialogueExpanded = false;
 
   @Output() openThread = new EventEmitter<void>();
-  @Output() openBackdrop = new EventEmitter<void>();
-  @Output() closeBackdrop = new EventEmitter<void>();
 
   openDialogueShowUser() {
-    this.openBackdrop.emit();
     this.showUserDialogue = true;
   }
 
   closeDialogueShowUser() {
     this.showUserDialogue = false;
-    this.closeBackdrop.emit();
   }
 
   handleOpenThread() {

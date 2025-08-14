@@ -19,6 +19,7 @@
     width: 366px+20px;
     top: 25px;
     left: 20px;
+    z-index: 0 !important;
 }
 
 .content {
@@ -47,7 +48,7 @@
     padding: 20px 12px;
     background-color: #ffffff;
     box-shadow: 4px 4px 7px 0px rgba(0, 0, 0, 0.2);
-    z-index: 3;
+    z-index: 1;
 
     &:hover {
         background-color: #eceefe;

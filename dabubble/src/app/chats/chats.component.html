@@ -27,7 +27,8 @@
                 </app-round-btn>
             </div>
         </div>
-
+        
+        <div (click)="closeDialogueShowUser()" *ngIf="showUserDialogue" class="dialogue-backdrop"></div>
         <app-dialogue-overlay 
             *ngIf="showUserDialogue"
             (close)="closeDialogueShowUser()" 

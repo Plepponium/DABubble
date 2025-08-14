@@ -123,10 +123,20 @@
     }
 }
 
+.dialogue-backdrop {
+    position: fixed;
+    inset: 0; /* top, right, bottom, left: 0 */
+    background-color: rgba(0,0,0,0.5); /* Abdunklung */
+    display: flex;
+    justify-content: flex-end; /* Panel rechts andocken */
+    align-items: flex-start;   /* oben ausrichten */
+    z-index: 10;
+}
+
 .dialogue-overlay-show-user {
     // position: absolute;
     // top: 60px;
-    z-index: 1;
+    z-index: 100;
 }
 
 .add-user-btn {
