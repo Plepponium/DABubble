@@ -19,8 +19,9 @@ export class SignupComponent {
 
   constructor(private fb: FormBuilder, private router: Router, private draftService: SignupDraftService) {
     this.signupForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(/^[a-zA-Z]+ [a-zA-Z]+$/),]],
-      email: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
+      name: ['', [Validators.required, Validators.pattern(/^[A-Za-zÄÖÜäöüß'-]+\s+[A-Za-zÄÖÜäöüß'-]+$/
+      ),]],
+      email: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9ÄÖÜäöüß._%+-]+@[A-Za-z0-9ÄÖÜäöüß.-]+\.[A-Za-z]{2,}$/)]],
       password: ['', [Validators.required,]],
       agree: [false, Validators.requiredTrue],
     });

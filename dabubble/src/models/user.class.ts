@@ -2,7 +2,7 @@ export class User {
     name: string = '';
     email: string = '';
     password: string = '';
-    photoURL: string = 'assets/user-icons/default-user.svg';
+    img: string = 'default-user';
     createdAt?: any;
     lastSeen?: any;
     presence: 'online' | 'offline' | 'idle' = 'offline';

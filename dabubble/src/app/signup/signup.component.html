@@ -22,7 +22,7 @@
             <div class="input-wrapper">
                 <div class="input-item">
                     <img src="/assets/icons/login-mail.svg">
-                    <input type="email" placeholder="beispiel@email.com" formControlName="email" autocomplete="email">
+                    <input type="text" placeholder="beispiel@email.com" formControlName="email" autocomplete="email">
                 </div>
                 @if (email?.invalid && (email?.touched || submitted)) {
                 <span class="error">*Diese E-Mail-Adresse ist leider ungültig.</span>
