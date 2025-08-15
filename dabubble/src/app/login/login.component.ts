@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { AuthLayoutComponent } from '../shared/auth-layout/auth-layout.component';
 import { Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Auth, signInWithEmailAndPassword, signInAnonymously } from '@angular/fire/auth';
 
 
 @Component({
@@ -16,37 +17,31 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 })
 
 export class LoginComponent implements OnInit {
+
   showIntro = true;
-  loginForm: FormGroup;
   submitted = false;
   showOverlay = false;
   overlayVariant: 'login' | 'created' | 'sent' = 'login';
 
-  constructor(private fb: FormBuilder, private router: Router) {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
-      password: ['', [Validators.required,]]
-    });
+  loginForm: FormGroup;
+
+  private guestEmail = 'guest@dabubble.de';
+  private guestPassword = 'guest123';
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private auth: Auth
+  ) {
+    this.loginForm = this.createForm();
   }
 
-  ngOnInit() {
-    const alreadyShown = localStorage.getItem('introShown');
-
-    if (!alreadyShown) {
-      this.showIntro = true;
-      localStorage.setItem('introShown', 'true');
-    } else {
-      this.showIntro = false;
-    }
+  ngOnInit(): void {
+    this.checkIntroAnimation();
   }
 
-  get email() {
-    return this.loginForm.get('email');
-  }
-
-  get password() {
-    return this.loginForm.get('password');
-  }
+  get email() { return this.loginForm.get('email'); }
+  get password() { return this.loginForm.get('password'); }
 
   onSubmit(): void {
     this.submitted = true;
@@ -54,17 +49,51 @@ export class LoginComponent implements OnInit {
       this.loginForm.markAllAsTouched();
       return;
     }
-    this.login();
+    this.performLogin();
   }
 
-  login() {
-    this.overlayVariant = 'login';
+  async guestLogin(): Promise<void> {
     this.showOverlay = true;
+    this.overlayVariant = 'login';
 
-    setTimeout(() => {
-      this.showOverlay = false;
+    try {
+      await signInWithEmailAndPassword(this.auth, this.guestEmail, this.guestPassword);
       this.router.navigate(['/main']);
-    }, 1500);
+    } catch (err) {
+      this.showOverlay = false;
+      console.error('Gast-Login fehlgeschlagen', err);
+    }
   }
 
+  private createForm(): FormGroup {
+    return this.fb.group({
+      email: ['', [
+        Validators.required,
+        Validators.pattern(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/)
+      ]],
+      password: ['', Validators.required]
+    });
+  }
+
+  private checkIntroAnimation(): void {
+    const alreadyShown = localStorage.getItem('introShown');
+    this.showIntro = !alreadyShown;
+    if (!alreadyShown) {
+      localStorage.setItem('introShown', 'true');
+    }
+  }
+
+  private async performLogin(): Promise<void> {
+    this.showOverlay = true;
+    this.overlayVariant = 'login';
+
+    try {
+      const { email, password } = this.loginForm.value;
+      await signInWithEmailAndPassword(this.auth, email, password);
+      this.router.navigate(['/main']);
+    } catch (err) {
+      this.showOverlay = false;
+      console.error('Login fehlgeschlagen:', err);
+    }
+  }
 }

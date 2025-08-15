@@ -1,34 +1,61 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthLayoutComponent } from '../shared/auth-layout/auth-layout.component';
-import { Router, } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SignupDraftService } from '../../services/signup-draft.service';
 import { User } from '../../models/user.class';
-import { Firestore } from '@angular/fire/firestore';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
+import { Auth, createUserWithEmailAndPassword } from '@angular/fire/auth';
+import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-signup-avatar',
+  standalone: true,
   imports: [AuthLayoutComponent, CommonModule],
   templateUrl: './signup-avatar.component.html',
   styleUrl: './signup-avatar.component.scss'
 })
 export class SignupAvatarComponent implements OnInit {
-  avatarImages: string[] = [
-    'icon1', 'icon2', 'icon3', 'icon4', 'icon5', 'icon6'];
 
+  avatarImages: string[] = ['icon1', 'icon2', 'icon3', 'icon4', 'icon5', 'icon6'];
   selectedAvatar: string = 'default-user';
   showOverlay = false;
   overlayVariant: 'login' | 'created' | 'sent' = 'created';
+
   draftUser!: User;
 
   constructor(
     private router: Router,
     private draftService: SignupDraftService,
-    private firestore: Firestore
+    private firestore: Firestore,
+    private auth: Auth
   ) { }
 
   ngOnInit(): void {
+    this.loadDraft();
+  }
+
+  selectAvatar(avatar: string): void {
+    this.selectedAvatar = avatar;
+  }
+
+  onBackClick(): void {
+    this.clearDraftIfSignupRoute();
+    this.router.navigate(['/signup']);
+  }
+
+  async register(): Promise<void> {
+    if (!this.draftUser) {
+      this.router.navigate(['/signup']);
+      return;
+    }
+
+    this.updateDraftWithAvatar();
+    await this.createUserWithAuthAndFirestore();
+    this.showSuccessOverlayAndNavigate();
+  }
+
+  private loadDraft(): void {
     const draft = this.draftService.getDraft();
     if (!draft) {
       this.router.navigate(['/signup']);
@@ -40,54 +67,47 @@ export class SignupAvatarComponent implements OnInit {
     }
   }
 
-  get draft() {
-    return this.draftService.getDraft();
-  }
-
-  selectAvatar(avatar: string): void {
-    this.selectedAvatar = avatar;
-  }
-
-  async register(): Promise<void> {
-    if (!this.draftUser) {
-      this.router.navigate(['/signup']);
-      return;
-    }
+  private updateDraftWithAvatar(): void {
     this.draftUser.img = this.selectedAvatar;
-    this.showOverlay = true;
-    this.overlayVariant = 'created';
+  }
+
+  private async createUserWithAuthAndFirestore(): Promise<void> {
     try {
-      const usersCol = collection(this.firestore, 'users');
-      await addDoc(usersCol, {
+      const cred = await createUserWithEmailAndPassword(
+        this.auth,
+        this.draftUser.email,
+        this.draftUser.password
+      );
+
+      const uid = cred.user.uid;
+      await setDoc(doc(this.firestore, 'users', uid), {
         name: this.draftUser.name,
         email: this.draftUser.email,
-        password: this.draftUser.password,
         img: this.draftUser.img,
         createdAt: serverTimestamp(),
         lastSeen: serverTimestamp(),
         presence: 'offline'
       });
-      setTimeout(() => {
-        this.draftService.clear();
-        this.showOverlay = false;
-        this.router.navigate(['/']);
-      }, 1500);
     } catch (err) {
-      console.error('Fehler beim Anlegen des Users in Firestore:', err);
       this.showOverlay = false;
+      console.error('Fehler beim Registrieren:', err);
+      throw err;
     }
   }
 
-  onBackClick(): void {
-    this.clearDraftIfSignupRoute();
-    this.router.navigate(['/signup']);
+  private showSuccessOverlayAndNavigate(): void {
+    this.showOverlay = true;
+    this.overlayVariant = 'created';
+    setTimeout(() => {
+      this.draftService.clear();
+      this.showOverlay = false;
+      this.router.navigate(['/']);
+    }, 1500);
   }
 
   private clearDraftIfSignupRoute(): void {
-    const currentUrl = this.router.url;
-    if (currentUrl.startsWith('/signup')) {
+    if (this.router.url.startsWith('/signup')) {
       this.draftService.clear();
     }
   }
-
 }
