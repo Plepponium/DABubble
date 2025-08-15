@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { AuthLayoutComponent } from '../shared/auth-layout/auth-layout.component';
 import { Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Auth, signInWithEmailAndPassword, signInAnonymously } from '@angular/fire/auth';
+import { Auth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from '@angular/fire/auth';
 
 
 @Component({
@@ -94,6 +94,20 @@ export class LoginComponent implements OnInit {
     } catch (err) {
       this.showOverlay = false;
       console.error('Login fehlgeschlagen:', err);
+    }
+  }
+
+  async loginWithGoogle(): Promise<void> {
+    this.showOverlay = true;
+    this.overlayVariant = 'login';
+
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(this.auth, provider);
+      this.router.navigate(['/main']);
+    } catch (err) {
+      this.showOverlay = false;
+      console.error('Google Login fehlgeschlagen:', err);
     }
   }
 }
