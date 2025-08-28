@@ -1,0 +1,35 @@
+<div class="dialogue-overlay">
+    <div class="header-container">
+        <div class="dialogue-overlay-header">
+            <div>Leute hinzufügen</div>
+            <app-round-btn (click)="handleClose()" iconSrc="assets/icons/close.svg"
+                iconHoverSrc="assets/icons/close-purple.svg"
+                altText="Schließen">
+            </app-round-btn>
+        </div>
+
+        <div class="channel-container">
+            <img src="assets/icons/tag-light-purple.svg" alt="">
+            <div>Entwicklerteam</div>
+        </div>
+    </div>
+    
+
+    
+
+    <div class="name-container">
+        <div class="user-name">Elise Roth</div>
+        <!-- <div class="online-info">
+            <div class="online-signal-solo online"></div>
+            <div class="online-status">Abwesend</div>
+        </div> -->
+    </div>
+
+    <div class="btn-container">
+        <button class="add-btn" [class.wiggle]="animationClass === 'wiggle'" 
+  (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+            <div class="f-nunito">Hizufügen</div>        
+        </button>
+    </div>
+    
+</div>

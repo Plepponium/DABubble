@@ -28,13 +28,20 @@
             </div>
         </div>
         
-        <div (click)="closeDialogueShowUser()" *ngIf="showUserDialogue" class="dialogue-backdrop"></div>
+        <div (click)="closeDialogueShowUser()" *ngIf="showUserDialogue || showAddDialogue" class="dialogue-backdrop"></div>
         <app-dialogue-overlay 
             *ngIf="showUserDialogue"
             (close)="closeDialogueShowUser()" 
             (openProfile)="openDialogueShowProfile()"
+            (openAddUser)="openDialogueAddUser()"
             class="dialogue-overlay-show-user">
         </app-dialogue-overlay>
+
+        <app-chat-add-user-overlay
+            *ngIf="showAddDialogue"
+            (close)="closeDialogueAddUser()" 
+            class="dialogue-overlay-add-user">
+        </app-chat-add-user-overlay>
 
         <div (click)="closeDialogueShowProfile()" *ngIf="showProfileDialogue" class="dialogue-backdrop-profile"></div>
         <app-profile-overlay 

@@ -8,16 +8,18 @@ import {FormsModule} from '@angular/forms';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { DialogueOverlayComponent } from '../dialogue-overlay/dialogue-overlay.component';
 import { ProfileOverlayComponent } from '../profile-overlay/profile-overlay.component';
+import { ChatAddUserOverlayComponent } from '../chat-add-user-overlay/chat-add-user-overlay.component';
 
 @Component({
   selector: 'app-chats',
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, DialogueOverlayComponent, ProfileOverlayComponent],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, DialogueOverlayComponent, ProfileOverlayComponent, ChatAddUserOverlayComponent],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.scss'
 })
 export class ChatsComponent {
   value = 'Clear me';
   showUserDialogue = false;
+  showAddDialogue = false;
   showProfileDialogue = false;
   editCommentDialogueExpanded = false;
 
@@ -29,6 +31,15 @@ export class ChatsComponent {
 
   closeDialogueShowUser() {
     this.showUserDialogue = false;
+  }
+
+  openDialogueAddUser() {
+    this.showAddDialogue = true;
+    this.showUserDialogue = false;
+  }
+
+  closeDialogueAddUser() {
+    this.showAddDialogue = false;
   }
 
   openDialogueShowProfile() {

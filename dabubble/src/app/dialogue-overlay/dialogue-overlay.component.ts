@@ -12,6 +12,7 @@ export class DialogueOverlayComponent {
   // @Input() isOpen = false;              
   @Output() close = new EventEmitter<void>();
   @Output() openProfile = new EventEmitter<void>();
+  @Output() openAddUser = new EventEmitter<void>();
 
   handleClose() {
     this.close.emit();
@@ -21,5 +22,7 @@ export class DialogueOverlayComponent {
     this.openProfile.emit();
   }
 
-  handleOpenAddUser() {}
+  handleOpenAddUser() {
+    this.openAddUser.emit();
+  }
 }
