@@ -69,7 +69,7 @@
                 </div>
             </div>
 
-            <div class="user-list" *ngIf="usersExpanded">
+            <!-- <div class="user-list" *ngIf="usersExpanded">
                 <div class="user">
                     <div class="img-container">
                         <img class="user-img" src="assets/user-icons/icon3.svg" alt="">
@@ -80,14 +80,23 @@
                 <div class="user">
                     <div class="img-container">
                         <img class="user-img" src="assets/user-icons/icon5.svg" alt="">
-                        <div class="online-signal online"></div>
+                        <div class="online-signal offline"></div>
                     </div> 
-                    <!-- <img src="assets/user-icons/icon5.svg" alt="">  -->
                     Sofia Müller
+                </div>
+            </div> -->
+            <div class="user-list" *ngIf="usersExpanded">
+                <div class="user" *ngFor="let user of users$ | async">
+                    <div class="img-container">
+                    <img class="user-img" [src]="'assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
+                    <div class="online-signal" [ngClass]="{'online': user.presence, 'offline': !user.presence}"></div>
+                    </div> 
+                    {{ user.name }}  
+                    <!-- <span *ngIf="user.isCurrentUser">(Du)</span>  -->
+                    <!-- optional, je nach Daten -->
                 </div>
             </div>
         </div>
     </div>
     
-
 </div>

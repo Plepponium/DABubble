@@ -1,22 +1,32 @@
-import {ChangeDetectionStrategy, Component, signal} from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {MatIconModule} from '@angular/material/icon';
-import {MatButtonModule} from '@angular/material/button';
-import {MatToolbarModule} from '@angular/material/toolbar';
-import {MatSidenavModule} from '@angular/material/sidenav';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
+import { UserService, User } from '../../services/user.service';
+import { Observable } from 'rxjs';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-menu',
-  imports: [CommonModule, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, RoundBtnComponent],
+  imports: [CommonModule, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, RoundBtnComponent, FormsModule, RouterModule],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
+  providers: [UserService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuComponent {
   readonly panelOpenState = signal(false);
   channelsExpanded = true;
   usersExpanded = true;
+  users$: Observable<User[]>;
+
+  constructor(private userService: UserService) {
+    this.users$ = this.userService.getUsers();
+  }
 
   toggleChannels() {
     this.channelsExpanded = !this.channelsExpanded;
