@@ -18,7 +18,7 @@ import { ProfileOverlayComponent } from '../profile-overlay/profile-overlay.comp
 export class ChatsComponent {
   value = 'Clear me';
   showUserDialogue = false;
-  showProfileDialogue = true;
+  showProfileDialogue = false;
   editCommentDialogueExpanded = false;
 
   @Output() openThread = new EventEmitter<void>();
@@ -31,11 +31,11 @@ export class ChatsComponent {
     this.showUserDialogue = false;
   }
 
-  openProfileDialogue() {
+  openDialogueShowProfile() {
     this.showProfileDialogue = true;
   }
 
-  closeProfileDialogue() {
+  closeDialogueShowProfile() {
     this.showProfileDialogue = false;
   }
 

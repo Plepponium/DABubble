@@ -139,6 +139,16 @@
 //     // z-index: 9;
 // }
 
+.dialogue-backdrop-profile {
+    position: fixed;
+    inset: 0; /* top, right, bottom, left: 0 */
+    background-color: rgba(0,0,0,0.5); /* Abdunklung */
+    display: flex;
+    justify-content: flex-end; /* Panel rechts andocken */
+    align-items: flex-start;   /* oben ausrichten */
+    z-index: 7;
+}
+
 .add-user-btn {
     background-color: rgba(0, 0, 0, 0.1);
 }

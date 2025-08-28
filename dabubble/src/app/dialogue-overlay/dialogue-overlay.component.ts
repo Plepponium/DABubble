@@ -4,15 +4,22 @@ import { RoundBtnComponent } from '../round-btn/round-btn.component';
 
 @Component({
   selector: 'app-dialogue-overlay',
-  imports: [CommonModule,RoundBtnComponent],
+  imports: [CommonModule, RoundBtnComponent],
   templateUrl: './dialogue-overlay.component.html',
   styleUrl: './dialogue-overlay.component.scss'
 })
 export class DialogueOverlayComponent {
-  @Input() isOpen = false;              // wird von außen gesetzt
+  // @Input() isOpen = false;              
   @Output() close = new EventEmitter<void>();
+  @Output() openProfile = new EventEmitter<void>();
 
   handleClose() {
     this.close.emit();
   }
+
+  handleOpenProfile() {
+    this.openProfile.emit();
+  }
+
+  handleOpenAddUser() {}
 }

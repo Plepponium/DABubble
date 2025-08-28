@@ -32,14 +32,15 @@
         <app-dialogue-overlay 
             *ngIf="showUserDialogue"
             (close)="closeDialogueShowUser()" 
+            (openProfile)="openDialogueShowProfile()"
             class="dialogue-overlay-show-user">
         </app-dialogue-overlay>
-        
-        <div (click)="closeProfileDialogue()" *ngIf="showProfileDialogue" class="dialogue-backdrop-profile"></div>
+
+        <div (click)="closeDialogueShowProfile()" *ngIf="showProfileDialogue" class="dialogue-backdrop-profile"></div>
         <app-profile-overlay 
             *ngIf="showProfileDialogue"
-            (close)="closeProfileDialogue()" 
-            class="dialogue-overlay-profile">
+            (close)="closeDialogueShowProfile()" 
+            class="dialogue-overlay-show-profile">
         </app-profile-overlay>
     </div>
 
