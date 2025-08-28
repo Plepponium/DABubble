@@ -7,16 +7,18 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { DialogueOverlayComponent } from '../dialogue-overlay/dialogue-overlay.component';
+import { ProfileOverlayComponent } from '../profile-overlay/profile-overlay.component';
 
 @Component({
   selector: 'app-chats',
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, DialogueOverlayComponent],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, DialogueOverlayComponent, ProfileOverlayComponent],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.scss'
 })
 export class ChatsComponent {
   value = 'Clear me';
   showUserDialogue = false;
+  showProfileDialogue = true;
   editCommentDialogueExpanded = false;
 
   @Output() openThread = new EventEmitter<void>();
@@ -27,6 +29,14 @@ export class ChatsComponent {
 
   closeDialogueShowUser() {
     this.showUserDialogue = false;
+  }
+
+  openProfileDialogue() {
+    this.showProfileDialogue = true;
+  }
+
+  closeProfileDialogue() {
+    this.showProfileDialogue = false;
   }
 
   handleOpenThread() {

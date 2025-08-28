@@ -34,6 +34,13 @@
             (close)="closeDialogueShowUser()" 
             class="dialogue-overlay-show-user">
         </app-dialogue-overlay>
+        
+        <div (click)="closeProfileDialogue()" *ngIf="showProfileDialogue" class="dialogue-backdrop-profile"></div>
+        <app-profile-overlay 
+            *ngIf="showProfileDialogue"
+            (close)="closeProfileDialogue()" 
+            class="dialogue-overlay-profile">
+        </app-profile-overlay>
     </div>
 
     <div class="chat-content">
