@@ -9,10 +9,28 @@ import { RoundBtnComponent } from '../round-btn/round-btn.component';
   styleUrl: './profile-overlay.component.scss'
 })
 export class ProfileOverlayComponent {
+  animationClass = '';
+
   // @Input() isOpen = false;              // wird von außen gesetzt
   @Output() close = new EventEmitter<void>();
 
   handleClose() {
     this.close.emit();
+  }
+
+  onMouseEnter() {
+    this.animationClass = 'wiggle';
+    // Nach 300ms (oder der gewünschten Dauer) zurücksetzen
+    setTimeout(() => {
+      this.animationClass = '';
+    }, 100);
+  }
+
+  onMouseLeave() {
+    this.animationClass = 'wiggle';
+    // Nach 300ms (oder der gewünschten Dauer) zurücksetzen
+    setTimeout(() => {
+      this.animationClass = '';
+    }, 100);
   }
 }

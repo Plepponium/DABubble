@@ -11,24 +11,28 @@
         <img class="user-img" src="assets/user-icons/icon2.svg" alt="">
     </div>
 
-    <div>
-        <div>Elise Roth</div>
-        <div>
-            <div class="online-signal"></div>
-            Abwesend
+    <div class="name-container">
+        <div class="user-name">Elise Roth</div>
+        <div class="online-info">
+            <div class="online-signal-solo online"></div>
+            <div class="online-status">Abwesend</div>
         </div>
     </div>
 
-    <div>
-        <div>
-            <img src="" alt="">
-            E-Mail-Adresse
+    <div class="mail-container">
+        <div class="mail-address">
+            <img src="assets/icons/mail.svg" alt="">
+            <div>E-Mail-Adresse</div>                    
         </div>
-        <div>rothelise&#64;beispiel.com</div>
+        <div class="mail">rothelise&#64;beispiel.com</div>
     </div>
 
-    <button>
-        <img src="" alt="">
-        Nachricht
-    </button>
+    <div class="btn-container">
+        <button class="message-btn" [class.wiggle]="animationClass === 'wiggle'" 
+  (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+            <img src="assets/icons/mode_comment.svg" alt="">
+            <div class="f-nunito">Nachricht</div>        
+        </button>
+    </div>
+    
 </div>
