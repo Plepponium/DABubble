@@ -88,8 +88,8 @@
             <div class="user-list" *ngIf="usersExpanded">
                 <div class="user" *ngFor="let user of users$ | async">
                     <div class="img-container">
-                    <img class="user-img" [src]="'assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
-                    <div class="online-signal" [ngClass]="{'online': user.presence, 'offline': !user.presence}"></div>
+                        <img class="user-img" [src]="'assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
+                        <div class="online-signal" [ngClass]="user.presence"></div>
                     </div> 
                     {{ user.name }}  
                     <!-- <span *ngIf="user.isCurrentUser">(Du)</span>  -->

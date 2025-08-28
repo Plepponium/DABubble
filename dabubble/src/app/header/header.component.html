@@ -13,8 +13,13 @@
     <div class="user">
         <div id="user-name" class="user-name font-32 font-w-700">Frederick Beck</div>
         
-        <img id="user-img" class="user-img" src="assets/user-icons/icon3.svg" alt="">
-     
+        
+        <div class="img-container">
+            <img id="user-img" class="user-img" src="assets/user-icons/icon3.svg" alt="">
+            <!-- <img class="user-img" [src]="'assets/user-icons/' + user.img + '.svg'" [alt]="user.name"> -->
+            <div class="online-signal-header online"></div>
+        </div> 
+
         <div class="icon-container">
             <img class="hover-icon" src="assets/icons/expand_more.svg" alt="">
             <img class="hover-icon-purple" src="assets/icons/expand_more-purple.svg" alt="">

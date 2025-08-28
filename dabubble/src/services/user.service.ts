@@ -8,7 +8,8 @@ export interface User {
   email: string;
   img: string;
   lastSeen: string;
-  presence: boolean;
+  presence: string;
+  online: boolean;
 }
 
 @Injectable({
