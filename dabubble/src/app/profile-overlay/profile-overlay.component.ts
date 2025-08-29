@@ -19,16 +19,14 @@ export class ProfileOverlayComponent {
   }
 
   onMouseEnter() {
-    this.animationClass = 'wiggle';
-    // Nach 300ms (oder der gewünschten Dauer) zurücksetzen
+    // this.animationClass = 'wiggle';
     setTimeout(() => {
       this.animationClass = '';
     }, 100);
   }
 
   onMouseLeave() {
-    this.animationClass = 'wiggle';
-    // Nach 300ms (oder der gewünschten Dauer) zurücksetzen
+    // this.animationClass = 'wiggle';
     setTimeout(() => {
       this.animationClass = '';
     }, 100);

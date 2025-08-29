@@ -28,7 +28,7 @@
             </div>
         </div>
         
-        <div (click)="closeDialogueShowUser()" *ngIf="showUserDialogue || showAddDialogue" class="dialogue-backdrop"></div>
+        <div (click)="closeDialogueShowUser(); closeDialogueAddUser()" *ngIf="showUserDialogue || showAddDialogue" class="dialogue-backdrop"></div>
         <app-dialogue-overlay 
             *ngIf="showUserDialogue"
             (close)="closeDialogueShowUser()" 

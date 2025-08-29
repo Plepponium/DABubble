@@ -34,20 +34,22 @@
     color: #797ef3;
 }
 
-.name-container {
-    pointer-events: none;
-}
+// .name-container {
+//     // pointer-events: none;
+// }
 
 .user-name {
-    width: 420px;
-    font-size: 32px;
-    font-weight: 700;
+    width: 434px;
+    font-size: 18px;
+    padding: 15px 20px;
+    border-radius: 30px;
+    border: 1px solid #adb0d9;
 }
 
 .btn-container {
     width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: end;
 }
 
 .add-btn {
@@ -58,9 +60,9 @@
     border-radius: 50px;
     padding: 12px 25px;
     background-color: #444df2;
+    // background-color: #686868;
     color: #ffffff;
     font-size: 18px;
-    // font-weight: 700;
     cursor: pointer;
     transition: background-color 0.2s;
 
@@ -69,12 +71,12 @@
     }
 }
 
-.wiggle {
-  animation: wiggle 0.3s ease forwards;
-}
+// .wiggle {
+//   animation: wiggle 0.2s ease forwards;
+// }
 
-@keyframes wiggle {
-    0%   { transform: translateY(0); }
-    50%  { transform: translateY(1px); }
-    100% { transform: translateY(0); }
-}
+// @keyframes wiggle {
+//     0%   { transform: translateY(0); }
+//     50%  { transform: translateY(1px); }
+//     100% { transform: translateY(0); }
+// }
