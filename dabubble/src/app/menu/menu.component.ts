@@ -1,14 +1,15 @@
-import { ChangeDetectionStrategy, Component, signal} from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
-import { UserService, User } from '../../services/user.service';
+import { UserService } from '../../services/user.service';
 import { Observable } from 'rxjs';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { User } from '../../models/user.class';
 
 @Component({
   selector: 'app-menu',

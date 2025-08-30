@@ -1,26 +1,25 @@
-import { Injectable } from '@angular/core';
-import { Firestore, collectionData, collection } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { Auth, authState } from '@angular/fire/auth';
+import { Firestore, collectionData, collection, doc, docData } from '@angular/fire/firestore';
+import { Observable, switchMap, of } from 'rxjs';
+import { User } from '../models/user.class';
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  img: string;
-  lastSeen: string;
-  presence: string;
-  online: boolean;
-}
-
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class UserService {
-  constructor(private firestore: Firestore) {}
+  private auth = inject(Auth);
+  private firestore = inject(Firestore);
 
-  // getUsers(): Observable<User[]> {
-  //   return this.firestore.collection<User>('users').valueChanges({idField:'id'});
-  // }
+  getCurrentUser(): Observable<User | undefined> {
+    return authState(this.auth).pipe(
+      switchMap(userAuth => {
+        if (!userAuth) return of(undefined);
+        const userRef = doc(this.firestore, 'users', userAuth.uid);
+        return docData(userRef, { idField: 'uid' }) as Observable<User>;
+      })
+    );
+  }
+
+
   getUsers(): Observable<User[]> {
     const usersCollection = collection(this.firestore, 'users');
     return collectionData(usersCollection, { idField: 'id' }) as Observable<User[]>;
