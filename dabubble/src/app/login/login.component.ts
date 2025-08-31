@@ -7,6 +7,7 @@ import { AuthLayoutComponent } from '../shared/auth-layout/auth-layout.component
 import { Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Auth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from '@angular/fire/auth';
+import { doc, Firestore, updateDoc } from '@angular/fire/firestore';
 
 
 @Component({
@@ -31,7 +32,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private auth: Auth
+    private auth: Auth,
+    private firestore: Firestore,
   ) {
     this.loginForm = this.createForm();
   }
@@ -52,16 +54,61 @@ export class LoginComponent implements OnInit {
     this.performLogin();
   }
 
+  private async performLogin(): Promise<void> {
+    try {
+      this.showOverlay = true;
+      this.overlayVariant = 'login';
+      const { email, password } = this.loginForm.value;
+      const cred = await signInWithEmailAndPassword(this.auth, email, password);
+      await this.setUserPresenceOnline(cred.user.uid);
+      this.router.navigate(['/main']);
+    } catch (err) {
+      this.showOverlay = false;
+      this.loginForm.get('password')?.reset();
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+  }
+
+  async loginWithGoogle(): Promise<void> {
+    this.showOverlay = true;
+    this.overlayVariant = 'login';
+
+    try {
+      const provider = new GoogleAuthProvider();
+      const cred = await signInWithPopup(this.auth, provider);
+      await this.setUserPresenceOnline(cred.user.uid);
+      this.router.navigate(['/main']);
+    } catch (err) {
+      this.showOverlay = false;
+      console.error('Google Login fehlgeschlagen:', err);
+    }
+  }
+
   async guestLogin(): Promise<void> {
     this.showOverlay = true;
     this.overlayVariant = 'login';
 
     try {
-      await signInWithEmailAndPassword(this.auth, this.guestEmail, this.guestPassword);
+      const cred = await signInWithEmailAndPassword(this.auth, this.guestEmail, this.guestPassword);
+      await this.setUserPresenceOnline(cred.user.uid);
       this.router.navigate(['/main']);
     } catch (err) {
       this.showOverlay = false;
       console.error('Gast-Login fehlgeschlagen', err);
+    }
+  }
+
+  private async setUserPresenceOnline(uid: string) {
+    const userRef = doc(this.firestore, 'users', uid);
+
+    try {
+      await updateDoc(userRef, {
+        presence: 'online',
+        lastSeen: new Date()
+      });
+    } catch (err) {
+      console.error(`Kein User-Dokument für UID ${uid} gefunden!`, err);
     }
   }
 
@@ -83,31 +130,7 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  private async performLogin(): Promise<void> {
-    this.showOverlay = true;
-    this.overlayVariant = 'login';
 
-    try {
-      const { email, password } = this.loginForm.value;
-      await signInWithEmailAndPassword(this.auth, email, password);
-      this.router.navigate(['/main']);
-    } catch (err) {
-      this.showOverlay = false;
-      console.error('Login fehlgeschlagen:', err);
-    }
-  }
 
-  async loginWithGoogle(): Promise<void> {
-    this.showOverlay = true;
-    this.overlayVariant = 'login';
 
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(this.auth, provider);
-      this.router.navigate(['/main']);
-    } catch (err) {
-      this.showOverlay = false;
-      console.error('Google Login fehlgeschlagen:', err);
-    }
-  }
 }

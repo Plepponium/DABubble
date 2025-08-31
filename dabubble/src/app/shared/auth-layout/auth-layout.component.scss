@@ -13,24 +13,24 @@
   justify-content: center;
   z-index: 9999;
   animation: fadeOutBg 1s ease forwards;
-  animation-delay: 4.5s; // Zeit, bis Hintergrund transparent wird
+  animation-delay: 4.5s;
 
   .logo-wrapper {
     display: flex;
     align-items: center;
     animation: moveToCorner 1s ease forwards;
-    animation-delay: 4s; // Logo + Text schrumpfen & verschieben
+    animation-delay: 4s;
 
     img {
       animation: logoShift 0.6s ease forwards;
-      animation-delay: 1s; // leicht nach links verschieben
+      animation-delay: 1s;
     }
 
     .text {
       opacity: 0;
       transform: translateX(-20px);
       animation: textFadeIn 0.8s ease forwards;
-      animation-delay: 1.3s; // kurz nach Logo-Shift
+      animation-delay: 1.3s;
       white-space: nowrap;
       font-size: 88px;
       font-weight: 700;
@@ -39,14 +39,12 @@
   }
 }
 
-/* Schritt 1 → Logo verschiebt sich leicht */
 @keyframes logoShift {
   to {
     transform: translateX(-100px);
   }
 }
 
-/* Schritt 1.5 → Text fädelt von links nach rechts ein */
 @keyframes textFadeIn {
   to {
     opacity: 1;
@@ -54,14 +52,12 @@
   }
 }
 
-/* Schritt 2 → Logo + Text schrumpfen & nach links oben */
 @keyframes moveToCorner {
   to {
     transform: translate(-40vw, -40vh) scale(0.4);
   }
 }
 
-/* Schritt 3 → Hintergrund transparent machen */
 @keyframes fadeOutBg {
   0% {
     opacity: 1;
