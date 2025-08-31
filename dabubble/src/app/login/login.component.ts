@@ -54,31 +54,32 @@ export class LoginComponent implements OnInit {
     this.performLogin();
   }
 
+
+  private async handleLoginAction(loginPromise: Promise<any>) {
+    this.showOverlay = true;
+    const cred = await loginPromise;
+    await this.setUserPresenceOnline(cred.user.uid);
+    this.router.navigate(['/main']);
+  }
+
+
   private async performLogin(): Promise<void> {
+    const { email, password } = this.loginForm.value;
+
     try {
-      this.showOverlay = true;
-      this.overlayVariant = 'login';
-      const { email, password } = this.loginForm.value;
-      const cred = await signInWithEmailAndPassword(this.auth, email, password);
-      await this.setUserPresenceOnline(cred.user.uid);
-      this.router.navigate(['/main']);
+      await this.handleLoginAction(signInWithEmailAndPassword(this.auth, email, password));
     } catch (err) {
       this.showOverlay = false;
-      this.loginForm.get('password')?.reset();
       this.loginForm.markAllAsTouched();
-      return;
+      this.loginForm.get('password')?.reset();
     }
   }
 
   async loginWithGoogle(): Promise<void> {
-    this.showOverlay = true;
-    this.overlayVariant = 'login';
+    const provider = new GoogleAuthProvider();
 
     try {
-      const provider = new GoogleAuthProvider();
-      const cred = await signInWithPopup(this.auth, provider);
-      await this.setUserPresenceOnline(cred.user.uid);
-      this.router.navigate(['/main']);
+      await this.handleLoginAction(signInWithPopup(this.auth, provider));
     } catch (err) {
       this.showOverlay = false;
       console.error('Google Login fehlgeschlagen:', err);
@@ -86,16 +87,11 @@ export class LoginComponent implements OnInit {
   }
 
   async guestLogin(): Promise<void> {
-    this.showOverlay = true;
-    this.overlayVariant = 'login';
-
     try {
-      const cred = await signInWithEmailAndPassword(this.auth, this.guestEmail, this.guestPassword);
-      await this.setUserPresenceOnline(cred.user.uid);
-      this.router.navigate(['/main']);
+      await this.handleLoginAction(signInWithEmailAndPassword(this.auth, this.guestEmail, this.guestPassword));
     } catch (err) {
       this.showOverlay = false;
-      console.error('Gast-Login fehlgeschlagen', err);
+      console.error('Gast-Login fehlgeschlagen:', err);
     }
   }
 
