@@ -36,12 +36,29 @@
 
 .name-container {
     width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     pointer-events: none;
+}
+
+.edit-info-container {
+    display: flex;
+    gap: 20px;
 }
 
 .edit-info {
     font-size: 20px;
     font-weight: 700;
+}
+
+.input {
+    width: 420px;
+    padding: 15px 20px;
+    box-sizing: border-box;
+    border-radius: 30px;
+    border: 1px solid #adb0d9;
+    font-size: 18px;
 }
 
 .btn-container {
@@ -63,12 +80,22 @@
 }
 
 .save-btn {
-    
     background-color: #444df2;
     color: #ffffff;
 
     &:hover {
         background-color: #797ef3;
+    }
+}
+
+.cancel-btn {
+    background-color: #ffffff;
+    color: #444df2;
+    border: 1px solid #797ef3;
+
+    &:hover {
+        background-color: #797ef3;
+        color: #ffffff;
     }
 }
 
