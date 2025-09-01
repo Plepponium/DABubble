@@ -2,6 +2,7 @@
     width: 100%;
     padding-top: 25px;
     display: flex;
+    position: relative;
 }
 
 .logo {
@@ -69,6 +70,7 @@
     align-items: center;
     gap: 20px;
     cursor: pointer;
+
     &:hover {
         .user-name {
             color: #535AF1;
