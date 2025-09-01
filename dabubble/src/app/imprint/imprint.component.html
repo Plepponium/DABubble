@@ -1,1 +1,15 @@
-<p>imprint works!</p>
+<app-auth-layout variant="imprint" [hideLegalLinks]="true">
+    <button [routerLink]="['/']" class="arrow-back">
+        <img src="/assets/icons/arrow_back.svg">
+    </button>
+    <div class="login-header">
+        <h1>Impressum</h1>
+        <span>[Student Names List] <br>
+            [Address of the DABubble operator] <br>
+            [Postcode and city]</span>
+    </div>
+    <div class="imprint-contact">
+        <h2>Contact:</h2>
+        <span>Email: [Deine Email]</span>
+    </div>
+</app-auth-layout>

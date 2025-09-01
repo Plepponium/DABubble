@@ -183,6 +183,17 @@
   max-width: 606px;
   width: 606px;
   padding: 40px 50px;
+  border-radius: 30px;
+}
+
+.login-card.privacy {
+  padding: 48px 56px;
+  align-items: center;
+  width: unset;
+}
+.login-card.imprint {
+  padding: 48px 56px;
+  padding-bottom: 64px;
 }
 
 .legal-links {
@@ -202,4 +213,10 @@
       box-shadow: 0 0 0 1px $lightpurple;
     }
   }
+}
+
+.text {
+  position: absolute;
+  left: 150px;
+  bottom: 150px;
 }

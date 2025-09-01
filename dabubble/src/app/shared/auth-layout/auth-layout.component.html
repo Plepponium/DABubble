@@ -29,19 +29,21 @@
 
 
 <div class="login">
-  <img src="/assets/img/login-logo-small.svg" class="logo" (click)="onLogoClick()"/>
+  <img src="/assets/img/login-logo-small.svg" class="logo" (click)="onLogoClick()" />
 
   <div class="register" *ngIf="showRegister">
     <span>Neu bei DABubble?</span>
     <button [routerLink]="['/signup']">Konto erstellen</button>
   </div>
 
-  <mat-card class="login-card">
+  <mat-card class="login-card" [ngClass]="variant">
     <ng-content></ng-content>
   </mat-card>
 
-  <div class="legal-links">
-    <a routerLink="/imprint" target="_blank">Impressum</a>
-    <a routerLink="/privacy" target="_blank">Datenschutz</a>
+  <div class="legal-links" *ngIf="!hideLegalLinks">
+    <a routerLink="/imprint">Impressum</a>
+    <a routerLink="/privacy">Datenschutz</a>
   </div>
+
+  <span class="text font-32 font-w-700" *ngIf="variant === 'privacy'">In construction</span>
 </div>

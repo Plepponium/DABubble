@@ -1,0 +1,27 @@
+@use "../../styles/variables" as *;
+@use "../../styles/shared-classes";
+
+.arrow-back {
+  position: unset;
+  justify-content: flex-start;
+  width: 40px;
+}
+
+.login-header {
+  margin-top: 16px;
+  text-align: left;
+}
+
+.imprint-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  h2 {
+    color: $purple1;
+    font-size: 32px;
+    font-weight: 700;
+  }
+  span {
+    font-size: 20px;
+  }
+}
