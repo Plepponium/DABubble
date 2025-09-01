@@ -1,15 +1,15 @@
-import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 
 @Component({
-  selector: 'app-profile-overlay',
+  selector: 'app-edit-user',
   imports: [CommonModule, RoundBtnComponent],
-  templateUrl: './profile-overlay.component.html',
-  styleUrl: './profile-overlay.component.scss'
+  templateUrl: './edit-user.component.html',
+  styleUrl: './edit-user.component.scss'
 })
-export class ProfileOverlayComponent {
-  animationClass = '';
+export class EditUserComponent {
+   animationClass = '';
 
   // @Input() isOpen = false;              // wird von außen gesetzt
   @Output() close = new EventEmitter<void>();

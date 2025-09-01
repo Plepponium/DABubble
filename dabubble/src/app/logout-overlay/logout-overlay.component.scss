@@ -14,7 +14,7 @@
     border-bottom-right-radius: 30px;
     box-shadow: 4px 4px 7px 0px rgba(0, 0, 0, 0.2);
     box-sizing: border-box;
-    z-index: 9;
+    z-index: 6;
 }
 
 .btn {
@@ -25,4 +25,5 @@
     font-size: 24px;
     font-weight: 600;
     box-sizing: border-box;
+    cursor: pointer;
 }
