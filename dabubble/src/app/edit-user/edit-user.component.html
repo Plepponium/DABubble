@@ -1,6 +1,6 @@
 <div class="dialogue-overlay">
     <div class="dialogue-overlay-header">
-        <div>Profil</div>
+        <div>Dein Profil bearbeiten</div>
         <app-round-btn (click)="handleClose()" iconSrc="assets/icons/close.svg"
             iconHoverSrc="assets/icons/close-purple.svg"
             altText="Schließen">
@@ -12,26 +12,40 @@
     </div>
 
     <div class="name-container">
-        <div class="user-name">Elise Roth</div>
-        <div class="online-info">
+        <div class="edit-info-container">
+            <img src="" alt="">
+            <div class="edit-info">Vollständiger Name</div>
+        </div>
+        
+
+        <div class="input-container">
+            <input type="text" placeholder="User Name">
+        </div>
+        <!-- <div class="online-info">
             <div class="online-signal-solo online"></div>
             <div class="online-status">Abwesend</div>
-        </div>
+        </div> -->
     </div>
 
-    <div class="mail-container">
+    <!-- <div class="mail-container">
         <div class="mail-address">
             <img src="assets/icons/mail.svg" alt="">
             <div>E-Mail-Adresse</div>                    
         </div>
         <div class="mail">rothelise&#64;beispiel.com</div>
-    </div>
+    </div> -->
 
     <div class="btn-container">
-        <button class="message-btn" [class.wiggle]="animationClass === 'wiggle'" 
+        <button class="btn message-btn" [class.wiggle]="animationClass === 'wiggle'" 
   (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
-            <img src="assets/icons/mode_comment.svg" alt="">
-            <div class="f-nunito">Nachricht</div>        
+            <!-- <img src="assets/icons/mode_comment.svg" alt=""> -->
+            <div class="f-nunito">Abbrechen</div>        
+        </button>
+
+        <button class="btn save-btn" [class.wiggle]="animationClass === 'wiggle'" 
+  (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+            <!-- <img src="assets/icons/mode_comment.svg" alt=""> -->
+            <div class="f-nunito">Speichern</div>        
         </button>
     </div>
     
