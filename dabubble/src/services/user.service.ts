@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { Auth, authState } from '@angular/fire/auth';
-import { Firestore, collectionData, collection, doc, docData } from '@angular/fire/firestore';
+import { Auth, authState, signOut } from '@angular/fire/auth';
+import { Firestore, collectionData, collection, doc, docData, updateDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Observable, switchMap, of } from 'rxjs';
 import { User } from '../models/user.class';
 
@@ -23,5 +23,17 @@ export class UserService {
   getUsers(): Observable<User[]> {
     const usersCollection = collection(this.firestore, 'users');
     return collectionData(usersCollection, { idField: 'id' }) as Observable<User[]>;
+  }
+
+  async logout(): Promise<void> {
+    const user = this.auth.currentUser;
+    if (user) {
+      const userRef = doc(this.firestore, 'users', user.uid);
+      await updateDoc(userRef, {
+        lastSeen: serverTimestamp(),
+        presence: 'offline'
+      });
+    }
+    await signOut(this.auth);
   }
 }
