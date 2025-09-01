@@ -113,6 +113,16 @@
     align-items: center;
 }
 
+.dialogue-backdrop {
+    position: fixed;
+    inset: 0; /* top, right, bottom, left: 0 */
+    background-color: rgba(0,0,0,0.5); /* Abdunklung */
+    display: flex;
+    justify-content: flex-end; /* Panel rechts andocken */
+    align-items: flex-start;   /* oben ausrichten */
+    z-index: 5;
+}
+
 @media(max-width: 1445px) {
     .searchBar {
         width: 514px;

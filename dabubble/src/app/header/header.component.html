@@ -10,7 +10,7 @@
         </button>
     </div>
 
-    <div class="user" *ngIf="currentUser$ | async as user">
+    <div (click)="openDialogueLogout()" class="user" *ngIf="currentUser$ | async as user">
         <div id="user-name" class="user-name font-32 font-w-700">{{ user.name }}</div>
         <div class="img-container">
             <img class="user-img" [src]="'assets/user-icons/' + getAvatarImg(user) + '.svg'" alt="Avatar">
@@ -22,4 +22,12 @@
             <img class="hover-icon-purple" src="assets/icons/expand_more-purple.svg" alt="">
         </div>
     </div>
+
+    <div (click)="closeDialogueLogout()" *ngIf="showLogoutDialogue" class="dialogue-backdrop"></div>
+    <app-logout-overlay
+        *ngIf="showLogoutDialogue"
+        (close)="closeDialogueLogout()" 
+        (openUserProfile)="openDialogueUserProfile()"
+        (logout)="logout()">
+    </app-logout-overlay>
 </div>
