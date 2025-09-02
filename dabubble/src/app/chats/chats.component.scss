@@ -90,7 +90,14 @@
     &:hover {
         background-color: #eceefe;
         color: #444DF2;
+        font-weight: 700;
     }
+}
+
+.users-display-active {
+    background-color: #eceefe;
+    color: #444DF2;
+    font-weight: 700;
 }
 
 .user-pics {
@@ -131,6 +138,13 @@
     justify-content: flex-end; /* Panel rechts andocken */
     align-items: flex-start;   /* oben ausrichten */
     z-index: 5;
+}
+
+.overlay-box {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    width: 540px;
 }
 
 // .dialogue-overlay-show-user {

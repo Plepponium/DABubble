@@ -1,9 +1,8 @@
 .dialogue-overlay {
-    // max-width: 500px;
-    // width: 100%;
     position: absolute;
-    top: 80px;
-    right: 96px;
+    top: 0px;
+    // right: 72px;
+    // left: 172px;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -42,6 +41,7 @@
     width: 434px;
     font-size: 18px;
     padding: 15px 20px;
+    box-sizing: border-box;
     border-radius: 30px;
     border: 1px solid #adb0d9;
 }

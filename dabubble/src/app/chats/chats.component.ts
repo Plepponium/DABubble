@@ -20,6 +20,7 @@ export class ChatsComponent {
   value = 'Clear me';
   showUserDialogue = false;
   showAddDialogue = false;
+  usersDisplayActive =false;
   showProfileDialogue = false;
   editCommentDialogueExpanded = false;
 
@@ -27,10 +28,14 @@ export class ChatsComponent {
 
   openDialogueShowUser() {
     this.showUserDialogue = true;
+    this.usersDisplayActive = true;
   }
 
   closeDialogueShowUser() {
     this.showUserDialogue = false;
+    if(this.showAddDialogue = false) {
+      this.usersDisplayActive = false;
+    }
   }
 
   openDialogueAddUser() {
@@ -40,6 +45,7 @@ export class ChatsComponent {
 
   closeDialogueAddUser() {
     this.showAddDialogue = false;
+    this.usersDisplayActive = false;
   }
 
   openDialogueShowProfile() {

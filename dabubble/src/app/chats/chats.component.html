@@ -12,7 +12,7 @@
             </div>
 
             <div class="header-right">
-                <div (click)="openDialogueShowUser()" class="users-display">
+                <div (click)="openDialogueShowUser()" class="users-display" [ngClass]="{'users-display-active': usersDisplayActive}">
                     <div class="user-pics">
                         <div class="img-box"><img src="assets/user-icons/icon3.svg" alt=""></div>
                         <div class="img-box"><img src="assets/user-icons/icon5.svg" alt=""></div>
@@ -21,7 +21,7 @@
                     <div class="user-counter">3</div>
                 </div>
                 
-                <app-round-btn style="--btn-bg: #eceefe;" iconSrc="assets/icons/person_add.svg"
+                <app-round-btn (click)="openDialogueAddUser()" style="--btn-bg: #eceefe;" iconSrc="assets/icons/person_add.svg"
                     iconHoverSrc="assets/icons/person_add-purple.svg"
                     altText="Senden">
                 </app-round-btn>
@@ -29,19 +29,21 @@
         </div>
         
         <div (click)="closeDialogueShowUser(); closeDialogueAddUser()" *ngIf="showUserDialogue || showAddDialogue" class="dialogue-backdrop"></div>
-        <app-dialogue-overlay 
-            *ngIf="showUserDialogue"
-            (close)="closeDialogueShowUser()" 
-            (openProfile)="openDialogueShowProfile()"
-            (openAddUser)="openDialogueAddUser()"
-            class="dialogue-overlay-show-user">
-        </app-dialogue-overlay>
+        <div class="overlay-box">
+            <app-dialogue-overlay 
+                *ngIf="showUserDialogue"
+                (close)="closeDialogueShowUser()" 
+                (openProfile)="openDialogueShowProfile()"
+                (openAddUser)="openDialogueAddUser()"
+                class="dialogue-overlay-show-user">
+            </app-dialogue-overlay>
 
-        <app-chat-add-user-overlay
-            *ngIf="showAddDialogue"
-            (close)="closeDialogueAddUser()" 
-            class="dialogue-overlay-add-user">
-        </app-chat-add-user-overlay>
+            <app-chat-add-user-overlay
+                *ngIf="showAddDialogue"
+                (close)="closeDialogueAddUser()" 
+                class="dialogue-overlay-add-user">
+            </app-chat-add-user-overlay>
+        </div>
 
         <div (click)="closeDialogueShowProfile()" *ngIf="showProfileDialogue" class="dialogue-backdrop-profile"></div>
         <app-profile-overlay 
