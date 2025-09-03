@@ -16,6 +16,12 @@ import { MatSidenavModule } from '@angular/material/sidenav';
   styleUrl: './main-page.component.scss'
 })
 export class MainPageComponent {
+  menuOpen = true;
+  menuBtnClose = true;
   threadOpen = true;
 
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+    console.log(this.menuOpen);
+  }
 }

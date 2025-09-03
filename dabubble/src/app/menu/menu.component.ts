@@ -29,6 +29,7 @@ export class MenuComponent implements OnInit {
   usersExpanded = true;
   users$: Observable<User[]>;
   activeUserId?: string;
+  showAddChannelDialogue = false;
 
   constructor(private channelService: ChannelService, private userService: UserService,
     private cdr: ChangeDetectorRef) {
@@ -59,9 +60,13 @@ export class MenuComponent implements OnInit {
     return channel.id;
   }
 
-  addChannel(event: Event) {
+  openAddChannel(event: Event) {
     event.stopPropagation(); // Verhindert, dass das click-Event der list-header-container ausgelöst wird
-    // Logik zum Hinzufügen eines Channels
+    this.showAddChannelDialogue = true;
+  }
+
+  closeAddChannel() {
+    this.showAddChannelDialogue = false;
   }
 
   toggleUsers() {

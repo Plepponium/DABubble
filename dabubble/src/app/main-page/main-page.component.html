@@ -1,13 +1,36 @@
 <div class="main-page">
     <app-header class="header"></app-header>
-    <button class="toggle-menu-btn" type="button" (click)="drawer.toggle()">
+    <button class="toggle-menu-btn" type="button" (click)="toggleMenu()">
+    <!-- <button class="toggle-menu-btn" type="button" (click)="drawer.toggle()"> -->
         <div class="toggle-btn-container">
-            <div class="toggle-btn-text font-20 f-nunito">Workspace-Menü schließen</div>
-            <img src="assets/icons/Show menu.svg" alt="">
+            <div *ngIf="menuOpen" class="toggle-btn-content menu-open">
+                <div class="toggle-btn-text font-20 f-nunito">Workspace-Menü schließen</div>
+                <img class="hover-icon" src="assets/icons/hide-navigation.svg" alt="">
+                <img class="hover-icon-purple" src="assets/icons/hide-navigation-purple.svg" alt="">
+            </div>
+            <div *ngIf="!menuOpen" class="toggle-btn-content menu-closed">
+                <div class="toggle-btn-text font-20 f-nunito">Workspace-Menü öffnen</div>
+                <img class="hover-icon" src="assets/icons/show-navigation.svg" alt="">
+                <img class="hover-icon-purple" src="assets/icons/show-navigation-purple.svg" alt="">
+            </div>
+            
         </div>
     </button>
 
-    <mat-drawer-container class="container" autosize>
+    <div class="container">
+        <!-- <div #drawer class="sidenav" (openMenu)="menuOpen = true" mode="side">
+            <app-menu></app-menu>
+        </div> -->
+        <div #drawer class="sidenav" [class.closed]="!menuOpen" mode="side">
+            <app-menu></app-menu>
+        </div>
+
+        <div class="content" [class.fullwidth]="!menuOpen">
+            <app-chats id="chats" class="chats" (openThread)="threadOpen = true"></app-chats>
+            <app-thread id="thread" class="thread" [hidden]="!threadOpen" (closeThread)="threadOpen = false"></app-thread>
+        </div>
+    </div>
+    <!-- <mat-drawer-container class="container" autosize>
         <mat-drawer #drawer class="sidenav" [opened]="true" mode="side">
             <app-menu></app-menu>
         </mat-drawer>
@@ -16,7 +39,6 @@
             <app-chats id="chats" class="chats" (openThread)="threadOpen = true"></app-chats>
             <app-thread id="thread" class="thread" [hidden]="!threadOpen" (closeThread)="threadOpen = false"></app-thread>
         </div>
-    </mat-drawer-container>
-
+    </mat-drawer-container> -->
     
 </div>

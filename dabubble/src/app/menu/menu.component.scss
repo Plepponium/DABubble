@@ -1,7 +1,7 @@
 .menu {
-    width: 366px;
-    height: calc(100vh - 145px);
-    box-sizing: border-box;
+    // width: 366px;
+    // height: calc(100vh - 145px);
+    // box-sizing: border-box;
     background-color: #ffffff;
     border-radius: 30px;
     padding: 32px 30px;
@@ -210,6 +210,16 @@ mat-toolbar {
             display: block;
         }
     }
+}
+
+.dialogue-backdrop {
+    position: fixed;
+    inset: 0; /* top, right, bottom, left: 0 */
+    background-color: rgba(0,0,0,0.5); /* Abdunklung */
+    display: flex;
+    justify-content: flex-end; /* Panel rechts andocken */
+    align-items: flex-start;   /* oben ausrichten */
+    z-index: 99;
 }
 
 .img-container {
