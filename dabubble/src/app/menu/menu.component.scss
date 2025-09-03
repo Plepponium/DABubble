@@ -121,12 +121,6 @@ mat-toolbar {
     flex-direction: column;
     gap: 15px;
     padding-left: 25px;
-    
-    img {
-        width: 50px;
-        height: 50px;
-        border-radius: 30px;
-    }
 }
 
 .channel, .user {
@@ -146,10 +140,51 @@ mat-toolbar {
 
 .channel {
     &:hover {
-        .channel-icon {
-            color: #535AF1;
+        .hover-icon {
+            display: none;
+        }
+        .hover-icon-purple {
+            display: block;
         }
     }
+}
+
+.channel.active {
+    background-color: #eceefe;
+    color: #535AF1;
+    font-weight: 700;
+    .hover-icon {
+        display: none;
+    }
+    .hover-icon-purple {
+        display: block;
+    }
+}
+
+.channel-icon-container {
+    display: flex;
+    align-items: center;
+}
+
+.user.active {
+    background-color: #eceefe;
+    color: #535AF1;
+    font-weight: 700;
+    // .hover-icon {
+    //     display: none;
+    // }
+    // .hover-icon-purple {
+    //     display: block;
+    // }
+}
+
+.hover-icon, .hover-icon-purple {
+    width: 24px;
+    height: 24px;
+}
+
+.hover-icon-purple {
+    display: none;
 }
 
 .sub-section {
@@ -177,12 +212,6 @@ mat-toolbar {
     }
 }
 
-.active {
-    background-color: #eceefe;
-    color: #535AF1;
-    font-weight: 700;
-}
-
 .img-container {
     width: 50px;
     height: 50px;
@@ -191,4 +220,5 @@ mat-toolbar {
 .user-img {
     width: 50px;
     height: 50px;
+    border-radius: 30px;
 }

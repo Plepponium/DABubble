@@ -34,14 +34,30 @@
 
 
             <div class="channel-section" *ngIf="channelsExpanded">
-                <div class="channel-list">
+                <!-- <div class="channel-list">
                     <div class="channel">
-                        <div class="channel-icon">#</div>
+                        <div class="channel-icon-container">
+                            <img class="hover-icon" src="assets/icons/tag.svg" alt="">
+                            <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
+                        </div>
                         <div>Entwickler-Team</div>
                     </div>
+
                     <div class="channel active">
-                        <div>#</div>
+                        <div class="channel-icon-container">
+                            <img class="hover-icon" src="assets/icons/tag.svg" alt="">
+                            <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
+                        </div>
                         <div>Office-Team</div>
+                    </div>
+                </div> -->
+                <div class="channel-list">
+                    <div (click)="openChannel(channel)" class="channel" *ngFor="let channel of channels" [class.active]="channel.id === activeChannelId">
+                        <div class="channel-icon-container">
+                            <img class="hover-icon" src="assets/icons/tag.svg" alt="">
+                            <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
+                        </div>
+                        <div>{{ channel.name }}</div>
                     </div>
                 </div>
 
@@ -69,24 +85,8 @@
                 </div>
             </div>
 
-            <!-- <div class="user-list" *ngIf="usersExpanded">
-                <div class="user">
-                    <div class="img-container">
-                        <img class="user-img" src="assets/user-icons/icon3.svg" alt="">
-                        <div class="online-signal online"></div>
-                    </div> 
-                    Frederick Beck (Du)
-                </div>
-                <div class="user">
-                    <div class="img-container">
-                        <img class="user-img" src="assets/user-icons/icon5.svg" alt="">
-                        <div class="online-signal offline"></div>
-                    </div> 
-                    Sofia Müller
-                </div>
-            </div> -->
             <div class="user-list" *ngIf="usersExpanded">
-                <div class="user" *ngFor="let user of users$ | async">
+                <div (click)="openUserChat(user)" class="user" *ngFor="let user of users$ | async" [class.active]="user.uid === activeUserId">
                     <div class="img-container">
                         <img class="user-img" [src]="'assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
                         <div class="online-signal" [ngClass]="user.presence"></div>
