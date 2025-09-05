@@ -1,5 +1,6 @@
 <div class="main-page">
     <app-header class="header"></app-header>
+
     <button class="toggle-menu-btn" type="button" (click)="toggleMenu()">
     <!-- <button class="toggle-menu-btn" type="button" (click)="drawer.toggle()"> -->
         <div class="toggle-btn-container">
@@ -22,7 +23,7 @@
             <app-menu></app-menu>
         </div> -->
         <div #drawer class="sidenav" [class.closed]="!menuOpen" mode="side">
-            <app-menu></app-menu>
+            <app-menu (openAddChannel)="openAddChannel()"></app-menu>
         </div>
 
         <div class="content" [class.fullwidth]="!menuOpen">
@@ -40,5 +41,18 @@
             <app-thread id="thread" class="thread" [hidden]="!threadOpen" (closeThread)="threadOpen = false"></app-thread>
         </div>
     </mat-drawer-container> -->
+
+
+    <div (click)="closeAddChannel()" *ngIf="showAddChannelDialogue" class="dialogue-backdrop"></div>
+    <!-- <app-logout-overlay
+        *ngIf="showLogoutDialogue"
+        (close)="closeDialogueLogout()" 
+        (openUser)="openDialogueUser()"
+        (logout)="logout()">
+    </app-logout-overlay> -->
+    <app-add-channel-overlay
+        *ngIf="showAddChannelDialogue"
+        (close)="closeAddChannel()">
+    </app-add-channel-overlay>
     
 </div>

@@ -1,0 +1,115 @@
+.dialogue-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 30px;
+    box-shadow: 4px 4px 7px 0px rgba(0, 0, 0, 0.2);
+    z-index: 8;
+}
+
+// .header-container {
+
+// }
+
+.dialogue-overlay-header {
+    // width: 335px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+label {
+    font-weight: 700;
+}
+
+.optional {
+    font-weight: 400;
+    color: #686868;
+}
+
+input {
+    width: 434px;
+    font-size: 18px;
+    padding: 18px 20px;
+    box-sizing: border-box;
+    border-radius: 30px;
+    border: 1px solid #adb0d9;
+    &:hover {
+        border-color: #797ef3;
+    }
+    &:focus {
+        border-color: #535af1;
+        outline: none;
+    }
+}
+
+.input-with-icon {
+  position: relative; 
+  width: 434px;
+}
+
+/* Input-Styling wie bisher */
+.channel-name {
+  width: 100%;
+  padding: 18px 20px 18px 50px; /* Mehr Padding links, damit Text nicht über Icon läuft */
+//   transition: border-color 0.3s ease;
+}
+
+/* Icon innerhalb des Inputs positionieren */
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 20px; 
+  transform: translateY(-50%); /* Vertikal zentrieren */
+  width: 20px; /* ggf. anpassen */
+  height: 20px;
+  pointer-events: none; /* Icon klickt nicht die Maus */
+}
+
+.btn-container {
+    width: 100%;
+    display: flex;
+    justify-content: end;
+}
+
+.add-btn {
+    width: fit-content;
+    display: flex;
+    gap: 10px;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 25px;
+    background-color: #444df2;
+    // background-color: #686868;
+    color: #ffffff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #797ef3;
+    }
+}
+
+// .wiggle {
+//   animation: wiggle 0.2s ease forwards;
+// }
+
+// @keyframes wiggle {
+//     0%   { transform: translateY(0); }
+//     50%  { transform: translateY(1px); }
+//     100% { transform: translateY(0); }
+// }

@@ -8,20 +8,32 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { AddChannelOverlayComponent } from '../add-channel-overlay/add-channel-overlay.component';
 
 @Component({
   selector: 'app-main-page',
-  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule],
+  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss'
 })
 export class MainPageComponent {
   menuOpen = true;
   menuBtnClose = true;
+  showAddChannelDialogue = true;
   threadOpen = true;
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
-    console.log(this.menuOpen);
+    // console.log(this.menuOpen);
+  }
+
+  openAddChannel() {
+    // event.stopPropagation(); // Verhindert, dass das click-Event der list-header-container ausgelöst wird
+    this.showAddChannelDialogue = true;
+    // this.openAddChannel.emit();
+  }
+
+  closeAddChannel() {
+    this.showAddChannelDialogue = false;
   }
 }

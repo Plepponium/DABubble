@@ -212,15 +212,15 @@ mat-toolbar {
     }
 }
 
-.dialogue-backdrop {
-    position: fixed;
-    inset: 0; /* top, right, bottom, left: 0 */
-    background-color: rgba(0,0,0,0.5); /* Abdunklung */
-    display: flex;
-    justify-content: flex-end; /* Panel rechts andocken */
-    align-items: flex-start;   /* oben ausrichten */
-    z-index: 99;
-}
+// .dialogue-backdrop {
+//     position: fixed;
+//     inset: 0; /* top, right, bottom, left: 0 */
+//     background-color: rgba(0,0,0,0.5); /* Abdunklung */
+//     display: flex;
+//     justify-content: flex-end; /* Panel rechts andocken */
+//     align-items: flex-start;   /* oben ausrichten */
+//     z-index: 99;
+// }
 
 .img-container {
     width: 50px;

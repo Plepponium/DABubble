@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, ChangeDetectionStrategy, Component, signal, OnInit } from '@angular/core';
+import { ChangeDetectorRef, ChangeDetectionStrategy, Component, signal, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,7 +29,8 @@ export class MenuComponent implements OnInit {
   usersExpanded = true;
   users$: Observable<User[]>;
   activeUserId?: string;
-  showAddChannelDialogue = false;
+  // showAddChannelDialogue = false;
+  @Output() openAddChannel = new EventEmitter<void>();
 
   constructor(private channelService: ChannelService, private userService: UserService,
     private cdr: ChangeDetectorRef) {
@@ -60,14 +61,15 @@ export class MenuComponent implements OnInit {
     return channel.id;
   }
 
-  openAddChannel(event: Event) {
+  handleOpenAddChannel(event: Event) {
     event.stopPropagation(); // Verhindert, dass das click-Event der list-header-container ausgelöst wird
-    this.showAddChannelDialogue = true;
+    // this.showAddChannelDialogue = true;
+    this.openAddChannel.emit();
   }
 
-  closeAddChannel() {
-    this.showAddChannelDialogue = false;
-  }
+  // closeAddChannel() {
+  //   this.showAddChannelDialogue = false;
+  // }
 
   toggleUsers() {
     this.usersExpanded = !this.usersExpanded;
