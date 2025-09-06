@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject } from '@angular/core';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -10,9 +11,11 @@ import { RoundBtnComponent } from '../round-btn/round-btn.component';
 })
 export class UserProfileComponent {
 
-  // @Input() isOpen = false;              // wird von außen gesetzt
   @Output() close = new EventEmitter<void>();
   @Output() openEdit = new EventEmitter<void>();
+  @Input() private userService = inject(UserService)
+
+  currentUser$ = this.userService.currentUser$;
 
   handleClose() {
     this.close.emit();

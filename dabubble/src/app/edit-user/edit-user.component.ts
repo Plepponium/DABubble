@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject } from '@angular/core';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-edit-user',
@@ -9,10 +10,12 @@ import { RoundBtnComponent } from '../round-btn/round-btn.component';
   styleUrl: './edit-user.component.scss'
 })
 export class EditUserComponent {
-   animationClass = '';
+  animationClass = '';
 
-  // @Input() isOpen = false;              // wird von außen gesetzt
   @Output() close = new EventEmitter<void>();
+  @Input() private userService = inject(UserService)
+
+  currentUser$ = this.userService.currentUser$;
 
   handleClose() {
     this.close.emit();

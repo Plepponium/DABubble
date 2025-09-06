@@ -10,31 +10,31 @@ body {
 }
 body {
   margin: 0;
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   font-size: 18px;
 }
 
 .online-signal {
-    width: 14px;
-    height: 14px;
-    border: 2px solid #ffffff;
-    border-radius: 100%;
-    box-sizing: border-box;
-    position: absolute;
-    top: 40px;
-    left: 56px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ffffff;
+  border-radius: 100%;
+  box-sizing: border-box;
+  position: absolute;
+  top: 40px;
+  left: 56px;
 }
 
 .online {
-    background-color: #92c83e;
+  background-color: #92c83e;
 }
 
 .offline {
-    background-color: #686868;
+  background-color: #686868;
 }
 
 .f-nunito {
-  font-family: 'Nunito', "Helvetica Neue", sans-serif;
+  font-family: "Nunito", "Helvetica Neue", sans-serif;
 }
 
 .font-32 {
@@ -50,7 +50,7 @@ body {
 }
 
 .font-14 {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .font-w-700 {
@@ -70,7 +70,7 @@ body {
 }
 
 .bg-dark-purple {
-  background-color: #444DF2;
+  background-color: #444df2;
 }
 
 .t-gray {
@@ -78,7 +78,7 @@ body {
 }
 
 .t-light-purple {
-  color: #ADB0D9;
+  color: #adb0d9;
 }
 
 .t-middle-purple {
@@ -86,9 +86,13 @@ body {
 }
 
 .t-purple {
-  color: #535AF1;
+  color: #535af1;
 }
 
 .t-dark-purple {
-  color: #444DF2;
+  color: #444df2;
+}
+
+.t-green {
+  color: #92c83e;
 }

@@ -1,34 +1,37 @@
-<div class="dialogue-overlay">
+<div class="dialogue-overlay" *ngIf="currentUser$ | async as user">
     <div class="dialogue-overlay-header">
         <div>Profil</div>
         <app-round-btn (click)="handleClose()" iconSrc="assets/icons/close.svg"
-            iconHoverSrc="assets/icons/close-purple.svg"
-            altText="Schließen">
+            iconHoverSrc="assets/icons/close-purple.svg" altText="Schließen">
         </app-round-btn>
     </div>
 
     <div class="user-img-container">
-        <img class="user-img" src="assets/user-icons/icon2.svg" alt="">
+        <img class="user-img" [src]="'assets/user-icons/' + user.img + '.svg'">
     </div>
 
     <div class="name-container">
         <div class="name-edit">
-            <div class="user-name">Elise Roth</div>
+            <div class="user-name">{{user.name}}</div>
             <div (click)="handleOpenEdit()" class="edit">Bearbeiten</div>
         </div>
-        
+
         <div class="online-info">
-            <div class="online-signal-solo online"></div>
-            <div class="online-status">Abwesend</div>
+            <div [class]="'online-signal-solo ' + user.presence"></div>
+            <div class="online-status" [ngSwitch]="user.presence">
+                <span class="t-green" *ngSwitchCase="'online'">Aktiv</span>
+                <span class="t-gray" *ngSwitchCase="'offline'">Abwesend</span>
+                <span></span>
+            </div>
         </div>
     </div>
 
     <div class="mail-container">
         <div class="mail-address">
             <img src="assets/icons/mail.svg" alt="">
-            <div>E-Mail-Adresse</div>                    
+            <div>E-Mail-Adresse</div>
         </div>
-        <div class="mail">rothelise&#64;beispiel.com</div>
+        <div class="mail">{{user.email}}</div>
     </div>
-    
+
 </div>

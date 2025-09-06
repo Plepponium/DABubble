@@ -1,14 +1,13 @@
-<div class="dialogue-overlay">
+<div class="dialogue-overlay" *ngIf="currentUser$ | async as user">
     <div class="dialogue-overlay-header">
         <div>Dein Profil bearbeiten</div>
         <app-round-btn (click)="handleClose()" iconSrc="assets/icons/close.svg"
-            iconHoverSrc="assets/icons/close-purple.svg"
-            altText="Schließen">
+            iconHoverSrc="assets/icons/close-purple.svg" altText="Schließen">
         </app-round-btn>
     </div>
 
     <div class="user-img-container">
-        <img class="user-img" src="assets/user-icons/icon2.svg" alt="">
+        <img class="user-img" [src]="'assets/user-icons/' + user.img + '.svg'">
     </div>
 
     <div class="name-container">
@@ -18,21 +17,21 @@
         </div>
 
         <div class="input-container">
-            <input class="input" type="text" placeholder="User Name">
+            <input class="input" type="text" [placeholder]="user.name">
         </div>
     </div>
 
 
     <div class="btn-container">
-        <button class="btn cancel-btn" [class.wiggle]="animationClass === 'wiggle'" 
-  (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
-            <div class="f-nunito">Abbrechen</div>        
+        <button class="btn cancel-btn" [class.wiggle]="animationClass === 'wiggle'" (mouseenter)="onMouseEnter()"
+            (mouseleave)="onMouseLeave()">
+            <div class="f-nunito">Abbrechen</div>
         </button>
 
-        <button class="btn save-btn" [class.wiggle]="animationClass === 'wiggle'" 
-  (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
-            <div class="f-nunito">Speichern</div>        
+        <button class="btn save-btn" [class.wiggle]="animationClass === 'wiggle'" (mouseenter)="onMouseEnter()"
+            (mouseleave)="onMouseLeave()">
+            <div class="f-nunito">Speichern</div>
         </button>
     </div>
-    
+
 </div>
