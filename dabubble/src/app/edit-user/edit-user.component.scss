@@ -45,6 +45,7 @@
 .edit-info-container {
     display: flex;
     gap: 20px;
+    pointer-events: none;
 }
 
 .edit-info {
