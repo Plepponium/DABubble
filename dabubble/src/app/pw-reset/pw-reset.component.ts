@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthLayoutComponent } from '../shared/auth-layout/auth-layout.component';
 import { Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-pw-reset',
@@ -12,22 +14,14 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 })
 export class PwResetComponent {
   resetForm: FormGroup;
+  auth = inject(Auth)
   submitted = false;
-
   showOverlay = false;
   overlayVariant: 'login' | 'created' | 'sent' | 'changed' = 'sent';
 
   constructor(private fb: FormBuilder, private router: Router) {
     this.resetForm = this.fb.group({
-      email: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(
-            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-          )
-        ]
-      ],
+      email: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
     });
   }
 
@@ -47,10 +41,11 @@ export class PwResetComponent {
   sendMail() {
     this.overlayVariant = 'sent';
     this.showOverlay = true;
+    sendPasswordResetEmail(this.auth, this.resetForm.value.email)
 
     setTimeout(() => {
       this.showOverlay = false;
-      this.router.navigate(['/']);
+      this.router.navigate(['password/change']);
     }, 1500);
   }
 }
