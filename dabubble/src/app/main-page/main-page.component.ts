@@ -19,7 +19,7 @@ import { AddChannelOverlayComponent } from '../add-channel-overlay/add-channel-o
 export class MainPageComponent {
   menuOpen = true;
   menuBtnClose = true;
-  showAddChannelDialogue = true;
+  showAddChannelDialogue = false;
   threadOpen = true;
 
   toggleMenu() {

@@ -23,7 +23,7 @@
 
 
     <div class="btn-container">
-        <button class="btn cancel-btn" [class.wiggle]="animationClass === 'wiggle'" (mouseenter)="onMouseEnter()"
+        <button (click)="handleClose()" class="btn cancel-btn" [class.wiggle]="animationClass === 'wiggle'" (mouseenter)="onMouseEnter()"
             (mouseleave)="onMouseLeave()">
             <div class="f-nunito">Abbrechen</div>
         </button>
