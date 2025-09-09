@@ -9,14 +9,15 @@ export class UserService {
   private auth = inject(Auth);
   private firestore = inject(Firestore);
 
-  public currentUser$: Observable<User | undefined> = authState(this.auth).pipe(
-    switchMap(userAuth => {
-      if (!userAuth) return of(undefined);
-      const userRef = doc(this.firestore, 'users', userAuth.uid);
-      return docData(userRef, { idField: 'uid' }) as Observable<User>;
-    }),
-    shareReplay(1)
-  );
+  public currentUser$: Observable<User | undefined> =
+    authState(this.auth).pipe(
+      switchMap(userAuth => {
+        if (!userAuth) return of(undefined);
+        const userRef = doc(this.firestore, 'users', userAuth.uid);
+        return docData(userRef, { idField: 'uid' }) as Observable<User>;
+      }),
+      shareReplay(1)
+    );
 
 
   getUsers(): Observable<User[]> {

@@ -13,7 +13,7 @@ export class EditUserComponent {
   animationClass = '';
 
   @Output() close = new EventEmitter<void>();
-  @Input() private userService = inject(UserService)
+  userService = inject(UserService)
 
   currentUser$ = this.userService.currentUser$;
 

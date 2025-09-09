@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, ChangeDetectionStrategy, Component, signal, OnInit, Output, EventEmitter } from '@angular/core';
+import { ChangeDetectorRef, ChangeDetectionStrategy, Component, signal, OnInit, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,15 +27,18 @@ export class MenuComponent implements OnInit {
   channels: Channel[] = [];
   activeChannelId?: string;
   usersExpanded = true;
-  users$: Observable<User[]>;
   activeUserId?: string;
   // showAddChannelDialogue = false;
   @Output() openAddChannel = new EventEmitter<void>();
 
-  constructor(private channelService: ChannelService, private userService: UserService,
-    private cdr: ChangeDetectorRef) {
-    this.users$ = this.userService.getUsers();
-  }
+  userService = inject(UserService);
+  channelService = inject(ChannelService)
+
+  currentUser$ = this.userService.currentUser$;
+  users$ = this.userService.getUsers();
+
+
+  constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.channelService.getChannels().subscribe(data => {

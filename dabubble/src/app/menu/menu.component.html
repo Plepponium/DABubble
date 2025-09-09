@@ -4,11 +4,10 @@
             <img src="assets/icons/workspace-logo.svg" alt="">
             <span class="font-24 font-w-700 f-nunito">Devspace</span>
         </div>
-        
+
         <span class="example-spacer"></span>
-        
-        <app-round-btn iconSrc="assets/icons/edit_square.svg"
-            iconHoverSrc="assets/icons/edit_square-purple.svg"
+
+        <app-round-btn iconSrc="assets/icons/edit_square.svg" iconHoverSrc="assets/icons/edit_square-purple.svg"
             altText="Bearbeiten">
         </app-round-btn>
     </mat-toolbar>
@@ -17,8 +16,10 @@
         <div class="menu-section">
             <div class="list-header-container">
                 <div (click)="toggleChannels()" class="list-header font-20">
-                    <img class="arrow-img hover-icon" src="assets/icons/arrow_drop_down.svg" [class.rotated]="!channelsExpanded" alt="">
-                    <img class="arrow-img hover-icon-purple" src="assets/icons/arrow_drop_down-purple.svg" [class.rotated]="!channelsExpanded" alt="">
+                    <img class="arrow-img hover-icon" src="assets/icons/arrow_drop_down.svg"
+                        [class.rotated]="!channelsExpanded" alt="">
+                    <img class="arrow-img hover-icon-purple" src="assets/icons/arrow_drop_down-purple.svg"
+                        [class.rotated]="!channelsExpanded" alt="">
                     <div class="list-headline font-w-700">
                         <img class="hover-icon" src="assets/icons/workspaces.svg" alt="">
                         <img class="hover-icon-purple" src="assets/icons/workspaces-purple.svg" alt="">
@@ -52,7 +53,8 @@
                     </div>
                 </div> -->
                 <div class="channel-list">
-                    <div (click)="openChannel(channel)" class="channel" *ngFor="let channel of channels" [class.active]="channel.id === activeChannelId">
+                    <div (click)="openChannel(channel)" class="channel" *ngFor="let channel of channels"
+                        [class.active]="channel.id === activeChannelId">
                         <div class="channel-icon-container">
                             <img class="hover-icon" src="assets/icons/tag.svg" alt="">
                             <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
@@ -61,10 +63,10 @@
                     </div>
                 </div>
 
-                <div class="sub-section"  (click)="handleOpenAddChannel($event)">
+                <div class="sub-section" (click)="handleOpenAddChannel($event)">
                     <!-- <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon"> -->
-                        <img class="hover-icon" src="assets/icons/add_circle.svg" alt="">
-                        <img class="hover-icon-purple" src="assets/icons/add_circle-purple.svg" alt="">
+                    <img class="hover-icon" src="assets/icons/add_circle.svg" alt="">
+                    <img class="hover-icon-purple" src="assets/icons/add_circle-purple.svg" alt="">
                     <!-- </button> -->
                     Channel hinzufügen
                 </div>
@@ -78,12 +80,14 @@
             (openUser)="openDialogueUser()"
             (logout)="logout()">
         </app-logout-overlay> -->
-        
+
         <div class="menu-section">
             <div class="list-header-container">
                 <div (click)="toggleUsers()" class="list-header font-20">
-                    <img class="arrow-img hover-icon" src="assets/icons/arrow_drop_down.svg" [class.rotated]="!usersExpanded" alt="">
-                    <img class="arrow-img hover-icon-purple" src="assets/icons/arrow_drop_down-purple.svg" [class.rotated]="!usersExpanded" alt="">
+                    <img class="arrow-img hover-icon" src="assets/icons/arrow_drop_down.svg"
+                        [class.rotated]="!usersExpanded" alt="">
+                    <img class="arrow-img hover-icon-purple" src="assets/icons/arrow_drop_down-purple.svg"
+                        [class.rotated]="!usersExpanded" alt="">
                     <div class="list-headline font-w-700">
                         <img class="hover-icon" src="assets/icons/account_circle.svg" alt="">
                         <img class="hover-icon-purple" src="assets/icons/account_circle-purple.svg" alt="">
@@ -93,17 +97,18 @@
             </div>
 
             <div class="user-list" *ngIf="usersExpanded">
-                <div (click)="openUserChat(user)" class="user" *ngFor="let user of users$ | async" [class.active]="user.uid === activeUserId">
-                    <div class="img-container">
-                        <img class="user-img" [src]="'assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
-                        <div class="online-signal" [ngClass]="user.presence"></div>
-                    </div> 
-                    {{ user.name }}  
-                    <!-- <span *ngIf="user.isCurrentUser">(Du)</span>  -->
-                    <!-- optional, je nach Daten -->
-                </div>
+                <ng-container *ngIf="(currentUser$ | async) as currentUser">
+                    <div (click)="openUserChat(user)" class="user" *ngFor="let user of users$ | async"
+                        [class.active]="user.uid === activeUserId">
+                        <div class="img-container">
+                            <img class="user-img" [src]="'assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
+                            <div class="online-signal" [ngClass]="user.presence"></div>
+                        </div>
+                        {{ user.name }}{{ user.uid === currentUser.uid ? ' (Du)' : '' }}
+                    </div>
+                </ng-container>
             </div>
         </div>
     </div>
-    
+
 </div>
