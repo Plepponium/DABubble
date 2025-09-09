@@ -44,6 +44,11 @@ label {
     color: #686868;
 }
 
+.input-wrapper {
+  position: relative; 
+  width: 100%;
+}
+
 input {
     width: 100%;
     font-size: 18px;
@@ -60,11 +65,6 @@ input {
     }
 }
 
-.input-with-icon {
-  position: relative; 
-  width: 100%;
-}
-
 /* Input-Styling wie bisher */
 .channel-name {
   width: 100%;
@@ -72,15 +72,14 @@ input {
 //   transition: border-color 0.3s ease;
 }
 
-/* Icon innerhalb des Inputs positionieren */
 .input-icon {
   position: absolute;
   top: 50%;
   left: 20px; 
-  transform: translateY(-50%); /* Vertikal zentrieren */
-  width: 20px; /* ggf. anpassen */
-  height: 20px;
-  pointer-events: none; /* Icon klickt nicht die Maus */
+  transform: translateY(-50%);
+//   width: 23px; 
+//   height: 23px;
+  pointer-events: none; 
 }
 
 .btn-container {
