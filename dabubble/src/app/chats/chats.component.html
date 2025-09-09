@@ -32,7 +32,7 @@
         <div (click)="closeDialogueShowUser(); closeDialogueAddUser(); closeDialogChannelDescription()"
             *ngIf="showUserDialogue || showAddDialogue || showChannelDescription" class="dialogue-backdrop">
         </div>
-        <div class="overlay-box">
+        <div class="overlay-box" [ngClass]="{'overlay-channel-description': showChannelDescription}">
             <app-dialogue-overlay *ngIf="showUserDialogue" (close)="closeDialogueShowUser()"
                 (openProfile)="openDialogueShowProfile()" (openAddUser)="openDialogueAddUser()"
                 class="dialogue-overlay-show-user">
@@ -43,7 +43,6 @@
             </app-chat-add-user-overlay>
 
             <app-channel-description-overlay *ngIf="showChannelDescription" (close)="closeDialogChannelDescription()">
-
             </app-channel-description-overlay>
         </div>
 

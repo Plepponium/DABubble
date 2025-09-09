@@ -146,6 +146,12 @@
   top: 80px;
   right: 20px;
   width: 540px;
+
+  &.overlay-channel-description {
+    top: 65px;
+    left: 45px;
+    right: unset;
+  }
 }
 
 // .dialogue-overlay-show-user {
