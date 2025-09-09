@@ -34,7 +34,8 @@ export class AddChannelOverlayComponent {
     const newChannel = {
       name: this.channelName,
       description: this.description,
-      user: this.currentUser, 
+      createdBy: this.currentUser,
+      participants: this.currentUser, 
       // createdAt: new Date() // Optional
     };
     this.channelService.addChannel(newChannel).then(() => {

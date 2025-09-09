@@ -54,7 +54,8 @@ export class MenuComponent implements OnInit {
 
   openChannel(channel: Channel) {
     this.activeChannelId = channel.id;
-    this.activeUserId = '';
+    // this.activeUserId = '';
+    console.log(channel.id);
   }
 
   trackByChannelId(index: number, channel: Channel): string {
