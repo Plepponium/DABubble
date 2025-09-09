@@ -3,8 +3,8 @@ export class Channel {
   name: string = '';
   description?: string;
   user: string = '';
-  createdBy?: string;
-  createdAt?: any;
+  // createdBy?: string;
+  // createdAt?: any;
   lastMessage?: any;
   chats?: string;
 
