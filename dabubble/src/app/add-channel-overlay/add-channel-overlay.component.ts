@@ -30,7 +30,7 @@ export class AddChannelOverlayComponent {
     this.close.emit();
   }
 
-  addChannel() {
+  handleAddChannel() {
     const newChannel = {
       name: this.channelName,
       description: this.description,
