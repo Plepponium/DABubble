@@ -1,7 +1,7 @@
 <div class="chats">
     <div class="header">
         <div class="header-inner-container">
-            <div class="header-left">
+            <div class="header-left" (click)="openDialogChannelDescription()">
                 <div class="channel-name-container">
                     <img class="hover-icon" src="assets/icons/tag.svg" alt="">
                     <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
@@ -12,7 +12,8 @@
             </div>
 
             <div class="header-right">
-                <div (click)="openDialogueShowUser()" class="users-display" [ngClass]="{'users-display-active': usersDisplayActive}">
+                <div (click)="openDialogueShowUser()" class="users-display"
+                    [ngClass]="{'users-display-active': usersDisplayActive}">
                     <div class="user-pics">
                         <div class="img-box"><img src="assets/user-icons/icon3.svg" alt=""></div>
                         <div class="img-box"><img src="assets/user-icons/icon5.svg" alt=""></div>
@@ -20,35 +21,34 @@
                     </div>
                     <div class="user-counter">3</div>
                 </div>
-                
-                <app-round-btn (click)="openDialogueAddUser()" style="--btn-bg: #eceefe;" iconSrc="assets/icons/person_add.svg"
-                    iconHoverSrc="assets/icons/person_add-purple.svg"
+
+                <app-round-btn (click)="openDialogueAddUser()" style="--btn-bg: #eceefe;"
+                    iconSrc="assets/icons/person_add.svg" iconHoverSrc="assets/icons/person_add-purple.svg"
                     altText="Senden">
                 </app-round-btn>
             </div>
         </div>
-        
-        <div (click)="closeDialogueShowUser(); closeDialogueAddUser()" *ngIf="showUserDialogue || showAddDialogue" class="dialogue-backdrop"></div>
+
+        <div (click)="closeDialogueShowUser(); closeDialogueAddUser(); closeDialogChannelDescription()"
+            *ngIf="showUserDialogue || showAddDialogue || showChannelDescription" class="dialogue-backdrop">
+        </div>
         <div class="overlay-box">
-            <app-dialogue-overlay 
-                *ngIf="showUserDialogue"
-                (close)="closeDialogueShowUser()" 
-                (openProfile)="openDialogueShowProfile()"
-                (openAddUser)="openDialogueAddUser()"
+            <app-dialogue-overlay *ngIf="showUserDialogue" (close)="closeDialogueShowUser()"
+                (openProfile)="openDialogueShowProfile()" (openAddUser)="openDialogueAddUser()"
                 class="dialogue-overlay-show-user">
             </app-dialogue-overlay>
 
-            <app-chat-add-user-overlay
-                *ngIf="showAddDialogue"
-                (close)="closeDialogueAddUser()" 
+            <app-chat-add-user-overlay *ngIf="showAddDialogue" (close)="closeDialogueAddUser()"
                 class="dialogue-overlay-add-user">
             </app-chat-add-user-overlay>
+
+            <app-channel-description-overlay *ngIf="showChannelDescription" (close)="closeDialogChannelDescription()">
+
+            </app-channel-description-overlay>
         </div>
 
         <div (click)="closeDialogueShowProfile()" *ngIf="showProfileDialogue" class="dialogue-backdrop-profile"></div>
-        <app-profile-overlay 
-            *ngIf="showProfileDialogue"
-            (close)="closeDialogueShowProfile()" 
+        <app-profile-overlay *ngIf="showProfileDialogue" (close)="closeDialogueShowProfile()"
             class="dialogue-overlay-show-profile">
         </app-profile-overlay>
     </div>
@@ -91,7 +91,7 @@
 
                     <div class="chat-info-container">
                         <div class="chat-start">
-                            <div class="font-w-700">Noah Braun</div> 
+                            <div class="font-w-700">Noah Braun</div>
                             <div class="font-14 t-gray">14:25 Uhr</div>
                         </div>
                         <div class="chat-message left bg-light-purple">Chat</div>
@@ -125,7 +125,7 @@
                 <div class="chat-date-section">
                     <div class="chat-date">Freitag, 1.September</div>
                 </div>
-                
+
                 <div class="chat-section reverse">
                     <div class="chat-dialogue reverse">
                         <button class="add-reaction-btn">
@@ -151,16 +151,18 @@
                                 <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg" alt="">
                             </button>
                         </div>
-                        
+
                     </div>
                     <img class="chat-user-img" src="assets/user-icons/icon3.svg" alt="">
 
                     <div class="chat-info-container">
                         <div class="chat-start reverse">
-                            <div class="font-w-700">Frederik Beck</div> 
+                            <div class="font-w-700">Frederik Beck</div>
                             <div class="font-14 t-gray">15:06 Uhr</div>
                         </div>
-                        <div class="chat-message right">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore perspiciatis aliquid dolorem, porro maiores asperiores libero omnis. Est omnis hic placeat, at eos pariatur corporis eaque quia quasi? Eos, quibusdam?</div>
+                        <div class="chat-message right">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore
+                            perspiciatis aliquid dolorem, porro maiores asperiores libero omnis. Est omnis hic placeat,
+                            at eos pariatur corporis eaque quia quasi? Eos, quibusdam?</div>
                         <div class="chat-answered right">
                             <!-- <div class="answers">
                                 <div class="answer t-purple">Antworten</div>
@@ -199,14 +201,12 @@
                             altText="Reaktion hinzufügen">
                         </app-round-btn>
                         <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
-                            iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
-                            altText="Mail hinzufügen">
+                            iconHoverSrc="assets/message-icons/alternate_email-purple.svg" altText="Mail hinzufügen">
                         </app-round-btn>
                     </div>
-                    
+
                     <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
-                        iconHoverSrc="assets/message-icons/send-purple2.svg"
-                        altText="Senden">
+                        iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden">
                     </app-round-btn>
                 </div>
             </div>
