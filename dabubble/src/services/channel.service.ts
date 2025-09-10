@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Firestore, collectionData, collection, addDoc } from '@angular/fire/firestore';
+import { Firestore, collectionData, collection, doc, addDoc, docData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Channel } from '../models/channel.class';
 
@@ -12,6 +12,11 @@ export class ChannelService {
   getChannels(): Observable<Channel[]> {
     const channelsCollection = collection(this.firestore, 'channels');
     return collectionData(channelsCollection, { idField: 'id' }) as Observable<Channel[]>;
+  }
+
+  getChannelById(channelId: string): Observable<Channel | undefined> {
+    const channelDoc = doc(this.firestore, `channels/${channelId}`);
+    return docData(channelDoc, { idField: 'id' }) as Observable<Channel | undefined>;
   }
 
   getChatsForChannel(channelId: string): Observable<any[]> {

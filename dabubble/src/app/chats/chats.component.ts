@@ -67,7 +67,7 @@ export class ChatsComponent {
   }
 
 
-  
+  //zum speichern von time in firebase (noch nicht in Verwendung)
   handleAddChatToChannel() {
     const date = new Date('2024-05-08T12:13:00Z'); // Z für UTC
     const unixTimestamp = Math.floor(date.getTime() / 1000);

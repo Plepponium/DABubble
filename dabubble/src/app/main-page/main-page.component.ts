@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
 import { MenuComponent } from '../menu/menu.component';
@@ -9,18 +9,22 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { AddChannelOverlayComponent } from '../add-channel-overlay/add-channel-overlay.component';
+import { ChannelService } from '../../services/channel.service';
 
 @Component({
   selector: 'app-main-page',
   imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent],
   templateUrl: './main-page.component.html',
-  styleUrl: './main-page.component.scss'
+  styleUrl: './main-page.component.scss',
+  providers: [ChannelService],
 })
 export class MainPageComponent {
   menuOpen = true;
   menuBtnClose = true;
   showAddChannelDialogue = false;
   threadOpen = true;
+
+  channelService = inject(ChannelService);
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
@@ -35,5 +39,22 @@ export class MainPageComponent {
 
   closeAddChannel() {
     this.showAddChannelDialogue = false;
+  }
+
+  openChannel(channelId: string) {
+    this.channelService.getChannelById(channelId).subscribe(channel => {
+    if (channel) {
+      console.log('Geöffneter Channel mit ID:', channelId);
+      console.log('Channel-Name:', channel.name);
+      // Chats laden etc.
+    }
+  });
+
+    console.log('Geöffneter Channel mit ID:', channelId);
+    // this.channelService.getChatsForChannel(channelId: string);
+    this.channelService.getChatsForChannel(channelId).subscribe(chats => {
+      console.log(chats);
+      // console.log(channelId.name);
+    });
   }
 }

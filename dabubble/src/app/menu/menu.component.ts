@@ -18,7 +18,7 @@ import { Channel } from '../../models/channel.class';
   imports: [CommonModule, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, RoundBtnComponent, FormsModule, RouterModule],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
-  providers: [UserService],
+  providers: [UserService, ChannelService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuComponent implements OnInit {
@@ -30,9 +30,10 @@ export class MenuComponent implements OnInit {
   activeUserId?: string;
   // showAddChannelDialogue = false;
   @Output() openAddChannel = new EventEmitter<void>();
+  @Output() openChannel = new EventEmitter<string>();
 
   userService = inject(UserService);
-  channelService = inject(ChannelService)
+  channelService = inject(ChannelService);
 
   currentUser$ = this.userService.currentUser$;
   users$ = this.userService.getUsers();
@@ -55,28 +56,21 @@ export class MenuComponent implements OnInit {
     this.channelsExpanded = !this.channelsExpanded;
   }
 
-  openChannel(channel: Channel) {
-    this.activeChannelId = channel.id;
-    this.activeUserId = '';
-
-    this.channelService.getChatsForChannel(channel.id).subscribe(chats => {
-    console.log(chats);
-  });
-  }
-
-  trackByChannelId(index: number, channel: Channel): string {
-    return channel.id;
-  }
+  // trackByChannelId(index: number, channel: Channel): string {
+  //   return channel.id;
+  // }
 
   handleOpenAddChannel(event: Event) {
     event.stopPropagation(); // Verhindert, dass das click-Event der list-header-container ausgelöst wird
     // this.showAddChannelDialogue = true;
     this.openAddChannel.emit();
   }
-
-  // closeAddChannel() {
-  //   this.showAddChannelDialogue = false;
-  // }
+  
+  handleOpenChannel(channel: Channel) {
+    this.activeChannelId = channel.id;
+    this.activeUserId = '';
+    this.openChannel.emit(channel.id);
+  }
 
   toggleUsers() {
     this.usersExpanded = !this.usersExpanded;
