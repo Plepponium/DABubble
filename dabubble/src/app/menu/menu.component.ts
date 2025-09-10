@@ -57,8 +57,11 @@ export class MenuComponent implements OnInit {
 
   openChannel(channel: Channel) {
     this.activeChannelId = channel.id;
-    // this.activeUserId = '';
-    console.log(channel.id);
+    this.activeUserId = '';
+
+    this.channelService.getChatsForChannel(channel.id).subscribe(chats => {
+    console.log(chats);
+  });
   }
 
   trackByChannelId(index: number, channel: Channel): string {
