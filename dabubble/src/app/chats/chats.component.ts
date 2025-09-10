@@ -66,6 +66,14 @@ export class ChatsComponent {
     this.showProfileDialogue = false;
   }
 
+
+  
+  handleAddChatToChannel() {
+    const date = new Date('2024-05-08T12:13:00Z'); // Z für UTC
+    const unixTimestamp = Math.floor(date.getTime() / 1000);
+    console.log(unixTimestamp); // 1702061580
+  }
+
   handleOpenThread() {
     this.openThread.emit();
   }

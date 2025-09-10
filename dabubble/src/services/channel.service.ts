@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { Firestore, collectionData, collection, doc, addDoc } from '@angular/fire/firestore';
-import { Observable, switchMap, map } from 'rxjs';
+import { Firestore, collectionData, collection, addDoc } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 import { Channel } from '../models/channel.class';
 
 @Injectable({ providedIn: 'root' })
