@@ -92,22 +92,6 @@ export class ChatsComponent {
     this.showProfileDialogue = false;
   }
 
-  // openChannel() {
-  //   this.channelService.getChannelById(channelId).subscribe(channel => {
-  //     if (channel) {
-  //       console.log('Geöffneter Channel mit ID:', channelId);
-  //       console.log('Channel-Name:', channel.chats);
-  //       // Chats laden etc.
-  //     }
-  //   });
-
-  //   // this.channelService.getChatsForChannel(channelId: string);
-  //   // this.channelService.getChatsForChannel(channelId).subscribe(chats => {
-  //   //   console.log(chats[0]);
-  //     // console.log(channelId.name);
-  //   // });
-  // }
-
 
   //zum speichern von time in firebase (noch nicht in Verwendung)
   handleAddChatToChannel() {

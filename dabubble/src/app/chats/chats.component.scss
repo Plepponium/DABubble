@@ -461,6 +461,14 @@
   display: flex;
   flex-direction: column;
   // justify-content: flex-end;
+  border: 1px solid #adb0d9;
+  &:hover {
+      border-color: #797ef3;
+  }
+  &:focus {
+      border-color: #535af1;
+      outline: none;
+  }
 }
 
 .floating-label {
