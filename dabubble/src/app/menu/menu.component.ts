@@ -32,8 +32,8 @@ export class MenuComponent implements OnInit {
   @Output() openAddChannel = new EventEmitter<void>();
   @Output() openChannel = new EventEmitter<string>();
 
-  private userService = inject(UserService);
-  private channelService = inject(ChannelService);
+  userService = inject(UserService);
+  channelService = inject(ChannelService);
 
   currentUser$ = this.userService.currentUser$;
   users$ = this.userService.getUsers();

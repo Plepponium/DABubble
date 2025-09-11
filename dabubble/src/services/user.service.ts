@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Auth, authState, signOut } from '@angular/fire/auth';
-import { Firestore, collectionData, collection, doc, docData, updateDoc, serverTimestamp } from '@angular/fire/firestore';
+import { Firestore, collectionData, collection, doc, docData, updateDoc, serverTimestamp, query, where } from '@angular/fire/firestore';
 import { Observable, switchMap, of, shareReplay } from 'rxjs';
 import { User } from '../models/user.class';
 
@@ -23,6 +23,15 @@ export class UserService {
   getUsers(): Observable<User[]> {
     const usersCollection = collection(this.firestore, 'users');
     return collectionData(usersCollection, { idField: 'uid' }) as Observable<User[]>;
+  }
+
+  getUsersByIds(uids: string[]): Observable<User[]> {
+    if (uids.length === 0) {
+      return of([]); // Leeres Array wenn keine IDs
+    }
+    const usersCollection = collection(this.firestore, 'users');
+    const q = query(usersCollection, where('uid', 'in', uids));
+    return collectionData(q, { idField: 'uid' }) as Observable<User[]>;
   }
 
   async logout(): Promise<void> {

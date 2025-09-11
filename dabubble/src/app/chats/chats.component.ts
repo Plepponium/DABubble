@@ -11,6 +11,8 @@ import { ProfileOverlayComponent } from '../profile-overlay/profile-overlay.comp
 import { ChatAddUserOverlayComponent } from '../chat-add-user-overlay/chat-add-user-overlay.component';
 import { ChannelDescriptionOverlayComponent } from '../channel-description-overlay/channel-description-overlay.component';
 import { ChannelService } from '../../services/channel.service';
+import { UserService } from '../../services/user.service';
+import { User } from 'firebase/auth';
 
 @Component({
   selector: 'app-chats',
@@ -28,11 +30,15 @@ export class ChatsComponent {
   showProfileDialogue = false;
   editCommentDialogueExpanded = false;
   channelName = '';
+  participantIds = '';
+  participants: User[] = [];
 
   channelService = inject(ChannelService);
+  userService = inject(UserService);
 
   @Input() channelId?: string;
   @Output() openThread = new EventEmitter<void>();
+  
 
   ngOnInit() {
     // Wenn noch keine channelId gesetzt wurde, lade alle Channels und nimm den ersten
@@ -41,6 +47,9 @@ export class ChatsComponent {
         if (channels.length > 0) {
           this.channelId = channels[0].id;
           this.channelName = channels[0].name;
+          this.participantIds = channels[0].participants;
+          // let x = this.userService.getUsersByIds(this.participantIds);
+          console.log(this.participantIds);
         }
       });
     }
@@ -50,9 +59,27 @@ export class ChatsComponent {
     if (changes['channelId'] && this.channelId) {
       this.channelService.getChannelById(this.channelId).subscribe(channel => {
         this.channelName = channel?.name ?? '';
+        this.participantIds = channel?.participants ?? '';
+        // let x = this.userService.getUsersByIds(this.participantIds);
+        // console.log(x);
+        // console.log('onChanges',this.participants);
+        console.log(this.participantIds);
       });
     }
   }
+  // ngOnChanges(changes: SimpleChanges) {
+  //   if (changes['channelId'] && this.channelId) {
+  //     this.channelService.getChannelById(this.channelId).pipe(
+  //       switchMap(channel => {
+  //         this.channelName = channel?.name ?? '';
+  //         const participantIds = channel?.participants ?? [];
+  //         return this.userService.getUsersByIds(participantIds);
+  //       })
+  //     ).subscribe(users => {
+  //       this.participants = users.slice(0, 3);
+  //     });
+  //   }
+  // }
   
   openDialogChannelDescription() {
     this.showChannelDescription = true;

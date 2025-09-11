@@ -53,7 +53,7 @@ export class MainPageComponent {
 
     this.currentChannelId = channelId;      // Channel-ID speichern
 
-    console.log('Geöffneter Channel mit ID:', channelId);
+    // console.log('Geöffneter Channel mit ID:', channelId);
     // this.channelService.getChatsForChannel(channelId: string);
     // this.channelService.getChatsForChannel(channelId).subscribe(chats => {
     //   console.log(chats[0]);
