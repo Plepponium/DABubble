@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,13 +9,15 @@ import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { DialogueOverlayComponent } from '../dialogue-overlay/dialogue-overlay.component';
 import { ProfileOverlayComponent } from '../profile-overlay/profile-overlay.component';
 import { ChatAddUserOverlayComponent } from '../chat-add-user-overlay/chat-add-user-overlay.component';
-import { ChannelDescriptionOverlayComponent } from './channel-description-overlay/channel-description-overlay.component';
+import { ChannelDescriptionOverlayComponent } from '../channel-description-overlay/channel-description-overlay.component';
+import { ChannelService } from '../../services/channel.service';
 
 @Component({
   selector: 'app-chats',
   imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, DialogueOverlayComponent, ProfileOverlayComponent, ChatAddUserOverlayComponent, ChannelDescriptionOverlayComponent],
   templateUrl: './chats.component.html',
-  styleUrl: './chats.component.scss'
+  styleUrl: './chats.component.scss',
+  // providers: [ChannelService],
 })
 export class ChatsComponent {
   value = 'Clear me';
@@ -25,9 +27,33 @@ export class ChatsComponent {
   usersDisplayActive = false;
   showProfileDialogue = false;
   editCommentDialogueExpanded = false;
+  channelName = '';
 
+  channelService = inject(ChannelService);
+
+  @Input() channelId?: string;
   @Output() openThread = new EventEmitter<void>();
 
+  ngOnInit() {
+    // Wenn noch keine channelId gesetzt wurde, lade alle Channels und nimm den ersten
+    if (!this.channelId) {
+      this.channelService.getChannels().subscribe(channels => {
+        if (channels.length > 0) {
+          this.channelId = channels[0].id;
+          this.channelName = channels[0].name;
+        }
+      });
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['channelId'] && this.channelId) {
+      this.channelService.getChannelById(this.channelId).subscribe(channel => {
+        this.channelName = channel?.name ?? '';
+      });
+    }
+  }
+  
   openDialogChannelDescription() {
     this.showChannelDescription = true;
   };
@@ -66,6 +92,22 @@ export class ChatsComponent {
     this.showProfileDialogue = false;
   }
 
+  // openChannel() {
+  //   this.channelService.getChannelById(channelId).subscribe(channel => {
+  //     if (channel) {
+  //       console.log('Geöffneter Channel mit ID:', channelId);
+  //       console.log('Channel-Name:', channel.chats);
+  //       // Chats laden etc.
+  //     }
+  //   });
+
+  //   // this.channelService.getChatsForChannel(channelId: string);
+  //   // this.channelService.getChatsForChannel(channelId).subscribe(chats => {
+  //   //   console.log(chats[0]);
+  //     // console.log(channelId.name);
+  //   // });
+  // }
+
 
   //zum speichern von time in firebase (noch nicht in Verwendung)
   handleAddChatToChannel() {
@@ -73,6 +115,8 @@ export class ChatsComponent {
     const unixTimestamp = Math.floor(date.getTime() / 1000);
     console.log(unixTimestamp); // 1702061580
   }
+
+  addToChats() {}
 
   handleOpenThread() {
     this.openThread.emit();

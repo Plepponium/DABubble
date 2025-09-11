@@ -27,8 +27,8 @@
         </div>
 
         <div class="content" [class.fullwidth]="!menuOpen">
-            <app-chats id="chats" class="chats" (openThread)="threadOpen = true"></app-chats>
-            <app-thread id="thread" class="thread" [hidden]="!threadOpen" (closeThread)="threadOpen = false"></app-thread>
+            <app-chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId" (openThread)="threadOpen = true"></app-chats>
+            <app-thread id="thread" class="thread" *ngIf="channelOpen" [hidden]="!threadOpen" (closeThread)="threadOpen = false"></app-thread>
         </div>
     </div>
     <!-- <mat-drawer-container class="container" autosize>

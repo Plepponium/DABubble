@@ -23,12 +23,13 @@ export class MainPageComponent {
   menuBtnClose = true;
   showAddChannelDialogue = false;
   threadOpen = true;
+  channelOpen = true;
+  currentChannelId?: string;
 
-  channelService = inject(ChannelService);
+  // channelService = inject(ChannelService);
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
-    // console.log(this.menuOpen);
   }
 
   openAddChannel() {
@@ -42,19 +43,19 @@ export class MainPageComponent {
   }
 
   openChannel(channelId: string) {
-    this.channelService.getChannelById(channelId).subscribe(channel => {
-    if (channel) {
-      console.log('Geöffneter Channel mit ID:', channelId);
-      console.log('Channel-Name:', channel.name);
-      // Chats laden etc.
-    }
-  });
+    // this.channelService.getChannelById(channelId).subscribe(channel => {
+    //   if (channel) {
+    //     console.log('Geöffneter Channel mit ID:', channelId);
+    //     console.log('Channel-Name:', channel.chats);
+    //     // Chats laden etc.
+    //   }
+    // });
+
+    this.currentChannelId = channelId;      // Channel-ID speichern
 
     console.log('Geöffneter Channel mit ID:', channelId);
-    // this.channelService.getChatsForChannel(channelId: string);
-    this.channelService.getChatsForChannel(channelId).subscribe(chats => {
-      console.log(chats);
-      // console.log(channelId.name);
-    });
+    
   }
+
+
 }

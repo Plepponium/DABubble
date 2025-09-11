@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { RoundBtnComponent } from '../../round-btn/round-btn.component';
+import { RoundBtnComponent } from '../round-btn/round-btn.component';
 
 @Component({
   selector: 'app-channel-description-overlay',
