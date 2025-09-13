@@ -22,7 +22,7 @@
                 <span>{{ channel.name }}</span>
             </ng-container>
             <ng-container *ngIf="isEditingName">
-                <input type="text" [placeholder]="channel.name" />
+                <input type="text" [(ngModel)]="editedName" [placeholder]="channel.name" />
             </ng-container>
         </div>
     </div>
@@ -39,7 +39,7 @@
                 {{ channel.description }}
             </ng-container>
             <ng-container *ngIf="isEditingDescription">
-                <input type="text" placeholder="Dein Text hier">
+                <input type="text" [(ngModel)]="editedDescription" placeholder="Dein Text hier">
             </ng-container>
         </div>
 

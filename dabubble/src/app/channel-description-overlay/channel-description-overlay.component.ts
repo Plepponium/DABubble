@@ -21,10 +21,15 @@ export class ChannelDescriptionOverlayComponent {
   isEditingName = false;
   isEditingDescription = false;
 
+  editedName = '';
+  editedDescription = '';
+
   ngOnInit() {
     if (this.channelId) {
       this.channelService.getChannelById(this.channelId).subscribe(channel => {
         this.channel = channel;
+        this.editedName = channel.name;
+        this.editedDescription = channel.description || '';
       });
     }
   }
@@ -34,10 +39,27 @@ export class ChannelDescriptionOverlayComponent {
   }
 
   toggleEditName() {
+    if (this.isEditingName && this.channel) {
+      if (this.editedName && this.editedName !== this.channel.name) {
+        this.channelService.updateChannel(this.channel.id, { name: this.editedName })
+          .then(() => {
+            this.channel!.name = this.editedName;
+          });
+      }
+    }
     this.isEditingName = !this.isEditingName;
   }
 
   toggleEditDescription() {
+    if (this.isEditingDescription && this.channel) {
+      if (this.editedDescription !== this.channel.description) {
+        this.channelService.updateChannel(this.channel.id, { description: this.editedDescription })
+          .then(() => {
+            this.channel!.description = this.editedDescription;
+          });
+      }
+    }
     this.isEditingDescription = !this.isEditingDescription;
   }
+
 }
