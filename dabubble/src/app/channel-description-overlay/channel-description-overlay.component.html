@@ -1,8 +1,8 @@
-<div class="dialogue-overlay">
+<div class="dialogue-overlay" *ngIf="channel">
     <div class="dialogue-overlay-header">
         <div class="header-left">
             <img src="assets/icons/tag.svg">
-            <h2 class="font-24 font-w-700">Entwicklerteam</h2>
+            <h2 class="font-24 font-w-700">{{ channel.name }}</h2>
         </div>
         <app-round-btn (click)="handleClose()" iconSrc="assets/icons/close.svg"
             iconHoverSrc="assets/icons/close-purple.svg" altText="Schließen">
@@ -15,7 +15,7 @@
         </div>
         <div class="title-content">
             <img src="assets/icons/tag.svg">
-            <span>Entwicklerteam</span>
+            <span>{{ channel.name }}</span>
         </div>
     </div>
     <div class="overlay-content-container container-box">
@@ -24,13 +24,11 @@
             <span class="font-w-600 t-purple edit">Bearbeiten</span>
         </div>
         <div class="description">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque sunt omnis distinctio molestiae,
-            exercitationem iure qui cumque eum! Animi, iste dolores! Natus officiis aliquam saepe, exercitationem
-            architecto fugiat aspernatur sunt!
+            {{ channel.description }}
         </div>
         <div class="line"></div>
         <span class="font-18 font-w-700">Erstellt von</span>
-        <span class="created-by font-24 t-purple">Noah Braun</span>
+        <span class="created-by font-24 t-purple">{{ channel.createdByName }}</span>
     </div>
     <button type="button" class="btn-leave font-18 font-w-700" (click)="handleClose()">Channel verlassen</button>
 

@@ -65,7 +65,7 @@ export class MenuComponent implements OnInit {
     // this.showAddChannelDialogue = true;
     this.openAddChannel.emit();
   }
-  
+
   handleOpenChannel(channel: Channel) {
     this.activeChannelId = channel.id;
     this.activeUserId = '';

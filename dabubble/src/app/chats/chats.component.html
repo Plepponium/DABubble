@@ -47,7 +47,8 @@
                 class="dialogue-overlay-add-user">
             </app-chat-add-user-overlay>
 
-            <app-channel-description-overlay *ngIf="showChannelDescription" (close)="closeDialogChannelDescription()">
+            <app-channel-description-overlay *ngIf="showChannelDescription" (close)="closeDialogChannelDescription()"
+                [channelId]="channelId">
             </app-channel-description-overlay>
         </div>
 

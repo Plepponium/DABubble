@@ -30,7 +30,7 @@ export class ChatsComponent {
   showProfileDialogue = false;
   editCommentDialogueExpanded = false;
   channelName = '';
-  participantIds = '';
+  participantIds: string[] = [];
   participants: User[] = [];
 
   channelService = inject(ChannelService);
@@ -38,7 +38,7 @@ export class ChatsComponent {
 
   @Input() channelId?: string;
   @Output() openThread = new EventEmitter<void>();
-  
+
 
   ngOnInit() {
     // Wenn noch keine channelId gesetzt wurde, lade alle Channels und nimm den ersten
@@ -59,7 +59,7 @@ export class ChatsComponent {
     if (changes['channelId'] && this.channelId) {
       this.channelService.getChannelById(this.channelId).subscribe(channel => {
         this.channelName = channel?.name ?? '';
-        this.participantIds = channel?.participants ?? '';
+        this.participantIds = channel?.participants ?? [];
         // let x = this.userService.getUsersByIds(this.participantIds);
         // console.log(x);
         // console.log('onChanges',this.participants);
@@ -80,7 +80,7 @@ export class ChatsComponent {
   //     });
   //   }
   // }
-  
+
   openDialogChannelDescription() {
     this.showChannelDescription = true;
   };
@@ -127,7 +127,7 @@ export class ChatsComponent {
     console.log(unixTimestamp); // 1702061580
   }
 
-  addToChats() {}
+  addToChats() { }
 
   handleOpenThread() {
     this.openThread.emit();

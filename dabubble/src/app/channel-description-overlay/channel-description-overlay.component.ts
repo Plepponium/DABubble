@@ -1,14 +1,29 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
+import { Channel } from '../../models/channel.class';
+import { ChannelService } from '../../services/channel.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-channel-description-overlay',
-  imports: [RoundBtnComponent],
+  imports: [RoundBtnComponent, CommonModule],
   templateUrl: './channel-description-overlay.component.html',
   styleUrl: './channel-description-overlay.component.scss'
 })
 export class ChannelDescriptionOverlayComponent {
+  @Input() channelId?: string;
   @Output() close = new EventEmitter<void>();
+
+  channel?: Channel;
+  channelService = inject(ChannelService);
+
+  ngOnInit() {
+    if (this.channelId) {
+      this.channelService.getChannelById(this.channelId).subscribe(channel => {
+        this.channel = channel;
+      });
+    }
+  }
 
   handleClose() {
     this.close.emit();

@@ -3,6 +3,7 @@ import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { ChannelService } from '../../services/channel.service';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../services/user.service';
+import { User } from '../../models/user.class';
 
 @Component({
   selector: 'app-add-channel-overlay',
@@ -16,13 +17,16 @@ export class AddChannelOverlayComponent {
 
   channelName: string = '';
   description: string = '';
-  currentUser: string = '';
+  currentUser?: User;
+
   userService = inject(UserService)
-  // currentUser$ = this.userService.currentUser$;
+
 
   constructor(private channelService: ChannelService) {
     this.userService.currentUser$.subscribe(user => {
-      this.currentUser = user?.uid || '';
+      if (user) {
+        this.currentUser = user;
+      }
     });
   }
 
@@ -31,13 +35,17 @@ export class AddChannelOverlayComponent {
   }
 
   handleAddChannel() {
+    if (!this.currentUser) return;
+
     const newChannel = {
       name: this.channelName,
       description: this.description,
-      createdBy: this.currentUser,
-      participants: this.currentUser, 
-      // createdAt: new Date() // Optional
+      createdBy: this.currentUser.uid,
+      createdByName: this.currentUser.name,
+      participants: [this.currentUser.uid],
+      createdAt: new Date()
     };
+
     this.channelService.addChannel(newChannel).then(() => {
       this.handleClose();
     });

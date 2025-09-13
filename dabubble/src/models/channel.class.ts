@@ -2,9 +2,10 @@ export class Channel {
   id!: string;
   name!: string;
   description?: string;
-  participants!: string;
+  participants!: string[];
   createdBy?: string;
-  // createdAt?: any;
+  createdByName?: string;
+  createdAt?: any;
   lastMessage?: any;
   chats?: string;
 
