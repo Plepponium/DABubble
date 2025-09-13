@@ -8,32 +8,45 @@
             iconHoverSrc="assets/icons/close-purple.svg" altText="Schließen">
         </app-round-btn>
     </div>
-    <div class="overlay-title-container container-box">
+
+    <div class="overlay-title-container container-box" [class.editing]="isEditingName">
         <div class="box-header">
             <span class="font-18 font-w-700">Channel-Name</span>
-            <span class="font-w-600 t-purple edit">Bearbeiten</span>
+            <span class="font-w-600 t-purple edit" (click)="toggleEditName()">
+                {{ isEditingName ? 'Speichern' : 'Bearbeiten' }}
+            </span>
         </div>
-        <div class="title-content">
+        <div class="title-content" [class.editing]="isEditingName">
             <img src="assets/icons/tag.svg">
-            <span>{{ channel.name }}</span>
+            <ng-container *ngIf="!isEditingName">
+                <span>{{ channel.name }}</span>
+            </ng-container>
+            <ng-container *ngIf="isEditingName">
+                <input type="text" [placeholder]="channel.name" />
+            </ng-container>
         </div>
     </div>
-    <div class="overlay-content-container container-box">
+
+    <div class="overlay-content-container container-box" [class.editing]="isEditingDescription">
         <div class="box-header">
             <span class="font-18 font-w-700">Beschreibung</span>
-            <span class="font-w-600 t-purple edit">Bearbeiten</span>
+            <span class="font-w-600 t-purple edit" (click)="toggleEditDescription()">
+                {{ isEditingDescription ? 'Speichern' : 'Bearbeiten' }}
+            </span>
         </div>
-        <div class="description">
-            {{ channel.description }}
+        <div class="description" [class.editing]="isEditingDescription">
+            <ng-container *ngIf="!isEditingDescription">
+                {{ channel.description }}
+            </ng-container>
+            <ng-container *ngIf="isEditingDescription">
+                <input type="text" placeholder="Dein Text hier">
+            </ng-container>
         </div>
+
         <div class="line"></div>
         <span class="font-18 font-w-700">Erstellt von</span>
         <span class="created-by font-24 t-purple">{{ channel.createdByName }}</span>
     </div>
+
     <button type="button" class="btn-leave font-18 font-w-700" (click)="handleClose()">Channel verlassen</button>
-
-
-
-
-
 </div>
