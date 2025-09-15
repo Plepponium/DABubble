@@ -43,22 +43,7 @@ export class MainPageComponent {
   }
 
   openChannel(channelId: string) {
-    // this.channelService.getChannelById(channelId).subscribe(channel => {
-    //   if (channel) {
-    //     console.log('Geöffneter Channel mit ID:', channelId);
-    //     console.log('Channel-Name:', channel.chats);
-    //     // Chats laden etc.
-    //   }
-    // });
-
-    this.currentChannelId = channelId;      // Channel-ID speichern
-
-    // console.log('Geöffneter Channel mit ID:', channelId);
-    // this.channelService.getChatsForChannel(channelId: string);
-    // this.channelService.getChatsForChannel(channelId).subscribe(chats => {
-    //   console.log(chats[0]);
-    //   console.log(channelId.name);
-    // });
+    this.currentChannelId = channelId; 
   }
 
 
