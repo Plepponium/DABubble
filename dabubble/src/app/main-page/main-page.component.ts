@@ -46,6 +46,10 @@ export class MainPageComponent {
 
   openChannel(channelId: string) {
     this.currentChannelId = channelId;
+    this.userChatOpen = false;
+    this.activeUserId = undefined;
+    this.threadOpen = true;
+    this.channelOpen = true;
   }
 
   openUserChat(user: User) {
