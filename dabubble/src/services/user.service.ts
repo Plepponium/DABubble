@@ -40,29 +40,53 @@ export class UserService {
     if (uids.length === 0) {
       return of([]);
     }
-    console.log('getUsersByIds uids:', uids);
 
-    const chunkSize = 10;
-    const chunks = [];
-    for (let i = 0; i < uids.length; i += chunkSize) {
-      chunks.push(uids.slice(i, i + chunkSize));
-    }
-
-    const observables = chunks.map(chunk => {
-      const usersCollection = collection(this.firestore, 'users');
-      const q = query(usersCollection, where('uid', 'in', chunk));
-      // console.log('getUsersByIds q:', q);
-      // return collectionData(q, { idField: 'uid' }) as Observable<User[]>;
-      return collectionData(q, { idField: 'uid' }).pipe(
-        tap((data: DocumentData[]) => console.log('Geladene Daten chunk:', data)),
-        map((data: DocumentData[]) => data.map(obj => new User(obj))) // Hier in User-Objekte umwandeln
-      ) as Observable<User[]>;
+    // Für jede uid wird eine eigene Query als Observable erzeugt
+    const observables = uids.map(uid => {
+      const userDocRef = doc(this.firestore, `users/${uid}`);
+      return docData(userDocRef, { idField: 'uid' }).pipe(
+        map(data => {
+          if (!data) throw new Error(`Kein Nutzer gefunden mit uid ${uid}`);
+          console.log('getUsersByIds data:', data);
+          return new User(data);
+        })
+      );
     });
 
-    return forkJoin(observables).pipe(
-      map(results => results.flat())
-    );
+    // Zusammensetzen aller Observables zu einem, das alle User als Array liefert
+    return forkJoin(observables);
   }
+  // getUsersByIds(uids: string[]): Observable<User[]> {
+  //   if (uids.length === 0) {
+  //     return of([]);
+  //   }
+  //   console.log('getUsersByIds uids:', uids);
+
+  //   const chunkSize = 10;
+  //   const chunks: string[][] = [];
+  //   for (let i = 0; i < uids.length; i += chunkSize) {
+  //     chunks.push(uids.slice(i, i + chunkSize));
+  //   }
+  //   console.log('getUsersByIds chunks:', chunks);
+
+  //   const observables = chunks.map(chunk => {
+  //     // Iteriere über einzelne UIDs im aktuellen Chunk und gebe sie aus
+  //     chunk.forEach(uid => {
+  //       console.log('Verarbeite UID im Chunk:', uid);
+  //     });
+
+  //     const usersCollection = collection(this.firestore, 'users');
+  //     const q = query(usersCollection, where('uid', 'in', chunk));
+  //     return collectionData(q, { idField: 'uid' }).pipe(
+  //       tap((data: DocumentData[]) => console.log('Geladene Daten chunk:', data)),
+  //       map((data: DocumentData[]) => data.map(obj => new User(obj)))
+  //     );
+  //   });
+
+  //   return forkJoin(observables).pipe(
+  //     map(results => results.flat())
+  //   );
+  // }
 
   async logout(): Promise<void> {
     const user = this.auth.currentUser;

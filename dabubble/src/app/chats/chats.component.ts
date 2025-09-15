@@ -69,6 +69,23 @@ export class ChatsComponent {
   //     });
   //   }
   // }
+  // ngOnChanges(changes: SimpleChanges) {
+  //   if (changes['channelId'] && this.channelId) {
+  //     this.channelService.getChannelById(this.channelId).pipe(
+  //       switchMap(channel => {
+  //         this.channelName = channel?.name ?? '';
+  //         this.participantIds = channel?.participants ?? [];
+  //         console.log('onChanges participantIds', this.participantIds);
+  //         return this.userService.getUsersByIds(this.participantIds);
+  //       })
+  //     ).subscribe(users => {
+  //       this.participants = users;
+  //       console.log('onChanges users', users);
+  //       // this.participants = users.slice(0, 3);
+  //       console.log('onChanges participants', this.participants);
+  //     });
+  //   }
+  // }
   ngOnChanges(changes: SimpleChanges) {
     if (changes['channelId'] && this.channelId) {
       this.channelService.getChannelById(this.channelId).pipe(
@@ -78,11 +95,18 @@ export class ChatsComponent {
           console.log('onChanges participantIds', this.participantIds);
           return this.userService.getUsersByIds(this.participantIds);
         })
-      ).subscribe(users => {
-        this.participants = users;
-        console.log('onChanges users', users);
-        // this.participants = users.slice(0, 3);
-        console.log('onChanges participants', this.participants);
+      ).subscribe({
+        next: users => {
+          this.participants = users;
+          console.log('onChanges users', users);
+          console.log('onChanges participants', this.participants);
+        },
+        error: error => {
+          console.error('Fehler beim Laden der User:', error);
+        },
+        complete: () => {
+          console.log('Ladevorgang der User abgeschlossen');
+        }
       });
     }
   }
