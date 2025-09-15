@@ -26,8 +26,6 @@ export class MainPageComponent {
   channelOpen = true;
   currentChannelId?: string;
 
-  // channelService = inject(ChannelService);
-
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }
