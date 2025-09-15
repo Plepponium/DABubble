@@ -62,4 +62,9 @@ export class ChannelDescriptionOverlayComponent {
     this.isEditingDescription = !this.isEditingDescription;
   }
 
+  leaveChannel() {
+    // participants--
+    // if participants === 0 => deleteChannel()
+  }
+
 }
