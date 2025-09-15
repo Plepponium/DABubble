@@ -2,7 +2,7 @@
     <app-header class="header"></app-header>
 
     <button class="toggle-menu-btn" type="button" (click)="toggleMenu()">
-    <!-- <button class="toggle-menu-btn" type="button" (click)="drawer.toggle()"> -->
+        <!-- <button class="toggle-menu-btn" type="button" (click)="drawer.toggle()"> -->
         <div class="toggle-btn-container">
             <div *ngIf="menuOpen" class="toggle-btn-content menu-open">
                 <div class="toggle-btn-text font-20 f-nunito">Workspace-Menü schließen</div>
@@ -14,7 +14,7 @@
                 <img class="hover-icon" src="assets/icons/show-navigation.svg" alt="">
                 <img class="hover-icon-purple" src="assets/icons/show-navigation-purple.svg" alt="">
             </div>
-            
+
         </div>
     </button>
 
@@ -23,12 +23,17 @@
             <app-menu></app-menu>
         </div> -->
         <div #drawer class="sidenav" [class.closed]="!menuOpen" mode="side">
-            <app-menu (openAddChannel)="openAddChannel()" (openChannel)="openChannel($event)"></app-menu>
+            <app-menu (openAddChannel)="openAddChannel()" (openChannel)="openChannel($event)"
+                (openUserChat)="openUserChat($event)"></app-menu>
         </div>
 
         <div class="content" [class.fullwidth]="!menuOpen">
-            <app-chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId" (openThread)="threadOpen = true"></app-chats>
-            <app-thread id="thread" class="thread" *ngIf="channelOpen" [hidden]="!threadOpen" (closeThread)="threadOpen = false"></app-thread>
+            <app-chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId"
+                (openThread)="threadOpen = true"></app-chats>
+            <app-thread id="thread" class="thread" *ngIf="channelOpen" [hidden]="!threadOpen"
+                (closeThread)="threadOpen = false"></app-thread>
+            <app-direct-message-chats *ngIf="userChatOpen && activeUserId"
+                [userId]="activeUserId"></app-direct-message-chats>
         </div>
     </div>
     <!-- <mat-drawer-container class="container" autosize>
@@ -50,9 +55,7 @@
         (openUser)="openDialogueUser()"
         (logout)="logout()">
     </app-logout-overlay> -->
-    <app-add-channel-overlay
-        *ngIf="showAddChannelDialogue"
-        (close)="closeAddChannel()">
+    <app-add-channel-overlay *ngIf="showAddChannelDialogue" (close)="closeAddChannel()">
     </app-add-channel-overlay>
-    
+
 </div>

@@ -6,7 +6,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { UserService } from '../../services/user.service';
-import { Observable } from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { User } from '../../models/user.class';
@@ -31,6 +31,7 @@ export class MenuComponent implements OnInit {
   // showAddChannelDialogue = false;
   @Output() openAddChannel = new EventEmitter<void>();
   @Output() openChannel = new EventEmitter<string>();
+  @Output() openUserChat = new EventEmitter<User>();
 
   userService = inject(UserService);
   channelService = inject(ChannelService);
@@ -38,16 +39,23 @@ export class MenuComponent implements OnInit {
   currentUser$ = this.userService.currentUser$;
   users$ = this.userService.getUsers();
 
+  sortedUsers$ = combineLatest([this.users$, this.currentUser$]).pipe(
+    map(([users, currentUser]) => {
+      if (!currentUser) return users;
+      return [...users].sort((a, b) => {
+        if (a.uid === currentUser.uid) return -1;
+        if (b.uid === currentUser.uid) return 1;
+        return 0;
+      });
+    })
+  );
+
 
   constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.channelService.getChannels().subscribe(data => {
       this.channels = data;
-      this.cdr.markForCheck();
-    });
-
-    this.users$.subscribe(() => {
       this.cdr.markForCheck();
     });
   }
@@ -76,9 +84,10 @@ export class MenuComponent implements OnInit {
     this.usersExpanded = !this.usersExpanded;
   }
 
-  openUserChat(user: User) {
+  handleOpenUserChat(user: User) {
     this.activeUserId = user.uid;
     this.activeChannelId = '';
+    this.openUserChat.emit(user);
   }
 
   trackByUserId(index: number, user: User): string {

@@ -10,10 +10,12 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { AddChannelOverlayComponent } from '../add-channel-overlay/add-channel-overlay.component';
 import { ChannelService } from '../../services/channel.service';
+import { DirectMessageChatsComponent } from '../direct-message-chats/direct-message-chats.component';
+import { User } from '../../models/user.class';
 
 @Component({
   selector: 'app-main-page',
-  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent],
+  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, DirectMessageChatsComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss',
   providers: [ChannelService],
@@ -24,7 +26,9 @@ export class MainPageComponent {
   showAddChannelDialogue = false;
   threadOpen = true;
   channelOpen = true;
+  userChatOpen = false;
   currentChannelId?: string;
+  activeUserId?: string;
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
@@ -41,8 +45,14 @@ export class MainPageComponent {
   }
 
   openChannel(channelId: string) {
-    this.currentChannelId = channelId; 
+    this.currentChannelId = channelId;
   }
 
+  openUserChat(user: User) {
+    this.activeUserId = user.uid;
+    this.userChatOpen = true;
+    this.channelOpen = false;
+    this.threadOpen = false;
+  }
 
 }

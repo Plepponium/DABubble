@@ -97,16 +97,15 @@
             </div>
 
             <div class="user-list" *ngIf="usersExpanded">
-                <ng-container *ngIf="(currentUser$ | async) as currentUser">
-                    <div (click)="openUserChat(user)" class="user" *ngFor="let user of users$ | async"
-                        [class.active]="user.uid === activeUserId">
-                        <div class="img-container">
-                            <img class="user-img" [src]="'assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
-                            <div class="online-signal" [ngClass]="user.presence"></div>
-                        </div>
-                        {{ user.name }}{{ user.uid === currentUser.uid ? ' (Du)' : '' }}
+                <div (click)="handleOpenUserChat(user)" class="user"
+                    *ngFor="let user of sortedUsers$ | async; trackBy: trackByUserId"
+                    [class.active]="user.uid === activeUserId">
+                    <div class="img-container">
+                        <img class="user-img" [src]="'assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
+                        <div class="online-signal" [ngClass]="user.presence"></div>
                     </div>
-                </ng-container>
+                    {{ user.name }}{{ (currentUser$ | async)?.uid === user.uid ? ' (Du)' : '' }}
+                </div>
             </div>
         </div>
     </div>
