@@ -1,8 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { Auth, authState, signOut } from '@angular/fire/auth';
-import { Firestore, collectionData, collection, doc, docData, updateDoc, serverTimestamp, query, where } from '@angular/fire/firestore';
-import { Observable, switchMap, of, shareReplay, merge, map, forkJoin } from 'rxjs';
+import { Firestore, collectionData, collection, doc, docData, updateDoc, serverTimestamp, query, where, DocumentData } from '@angular/fire/firestore';
+import { Observable, switchMap, of, shareReplay, merge, map, forkJoin, tap } from 'rxjs';
 import { User } from '../models/user.class';
+// import { tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -39,7 +40,6 @@ export class UserService {
     if (uids.length === 0) {
       return of([]);
     }
-
     console.log('getUsersByIds uids:', uids);
 
     const chunkSize = 10;
@@ -51,34 +51,17 @@ export class UserService {
     const observables = chunks.map(chunk => {
       const usersCollection = collection(this.firestore, 'users');
       const q = query(usersCollection, where('uid', 'in', chunk));
-      return collectionData(q, { idField: 'uid' }) as Observable<User[]>;
+      // console.log('getUsersByIds q:', q);
+      // return collectionData(q, { idField: 'uid' }) as Observable<User[]>;
+      return collectionData(q, { idField: 'uid' }).pipe(
+        tap((data: DocumentData[]) => console.log('Geladene Daten chunk:', data)),
+        map((data: DocumentData[]) => data.map(obj => new User(obj))) // Hier in User-Objekte umwandeln
+      ) as Observable<User[]>;
     });
 
     return forkJoin(observables).pipe(
       map(results => results.flat())
     );
-
-    // Wenn mehr als 10 IDs, in mehrere Teile splitten oder entsprechend anders abfragen
-    // if (uids.length > 10) {
-    //   const chunks = [];
-    //   for (let i = 0; i < uids.length; i += 10) {
-        
-    //     const chunk = uids.slice(i, i + 10);
-    //     chunks.push(chunk);
-    //   }
-    //   return merge(...chunks.map(chunk => {
-    //     const usersCollection = collection(this.firestore, 'users');
-    //     // console.log('getUsersByIds uids:', uids);
-    //     const q = query(usersCollection, where('uid', 'in', chunk));
-    //     return collectionData(q, { idField: 'uid' }) as Observable<User[]>;
-    //   })).pipe(
-    //     map(arrays => arrays.flat())
-    //   );
-    // } else {
-    //   const usersCollection = collection(this.firestore, 'users');
-    //   const q = query(usersCollection, where('uid', 'in', uids));
-    //   return collectionData(q, { idField: 'uid' }) as Observable<User[]>;
-    // }
   }
 
   async logout(): Promise<void> {

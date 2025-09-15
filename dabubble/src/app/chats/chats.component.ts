@@ -80,8 +80,8 @@ export class ChatsComponent {
         })
       ).subscribe(users => {
         this.participants = users;
-        // this.participants = users.slice(0, 3);
         console.log('onChanges users', users);
+        // this.participants = users.slice(0, 3);
         console.log('onChanges participants', this.participants);
       });
     }
