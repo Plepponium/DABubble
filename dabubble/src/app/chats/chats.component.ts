@@ -14,7 +14,7 @@ import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 // import { User } from 'firebase/auth';
 import { User } from '../../models/user.class';
-import { switchMap } from 'rxjs';
+import { of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-chats',
@@ -43,70 +43,34 @@ export class ChatsComponent {
 
 
   ngOnInit() {
-    // Wenn noch keine channelId gesetzt wurde, lade alle Channels und nimm den ersten
     if (!this.channelId) {
-      this.channelService.getChannels().subscribe(channels => {
-        if (channels.length > 0) {
-          this.channelId = channels[0].id;
-          this.channelName = channels[0].name;
-          this.participantIds = channels[0].participants;
-          // let x = this.userService.getUsersByIds(this.participantIds);
-          console.log('onInit participantIds', this.participantIds);
-        }
+      this.channelService.getChannels().pipe(
+        switchMap(channels => {
+          if (channels.length > 0) {
+            this.channelId = channels[0].id;
+            this.channelName = channels[0].name;
+            this.participantIds = channels[0].participants;
+            return this.userService.getUsersByIds(this.participantIds);
+          } else {
+            return of([]);
+          }
+        })
+      ).subscribe(users => {
+        this.participants = users;
       });
     }
   }
-
-  // ngOnChanges(changes: SimpleChanges) {
-  //   if (changes['channelId'] && this.channelId) {
-  //     this.channelService.getChannelById(this.channelId).subscribe(channel => {
-  //       this.channelName = channel?.name ?? '';
-  //       this.participantIds = channel?.participants ?? [];
-  //       // let x = this.userService.getUsersByIds(this.participantIds);
-  //       // console.log(x);
-  //       // console.log('onChanges',this.participants);
-  //       console.log(this.participantIds);
-  //     });
-  //   }
-  // }
-  // ngOnChanges(changes: SimpleChanges) {
-  //   if (changes['channelId'] && this.channelId) {
-  //     this.channelService.getChannelById(this.channelId).pipe(
-  //       switchMap(channel => {
-  //         this.channelName = channel?.name ?? '';
-  //         this.participantIds = channel?.participants ?? [];
-  //         console.log('onChanges participantIds', this.participantIds);
-  //         return this.userService.getUsersByIds(this.participantIds);
-  //       })
-  //     ).subscribe(users => {
-  //       this.participants = users;
-  //       console.log('onChanges users', users);
-  //       // this.participants = users.slice(0, 3);
-  //       console.log('onChanges participants', this.participants);
-  //     });
-  //   }
-  // }
+  
   ngOnChanges(changes: SimpleChanges) {
     if (changes['channelId'] && this.channelId) {
       this.channelService.getChannelById(this.channelId).pipe(
         switchMap(channel => {
           this.channelName = channel?.name ?? '';
           this.participantIds = channel?.participants ?? [];
-          console.log('onChanges participantIds', this.participantIds);
           return this.userService.getUsersByIds(this.participantIds);
         })
-      ).subscribe({
-        next: users => {
-          this.participants = users;
-          console.log('onChanges users', users);
-          console.log('onChanges participants', this.participants);
-        },
-        error: error => {
-          console.error('Fehler beim Laden der User:', error);
-        },
-        complete: () => {
-          console.log('Ladevorgang der User abgeschlossen');
-        }
+      ).subscribe(users => {
+        this.participants = users;
       });
     }
   }
