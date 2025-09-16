@@ -27,7 +27,7 @@
                 (openUserChat)="openUserChat($event)"></app-menu>
         </div>
 
-        <div class="content" [class.fullwidth]="!menuOpen">
+        <div class="content" [class.fullwidth]="!menuOpen" [class.dm-open]="isDmOpen">
             <app-chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId"
                 (openThread)="threadOpen = true"></app-chats>
             <app-thread id="thread" class="thread" *ngIf="channelOpen" [hidden]="!threadOpen"

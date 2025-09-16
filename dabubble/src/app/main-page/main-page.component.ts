@@ -30,6 +30,10 @@ export class MainPageComponent {
   currentChannelId?: string;
   activeUserId?: string;
 
+  get isDmOpen(): boolean {
+    return this.userChatOpen && !!this.activeUserId;
+  }
+
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }
@@ -55,6 +59,7 @@ export class MainPageComponent {
   openUserChat(user: User) {
     this.activeUserId = user.uid;
     this.userChatOpen = true;
+    this.currentChannelId = undefined;
     this.channelOpen = false;
     this.threadOpen = false;
   }
