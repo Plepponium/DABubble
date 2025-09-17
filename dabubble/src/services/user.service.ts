@@ -30,7 +30,6 @@ export class UserService {
     if (uids.length === 0) {
       return of([]);
     }
-
     const observables = uids.map(uid => {
       const userDocRef = doc(this.firestore, `users/${uid}`);
       return docData(userDocRef, { idField: 'uid' }).pipe(
@@ -43,6 +42,11 @@ export class UserService {
     });
 
     return forkJoin(observables);
+  }
+
+  getSingleUserById(userId: string): Observable<User | undefined> {
+    const userRef = doc(this.firestore, `users/${userId}`);
+    return docData(userRef, { idField: 'uid' }) as Observable<User | undefined>;
   }
 
   async logout(): Promise<void> {

@@ -1,13 +1,26 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input, SimpleChanges } from '@angular/core';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
-import { DialogueOverlayComponent } from '../dialogue-overlay/dialogue-overlay.component';
+import { User } from '../../models/user.class';
+import { UserService } from '../../services/user.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-direct-message-chats',
-  imports: [RoundBtnComponent, DialogueOverlayComponent],
+  imports: [RoundBtnComponent, CommonModule],
   templateUrl: './direct-message-chats.component.html',
   styleUrl: './direct-message-chats.component.scss'
 })
 export class DirectMessageChatsComponent {
   @Input() userId!: string;
+  user?: User;
+
+  userService = inject(UserService);
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['userId'] && this.userId) {
+      this.userService.getSingleUserById(this.userId).subscribe(user => {
+        this.user = user;
+      });
+    }
+  }
 }

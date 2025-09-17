@@ -1,12 +1,45 @@
-<div class="dm-chats">
+<div class="dm-chats" *ngIf="user as u">
 
     <div class="header">
         <div class="user">
             <div class="img-container">
-                <img class="user-img" src="assets/user-icons/icon3.svg">
-                <div class="online-signal offline"></div>
+                <img class="user-img" [src]="'assets/user-icons/' + u.img + '.svg'">
+                <div [class]="'online-signal ' + u.presence"></div>
             </div>
-            <span>Noah Braun</span>
+            <span class="font-w-700 font-24">{{ u.name }}</span>
+        </div>
+    </div>
+
+    <div class="dm-chat-container">
+        <div class="emtpy-conversation">
+            <div class="recipient">
+                <img class="recipient-img" [src]="'assets/user-icons/' + u.img + '.svg'">
+                <span class="font-w-700 font-24">{{ u.name }}</span>
+            </div>
+            <span class="t-gray">
+                Diese Unterhaltung findet nur zwischen
+                <span class="t-purple at-name">&#64;{{ u.name }}</span>
+                und dir statt.
+            </span>
+        </div>
+
+        <div class="form-field full-width">
+            <textarea class="input font-18" type="text" [placeholder]="'Nachricht an ' + u.name"></textarea>
+            <div class="input-icon-bar">
+                <div class="icon-bar t-gray">
+                    <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
+                        iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
+                        altText="Reaktion hinzufügen">
+                    </app-round-btn>
+                    <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
+                        iconHoverSrc="assets/message-icons/alternate_email-purple.svg" altText="Mail hinzufügen">
+                    </app-round-btn>
+                </div>
+
+                <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
+                    iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden">
+                </app-round-btn>
+            </div>
         </div>
     </div>
 
