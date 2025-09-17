@@ -1,5 +1,5 @@
-import { Component, Output, EventEmitter, Input, inject, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Output, EventEmitter, Input, inject, OnChanges, SimpleChanges, OnInit } from '@angular/core';
+import { CommonModule, registerLocaleData } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -14,7 +14,9 @@ import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 // import { User } from 'firebase/auth';
 import { User } from '../../models/user.class';
-import { of, switchMap } from 'rxjs';
+import { forkJoin, of, switchMap, take } from 'rxjs';
+import localeDe from '@angular/common/locales/de';
+registerLocaleData(localeDe);
 
 @Component({
   selector: 'app-chats',
@@ -23,7 +25,7 @@ import { of, switchMap } from 'rxjs';
   styleUrl: './chats.component.scss',
   // providers: [ChannelService],
 })
-export class ChatsComponent {
+export class ChatsComponent implements OnInit, OnChanges {
   value = 'Clear me';
   showChannelDescription = false;
   showUserDialogue = false;
@@ -34,6 +36,7 @@ export class ChatsComponent {
   channelName = '';
   participantIds: string[] = [];
   participants: User[] = [];
+  channelChats: any[] = [];
 
   channelService = inject(ChannelService);
   userService = inject(UserService);
@@ -42,21 +45,115 @@ export class ChatsComponent {
   @Output() openThread = new EventEmitter<void>();
 
 
+  // ngOnInit() {
+  //   if (!this.channelId) {
+  //     this.channelService.getChannels().pipe(
+  //       switchMap(channels => {
+  //         if (channels.length > 0) {
+  //           this.channelId = channels[0].id;
+  //           this.channelName = channels[0].name;
+  //           this.participantIds = channels[0].participants;
+  //           return this.userService.getUsersByIds(this.participantIds);
+  //         } else {
+  //           return of([]);
+  //         }
+  //       })
+  //     ).subscribe(users => {
+  //       this.participants = users;
+  //     });
+  //   }
+  //   if (this.channelId) {
+  //     this.channelService.getChatsForChannel(this.channelId).subscribe(chats => {
+  //       console.log(chats);
+  //       this.channelChats = chats;
+  //     });
+  //   }
+  // }
+  // ngOnInit() {
+  //   if (!this.channelId) {
+  //     console.log('no channelId');
+  //     this.channelService.getChannels().pipe(
+  //       switchMap(channels => {
+  //         if (channels.length > 0) {
+  //           this.channelId = channels[0].id;
+  //           console.log('channelId', this.channelId);
+  //           this.channelName = channels[0].name;
+  //           console.log('channelName', this.channelName);
+  //           this.participantIds = channels[0].participants;
+  //           console.log('participantIds', this.participantIds);
+  //           return this.userService.getUsersByIds(this.participantIds);
+  //         } else {
+  //           return of([]);
+  //         }
+  //       })
+  //     ).subscribe(users => {
+  //       this.participants = users;
+  //     });
+  //   }
+  //   if (this.channelId) {
+  //     this.channelService.getChatsForChannel(this.channelId).subscribe(chats => {
+  //       console.log(chats);
+  //       this.channelChats = chats;
+  //     });
+  //   }
+  //   if (this.channelId) {
+  //     // Lade beide parallel oder nacheinander:
+  //     forkJoin([
+  //       this.channelService.getChatsForChannel(this.channelId).pipe(take(1)),
+  //       this.userService.getUsersByIds(this.participantIds).pipe(take(1)),
+  //     ]).subscribe(([chats, users]) => {
+  //       this.participants = users;
+
+  //       // Nun Chats mit User ergänzen:
+  //       this.channelChats = chats.map(chat => {
+  //         const user = this.participants.find(u => u.uid === chat.user);
+  //         return { ...chat, userName: user?.name, userImg: user?.img };
+  //       });
+  //     });
+  //   }
+  // }
   ngOnInit() {
     if (!this.channelId) {
+      // Kein ChannelId: Lade erst alle Channels und nutze den ersten
       this.channelService.getChannels().pipe(
         switchMap(channels => {
           if (channels.length > 0) {
             this.channelId = channels[0].id;
             this.channelName = channels[0].name;
             this.participantIds = channels[0].participants;
-            return this.userService.getUsersByIds(this.participantIds);
+            // Jetzt beide Daten (Chats + Nutzer) parallel laden
+            return forkJoin([
+              this.channelService.getChatsForChannel(this.channelId).pipe(take(1)),
+              this.userService.getUsersByIds(this.participantIds).pipe(take(1))
+            ]);
           } else {
-            return of([]);
+            return of([[], []]); // leere Chats + Nutzer
           }
         })
-      ).subscribe(users => {
+      ).subscribe(([chats, users]) => {
         this.participants = users;
+        this.channelChats = chats.map(chat => {
+          const user = this.participants.find(u => u.uid === chat.user);
+          return { ...chat, userName: user?.name, userImg: user?.img };
+        });
+      });
+    } else if (this.channelId) {
+      // ChannelId ist bereits bekannt - Chats und Teilnehmer laden
+      this.channelService.getChannelById(this.channelId).pipe(
+        switchMap(channel => {
+          this.channelName = channel?.name ?? '';
+          this.participantIds = channel?.participants ?? [];
+          return forkJoin([
+            this.channelService.getChatsForChannel(this.channelId!).pipe(take(1)),
+            this.userService.getUsersByIds(this.participantIds).pipe(take(1))
+          ]);
+        })
+      ).subscribe(([chats, users]) => {
+        this.participants = users;
+        this.channelChats = chats.map(chat => {
+          const user = this.participants.find(u => u.uid === chat.user);
+          return { ...chat, userName: user?.name, userImg: user?.img };
+        });
       });
     }
   }
@@ -71,6 +168,11 @@ export class ChatsComponent {
         })
       ).subscribe(users => {
         this.participants = users;
+      });
+    }
+    if (changes['channelId'] && this.channelId) {
+      this.channelService.getChatsForChannel(this.channelId).subscribe(chats => {
+        this.channelChats = chats;
       });
     }
   }

@@ -31,20 +31,17 @@ export class UserService {
       return of([]);
     }
 
-    // Für jede uid wird eine eigene Query als Observable erzeugt
     const observables = uids.map(uid => {
       const userDocRef = doc(this.firestore, `users/${uid}`);
       return docData(userDocRef, { idField: 'uid' }).pipe(
         take(1), // wichtig für forkJoin
         map(data => {
           if (!data) throw new Error(`Kein Nutzer gefunden mit uid ${uid}`);
-          // console.log('getUsersByIds data:', data);
           return new User(data);
         })
       );
     });
 
-    // Zusammensetzen aller Observables zu einem, das alle User als Array liefert
     return forkJoin(observables);
   }
 
