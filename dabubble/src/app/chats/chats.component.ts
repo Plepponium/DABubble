@@ -14,7 +14,7 @@ import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 // import { User } from 'firebase/auth';
 import { User } from '../../models/user.class';
-import { forkJoin, of, switchMap, take } from 'rxjs';
+import { forkJoin, map, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 import localeDe from '@angular/common/locales/de';
 registerLocaleData(localeDe);
 
@@ -43,137 +43,96 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   @Input() channelId?: string;
   @Output() openThread = new EventEmitter<void>();
+  private channelIdChange$ = new Subject<void>();
 
-
-  // ngOnInit() {
-  //   if (!this.channelId) {
-  //     this.channelService.getChannels().pipe(
-  //       switchMap(channels => {
-  //         if (channels.length > 0) {
-  //           this.channelId = channels[0].id;
-  //           this.channelName = channels[0].name;
-  //           this.participantIds = channels[0].participants;
-  //           return this.userService.getUsersByIds(this.participantIds);
-  //         } else {
-  //           return of([]);
-  //         }
-  //       })
-  //     ).subscribe(users => {
-  //       this.participants = users;
-  //     });
-  //   }
-  //   if (this.channelId) {
-  //     this.channelService.getChatsForChannel(this.channelId).subscribe(chats => {
-  //       console.log(chats);
-  //       this.channelChats = chats;
-  //     });
-  //   }
-  // }
-  // ngOnInit() {
-  //   if (!this.channelId) {
-  //     console.log('no channelId');
-  //     this.channelService.getChannels().pipe(
-  //       switchMap(channels => {
-  //         if (channels.length > 0) {
-  //           this.channelId = channels[0].id;
-  //           console.log('channelId', this.channelId);
-  //           this.channelName = channels[0].name;
-  //           console.log('channelName', this.channelName);
-  //           this.participantIds = channels[0].participants;
-  //           console.log('participantIds', this.participantIds);
-  //           return this.userService.getUsersByIds(this.participantIds);
-  //         } else {
-  //           return of([]);
-  //         }
-  //       })
-  //     ).subscribe(users => {
-  //       this.participants = users;
-  //     });
-  //   }
-  //   if (this.channelId) {
-  //     this.channelService.getChatsForChannel(this.channelId).subscribe(chats => {
-  //       console.log(chats);
-  //       this.channelChats = chats;
-  //     });
-  //   }
-  //   if (this.channelId) {
-  //     // Lade beide parallel oder nacheinander:
-  //     forkJoin([
-  //       this.channelService.getChatsForChannel(this.channelId).pipe(take(1)),
-  //       this.userService.getUsersByIds(this.participantIds).pipe(take(1)),
-  //     ]).subscribe(([chats, users]) => {
-  //       this.participants = users;
-
-  //       // Nun Chats mit User ergänzen:
-  //       this.channelChats = chats.map(chat => {
-  //         const user = this.participants.find(u => u.uid === chat.user);
-  //         return { ...chat, userName: user?.name, userImg: user?.img };
-  //       });
-  //     });
-  //   }
-  // }
   ngOnInit() {
     if (!this.channelId) {
-      // Kein ChannelId: Lade erst alle Channels und nutze den ersten
-      this.channelService.getChannels().pipe(
-        switchMap(channels => {
-          if (channels.length > 0) {
-            this.channelId = channels[0].id;
-            this.channelName = channels[0].name;
-            this.participantIds = channels[0].participants;
-            // Jetzt beide Daten (Chats + Nutzer) parallel laden
-            return forkJoin([
-              this.channelService.getChatsForChannel(this.channelId).pipe(take(1)),
-              this.userService.getUsersByIds(this.participantIds).pipe(take(1))
-            ]);
-          } else {
-            return of([[], []]); // leere Chats + Nutzer
-          }
-        })
-      ).subscribe(([chats, users]) => {
-        this.participants = users;
-        this.channelChats = chats.map(chat => {
-          const user = this.participants.find(u => u.uid === chat.user);
-          return { ...chat, userName: user?.name, userImg: user?.img };
-        });
-      });
-    } else if (this.channelId) {
-      // ChannelId ist bereits bekannt - Chats und Teilnehmer laden
-      this.channelService.getChannelById(this.channelId).pipe(
-        switchMap(channel => {
-          this.channelName = channel?.name ?? '';
-          this.participantIds = channel?.participants ?? [];
-          return forkJoin([
-            this.channelService.getChatsForChannel(this.channelId!).pipe(take(1)),
-            this.userService.getUsersByIds(this.participantIds).pipe(take(1))
-          ]);
-        })
-      ).subscribe(([chats, users]) => {
-        this.participants = users;
-        this.channelChats = chats.map(chat => {
-          const user = this.participants.find(u => u.uid === chat.user);
-          return { ...chat, userName: user?.name, userImg: user?.img };
-        });
-      });
+      this.loadFirstChannelAndData();
+    } else {
+      this.loadDataForChannel(this.channelId);
     }
+  }
+
+  // Lädt die erste verfügbare Channel-ID plus alle zugehörigen Daten
+  private loadFirstChannelAndData() {
+    this.channelService.getChannels().pipe(
+      switchMap(channels => {
+        if (channels.length > 0) {
+          this.channelId = channels[0].id;
+          this.channelName = channels[0].name;
+          this.participantIds = channels[0].participants;
+          return this.loadChatsAndUsers(this.channelId, this.participantIds);
+        } else {
+          return of([[], []]);
+        }
+      })
+    ).subscribe(([chatsWithAnswers, users]) => {
+      this.participants = users;
+      this.channelChats = chatsWithAnswers;
+      console.log('Daten geladen für Erst-Channel:', this.channelId);
+    });
+  }
+
+  // Lädt alle nötigen Daten für eine konkrete Channel-ID
+  private loadDataForChannel(channelId: string) {
+    // Vorher bestehende Abos abbrechen
+    this.channelIdChange$.next();
+
+    this.channelService.getChannelById(channelId).pipe(
+      switchMap(channel => {
+        this.channelName = channel?.name ?? '';
+        this.participantIds = channel?.participants ?? [];
+        return this.loadChatsAndUsers(channelId, this.participantIds);
+      }),
+      takeUntil(this.channelIdChange$)  // Beispiel für Abbrechen bei neuem ChannelId-Change (optional)
+    ).subscribe(([chatsWithAnswers, users]) => {
+      if (this.channelId === channelId) {  // nur setzen, wenn der Kanal noch der erwartete ist
+        this.participants = users;
+        this.channelChats = chatsWithAnswers;
+        console.log('Daten geladen für Channel:', channelId);
+      }
+    });
+  }
+
+  // Lädt Chats und Userdaten parallel und verknüpft Antworten mit Chats
+  private loadChatsAndUsers(channelId: string, participantIds: string[]) {
+    return forkJoin([
+      this.channelService.getChatsForChannel(channelId).pipe(take(1)),
+      this.userService.getUsersByIds(participantIds).pipe(take(1))
+    ]).pipe(
+      switchMap(([chats, users]) => {
+        const chatsWithAnswers$ = chats.map(chat =>
+          this.channelService.getAnswersForChat(channelId, chat.id).pipe(
+            take(1),
+            map(answers => {
+              const user = users.find(u => u.uid === chat.user);
+              return {
+                ...chat,
+                userName: user?.name,
+                userImg: user?.img,
+                answersCount: answers.length,
+                lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null
+              };
+            })
+          )
+        );
+        return forkJoin(chatsWithAnswers$).pipe(
+          map(chatsWithAnswers => [chatsWithAnswers, users] as [any[], User[]])
+        );
+      })
+    );
   }
   
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['channelId'] && this.channelId) {
-      this.channelService.getChannelById(this.channelId).pipe(
-        switchMap(channel => {
-          this.channelName = channel?.name ?? '';
-          this.participantIds = channel?.participants ?? [];
-          return this.userService.getUsersByIds(this.participantIds);
-        })
-      ).subscribe(users => {
-        this.participants = users;
-      });
-    }
-    if (changes['channelId'] && this.channelId) {
-      this.channelService.getChatsForChannel(this.channelId).subscribe(chats => {
-        this.channelChats = chats;
-      });
+    if (changes['channelId']) {
+      const newChannelId = changes['channelId'].currentValue;
+      if (newChannelId) {
+        this.channelChats = [];
+        this.participants = [];
+        this.channelName = '';
+        // console.log('newChannelId', newChannelId);
+        this.loadDataForChannel(newChannelId);
+      }
     }
   }
 

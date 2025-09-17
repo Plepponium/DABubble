@@ -62,9 +62,9 @@
     <div class="chat-content">
         <div class="chat-history">
 
-            <div *ngFor="let chat of channelChats" class="chat-day-section">
+            <!-- <div *ngFor="let chat of channelChats" class="chat-day-section"> -->
             <!-- <div class="chat-day-section"> -->
-                <div class="chat-date-section">
+                <!-- <div class="chat-date-section">
                     <div class="chat-date">Dienstag, 14. Januar</div>
                 </div>
                 <div class="chat-section">
@@ -108,10 +108,10 @@
                             </div>
                             <div class="reactions">
                                 <div class="reaction-btns">
-                                    <!-- <div class="reaction-btn">
+                                    <div class="reaction-btn">
                                         <img src="assets/reaction-icons/check.svg" alt="">
                                         <div>2</div>
-                                    </div> -->
+                                    </div>
                                     <div class="reaction-btn">
                                         <img src="assets/reaction-icons/thumb.svg" alt="">
                                         <div>1</div>
@@ -125,7 +125,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <div *ngFor="let chat of channelChats" class="chat-day-section">
                 <div class="chat-date-section">
@@ -167,9 +167,9 @@
                         </div>
                         <div class="chat-message left bg-light-purple">{{ chat.message }}</div>
                         <div class="chat-answered">
-                            <div class="answers">
-                                <div (click)="handleOpenThread()" class="answer t-purple">2 Antworten</div>
-                                <div class="last-answer font-14 t-gray">Letzte Antwort 14:56</div>
+                            <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0">
+                                <div (click)="handleOpenThread()" class="answer t-purple">{{ chat.answersCount }} Antworten</div>
+                                <div class="last-answer font-14 t-gray">Letzte Antwort {{ (chat.lastAnswerTime * 1000) | date: 'HH:mm' }}</div>
                             </div>
                             <div class="reactions">
                                 <div class="reaction-btns">

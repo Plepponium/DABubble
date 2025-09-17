@@ -14,6 +14,11 @@ export class ChannelService {
     return collectionData(channelsCollection, { idField: 'id' }) as Observable<Channel[]>;
   }
 
+  addChannel(channel: Partial<Channel>): Promise<any> {
+    const channelsCollection = collection(this.firestore, 'channels');
+    return addDoc(channelsCollection, channel);
+  }
+
   getChannelById(channelId: string): Observable<Channel> {
     const channelDoc = doc(this.firestore, `channels/${channelId}`);
     return docData(channelDoc, { idField: 'id' }) as Observable<Channel>;
@@ -24,9 +29,9 @@ export class ChannelService {
     return collectionData(chatsCollection, { idField: 'id' }) as Observable<any[]>;
   }
 
-  addChannel(channel: Partial<Channel>): Promise<any> {
-    const channelsCollection = collection(this.firestore, 'channels');
-    return addDoc(channelsCollection, channel);
+  getAnswersForChat(channelId: string, chatId: string): Observable<any[]> {
+    const answersCollection = collection(this.firestore, `channels/${channelId}/chats/${chatId}/answers`);
+    return collectionData(answersCollection, { idField: 'id' }) as Observable<any[]>;
   }
 
   addChatToChannel(channelId: string, chat: any): Promise<any> {
