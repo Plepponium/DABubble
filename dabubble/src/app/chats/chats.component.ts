@@ -43,7 +43,7 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   @Input() channelId?: string;
   @Output() openThread = new EventEmitter<void>();
-  private channelIdChange$ = new Subject<void>();
+  // private channelIdChange$ = new Subject<void>();
 
   ngOnInit() {
     if (!this.channelId) {
@@ -69,14 +69,14 @@ export class ChatsComponent implements OnInit, OnChanges {
     ).subscribe(([chatsWithAnswers, users]) => {
       this.participants = users;
       this.channelChats = chatsWithAnswers;
-      console.log('Daten geladen für Erst-Channel:', this.channelId);
+      // console.log('Daten geladen für Erst-Channel:', this.channelId);
     });
   }
 
   // Lädt alle nötigen Daten für eine konkrete Channel-ID
   private loadDataForChannel(channelId: string) {
     // Vorher bestehende Abos abbrechen
-    this.channelIdChange$.next();
+    // this.channelIdChange$.next();
 
     this.channelService.getChannelById(channelId).pipe(
       switchMap(channel => {
@@ -84,12 +84,12 @@ export class ChatsComponent implements OnInit, OnChanges {
         this.participantIds = channel?.participants ?? [];
         return this.loadChatsAndUsers(channelId, this.participantIds);
       }),
-      takeUntil(this.channelIdChange$)  // Beispiel für Abbrechen bei neuem ChannelId-Change (optional)
+      // takeUntil(this.channelIdChange$)  // Beispiel für Abbrechen bei neuem ChannelId-Change (optional)
     ).subscribe(([chatsWithAnswers, users]) => {
       if (this.channelId === channelId) {  // nur setzen, wenn der Kanal noch der erwartete ist
         this.participants = users;
         this.channelChats = chatsWithAnswers;
-        console.log('Daten geladen für Channel:', channelId);
+        // console.log('Daten geladen für Channel:', channelId);
       }
     });
   }
@@ -106,13 +106,15 @@ export class ChatsComponent implements OnInit, OnChanges {
             take(1),
             map(answers => {
               const user = users.find(u => u.uid === chat.user);
-              return {
+              const chatWithAnswers = {
                 ...chat,
                 userName: user?.name,
                 userImg: user?.img,
                 answersCount: answers.length,
                 lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null
               };
+              // console.log(`answersCount für Chat ${chat.id}:`, chatWithAnswers.answersCount);
+              return chatWithAnswers;
             })
           )
         );
@@ -130,7 +132,6 @@ export class ChatsComponent implements OnInit, OnChanges {
         this.channelChats = [];
         this.participants = [];
         this.channelName = '';
-        // console.log('newChannelId', newChannelId);
         this.loadDataForChannel(newChannelId);
       }
     }
