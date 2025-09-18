@@ -14,15 +14,9 @@
             <div class="header-right">
                 <div (click)="openDialogueShowUser()" class="users-display"
                     [ngClass]="{'users-display-active': usersDisplayActive}">
-                    <!-- <div class="user-pics">
-                        <div class="img-box"><img src="assets/user-icons/icon3.svg" alt=""></div>
-                        <div class="img-box"><img src="assets/user-icons/icon5.svg" alt=""></div>
-                        <div class="img-box"><img src="assets/user-icons/icon4.svg" alt=""></div>
-                    </div> -->
                     <div class="user-pics">
                         <div class="img-box" *ngFor="let user of participants | slice:0:3">
                             <img [src]="'/assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
-                            <!-- <img [src]="'assets/user-icons/' + 'icon3' + '.svg'" [alt]="user.name"> -->
                         </div>
                     </div>
                     <div class="user-counter">{{ participants.length }}</div>
@@ -127,12 +121,12 @@
                 </div>
             </div> -->
 
-            <div *ngFor="let chat of channelChats" class="chat-day-section">
+            <div *ngFor="let chat of channelChats" class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                 <div class="chat-date-section">
                     <div class="chat-date">{{ chat.time * 1000 | date: 'EEEE, d. MMMM':'':'de' }}</div>
                 </div>
-                <div class="chat-section">
-                    <div class="chat-dialogue">
+                <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}">
+                    <div class="chat-dialogue" [ngClass]="{'reverse': chat.user === currentUserId}">
                         <button class="add-reaction-btn">
                             <img class="" src="assets/reaction-icons/check.svg" alt="">
                         </button>
@@ -161,26 +155,31 @@
                     <img class="chat-user-img" [src]="'assets/user-icons/' + chat.userImg + '.svg'" [alt]="chat.userName">
 
                     <div class="chat-info-container">
-                        <div class="chat-start">
+                        <div class="chat-start" [ngClass]="{'reverse': chat.user === currentUserId}">
                             <div class="font-w-700">{{ chat.userName }}</div>
                             <div class="font-14 t-gray">{{ chat.time * 1000 | date: 'HH:mm' }} Uhr</div>
                         </div>
-                        <div class="chat-message left bg-light-purple">{{ chat.message }}</div>
-                        <div class="chat-answered">
+                        <div class="chat-message" [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 'right': chat.user === currentUserId}">{{ chat.message }}</div>
+                        <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}">
                             <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0">
                                 <div (click)="handleOpenThread()" class="answer t-purple">{{ chat.answersCount }} Antworten</div>
                                 <div class="last-answer font-14 t-gray">Letzte Antwort {{ (chat.lastAnswerTime * 1000) | date: 'HH:mm' }}</div>
                             </div>
                             <div class="reactions">
                                 <div class="reaction-btns">
+                                    <div *ngFor="let reaction of transformReactionsToArray(chat.reactions)" class="reaction-btn">
+                                        <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'" [alt]="reaction.type">
+                                        <div>{{ reaction.count }}</div>
+                                        <div></div>
+                                    </div>
                                     <!-- <div class="reaction-btn">
                                         <img src="assets/reaction-icons/check.svg" alt="">
                                         <div>2</div>
-                                    </div> -->
+                                    </div>
                                     <div class="reaction-btn">
                                         <img src="assets/reaction-icons/thumb.svg" alt="">
                                         <div>1</div>
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
                                     iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
@@ -191,7 +190,7 @@
                     </div>
                 </div>
             </div>
-
+            <!-- <pre>{{ channelChats | json }}</pre> -->
 
             <!-- <div class="chat-day-section">
                 <div class="chat-date-section">
