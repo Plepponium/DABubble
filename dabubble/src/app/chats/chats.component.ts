@@ -76,12 +76,12 @@ export class ChatsComponent implements OnInit, OnChanges {
   private loadDataForChannel(channelId: string) {
     // Vorher bestehende Abos abbrechen
     // this.channelIdChange$.next();
-
     this.channelService.getChannelById(channelId).pipe(
       switchMap(channel => {
         this.channelName = channel?.name ?? '';
         this.participantIds = channel?.participants ?? [];
-        return this.loadChatsAndUsers(channelId, this.participantIds);
+        const channelData = this.loadChatsAndUsers(channelId, this.participantIds);
+        return channelData;
       }),
       // takeUntil(this.channelIdChange$)  // Beispiel für Abbrechen bei neuem ChannelId-Change (optional)
     ).subscribe(([chatsWithAnswers, users]) => {
@@ -100,6 +100,10 @@ export class ChatsComponent implements OnInit, OnChanges {
       this.userService.getUsersByIds(participantIds).pipe(take(1))
     ]).pipe(
       switchMap(([chats, users]) => {
+        if (!chats.length) {
+          // Wenn keine Chats, trotzdem Users zurückliefern (und leere chats)
+          return of([[], users] as [any[], User[]]);
+        }
         const chatsWithAnswers$ = chats.map(chat =>
           this.channelService.getAnswersForChat(channelId, chat.id).pipe(
             take(1),
@@ -117,6 +121,7 @@ export class ChatsComponent implements OnInit, OnChanges {
             })
           )
         );
+        // console.log('loadChatsAndUsers participants', this.participants);
         return forkJoin(chatsWithAnswers$).pipe(
           map(chatsWithAnswers => [chatsWithAnswers, users] as [any[], User[]])
         );
