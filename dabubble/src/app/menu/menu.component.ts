@@ -18,7 +18,6 @@ import { Channel } from '../../models/channel.class';
   imports: [CommonModule, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, RoundBtnComponent, FormsModule, RouterModule],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
-  providers: [UserService, ChannelService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuComponent implements OnInit {
@@ -36,7 +35,7 @@ export class MenuComponent implements OnInit {
   userService = inject(UserService);
   channelService = inject(ChannelService);
 
-  currentUser$ = this.userService.currentUser$;
+  currentUser$ = this.userService.getCurrentUser();
   users$ = this.userService.getUsers();
 
   sortedUsers$ = combineLatest([this.users$, this.currentUser$]).pipe(

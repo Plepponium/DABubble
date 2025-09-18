@@ -1,25 +1,26 @@
 import { inject, Injectable } from '@angular/core';
 import { Auth, authState, signOut } from '@angular/fire/auth';
-import { Firestore, collectionData, collection, doc, docData, updateDoc, serverTimestamp, query, where, DocumentData } from '@angular/fire/firestore';
+import { Firestore, collectionData, collection, serverTimestamp } from '@angular/fire/firestore';
+import { doc, docData, updateDoc } from '@angular/fire/firestore';
 import { Observable, switchMap, of, shareReplay, merge, map, forkJoin, tap, take } from 'rxjs';
 import { User } from '../models/user.class';
+
 // import { tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private auth = inject(Auth);
-  private firestore = inject(Firestore);
+  auth = inject(Auth);
+  firestore = inject(Firestore);
 
-  public currentUser$: Observable<User | undefined> =
-    authState(this.auth).pipe(
+  getCurrentUser(): Observable<User | undefined> {
+    return authState(this.auth).pipe(
       switchMap(userAuth => {
         if (!userAuth) return of(undefined);
-        const userRef = doc(this.firestore, 'users', userAuth.uid);
-        return docData(userRef, { idField: 'uid' }) as Observable<User>;
+        return this.getSingleUserById(userAuth.uid);
       }),
       shareReplay(1)
     );
-
+  }
 
   getUsers(): Observable<User[]> {
     const usersCollection = collection(this.firestore, 'users');

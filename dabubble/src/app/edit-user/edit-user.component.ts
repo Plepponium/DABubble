@@ -15,7 +15,7 @@ export class EditUserComponent {
   @Output() close = new EventEmitter<void>();
   userService = inject(UserService)
 
-  currentUser$ = this.userService.currentUser$;
+  currentUser$ = this.userService.getCurrentUser();
 
   handleClose() {
     this.close.emit();

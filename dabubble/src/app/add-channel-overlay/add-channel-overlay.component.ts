@@ -23,7 +23,7 @@ export class AddChannelOverlayComponent {
 
 
   constructor(private channelService: ChannelService) {
-    this.userService.currentUser$.subscribe(user => {
+    this.userService.getCurrentUser().subscribe(user => {
       if (user) {
         this.currentUser = user;
       }

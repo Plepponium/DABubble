@@ -9,7 +9,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { AddChannelOverlayComponent } from '../add-channel-overlay/add-channel-overlay.component';
-import { ChannelService } from '../../services/channel.service';
 import { DirectMessageChatsComponent } from '../direct-message-chats/direct-message-chats.component';
 import { User } from '../../models/user.class';
 
@@ -18,7 +17,6 @@ import { User } from '../../models/user.class';
   imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, DirectMessageChatsComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss',
-  providers: [ChannelService],
 })
 export class MainPageComponent {
   menuOpen = true;

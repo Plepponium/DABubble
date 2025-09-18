@@ -23,7 +23,6 @@ registerLocaleData(localeDe);
   imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, DialogueOverlayComponent, ProfileOverlayComponent, ChatAddUserOverlayComponent, ChannelDescriptionOverlayComponent],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.scss',
-  // providers: [ChannelService],
 })
 export class ChatsComponent implements OnInit, OnChanges {
   value = 'Clear me';
@@ -124,7 +123,7 @@ export class ChatsComponent implements OnInit, OnChanges {
       })
     );
   }
-  
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['channelId']) {
       const newChannelId = changes['channelId'].currentValue;

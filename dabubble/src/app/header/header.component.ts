@@ -23,7 +23,7 @@ export class HeaderComponent {
   currentUser$: Observable<User | undefined>;
 
   constructor(private userService: UserService, private router: Router) {
-    this.currentUser$ = this.userService.currentUser$;
+    this.currentUser$ = this.userService.getCurrentUser();
   }
 
   getAvatarImg(user?: User): string {

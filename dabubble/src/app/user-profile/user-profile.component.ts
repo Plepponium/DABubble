@@ -15,7 +15,7 @@ export class UserProfileComponent {
   @Output() openEdit = new EventEmitter<void>();
   @Input() private userService = inject(UserService)
 
-  currentUser$ = this.userService.currentUser$;
+  currentUser$ = this.userService.getCurrentUser();
 
   handleClose() {
     this.close.emit();
