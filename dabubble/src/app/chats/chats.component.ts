@@ -39,6 +39,12 @@ export class ChatsComponent implements OnInit, OnChanges {
   reactionArray: { type: string, count: number, user: string[] }[] = [];
   currentUserId: string = '';
 
+  userReacted = false;
+  onlyOneUserReacted = true;
+  otherUserReacted = false;
+  currentUserReacted = true;
+  
+
   channelService = inject(ChannelService);
   userService = inject(UserService);
 
@@ -57,6 +63,18 @@ export class ChatsComponent implements OnInit, OnChanges {
         this.loadDataForChannel(this.channelId);
       }
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['channelId']) {
+      const newChannelId = changes['channelId'].currentValue;
+      if (newChannelId) {
+        this.channelChats = [];
+        this.participants = [];
+        this.channelName = '';
+        this.loadDataForChannel(newChannelId);
+      }
+    }
   }
 
   // Lädt die erste verfügbare Channel-ID plus alle zugehörigen Daten
@@ -134,7 +152,7 @@ export class ChatsComponent implements OnInit, OnChanges {
                 answersCount: answers.length,
                 lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
                 reactions,
-                reactionArray: this.transformReactionsToArray(reactions)
+                reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
               };
               // console.log('chatWithDetails', chatsWithDetails);
               return chatsWithDetails;
@@ -152,17 +170,39 @@ export class ChatsComponent implements OnInit, OnChanges {
     );
   }
 
-  transformReactionsToArray(reactionsMap: Record<string, string[]>): {type: string, count: number, user: string[]}[] {
+  transformReactionsToArray(
+    reactionsMap: Record<string, string[]>, 
+    participants: User[], 
+    currentUserId: string
+  ): {
+    type: string, 
+    count: number, 
+    userIds: string[],
+    currentUserReacted: boolean,
+    otherUserName?: string,
+    otherUserReacted: boolean
+  }[] {
     if (!reactionsMap) return [];
 
     const data = Object.entries(reactionsMap).map(([type, users]) => {
       // Stelle sicher, dass alle User IDs als Array vorliegen
       const userArray = users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
-
+      const currentUserReacted = userArray.includes(currentUserId);
+      // Finde alle User außer currentUserId
+      const others = userArray.filter(id => id !== currentUserId);
+      // Hole optional Namen des ersten anderen
+      const otherUserName = others.length
+        ? participants.find(u => u.uid === others[0])?.name || 'Unbekannt'
+        : undefined;
+      const otherUserReacted = others.length > 1;
+      
       return {
         type,
         count: userArray.length,
-        user: userArray,
+        userIds: userArray,
+        currentUserReacted,
+        otherUserName,
+        otherUserReacted
       };
     });
 
@@ -172,22 +212,10 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   private updateReactionsArrayForChat(chatIndex: number) {
     if (this.channelChats[chatIndex]?.reactions) {
-      const data = this.transformReactionsToArray(this.channelChats[chatIndex].reactions);
+      const data = this.transformReactionsToArray(this.channelChats[chatIndex].reactions, this.participants, this.currentUserId);
       // console.log('data', data);
     } else {
       this.reactionArray = [];
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['channelId']) {
-      const newChannelId = changes['channelId'].currentValue;
-      if (newChannelId) {
-        this.channelChats = [];
-        this.participants = [];
-        this.channelName = '';
-        this.loadDataForChannel(newChannelId);
-      }
     }
   }
 

@@ -170,7 +170,46 @@
                                     <div  *ngFor="let reaction of chat.reactionArray" class="reaction-btn">
                                         <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'" [alt]="reaction.type">
                                         <div>{{ reaction.count }}</div>
-                                        <div></div>
+
+                                        <!-- <div class="r-btn-hover-display">
+                                            <div class="r-btn-hover-display-content">
+                                                <img src="assets/reaction-icons/check.svg" alt="">
+                                                <div class="reaction-btn-t-box">
+                                                    <div *ngIf="userReacted" class="no-wrap font-w-700">Sofia Müller<span *ngIf="!otherUserReacted && currentUserReacted"> und</span><span *ngIf="otherUserReacted && currentUserReacted">,</span><span *ngIf="currentUserReacted"> Du</span></div>
+                                                    <span *ngIf="onlyOneUserReacted && !currentUserReacted">hat reagiert</span>
+                                                    <span *ngIf="otherUserReacted" class="font-w-700">und andere</span>
+                                                    <span *ngIf="userReacted && (currentUserReacted || otherUserReacted)">haben reagiert</span>
+                                                    
+                                                    <div *ngIf="!userReacted && currentUserReacted" class="font-w-700">Du</div>
+                                                    <span *ngIf="!userReacted && currentUserReacted">hast reagiert</span>
+                                                </div>
+                                            </div>
+                                        </div> -->
+
+                                        <div class="r-btn-hover-display">
+                                            <div class="r-btn-hover-display-content">
+                                                <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'" [alt]="reaction.type">
+                                                <div class="reaction-btn-t-box">
+                                                    <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count <= 2" class="font-w-700">
+                                                        {{ reaction.otherUserName }} und Du
+                                                    </div>
+                                                    <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count > 2" class="font-w-700">
+                                                        {{ reaction.otherUserName }}, Du
+                                                    </div>
+                                                    <div *ngIf="!reaction.currentUserReacted && reaction.otherUserName" class="font-w-700">
+                                                        {{ reaction.otherUserName }}
+                                                    </div>
+                                                    <div *ngIf="reaction.currentUserReacted && !reaction.otherUserName" class="font-w-700">
+                                                        Du
+                                                    </div>
+                                                    <span *ngIf="reaction.count === 1 && reaction.currentUserReacted">hast reagiert</span>
+                                                    <span *ngIf="reaction.count === 1">hat reagiert</span>
+                                                    <span *ngIf="reaction.count > 2" class="font-w-700">und andere</span>
+                                                    <span *ngIf="reaction.count > 1">haben reagiert</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <!-- <pre>{{ reaction | json }}</pre> -->
                                     </div>
                                     <!-- <div class="reaction-btn">

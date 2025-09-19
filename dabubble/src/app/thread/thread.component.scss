@@ -294,6 +294,9 @@
     border-radius: 20px;
     padding: 5px 10px;
     cursor: pointer;
+    &:hover {
+        border-color: #797ef3;
+    }
 
     img {
         width: 24px;
@@ -328,11 +331,11 @@
 }
 
 .line {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #ADB0D9;
-  margin: 0 0 0 20px;
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #ADB0D9;
+    margin: 0 0 0 20px;
 }
 
 .form {
