@@ -451,6 +451,10 @@
     }
 }
 
+.reaction-btn.reacted {
+    border-color: #797ef3;
+}
+
 .r-btn-hover-display {
     display: none;
 }
@@ -481,6 +485,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
 }
 
 .no-wrap {

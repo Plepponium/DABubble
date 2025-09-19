@@ -37,13 +37,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   channelChats: any[] = [];
   // reactions: string[] = [];
   reactionArray: { type: string, count: number, user: string[] }[] = [];
-  currentUserId: string = '';
-
-  userReacted = false;
-  onlyOneUserReacted = true;
-  otherUserReacted = false;
-  currentUserReacted = true;
-  
+  currentUserId: string = '';  
 
   channelService = inject(ChannelService);
   userService = inject(UserService);
@@ -216,6 +210,58 @@ export class ChatsComponent implements OnInit, OnChanges {
       // console.log('data', data);
     } else {
       this.reactionArray = [];
+    }
+  }
+
+  
+  async toggleReaction(chatIndex: number, reactionType: string) {
+    const chat = this.channelChats[chatIndex];
+    if (!chat) return;
+
+    const channelId = this.channelId;
+    const chatId = chat.id;
+    const currentUserId = this.currentUserId;
+    console.log('channelId:', channelId, 'chatId: ', chatId, 'currentUserId: ', currentUserId)
+
+    if (!channelId || !chatId || !currentUserId) return;
+
+    // Hole die Reaktionen für den Chat
+    const reactions = chat.reactions || {};
+    const currentReactionUsersRaw = reactions[reactionType] || [];
+    // Reine User-IDs array, evtl. aus CSV strings splitten
+    const currentReactionUsers = currentReactionUsersRaw.flatMap((u: string) =>
+      u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
+    );
+
+    let updatedUsers: string[];
+
+    if (currentReactionUsers.includes(currentUserId)) {
+      // User hat schon reagiert: entfernen
+      updatedUsers = currentReactionUsers.filter((uid: string) => uid !== currentUserId);
+    } else {
+      // User hat noch nicht reagiert: hinzufügen
+      updatedUsers = [...currentReactionUsers, currentUserId];
+    }
+
+    try {
+      if (updatedUsers.length === 0) {
+        // Wenn keine User mehr, Reaction löschen (Document entfernen)
+        await this.channelService.deleteReactionForChat(channelId, chatId, reactionType);
+      } else {
+        // Sonst Reaction mit aktualisierter Userliste updaten
+        await this.channelService.updateReactionForChat(channelId, chatId, reactionType, updatedUsers);
+      }
+      // Lokales chat Objekt aktualisieren, um UI direkt zu aktualisieren
+      chat.reactions = { ...chat.reactions };
+      if (updatedUsers.length === 0) {
+        delete chat.reactions[reactionType];
+      } else {
+        chat.reactions[reactionType] = updatedUsers;
+      }
+      chat.reactionArray = this.transformReactionsToArray(chat.reactions, this.participants, this.currentUserId);
+
+    } catch (error) {
+      console.error('Fehler beim Aktualisieren der Reaction:', error);
     }
   }
 

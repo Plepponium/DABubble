@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Firestore, collectionData, collection } from '@angular/fire/firestore';
+import { Firestore, collectionData, collection, setDoc, deleteDoc } from '@angular/fire/firestore';
 import { doc, addDoc, docData, updateDoc } from '@angular/fire/firestore';
 import { map, Observable, take } from 'rxjs';
 import { Channel } from '../models/channel.class';
@@ -49,6 +49,19 @@ export class ChannelService {
         return reactionsMap;
       })
     );
+  }
+
+  async updateReactionForChat(channelId: string, chatId: string, reactionType: string, userIds: string[]) {
+    const reactionDocRef = doc(this.firestore, `channels/${channelId}/chats/${chatId}/reactions`, reactionType);
+    return setDoc(reactionDocRef, {
+      type: reactionType,
+      user: userIds
+    });
+  }
+
+  async deleteReactionForChat(channelId: string, chatId: string, reactionType: string) {
+    const reactionDocRef = doc(this.firestore, `channels/${channelId}/chats/${chatId}/reactions`, reactionType);
+    return deleteDoc(reactionDocRef);
   }
 
   getAnswersForChat(channelId: string, chatId: string): Observable<any[]> {
