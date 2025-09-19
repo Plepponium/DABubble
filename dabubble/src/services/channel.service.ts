@@ -41,6 +41,8 @@ export class ChannelService {
             if (!reactionsMap[type]) {
               reactionsMap[type] = [];
             }
+            // type: reactionsMap[type];
+            // userId: reactionsMap[type].concat(users);
             reactionsMap[type] = reactionsMap[type].concat(users);
           }
         });

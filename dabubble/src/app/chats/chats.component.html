@@ -167,10 +167,11 @@
                             </div>
                             <div class="reactions">
                                 <div class="reaction-btns">
-                                    <div *ngFor="let reaction of transformReactionsToArray(chat.reactions)" class="reaction-btn">
+                                    <div  *ngFor="let reaction of chat.reactionArray" class="reaction-btn">
                                         <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'" [alt]="reaction.type">
                                         <div>{{ reaction.count }}</div>
                                         <div></div>
+                                        <!-- <pre>{{ reaction | json }}</pre> -->
                                     </div>
                                     <!-- <div class="reaction-btn">
                                         <img src="assets/reaction-icons/check.svg" alt="">
@@ -191,6 +192,7 @@
                 </div>
             </div>
             <!-- <pre>{{ channelChats | json }}</pre> -->
+            
 
             <!-- <div class="chat-day-section">
                 <div class="chat-date-section">

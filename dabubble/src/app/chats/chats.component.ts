@@ -123,14 +123,14 @@ export class ChatsComponent implements OnInit, OnChanges {
         const chatsWithDetails$ = chats.map(chat =>
           forkJoin({
             answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1), catchError(() => of([]))),
-            // reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(catchError(() => of({})))
-            reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(
-              tap(reactions => {
-                // debugger;
-                console.log(`Reactions geladen für chatId=${chat.id}:`, reactions);
-              }),
-              catchError(() => of({}))
-            )
+            reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(catchError(() => of({})))
+            // reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(
+            //   tap(reactions => {
+            //     // debugger;
+            //     console.log(`Reactions geladen für chatId=${chat.id}:`, reactions);
+            //   }),
+            //   catchError(() => of({}))
+            // )
           }).pipe(
             map(({answers, reactions}) => {
               // console.log('channelId', channelId, 'chat.id', chat.id);
@@ -141,7 +141,8 @@ export class ChatsComponent implements OnInit, OnChanges {
                 userImg: user?.img,
                 answersCount: answers.length,
                 lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
-                reactions
+                reactions,
+                reactionArray: this.transformReactionsToArray(reactions)
               };
               console.log('chatWithDetails', chatsWithDetails);
               return chatsWithDetails;
@@ -196,18 +197,29 @@ export class ChatsComponent implements OnInit, OnChanges {
   //     count: users.length
   //   }));
   // }
-  transformReactionsToArray(reactionsMap: Record<string, string[]>): {type: string, count: number}[] {
-    if (!reactionsMap) return [];
-    return Object.entries(reactionsMap).map(([type, users]) => ({
+  transformReactionsToArray(reactionsMap: Record<string, string[]>): {type: string, count: number, user: string[]}[] {
+  if (!reactionsMap) return [];
+
+  const data = Object.entries(reactionsMap).map(([type, users]) => {
+    // Stelle sicher, dass alle User IDs als Array vorliegen
+    const userArray = users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
+
+    return {
       type,
-      count: users.length
-    }));
-  }
+      count: userArray.length,
+      user: userArray,
+    };
+  });
+
+  console.log('transformToArray', reactionsMap, data);
+  return data;
+}
 
   // Beispiel: rufe diese Funktion auf, nachdem channelChats geladen sind und Reactions vorhanden sind
   private updateReactionsArrayForChat(chatIndex: number) {
     if (this.channelChats[chatIndex]?.reactions) {
-      this.transformReactionsToArray(this.channelChats[chatIndex].reactions);
+      const data = this.transformReactionsToArray(this.channelChats[chatIndex].reactions);
+      console.log('data', data);
     } else {
       this.reactionArray = [];
     }
