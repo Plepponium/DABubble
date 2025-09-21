@@ -3,8 +3,8 @@
     <div class="header">
         <div class="user">
             <div class="img-container">
-                <img class="user-img" [src]="'assets/user-icons/' + u.img + '.svg'">
-                <div [class]="'online-signal ' + u.presence"></div>
+                <img class="user-img" [src]="'assets/user-icons/' + (u.img || 'default-user') + '.svg'" />
+                <div [class]="'online-signal ' + (u.presence || 'offline')"></div>
             </div>
             <span class="font-w-700 font-24">
                 {{ u.name }} <span *ngIf="isSelf()">(Du)</span>
@@ -13,45 +13,72 @@
     </div>
 
     <div class="dm-chat-container">
-        <div class="emtpy-conversation">
-            <div class="recipient">
-                <img class="recipient-img" [src]="'assets/user-icons/' + u.img + '.svg'">
-                <span class="font-w-700 font-24">
-                    {{ u.name }} <span *ngIf="isSelf()">(Du)</span>
+
+        <ng-container *ngIf="messages$ | async as messages; else loading">
+            <div *ngIf="messages.length === 0; else chatContent" class="empty-conversation">
+                <div class="recipient">
+                    <img class="recipient-img" [src]="'assets/user-icons/' + (u.img || 'default-user') + '.svg'" />
+                    <span class="font-w-700 font-24">
+                        {{ u.name }} <span *ngIf="isSelf()">(Du)</span>
+                    </span>
+                </div>
+
+                <span class="t-gray" *ngIf="!isSelf()">
+                    Diese Unterhaltung findet nur zwischen
+                    <span class="t-purple at-name">&#64;{{ u.name }}</span>
+                    und dir statt.
+                </span>
+
+                <span class="t-gray" *ngIf="isSelf()">
+                    <span class="font-w-700">Dieser Raum ist nur für dich da.</span>
+                    Mache dir Notizen, liste deine To-dos auf oder bewahre Links und Dateien griffbereit auf.
+                    Du kannst hier auch gerne Dinge mit dir selbst besprechen.
                 </span>
             </div>
 
-            <span class="t-gray" *ngIf="!isSelf()">
-                Diese Unterhaltung findet nur zwischen
-                <span class="t-purple at-name">&#64;{{ u.name }}</span>
-                und dir statt.
-            </span>
-
-            <span class="t-gray" *ngIf="isSelf()">
-                <span class="font-w-700">Dieser Raum ist nur für dich da.</span> Mache dir Notizen, liste deine To-dos
-                auf
-                oder bewahre Links und Dateien griffbereit auf. Du kannst hier auch gerne
-                Dinge mit dir selbst besprechen.
-            </span>
-        </div>
+            <ng-template #chatContent>
+                <div class="chat-content">
+                    <div class="chat-history">
+                        <div *ngFor="let m of messages" class="chat-message-row"
+                            [class.me]="m.senderId === currentUser?.uid">
+                            <img class="chat-user-img"
+                                [src]="'assets/user-icons/' + (m.senderImg || 'default-user') + '.svg'" />
+                            <div class="chat-bubble">
+                                <div class="chat-meta">
+                                    <span class="font-w-700 font-18">{{ m.senderName }} </span>
+                                    <span class="time t-gray font-14">
+                                        {{ m.sentAt?.toDate ? (m.sentAt.toDate() | date:'HH:mm') : '' }} Uhr
+                                    </span>
+                                </div>
+                                <div class="chat-text font-18">{{ m.text }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </ng-container>
 
         <div class="form-field full-width">
-            <textarea class="input font-18" type="text" [placeholder]="'Nachricht an ' + u.name"></textarea>
+            <textarea class="input font-18" [(ngModel)]="messageText"
+                [placeholder]="'Nachricht an ' + u.name"></textarea>
             <div class="input-icon-bar">
                 <div class="icon-bar t-gray">
                     <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
                         iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
-                        altText="Reaktion hinzufügen">
-                    </app-round-btn>
+                        altText="Reaktion hinzufügen"></app-round-btn>
                     <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
-                        iconHoverSrc="assets/message-icons/alternate_email-purple.svg" altText="Mail hinzufügen">
-                    </app-round-btn>
+                        iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
+                        altText="Mail hinzufügen"></app-round-btn>
                 </div>
 
                 <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
-                    iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden">
-                </app-round-btn>
+                    iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden"
+                    (click)="sendMessage()"></app-round-btn>
             </div>
         </div>
     </div>
 </div>
+
+<ng-template #loading>
+    <div class="dm-loading">Lade Unterhaltung…</div>
+</ng-template>

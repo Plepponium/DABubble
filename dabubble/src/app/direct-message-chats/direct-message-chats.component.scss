@@ -142,3 +142,90 @@
     font-weight: 700;
   }
 }
+
+.chat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  overflow-y: auto;
+
+  .chat-history {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    // .chat-date {
+    //   text-align: center;
+    //   font-size: 0.75rem;
+    //   color: gray;
+    //   margin: 1rem 0;
+    // }
+
+    .chat-message-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-start;
+
+      &.me {
+        flex-direction: row-reverse;
+
+        .chat-bubble {
+          .chat-meta {
+            flex-direction: row-reverse;
+          }
+
+          .chat-text {
+            background-color: #797ef3;
+            color: white;
+            border-radius: 30px 0px 30px 30px;
+          }
+        }
+      }
+
+      .chat-user-img {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+      }
+
+      .chat-bubble {
+        padding: 0.5rem 1rem;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .chat-meta {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+        }
+
+        .chat-text {
+          background-color: #eceefe;
+          padding: 15px;
+          border-radius: 0px 30px 30px 30px;
+        }
+
+        .chat-reactions {
+          display: flex;
+          gap: 0.25rem;
+          margin-top: 0.25rem;
+
+          .reaction {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+
+            img {
+              width: 16px;
+              height: 16px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
