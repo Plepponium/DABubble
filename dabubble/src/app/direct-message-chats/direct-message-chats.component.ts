@@ -13,8 +13,15 @@ import { CommonModule } from '@angular/common';
 export class DirectMessageChatsComponent {
   @Input() userId!: string;
   user?: User;
+  currentUser?: User;
 
   userService = inject(UserService);
+
+  ngOnInit() {
+    this.userService.getCurrentUser().subscribe(current => {
+      this.currentUser = current;
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['userId'] && this.userId) {
@@ -22,5 +29,9 @@ export class DirectMessageChatsComponent {
         this.user = user;
       });
     }
+  }
+
+  isSelf(): boolean {
+    return this.user?.uid === this.currentUser?.uid;
   }
 }
