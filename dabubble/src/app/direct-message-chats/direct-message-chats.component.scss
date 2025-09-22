@@ -47,8 +47,8 @@
   flex-direction: column;
   justify-content: end;
   height: calc(100% - 145px);
-  padding: 0px 45px;
-  gap: 60px;
+  padding: 16px 45px 0px 45px;
+  gap: 16px;
 }
 
 .recipient {
@@ -143,12 +143,34 @@
   }
 }
 
+@mixin scrollbar() {
+  &::-webkit-scrollbar {
+    width: 18px;
+  }
+  &::-webkit-scrollbar-thumb {
+    // height: 6px;
+    border: none;
+    // background-clip: padding-box;
+    // border-radius: 10px;
+    background-color: transparent;
+  }
+  &::-webkit-scrollbar-button {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+  &::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+}
+
 .chat-content {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  padding: 1rem;
+  padding: 16px;
   overflow-y: auto;
+  @include scrollbar();
 
   .chat-history {
     display: flex;
@@ -200,6 +222,13 @@
           display: flex;
           align-items: center;
           gap: 20px;
+
+          .sender-name {
+            cursor: pointer;
+            &:hover {
+              color: #535af1;
+            }
+          }
         }
 
         .chat-text {

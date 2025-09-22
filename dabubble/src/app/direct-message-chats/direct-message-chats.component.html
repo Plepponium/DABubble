@@ -45,7 +45,7 @@
                                 [src]="'assets/user-icons/' + (m.senderImg || 'default-user') + '.svg'" />
                             <div class="chat-bubble">
                                 <div class="chat-meta">
-                                    <span class="font-w-700 font-18">{{ m.senderName }} </span>
+                                    <span class="sender-name font-w-700 font-18">{{ m.senderName }} </span>
                                     <span class="time t-gray font-14">
                                         {{ m.sentAt?.toDate ? (m.sentAt.toDate() | date:'HH:mm') : '' }} Uhr
                                     </span>
