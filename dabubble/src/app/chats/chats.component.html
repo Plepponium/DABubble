@@ -174,7 +174,7 @@
                                         <div class="r-btn-hover-display">
                                             <div class="r-btn-hover-display-content">
                                                 <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'" [alt]="reaction.type">
-                                                <div class="reaction-btn-t-box">
+                                                <div class="reaction-btn-t-box no-wrap">
                                                     <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count <= 2" class="font-w-700">
                                                         {{ reaction.otherUserName }} und Du
                                                     </div>
