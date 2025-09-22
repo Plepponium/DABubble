@@ -1,4 +1,4 @@
-import { Component, inject, Input, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject, Input, SimpleChanges } from '@angular/core';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { User } from '../../models/user.class';
 import { UserService } from '../../services/user.service';
@@ -29,30 +29,41 @@ export class DirectMessageChatsComponent {
     if (changes['userId'] && this.userId) {
       this.userService.getSingleUserById(this.userId).subscribe(u => this.user = u);
       this.currentUser = await firstValueFrom(this.userService.getCurrentUser());
-
       if (!this.currentUser) {
         this.messages$ = of([]);
         return;
       }
-
       this.dmId = await this.dmService.getOrCreateDmId(this.currentUser.uid, this.userId);
       this.messages$ = this.dmService.getMessages(this.dmId);
+      this.messages$.subscribe(() => {
+        setTimeout(() => this.scrollToBottom(), 0);
+      });
     }
   }
 
   isSelf(): boolean {
-    return !!this.user && !!this.currentUser && this.user.uid === this.currentUser.uid;
+    return this.user?.uid === this.currentUser?.uid;
   }
 
   async sendMessage() {
     const text = (this.messageText || '').trim();
     if (!text || !this.dmId || !this.currentUser) return;
+
     await this.dmService.sendMessage(this.dmId, {
       senderId: this.currentUser.uid,
       senderName: this.currentUser.name,
       senderImg: this.currentUser.img,
       text
     });
+
     this.messageText = '';
+    this.scrollToBottom();
+  }
+
+  scrollToBottom() {
+    const container = document.getElementById("dm-chat-content");
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
   }
 }

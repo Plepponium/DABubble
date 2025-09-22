@@ -37,7 +37,7 @@
             </div>
 
             <ng-template #chatContent>
-                <div class="chat-content">
+                <div class="chat-content" id="dm-chat-content">
                     <div class="chat-history">
                         <div *ngFor="let m of messages" class="chat-message-row"
                             [class.me]="m.senderId === currentUser?.uid">

@@ -47,7 +47,7 @@
   flex-direction: column;
   justify-content: end;
   height: calc(100% - 145px);
-  padding: 16px 45px 0px 45px;
+  padding: 0px 45px 0px 45px;
   gap: 16px;
 }
 
@@ -89,9 +89,8 @@
   &:hover {
     border-color: #797ef3;
   }
-  &:focus {
+  &:focus-within {
     border-color: #535af1;
-    outline: none;
   }
 }
 
