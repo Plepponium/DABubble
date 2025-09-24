@@ -14,6 +14,7 @@ import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.class';
 import { catchError, forkJoin, map, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { reactionIcons } from '../reaction-icons';
 import localeDe from '@angular/common/locales/de';
 registerLocaleData(localeDe);
 
@@ -31,11 +32,13 @@ export class ChatsComponent implements OnInit, OnChanges {
   usersDisplayActive = false;
   showProfileDialogue = false;
   editCommentDialogueExpanded = false;
+  activeReactionDialogueIndex: number | null = null;
   channelName = '';
   participantIds: string[] = [];
   participants: User[] = [];
   channelChats: any[] = [];
-  // reactions: string[] = [];
+  // reactionIcons: string[] = [];
+  reactionIcons = reactionIcons;
   reactionArray: { type: string, count: number, user: string[] }[] = [];
   currentUserId: string = '';  
 
@@ -94,59 +97,14 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
   }
 
-  // Lädt die erste verfügbare Channel-ID plus alle zugehörigen Daten
-  // private loadFirstChannelAndData() {
-  //   this.channelService.getChannels().pipe(
-  //     switchMap(channels => {
-  //       if (channels.length > 0) {
-  //         this.channelId = channels[0].id;
-  //         this.channelName = channels[0].name;
-  //         this.participantIds = channels[0].participants;
-  //         return this.loadChatsAndUsers(this.channelId, this.participantIds);
-  //       } else {
-  //         return of([[], []]);
-  //       }
-  //     })
-  //   ).subscribe(([chatsWithAnswers, users]) => {
-  //     this.participants = users;
-  //     this.channelChats = chatsWithAnswers;
-  //     // console.log('Daten geladen für Erst-Channel:', this.channelId);
-  //     this.channelChats.forEach((chat, index) => {
-  //       this.updateReactionsArrayForChat(index);
-  //     });
-  //   });
-  // }
-
   private loadDataForChannel(channelId: string) {
     this.channelService.getChannelById(channelId).pipe(take(1)).subscribe(channel => {
       if (!channel) return;
-      // Sicherheit: nur setzen wenn channelId noch aktuell ist
-      if (this.channelId !== channelId) {
-        this.loadChannelData(channel.id, channel.name || '', channel.participants || []);
-      }
+      
+      this.channelId = channelId;
+      this.loadChannelData(channel.id, channel.name || '', channel.participants || []);
     });
   }
-
-  // Lädt alle nötigen Daten für eine konkrete Channel-ID
-  // private loadDataForChannel(channelId: string) {
-  //   this.channelService.getChannelById(channelId).pipe(
-  //     switchMap(channel => {
-  //       this.channelName = channel?.name ?? '';
-  //       this.participantIds = channel?.participants ?? [];
-  //       const channelData = this.loadChatsAndUsers(channelId, this.participantIds);
-  //       return channelData;
-  //     }),
-  //   ).subscribe(([chatsWithAnswers, users]) => {
-  //     if (this.channelId === channelId) {  // nur setzen, wenn der Kanal noch der erwartete ist
-  //       this.participants = users;
-  //       this.channelChats = chatsWithAnswers;
-  //       // console.log('Daten geladen für Channel:', channelId);
-  //       this.channelChats.forEach((chat, index) => {
-  //         this.updateReactionsArrayForChat(index);
-  //       });
-  //     }
-  //   });
-  // }
 
   // private loadChatsAndUsers(channelId: string, participantIds: string[]): Observable<ChatsWithUsers> {
   //   return forkJoin([
@@ -225,45 +183,110 @@ export class ChatsComponent implements OnInit, OnChanges {
     );
   }
 
+  openReactionsDialogue(chatIndex: number) {
+    if (this.activeReactionDialogueIndex === chatIndex) {
+      this.activeReactionDialogueIndex = null; // schließe, wenn bereits offen
+    } else {
+      this.activeReactionDialogueIndex = chatIndex; // öffne aktuellen
+    }
+  }
+
+  private parseUserIds(users: string[]): string[] {
+    return users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
+  }
+
+  private findOtherUserName(userIds: string[], currentUserId: string, participants: User[]): string | undefined {
+    const others = userIds.filter(id => id !== currentUserId);
+    if (others.length === 0) return undefined;
+    return participants.find(u => u.uid === others[0])?.name || 'Unbekannt';
+  }
+
+  private buildReactionObject(
+    type: string,
+    usersRaw: string[],
+    participants: User[],
+    currentUserId: string
+  ): {
+    type: string,
+    count: number,
+    userIds: string[],
+    currentUserReacted: boolean,
+    otherUserName?: string,
+    otherUserReacted: boolean
+  } {
+    const userIds = this.parseUserIds(usersRaw);
+    const currentUserReacted = userIds.includes(currentUserId);
+    const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
+    const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
+
+    return {
+      type,
+      count: userIds.length,
+      userIds,
+      currentUserReacted,
+      otherUserName,
+      otherUserReacted
+    };
+  }
+
   transformReactionsToArray(
     reactionsMap: Record<string, string[]>, 
     participants: User[], 
     currentUserId: string
   ): {
-    type: string, 
-    count: number, 
+    type: string,
+    count: number,
     userIds: string[],
     currentUserReacted: boolean,
     otherUserName?: string,
     otherUserReacted: boolean
   }[] {
     if (!reactionsMap) return [];
-
-    const data = Object.entries(reactionsMap).map(([type, users]) => {
-      // Stelle sicher, dass alle User IDs als Array vorliegen
-      const userArray = users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
-      const currentUserReacted = userArray.includes(currentUserId);
-      // Finde alle User außer currentUserId
-      const others = userArray.filter(id => id !== currentUserId);
-      // Hole optional Namen des ersten anderen
-      const otherUserName = others.length
-        ? participants.find(u => u.uid === others[0])?.name || 'Unbekannt'
-        : undefined;
-      const otherUserReacted = others.length > 1;
-      
-      return {
-        type,
-        count: userArray.length,
-        userIds: userArray,
-        currentUserReacted,
-        otherUserName,
-        otherUserReacted
-      };
-    });
-
     // console.log('transformToArray', reactionsMap, data);
-    return data;
+    return Object.entries(reactionsMap).map(([type, usersRaw]) =>
+      this.buildReactionObject(type, usersRaw, participants, currentUserId)
+    );
   }
+
+  // transformReactionsToArray(
+  //   reactionsMap: Record<string, string[]>, 
+  //   participants: User[], 
+  //   currentUserId: string
+  // ): {
+  //   type: string, 
+  //   count: number, 
+  //   userIds: string[],
+  //   currentUserReacted: boolean,
+  //   otherUserName?: string,
+  //   otherUserReacted: boolean
+  // }[] {
+  //   if (!reactionsMap) return [];
+
+  //   const data = Object.entries(reactionsMap).map(([type, users]) => {
+  //     // Stelle sicher, dass alle User IDs als Array vorliegen
+  //     const userArray = users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
+  //     const currentUserReacted = userArray.includes(currentUserId);
+  //     // Finde alle User außer currentUserId
+  //     const others = userArray.filter(id => id !== currentUserId);
+  //     // Hole optional Namen des ersten anderen
+  //     const otherUserName = others.length
+  //       ? participants.find(u => u.uid === others[0])?.name || 'Unbekannt'
+  //       : undefined;
+  //     const otherUserReacted = others.length > 1;
+      
+  //     return {
+  //       type,
+  //       count: userArray.length,
+  //       userIds: userArray,
+  //       currentUserReacted,
+  //       otherUserName,
+  //       otherUserReacted
+  //     };
+  //   });
+
+  //   // console.log('transformToArray', reactionsMap, data);
+  //   return data;
+  // }
 
   private updateReactionsArrayForChat(chatIndex: number) {
     if (this.channelChats[chatIndex]?.reactions) {

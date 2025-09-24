@@ -360,9 +360,8 @@
     &:hover {
         border-color: #797ef3;
     }
-    &:focus {
+    &:focus-within {
         border-color: #535af1;
-        outline: none;
     }
 }
 

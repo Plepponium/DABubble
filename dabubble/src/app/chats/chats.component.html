@@ -65,17 +65,31 @@
                         <button (click)="addReaction(i, 'check')" class="add-reaction-btn">
                             <img class="" src="assets/reaction-icons/check.svg" alt="">
                         </button>
+
                         <button (click)="addReaction(i, 'thumb')" class="add-reaction-btn">
                             <img class="" src="assets/reaction-icons/thumb.svg" alt="">
                         </button>
-                        <button class="add-reaction-btn">
-                            <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
-                            <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg" alt="">
-                        </button>
+
+                        <div class="reactions-display-container">
+                            <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === i">
+                                <div *ngFor="let icon of reactionIcons" class="reactions-container">
+                                    <button (click)="addReaction(i, icon)" class="add-reaction-btn">
+                                        <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                    </button>
+                                </div>    
+                                
+                            </div>
+                            <button (click)="openReactionsDialogue(i)" class="add-reaction-btn">
+                                <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
+                                <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg" alt="">
+                            </button>
+                        </div>         
+
                         <button class="add-reaction-btn">
                             <img class="hover-icon" src="assets/icons/comment.svg" alt="">
                             <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="">
                         </button>
+
                         <div class="edit-comment-container">
                             <div class="edit-comment-dialogue" *ngIf="editCommentDialogueExpanded">
                                 <div class="edit-comment">Nachricht bearbeiten</div>
@@ -141,10 +155,13 @@
                                         <div>1</div>
                                     </div> -->
                                 </div>
-                                <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
-                                    iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
-                                    altText="Reaktion hinzufügen">
-                                </app-round-btn>
+
+                                <div>
+                                    <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
+                                        iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
+                                        altText="Reaktion hinzufügen">
+                                    </app-round-btn>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -156,8 +173,8 @@
 
         <form class="form">
             <div class="form-field full-width">
-                <textarea id="chat-message" class="input" name="" type="text" placeholder=" "></textarea>
-                <label for="chat-message" class="floating-label t-gray">Nachricht an #Entwicklerteam</label>
+                <textarea id="chat-message" class="input" name="" type="text" [placeholder]="'Nachricht an #' + channelName"></textarea>
+                <!-- <label for="chat-message" class="floating-label t-gray">Nachricht an #Entwicklerteam</label> -->
                 <div class="input-icon-bar">
                     <div class="icon-bar t-gray">
                         <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
