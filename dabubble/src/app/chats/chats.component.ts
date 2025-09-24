@@ -187,6 +187,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     if (this.activeReactionDialogueIndex === chatIndex) {
       this.activeReactionDialogueIndex = null; // schließe, wenn bereits offen
     } else {
+      this.editCommentDialogueExpanded = false;
       this.activeReactionDialogueIndex = chatIndex; // öffne aktuellen
     }
   }
@@ -342,7 +343,8 @@ export class ChatsComponent implements OnInit, OnChanges {
   async addReaction(chatIndex: number, reactionType: string) {
     const chat = this.channelChats[chatIndex];
     if (!chat) return;
-
+    
+    this.activeReactionDialogueIndex = null;
     const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
     if (!currentReactionUsers.includes(this.currentUserId)) {
       const updatedUsers = [...currentReactionUsers, this.currentUserId];
@@ -365,6 +367,12 @@ export class ChatsComponent implements OnInit, OnChanges {
     await this.updateReactionForChat(chatIndex, reactionType, updatedUsers);
   }
 
+  openAddComment() {}
+
+  openEditCommentDialogue() {
+    this.activeReactionDialogueIndex = null;
+    this.editCommentDialogueExpanded = !this.editCommentDialogueExpanded;
+  }
 
   openDialogChannelDescription() {
     this.showChannelDescription = true;
@@ -416,9 +424,5 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   handleOpenThread() {
     this.openThread.emit();
-  }
-
-  openEditCommentDialogue() {
-    this.editCommentDialogueExpanded = !this.editCommentDialogueExpanded;
   }
 }

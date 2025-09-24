@@ -184,6 +184,7 @@
 .chat-history {
     display: flex;
     flex-direction: column;
+    // align-items: end;
     gap: 16px;
     overflow-y: auto;
     scrollbar-width: none;
@@ -276,7 +277,7 @@
     align-items: center;
     box-sizing: border-box;
     padding: 3px 15px 3px 20px;
-    // display: none;
+    display: none;
 }
 
 .chat-dialogue.reverse {

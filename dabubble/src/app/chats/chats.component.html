@@ -76,8 +76,7 @@
                                     <button (click)="addReaction(i, icon)" class="add-reaction-btn">
                                         <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
                                     </button>
-                                </div>    
-                                
+                                </div>   
                             </div>
                             <button (click)="openReactionsDialogue(i)" class="add-reaction-btn">
                                 <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
@@ -85,7 +84,7 @@
                             </button>
                         </div>         
 
-                        <button class="add-reaction-btn">
+                        <button (click)="openAddComment()" class="add-reaction-btn">
                             <img class="hover-icon" src="assets/icons/comment.svg" alt="">
                             <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="">
                         </button>
