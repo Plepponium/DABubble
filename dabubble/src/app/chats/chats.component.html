@@ -62,10 +62,10 @@
                 </div>
                 <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                     <div class="chat-dialogue" [ngClass]="{'reverse': chat.user === currentUserId}">
-                        <button class="add-reaction-btn">
+                        <button (click)="addReaction(i, 'check')" class="add-reaction-btn">
                             <img class="" src="assets/reaction-icons/check.svg" alt="">
                         </button>
-                        <button class="add-reaction-btn">
+                        <button (click)="addReaction(i, 'thumb')" class="add-reaction-btn">
                             <img class="" src="assets/reaction-icons/thumb.svg" alt="">
                         </button>
                         <button class="add-reaction-btn">

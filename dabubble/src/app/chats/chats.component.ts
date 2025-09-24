@@ -44,7 +44,6 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   @Input() channelId?: string;
   @Output() openThread = new EventEmitter<void>();
-  // private channelIdChange$ = new Subject<void>();
 
   ngOnInit() {
     this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
@@ -71,52 +70,115 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  // Lädt die erste verfügbare Channel-ID plus alle zugehörigen Daten
-  private loadFirstChannelAndData() {
-    this.channelService.getChannels().pipe(
-      switchMap(channels => {
-        if (channels.length > 0) {
-          this.channelId = channels[0].id;
-          this.channelName = channels[0].name;
-          this.participantIds = channels[0].participants;
-          return this.loadChatsAndUsers(this.channelId, this.participantIds);
-        } else {
-          return of([[], []]);
-        }
-      })
-    ).subscribe(([chatsWithAnswers, users]) => {
+  private loadChannelData(channelId: string, channelName: string, participantIds: string[]) {
+    this.channelId = channelId;
+    this.channelName = channelName;
+    this.participantIds = participantIds;
+
+    this.loadChatsAndUsers(channelId, participantIds).subscribe(([chatsWithAnswers, users]) => {
       this.participants = users;
       this.channelChats = chatsWithAnswers;
-      // console.log('Daten geladen für Erst-Channel:', this.channelId);
-      this.channelChats.forEach((chat, index) => {
-        this.updateReactionsArrayForChat(index);
-      });
+      this.channelChats.forEach((_, index) => this.updateReactionsArrayForChat(index));
+    });
+  }
+
+  private loadFirstChannelAndData() {
+    this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
+      if (channels.length > 0) {
+        const firstChannel = channels[0];
+        this.loadChannelData(firstChannel.id, firstChannel.name, firstChannel.participants);
+      } else {
+        this.participants = [];
+        this.channelChats = [];
+      }
+    });
+  }
+
+  // Lädt die erste verfügbare Channel-ID plus alle zugehörigen Daten
+  // private loadFirstChannelAndData() {
+  //   this.channelService.getChannels().pipe(
+  //     switchMap(channels => {
+  //       if (channels.length > 0) {
+  //         this.channelId = channels[0].id;
+  //         this.channelName = channels[0].name;
+  //         this.participantIds = channels[0].participants;
+  //         return this.loadChatsAndUsers(this.channelId, this.participantIds);
+  //       } else {
+  //         return of([[], []]);
+  //       }
+  //     })
+  //   ).subscribe(([chatsWithAnswers, users]) => {
+  //     this.participants = users;
+  //     this.channelChats = chatsWithAnswers;
+  //     // console.log('Daten geladen für Erst-Channel:', this.channelId);
+  //     this.channelChats.forEach((chat, index) => {
+  //       this.updateReactionsArrayForChat(index);
+  //     });
+  //   });
+  // }
+
+  private loadDataForChannel(channelId: string) {
+    this.channelService.getChannelById(channelId).pipe(take(1)).subscribe(channel => {
+      if (!channel) return;
+      // Sicherheit: nur setzen wenn channelId noch aktuell ist
+      if (this.channelId !== channelId) {
+        this.loadChannelData(channel.id, channel.name || '', channel.participants || []);
+      }
     });
   }
 
   // Lädt alle nötigen Daten für eine konkrete Channel-ID
-  private loadDataForChannel(channelId: string) {
-    // Vorher bestehende Abos abbrechen
-    // this.channelIdChange$.next();
-    this.channelService.getChannelById(channelId).pipe(
-      switchMap(channel => {
-        this.channelName = channel?.name ?? '';
-        this.participantIds = channel?.participants ?? [];
-        const channelData = this.loadChatsAndUsers(channelId, this.participantIds);
-        return channelData;
-      }),
-      // takeUntil(this.channelIdChange$)  // Beispiel für Abbrechen bei neuem ChannelId-Change (optional)
-    ).subscribe(([chatsWithAnswers, users]) => {
-      if (this.channelId === channelId) {  // nur setzen, wenn der Kanal noch der erwartete ist
-        this.participants = users;
-        this.channelChats = chatsWithAnswers;
-        // console.log('Daten geladen für Channel:', channelId);
-        this.channelChats.forEach((chat, index) => {
-          this.updateReactionsArrayForChat(index);
-        });
-      }
-    });
-  }
+  // private loadDataForChannel(channelId: string) {
+  //   this.channelService.getChannelById(channelId).pipe(
+  //     switchMap(channel => {
+  //       this.channelName = channel?.name ?? '';
+  //       this.participantIds = channel?.participants ?? [];
+  //       const channelData = this.loadChatsAndUsers(channelId, this.participantIds);
+  //       return channelData;
+  //     }),
+  //   ).subscribe(([chatsWithAnswers, users]) => {
+  //     if (this.channelId === channelId) {  // nur setzen, wenn der Kanal noch der erwartete ist
+  //       this.participants = users;
+  //       this.channelChats = chatsWithAnswers;
+  //       // console.log('Daten geladen für Channel:', channelId);
+  //       this.channelChats.forEach((chat, index) => {
+  //         this.updateReactionsArrayForChat(index);
+  //       });
+  //     }
+  //   });
+  // }
+
+  // private loadChatsAndUsers(channelId: string, participantIds: string[]): Observable<ChatsWithUsers> {
+  //   return forkJoin([
+  //     this.channelService.getChatsForChannel(channelId).pipe(take(1)),
+  //     this.userService.getUsersByIds(participantIds).pipe(take(1))
+  //   ]).pipe(switchMap(([chats, users]) => {
+  //     if (chats.length === 0) {
+  //       return of([[], users] as ChatsWithUsers);
+  //     }
+  //     const chatsWithDetails$ = chats.map(chat => forkJoin({
+  //       answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1), catchError(() => of([]))),
+  //       reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(catchError(() => of({})))
+  //     }).pipe(map(({ answers, reactions }) => {
+  //       const user = users.find(u => u.uid === chat.user);
+  //       return {
+  //         ...chat,
+  //         userName: user?.name,
+  //         userImg: user?.img,
+  //         answersCount: answers.length,
+  //         lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
+  //         reactions,
+  //         reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
+  //       };
+  //     })));
+  //     return forkJoin(chatsWithDetails$).pipe(
+  //       map(chatsWithDetails => {
+  //         chatsWithDetails.sort((a, b) => a.time - b.time);
+  //         return [chatsWithDetails, users] as ChatsWithUsers;
+  //       })
+  //     );
+  //   }));
+  // }
 
   // Lädt Chats und Userdaten parallel und verknüpft Antworten mit Chats
   private loadChatsAndUsers(channelId: string, participantIds: string[]) {
@@ -126,7 +188,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     ]).pipe(
       switchMap(([chats, users]) => {
         if (!chats.length) {
-          // Wenn keine Chats, trotzdem Users zurückliefern (und leere chats)
           return of([[], users] as [any[], User[]]);
         }
         
@@ -213,57 +274,74 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  
-  async toggleReaction(chatIndex: number, reactionType: string) {
+  private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
+    const usersRaw = reactions[reactionType] || [];
+    return usersRaw.flatMap((u: string) =>
+      u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
+    );
+  }
+
+  private async saveOrDeleteReaction(channelId: string, chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
+    if (updatedUsers.length === 0) {
+      await this.channelService.deleteReactionForChat(channelId, chatId, reactionType);
+    } else {
+      await this.channelService.updateReactionForChat(channelId, chatId, reactionType, updatedUsers);
+    }
+  }
+
+  private updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[]) {
+    chat.reactions = { ...chat.reactions };
+    if (updatedUsers.length === 0) {
+      delete chat.reactions[reactionType];
+    } else {
+      chat.reactions[reactionType] = updatedUsers;
+    }
+    chat.reactionArray = this.transformReactionsToArray(chat.reactions, this.participants, this.currentUserId);
+  }
+
+  private async updateReactionForChat(chatIndex: number, reactionType: string, updatedUsers: string[]): Promise<void> {
     const chat = this.channelChats[chatIndex];
     if (!chat) return;
 
     const channelId = this.channelId;
     const chatId = chat.id;
     const currentUserId = this.currentUserId;
-    console.log('channelId:', channelId, 'chatId: ', chatId, 'currentUserId: ', currentUserId)
-
     if (!channelId || !chatId || !currentUserId) return;
 
-    // Hole die Reaktionen für den Chat
-    const reactions = chat.reactions || {};
-    const currentReactionUsersRaw = reactions[reactionType] || [];
-    // Reine User-IDs array, evtl. aus CSV strings splitten
-    const currentReactionUsers = currentReactionUsersRaw.flatMap((u: string) =>
-      u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
-    );
-
-    let updatedUsers: string[];
-
-    if (currentReactionUsers.includes(currentUserId)) {
-      // User hat schon reagiert: entfernen
-      updatedUsers = currentReactionUsers.filter((uid: string) => uid !== currentUserId);
-    } else {
-      // User hat noch nicht reagiert: hinzufügen
-      updatedUsers = [...currentReactionUsers, currentUserId];
-    }
-
     try {
-      if (updatedUsers.length === 0) {
-        // Wenn keine User mehr, Reaction löschen (Document entfernen)
-        await this.channelService.deleteReactionForChat(channelId, chatId, reactionType);
-      } else {
-        // Sonst Reaction mit aktualisierter Userliste updaten
-        await this.channelService.updateReactionForChat(channelId, chatId, reactionType, updatedUsers);
-      }
-      // Lokales chat Objekt aktualisieren, um UI direkt zu aktualisieren
-      chat.reactions = { ...chat.reactions };
-      if (updatedUsers.length === 0) {
-        delete chat.reactions[reactionType];
-      } else {
-        chat.reactions[reactionType] = updatedUsers;
-      }
-      chat.reactionArray = this.transformReactionsToArray(chat.reactions, this.participants, this.currentUserId);
-
+      await this.saveOrDeleteReaction(channelId, chatId, reactionType, updatedUsers);
+      this.updateLocalReaction(chat, reactionType, updatedUsers);
     } catch (error) {
       console.error('Fehler beim Aktualisieren der Reaction:', error);
     }
   }
+
+  async addReaction(chatIndex: number, reactionType: string) {
+    const chat = this.channelChats[chatIndex];
+    if (!chat) return;
+
+    const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
+    if (!currentReactionUsers.includes(this.currentUserId)) {
+      const updatedUsers = [...currentReactionUsers, this.currentUserId];
+      await this.updateReactionForChat(chatIndex, reactionType, updatedUsers);
+    }
+  }
+  
+  async toggleReaction(chatIndex: number, reactionType: string) {
+    const chat = this.channelChats[chatIndex];
+    if (!chat) return;
+
+    const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
+    let updatedUsers: string[];
+    if (currentReactionUsers.includes(this.currentUserId)) {
+      updatedUsers = currentReactionUsers.filter(uid => uid !== this.currentUserId);
+    } else {
+      updatedUsers = [...currentReactionUsers, this.currentUserId];
+    }
+
+    await this.updateReactionForChat(chatIndex, reactionType, updatedUsers);
+  }
+
 
   openDialogChannelDescription() {
     this.showChannelDescription = true;
