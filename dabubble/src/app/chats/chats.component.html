@@ -56,71 +56,6 @@
     <div class="chat-content">
         <div class="chat-history">
 
-            <!-- <div *ngFor="let chat of channelChats" class="chat-day-section"> -->
-            <!-- <div class="chat-day-section"> -->
-                <!-- <div class="chat-date-section">
-                    <div class="chat-date">Dienstag, 14. Januar</div>
-                </div>
-                <div class="chat-section">
-                    <div class="chat-dialogue">
-                        <button class="add-reaction-btn">
-                            <img class="" src="assets/reaction-icons/check.svg" alt="">
-                        </button>
-                        <button class="add-reaction-btn">
-                            <img class="" src="assets/reaction-icons/thumb.svg" alt="">
-                        </button>
-                        <button class="add-reaction-btn">
-                            <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
-                            <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg" alt="">
-                        </button>
-                        <button class="add-reaction-btn">
-                            <img class="hover-icon" src="assets/icons/comment.svg" alt="">
-                            <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="">
-                        </button>
-                        <div class="edit-comment-container">
-                            <div class="edit-comment-dialogue" *ngIf="editCommentDialogueExpanded">
-                                <div class="edit-comment">Nachricht bearbeiten</div>
-                            </div>
-                            <button (click)="openEditCommentDialogue()" class="add-reaction-btn reverse">
-                                <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="">
-                                <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg" alt="">
-                            </button>
-                        </div>
-                    </div>
-                    <img class="chat-user-img" src="assets/user-icons/icon4.svg" alt="">
-
-                    <div class="chat-info-container">
-                        <div class="chat-start">
-                            <div class="font-w-700">Noah Braun</div>
-                            <div class="font-14 t-gray">14:25 Uhr</div>
-                        </div>
-                        <div class="chat-message left bg-light-purple">Chat</div>
-                        <div class="chat-answered">
-                            <div class="answers">
-                                <div (click)="handleOpenThread()" class="answer t-purple">2 Antworten</div>
-                                <div class="last-answer font-14 t-gray">Letzte Antwort 14:56</div>
-                            </div>
-                            <div class="reactions">
-                                <div class="reaction-btns">
-                                    <div class="reaction-btn">
-                                        <img src="assets/reaction-icons/check.svg" alt="">
-                                        <div>2</div>
-                                    </div>
-                                    <div class="reaction-btn">
-                                        <img src="assets/reaction-icons/thumb.svg" alt="">
-                                        <div>1</div>
-                                    </div>
-                                </div>
-                                <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
-                                    iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
-                                    altText="Reaktion hinzufügen">
-                                </app-round-btn>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-
             <div *ngFor="let chat of channelChats; let i = index" class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                 <div class="chat-date-section">
                     <div class="chat-date">{{ chat.time * 1000 | date: 'EEEE, d. MMMM':'':'de' }}</div>
@@ -217,75 +152,7 @@
             </div>
             <!-- <pre>{{ channelChats | json }}</pre> -->
             
-
-            <!-- <div class="chat-day-section">
-                <div class="chat-date-section">
-                    <div class="chat-date">Freitag, 1.September</div>
-                </div>
-
-                <div class="chat-section reverse">
-                    <div class="chat-dialogue reverse">
-                        <button class="add-reaction-btn">
-                            <img class="" src="assets/reaction-icons/check.svg" alt="">
-                        </button>
-                        <button class="add-reaction-btn">
-                            <img class="" src="assets/reaction-icons/thumb.svg" alt="">
-                        </button>
-                        <button class="add-reaction-btn">
-                            <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
-                            <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg" alt="">
-                        </button>
-                        <button class="add-reaction-btn">
-                            <img class="hover-icon" src="assets/icons/comment.svg" alt="">
-                            <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="">
-                        </button>
-                        <div class="edit-comment-container">
-                            <div class="edit-comment-dialogue" *ngIf="editCommentDialogueExpanded">
-                                <div class="edit-comment">Nachricht bearbeiten</div>
-                            </div>
-                            <button (click)="openEditCommentDialogue()" class="add-reaction-btn reverse">
-                                <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="">
-                                <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg" alt="">
-                            </button>
-                        </div>
-
-                    </div>
-                    <img class="chat-user-img" src="assets/user-icons/icon3.svg" alt="">
-
-                    <div class="chat-info-container">
-                        <div class="chat-start reverse">
-                            <div class="font-w-700">Frederik Beck</div>
-                            <div class="font-14 t-gray">15:06 Uhr</div>
-                        </div>
-                        <div class="chat-message right">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore
-                            perspiciatis aliquid dolorem, porro maiores asperiores libero omnis. Est omnis hic placeat,
-                            at eos pariatur corporis eaque quia quasi? Eos, quibusdam?</div>
-                        <div class="chat-answered right">
-                            <div class="answers">
-                                <div class="answer t-purple">Antworten</div>
-                                <div class="last-answer font-14 t-gray">letzte Antwort</div>
-                            </div>
-                            <div class="reactions">
-                                <div class="reaction-btns">
-                                    <div class="reaction-btn">
-                                        <img src="assets/reaction-icons/check.svg" alt="">
-                                        <div>2</div>
-                                    </div>
-                                    <div class="reaction-btn">
-                                        <img src="assets/reaction-icons/thumb.svg" alt="">
-                                        <div>1</div>
-                                    </div>
-                                </div>
-                                <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
-                                    iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
-                                    altText="Reaktion hinzufügen">
-                                </app-round-btn>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> -->
+        </div> 
 
         <form class="form">
             <div class="form-field full-width">
