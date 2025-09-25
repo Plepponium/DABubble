@@ -39,41 +39,61 @@
             <ng-template #chatContent>
                 <div class="chat-content" id="dm-chat-content">
                     <div class="chat-history">
-                        <div *ngFor="let m of messages" class="chat-message-row"
-                            [class.me]="m.senderId === currentUser?.uid">
-                            <img class="chat-user-img"
-                                [src]="'assets/user-icons/' + (m.senderImg || 'default-user') + '.svg'" />
-                            <div class="chat-bubble">
-                                <div class="chat-meta">
-                                    <span class="sender-name font-w-700 font-18">{{ m.senderName }} </span>
-                                    <span class="time t-gray font-14">
-                                        {{ m.sentAt?.toDate ? (m.sentAt.toDate() | date:'HH:mm') : '' }} Uhr
-                                    </span>
+                        <div *ngFor="let m of messages; let i = index" class="chat-day-section">
+                            <div *ngIf="i === 0 || !isSameDate(m.sentAt?.toDate(), messages[i-1]?.sentAt?.toDate())"
+                                class="chat-date-section">
+                                <div class="line"></div>
+                                <div class="chat-date">
+                                    {{ getDisplayDate(m.sentAt?.toDate()) }}
                                 </div>
-                                <div class="chat-text font-18">{{ m.text }}</div>
+                                <div class="line"></div>
+                            </div>
+                            <div class="chat-message-row" [class.me]="m.senderId === currentUser?.uid">
+                                <img class="chat-user-img"
+                                    [src]="'assets/user-icons/' + (m.senderImg || 'default-user') + '.svg'" />
+                                <div class="chat-bubble">
+                                    <div class="chat-meta">
+                                        <span class="sender-name font-w-700 font-18">{{ m.senderName }} </span>
+                                        <span class="time t-gray font-14">
+                                            {{ m.sentAt?.toDate ? (m.sentAt.toDate() | date:'HH:mm') : '' }} Uhr
+                                        </span>
+                                    </div>
+                                    <div class="chat-text font-18">{{ m.text }}</div>
+                                </div>
+                                <app-dm-reactions-dialog class="dm-reactions-dialog"
+                                    [class.reverse]="m.senderId === currentUser?.uid" [messageId]="m.id"
+                                    [isOwnMessage]="m.senderId === currentUser?.uid" [index]="i"
+                                    [reactionIcons]="reactionIcons"
+                                    (addReactionEvent)="addReaction($event.index, $event.icon)"
+                                    (openReactionsEvent)="openReactionsDialogue($event)"
+                                    (editMessageEvent)="openEditComment($event)">
+                                </app-dm-reactions-dialog>
                             </div>
                         </div>
                     </div>
                 </div>
             </ng-template>
+
         </ng-container>
 
-        <div class="form-field full-width">
-            <textarea class="input font-18" [(ngModel)]="messageText"
-                [placeholder]="'Nachricht an ' + u.name"></textarea>
-            <div class="input-icon-bar">
-                <div class="icon-bar t-gray">
-                    <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
-                        iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
-                        altText="Reaktion hinzufügen"></app-round-btn>
-                    <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
-                        iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
-                        altText="Mail hinzufügen"></app-round-btn>
-                </div>
+        <div class="form-field-wrapper">
+            <div class="form-field full-width">
+                <textarea class="input font-18" [(ngModel)]="messageText"
+                    [placeholder]="'Nachricht an ' + u.name"></textarea>
+                <div class="input-icon-bar">
+                    <div class="icon-bar t-gray">
+                        <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
+                            iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
+                            altText="Reaktion hinzufügen"></app-round-btn>
+                        <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
+                            iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
+                            altText="Mail hinzufügen"></app-round-btn>
+                    </div>
 
-                <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
-                    iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden"
-                    (click)="sendMessage()"></app-round-btn>
+                    <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
+                        iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden"
+                        (click)="sendMessage()"></app-round-btn>
+                </div>
             </div>
         </div>
     </div>

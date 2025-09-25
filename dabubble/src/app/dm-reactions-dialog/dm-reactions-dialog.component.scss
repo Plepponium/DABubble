@@ -1,0 +1,38 @@
+.dm-reactions-dialog {
+  height: 46px;
+  background-color: #ffffff;
+  border: 1px solid #adb0d9;
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+  border-bottom-left-radius: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 3px 15px 3px 20px;
+}
+
+.add-reaction-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 20px;
+  border: none;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  &:hover {
+    background-color: #eceefe;
+    .hover-icon {
+      display: none;
+    }
+    .hover-icon-purple {
+      display: block;
+    }
+  }
+}
+
+.hover-icon-purple {
+  display: none;
+}
