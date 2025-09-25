@@ -13,8 +13,9 @@ import { ChannelDescriptionOverlayComponent } from '../channel-description-overl
 import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.class';
-import { catchError, forkJoin, map, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { reactionIcons } from '../reaction-icons';
+import { Chat } from '../../models/chat.class';
 import localeDe from '@angular/common/locales/de';
 registerLocaleData(localeDe);
 
@@ -37,17 +38,21 @@ export class ChatsComponent implements OnInit, OnChanges {
   participantIds: string[] = [];
   participants: User[] = [];
   channelChats: any[] = [];
-  // reactionIcons: string[] = [];
   reactionIcons = reactionIcons;
   reactionArray: { type: string, count: number, user: string[] }[] = [];
   currentUserId: string = '';  
+  newMessage: string = '';
+
+  // chats$: Observable<any[]>; // Füge ein Observable Feld hinzu
+  chats$: Observable<Chat[]> = of([]);
+  // chats$: Observable<Chat[]>;
 
   channelService = inject(ChannelService);
   userService = inject(UserService);
 
   @Input() channelId?: string;
   @Output() openThread = new EventEmitter<void>();
-  @ViewChild('chatHistory') chatHistory!: ElementRef<HTMLDivElement>;
+  // @ViewChild('chatHistory') chatHistory!: ElementRef<HTMLDivElement>;
 
   ngOnInit() {
     this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
@@ -57,7 +62,8 @@ export class ChatsComponent implements OnInit, OnChanges {
       if (!this.channelId) {
         this.loadFirstChannelAndData();
       } else {
-        this.loadDataForChannel(this.channelId);
+        // this.loadDataForChannel(this.channelId);
+        this.subscribeToChatsAndUsers(this.channelId, this.participantIds);
       }
     });
   }
@@ -75,9 +81,28 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
   scrollToBottom() {
-    if (this.chatHistory && this.chatHistory.nativeElement) {
-      this.chatHistory.nativeElement.scrollTop = this.chatHistory.nativeElement.scrollHeight;
+    const chatHistory = document.getElementById('chat-history');
+    if (chatHistory) {
+      chatHistory.scrollTop = chatHistory.scrollHeight;
     }
+  }
+
+  private subscribeToChatsAndUsers(channelId: string, participantIds: string[]) {
+    this.chats$ = this.channelService.getChatsForChannel(channelId).pipe(
+      switchMap((chats: Chat[]) =>
+        this.userService.getUsersByIds(participantIds).pipe(
+          map(users => {
+            this.participants = users; // damit auch andere Komponenten Zugriff auf User haben
+            return chats; // Du kannst hier bei Bedarf Chats anreichern mit Nutzerdaten
+          })
+        )
+      )
+    );
+
+    // Optional: scroll to bottom immer, wenn sich chats ändern
+    this.chats$.subscribe(() => {
+      setTimeout(() => this.scrollToBottom());
+    });
   }
 
   private loadChannelData(channelId: string, channelName: string, participantIds: string[]) {
@@ -92,6 +117,7 @@ export class ChatsComponent implements OnInit, OnChanges {
       this.channelChats.forEach((_, index) => this.updateReactionsArrayForChat(index));
     });
   }
+  
 
   private loadFirstChannelAndData() {
     this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
@@ -114,36 +140,8 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
   }
 
-  // private loadChatsAndUsers(channelId: string, participantIds: string[]): Observable<ChatsWithUsers> {
-  //   return forkJoin([
-  //     this.channelService.getChatsForChannel(channelId).pipe(take(1)),
-  //     this.userService.getUsersByIds(participantIds).pipe(take(1))
-  //   ]).pipe(switchMap(([chats, users]) => {
-  //     if (chats.length === 0) {
-  //       return of([[], users] as ChatsWithUsers);
-  //     }
-  //     const chatsWithDetails$ = chats.map(chat => forkJoin({
-  //       answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1), catchError(() => of([]))),
-  //       reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(catchError(() => of({})))
-  //     }).pipe(map(({ answers, reactions }) => {
-  //       const user = users.find(u => u.uid === chat.user);
-  //       return {
-  //         ...chat,
-  //         userName: user?.name,
-  //         userImg: user?.img,
-  //         answersCount: answers.length,
-  //         lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
-  //         reactions,
-  //         reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
-  //       };
-  //     })));
-  //     return forkJoin(chatsWithDetails$).pipe(
-  //       map(chatsWithDetails => {
-  //         chatsWithDetails.sort((a, b) => a.time - b.time);
-  //         return [chatsWithDetails, users] as ChatsWithUsers;
-  //       })
-  //     );
-  //   }));
+  // private subscribeToChats(channelId: string) {
+  //   this.chats$ = this.channelService.getChatsForChannel(channelId);
   // }
 
   // Lädt Chats und Userdaten parallel und verknüpft Antworten mit Chats
@@ -256,46 +254,6 @@ export class ChatsComponent implements OnInit, OnChanges {
       this.buildReactionObject(type, usersRaw, participants, currentUserId)
     );
   }
-
-  // transformReactionsToArray(
-  //   reactionsMap: Record<string, string[]>, 
-  //   participants: User[], 
-  //   currentUserId: string
-  // ): {
-  //   type: string, 
-  //   count: number, 
-  //   userIds: string[],
-  //   currentUserReacted: boolean,
-  //   otherUserName?: string,
-  //   otherUserReacted: boolean
-  // }[] {
-  //   if (!reactionsMap) return [];
-
-  //   const data = Object.entries(reactionsMap).map(([type, users]) => {
-  //     // Stelle sicher, dass alle User IDs als Array vorliegen
-  //     const userArray = users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
-  //     const currentUserReacted = userArray.includes(currentUserId);
-  //     // Finde alle User außer currentUserId
-  //     const others = userArray.filter(id => id !== currentUserId);
-  //     // Hole optional Namen des ersten anderen
-  //     const otherUserName = others.length
-  //       ? participants.find(u => u.uid === others[0])?.name || 'Unbekannt'
-  //       : undefined;
-  //     const otherUserReacted = others.length > 1;
-      
-  //     return {
-  //       type,
-  //       count: userArray.length,
-  //       userIds: userArray,
-  //       currentUserReacted,
-  //       otherUserName,
-  //       otherUserReacted
-  //     };
-  //   });
-
-  //   // console.log('transformToArray', reactionsMap, data);
-  //   return data;
-  // }
 
   private updateReactionsArrayForChat(chatIndex: number) {
     if (this.channelChats[chatIndex]?.reactions) {
@@ -421,14 +379,27 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
 
-  //zum speichern von time in firebase (noch nicht in Verwendung)
-  handleAddChatToChannel() {
-    const date = new Date('2024-05-08T12:13:00Z'); // Z für UTC
-    const unixTimestamp = Math.floor(date.getTime() / 1000);
-    console.log(unixTimestamp); // 1702061580
-  }
 
-  addToChats() { }
+  submitChatMessage() {
+    if (!this.newMessage.trim()) return;      // Leere Eingabe unterdrücken
+    if (!this.channelId || !this.currentUserId) return;
+
+    const messagePayload = {
+      message: this.newMessage.trim(),
+      time: Math.floor(Date.now() / 1000),    // UNIX-Timestamp in Sekunden
+      user: this.currentUserId
+    };
+    // console.log(messagePayload);
+    this.channelService.addChatToChannel(this.channelId, messagePayload)
+      .then(() => {
+        this.newMessage = '';
+        setTimeout(() => this.scrollToBottom());
+      })
+      .catch(err => {
+        // Optionale Fehlerbehandlung
+        console.error('Fehler beim Senden:', err);
+      });
+  }
 
   handleOpenThread() {
     this.openThread.emit();

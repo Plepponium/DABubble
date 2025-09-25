@@ -54,7 +54,7 @@
     </div>
 
     <div class="chat-content">
-        <div class="chat-history" #chatHistory>
+        <div id="chat-history" class="chat-history">
 
             <div *ngFor="let chat of channelChats; let i = index" class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                 <div class="chat-date-section">
@@ -170,9 +170,9 @@
             
         </div> 
 
-        <form class="form">
+        <form class="form" (ngSubmit)="submitChatMessage()" #chatForm="ngForm">
             <div class="form-field full-width">
-                <textarea id="chat-message" class="input" name="" type="text" [placeholder]="'Nachricht an #' + channelName"></textarea>
+                <textarea id="chat-message" class="input" name="message" [(ngModel)]="newMessage" (keydown.enter)="submitChatMessage(); $event.preventDefault();" type="text" [placeholder]="'Nachricht an #' + channelName"></textarea>
                 <!-- <label for="chat-message" class="floating-label t-gray">Nachricht an #Entwicklerteam</label> -->
                 <div class="input-icon-bar">
                     <div class="icon-bar t-gray">
@@ -186,7 +186,7 @@
                     </div>
 
                     <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
-                        iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden">
+                        iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden" type="submit">
                     </app-round-btn>
                 </div>
             </div>

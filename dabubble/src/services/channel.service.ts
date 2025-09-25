@@ -3,6 +3,7 @@ import { Firestore, collectionData, collection, setDoc, deleteDoc } from '@angul
 import { doc, addDoc, docData, updateDoc } from '@angular/fire/firestore';
 import { map, Observable, take } from 'rxjs';
 import { Channel } from '../models/channel.class';
+import { Chat } from '../models/chat.class';
 
 @Injectable({ providedIn: 'root' })
 export class ChannelService {
@@ -23,7 +24,7 @@ export class ChannelService {
     return docData(channelDoc, { idField: 'id' }) as Observable<Channel>;
   }
 
-  getChatsForChannel(channelId: string): Observable<any[]> {
+  getChatsForChannel(channelId: string): Observable<Chat[]> {
     const chatsCollection = collection(this.firestore, `channels/${channelId}/chats`);
     return collectionData(chatsCollection, { idField: 'id' }) as Observable<any[]>;
   }
