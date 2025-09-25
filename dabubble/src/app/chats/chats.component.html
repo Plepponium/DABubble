@@ -54,7 +54,7 @@
     </div>
 
     <div class="chat-content">
-        <div class="chat-history">
+        <div class="chat-history" #chatHistory>
 
             <div *ngFor="let chat of channelChats; let i = index" class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                 <div class="chat-date-section">

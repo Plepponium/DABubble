@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input, inject, OnChanges, SimpleChanges, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, OnChanges, SimpleChanges, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -47,6 +47,7 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   @Input() channelId?: string;
   @Output() openThread = new EventEmitter<void>();
+  @ViewChild('chatHistory') chatHistory!: ElementRef<HTMLDivElement>;
 
   ngOnInit() {
     this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
@@ -73,6 +74,12 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
+  scrollToBottom() {
+    if (this.chatHistory && this.chatHistory.nativeElement) {
+      this.chatHistory.nativeElement.scrollTop = this.chatHistory.nativeElement.scrollHeight;
+    }
+  }
+
   private loadChannelData(channelId: string, channelName: string, participantIds: string[]) {
     this.channelId = channelId;
     this.channelName = channelName;
@@ -81,6 +88,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.loadChatsAndUsers(channelId, participantIds).subscribe(([chatsWithAnswers, users]) => {
       this.participants = users;
       this.channelChats = chatsWithAnswers;
+      setTimeout(() => this.scrollToBottom());
       this.channelChats.forEach((_, index) => this.updateReactionsArrayForChat(index));
     });
   }
@@ -343,7 +351,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   async addReaction(chatIndex: number, reactionType: string) {
     const chat = this.channelChats[chatIndex];
     if (!chat) return;
-    
+
     this.activeReactionDialogueIndex = null;
     const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
     if (!currentReactionUsers.includes(this.currentUserId)) {
