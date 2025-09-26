@@ -57,8 +57,11 @@
         <div id="chat-history" class="chat-history">
 
             <div *ngFor="let chat of channelChats; let i = index" class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
-                <div class="chat-date-section">
-                    <div class="chat-date">{{ chat.time * 1000 | date: 'EEEE, d. MMMM':'':'de' }}</div>
+                <!-- <div class="chat-date-section"> -->
+                <div *ngIf="i === 0 || !isSameDate(getChatDate(chat), getChatDate(channelChats[i-1]))"
+                                class="chat-date-section">
+                    <!-- <div class="chat-date">{{ chat.time * 1000 | date: 'EEEE, d. MMMM':'':'de' }}</div> -->
+                    <div class="chat-date">{{ getDisplayDate(getChatDate(chat)) }}</div>
                 </div>
                 <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                     <div class="chat-dialogue" [ngClass]="{'reverse': chat.user === currentUserId}">

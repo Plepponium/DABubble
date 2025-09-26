@@ -140,9 +140,37 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
   }
 
-  // private subscribeToChats(channelId: string) {
-  //   this.chats$ = this.channelService.getChatsForChannel(channelId);
-  // }
+  getChatDate(chat: any): Date | undefined {
+    return chat.time ? new Date(chat.time * 1000) : undefined;
+  }
+
+  isSameDate(d1: Date | undefined, d2: Date | undefined): boolean {
+    if (!d1 || !d2) return false;
+    return d1.getFullYear() === d2.getFullYear() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getDate() === d2.getDate();
+  }
+
+  getDisplayDate(date: Date | undefined): string {
+    if (!date) return '';
+
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    if (this.isSameDate(date, today)) {
+      return 'Heute';
+    } else if (this.isSameDate(date, yesterday)) {
+      return 'Gestern';
+    } else {
+      // normales Datum: Montag, 20. September
+      return new Intl.DateTimeFormat('de-DE', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      }).format(date);
+    }
+  }
 
   // Lädt Chats und Userdaten parallel und verknüpft Antworten mit Chats
   private loadChatsAndUsers(channelId: string, participantIds: string[]) {
