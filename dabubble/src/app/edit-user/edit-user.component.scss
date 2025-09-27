@@ -141,6 +141,11 @@
   &:hover {
     background-color: #797ef3;
   }
+
+  &[disabled] {
+    background-color: #686868;
+    cursor: default;
+  }
 }
 
 .cancel-btn {
