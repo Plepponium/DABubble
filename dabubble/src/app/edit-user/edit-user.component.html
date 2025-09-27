@@ -6,8 +6,21 @@
         </app-round-btn>
     </div>
 
-    <div class="user-img-container">
-        <img class="user-img" [src]="'assets/user-icons/' + user.img + '.svg'">
+    <div class="user-img-container" *ngIf="!showImgPicker">
+        <div class="user-img-wrapper">
+            <img class="user-img" [src]="'assets/user-icons/' + (selectedImg || user.img) + '.svg'"
+                (click)="toggleImgPicker()" />
+
+            <button class="img-close-btn" (click)="resetImg()">
+                <img src="assets/icons/close.svg" alt="Entfernen" />
+            </button>
+        </div>
+    </div>
+
+
+    <div class="img-picker" *ngIf="showImgPicker">
+        <img *ngFor="let icon of availableIcons" [src]="'assets/user-icons/' + icon + '.svg'" (click)="selectImg(icon)"
+            class="img-option" />
     </div>
 
     <div class="name-container">
@@ -23,8 +36,8 @@
 
 
     <div class="btn-container">
-        <button (click)="handleClose()" class="btn cancel-btn" [class.wiggle]="animationClass === 'wiggle'" (mouseenter)="onMouseEnter()"
-            (mouseleave)="onMouseLeave()">
+        <button (click)="handleClose()" class="btn cancel-btn" [class.wiggle]="animationClass === 'wiggle'"
+            (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
             <div class="f-nunito">Abbrechen</div>
         </button>
 

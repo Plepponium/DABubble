@@ -10,15 +10,32 @@ import { UserService } from '../../services/user.service';
   styleUrl: './edit-user.component.scss'
 })
 export class EditUserComponent {
-  animationClass = '';
-
   @Output() close = new EventEmitter<void>();
   userService = inject(UserService)
 
   currentUser$ = this.userService.getCurrentUser();
 
+  selectedImg?: string;
+  showImgPicker = false;
+  animationClass = '';
+  availableIcons = ['icon1', 'icon2', 'icon3', 'icon4', 'icon5', 'icon6'];
+
+
   handleClose() {
     this.close.emit();
+  }
+
+  toggleImgPicker() {
+    this.showImgPicker = !this.showImgPicker;
+  }
+
+  selectImg(icon: string) {
+    this.selectedImg = icon;
+    this.showImgPicker = false;
+  }
+
+  resetImg() {
+    this.selectedImg = 'default-user';
   }
 
   onMouseEnter() {
