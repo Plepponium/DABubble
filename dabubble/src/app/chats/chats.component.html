@@ -34,7 +34,7 @@
         </div>
         <div class="overlay-box" [ngClass]="{'overlay-channel-description': showChannelDescription}">
             <app-dialogue-overlay *ngIf="showUserDialogue" [participants]="participants"
-                (close)="closeDialogueShowUser()" (openProfile)="openDialogueShowProfile()"
+                (close)="closeDialogueShowUser()" (openProfile)="openDialogueShowProfile($event)"
                 (openAddUser)="openDialogueAddUser()" class="dialogue-overlay-show-user">
             </app-dialogue-overlay>
 
@@ -48,8 +48,8 @@
         </div>
 
         <div (click)="closeDialogueShowProfile()" *ngIf="showProfileDialogue" class="dialogue-backdrop-profile"></div>
-        <app-profile-overlay *ngIf="showProfileDialogue" (close)="closeDialogueShowProfile()"
-            class="dialogue-overlay-show-profile">
+        <app-profile-overlay *ngIf="showProfileDialogue" [user]="selectedProfileUser!"
+            (close)="closeDialogueShowProfile()" class="dialogue-overlay-show-profile">
         </app-profile-overlay>
     </div>
 

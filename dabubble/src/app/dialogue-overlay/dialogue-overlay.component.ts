@@ -15,15 +15,15 @@ export class DialogueOverlayComponent {
   @Input() participants: User[] = [];
 
   @Output() close = new EventEmitter<void>();
-  @Output() openProfile = new EventEmitter<void>();
+  @Output() openProfile = new EventEmitter<User>();
   @Output() openAddUser = new EventEmitter<void>();
 
   handleClose() {
     this.close.emit();
   }
 
-  handleOpenProfile() {
-    this.openProfile.emit();
+  handleOpenProfile(user: User) {
+    this.openProfile.emit(user);
   }
 
   handleOpenAddUser() {

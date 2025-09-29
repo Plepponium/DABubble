@@ -8,7 +8,7 @@
 
     <div class="dialogue-content">
         <div class="selected-users">
-            <div class="user" *ngFor="let u of participants" (click)="handleOpenProfile()">
+            <div class="user" *ngFor="let u of participants" (click)="handleOpenProfile(u)">
                 <div class="img-container">
                     <img class="user-img" [src]="'assets/user-icons/' + u.img + '.svg'" alt="">
                     <div class="online-signal" [ngClass]="u.presence"></div>
