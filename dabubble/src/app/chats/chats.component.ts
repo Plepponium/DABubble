@@ -13,7 +13,7 @@ import { ChannelDescriptionOverlayComponent } from '../channel-description-overl
 import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.class';
-import { catchError, forkJoin, map, Observable, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, forkJoin, map, Observable, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { reactionIcons } from '../reaction-icons';
 import { Chat } from '../../models/chat.class';
 import { ChatWithDetails } from '../../models/chat-with-details.class';
@@ -47,7 +47,9 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
-  chats$: Observable<ChatWithDetails[]> = of([]);
+  // chats$: Observable<ChatWithDetails[]> = of([]);
+  private chatsSubject = new BehaviorSubject<ChatWithDetails[]>([]);
+  public chats$ = this.chatsSubject.asObservable();
 
   channelService = inject(ChannelService);
   userService = inject(UserService);
@@ -62,46 +64,18 @@ export class ChatsComponent implements OnInit, OnChanges {
         this.currentUserId = user.uid;
       }
       if (!this.channelId) {
-        this.loadFirstChannelAndData();
+        this.loadFirstChannelWithoutId();
       } else {
-        // this.loadDataForChannel(this.channelId);
-        // this.subscribeToChatsAndUsers(this.channelId, this.participantIds);
-        this.channelService.getChannelById(this.channelId).pipe(take(1)).subscribe(channel => {
-          if (!channel) return;
-          this.participantIds = channel.participants || [];
-          this.subscribeToChatsAndUsers(this.channelId!, this.participantIds);
-        });
+        this.loadChannelWithId(this.channelId);
       }
     });
   }
 
-  // ngOnChanges(changes: SimpleChanges) {
-  //   if (changes['channelId']) {
-  //     const newChannelId = changes['channelId'].currentValue;
-  //     if (newChannelId) {
-  //       // console.log(newChannelId);
-  //       this.channelChats = [];
-  //       this.participants = [];
-  //       this.channelName = '';
-  //       this.loadDataForChannel(newChannelId);
-  //       this.subscribeToChatsAndUsers(newChannelId, this.participantIds);
-  //     }
-  //   }
-  // }
   ngOnChanges(changes: SimpleChanges) {
     if (changes['channelId']) {
       const newChannelId = changes['channelId'].currentValue;
       if (newChannelId) {
-        this.channelChats = [];
-        this.participants = [];
-        this.channelName = '';
-        this.channelService.getChannelById(newChannelId).pipe(take(1)).subscribe(channel => {
-          if (!channel) return;
-          this.channelId = newChannelId;
-          this.channelName = channel.name || '';
-          this.participantIds = channel.participants || [];
-          this.subscribeToChatsAndUsers(this.channelId!, this.participantIds);
-        });
+        this.loadChannelWithId(newChannelId);
       }
     }
   }
@@ -113,149 +87,58 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  // private subscribeToChatsAndUsers(channelId: string, participantIds: string[]) {
-  //   this.chats$ = this.channelService.getChatsForChannel(channelId).pipe(
-  //     switchMap((chats: Chat[]) =>
-  //       this.userService.getUsersByIds(participantIds).pipe(
-  //         map(users => {
-  //           this.participants = users; // damit auch andere Komponenten Zugriff auf User haben
-  //           return chats; // Du kannst hier bei Bedarf Chats anreichern mit Nutzerdaten
-  //         })
-  //       )
-  //     )
-  //   );
-
-  //   // Optional: scroll to bottom immer, wenn sich chats ändern
-  //   this.chats$.subscribe(() => {
-  //     setTimeout(() => this.scrollToBottom());
-  //   });
-  // }
-
-  private loadFirstChannelAndData() {
+  private loadFirstChannelWithoutId() {
     this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
       if (channels.length > 0) {
         const firstChannel = channels[0];
         this.channelId = firstChannel.id;
         this.channelName$ = of(firstChannel.name);
         this.participants$ = this.userService.getUsersByIds(firstChannel.participants);
-        // console.log('loadFirstChannelAndData this.channelId', this.channelId);
-        // this.channelName = firstChannel.name;
-        // this.participantIds = firstChannel.participants;
-        // console.log('loadFirstChannelAndData', firstChannel.id, firstChannel.name, firstChannel.participants);
-        this.subscribeToChatsAndUsers(this.channelId, firstChannel.participants);
-        // this.loadChannelData(firstChannel.id, firstChannel.name, firstChannel.participants);
+        this.subscribeToParticipants();
+        this.subscribeToChatsAndUsers(this.channelId, this.participants$);
       } else {
-        this.participants = [];
-        this.channelChats = [];
       }
     });
   }
 
-  private loadDataForChannel(channelId: string) {
+  private loadChannelWithId(channelId: string) {
     this.channelService.getChannelById(channelId).pipe(take(1)).subscribe(channel => {
       if (!channel) return;
 
       this.channelId = channelId;
-      this.channelName = channel.name || '';
-      this.participantIds = channel.participants || [];
-      this.subscribeToChatsAndUsers(channelId, this.participantIds);
-      // this.loadChannelData(channel.id, channel.name || '', channel.participants || []);
+      this.channelName$ = of(channel.name);
+      this.participants$ = this.userService.getUsersByIds(channel.participants);
+      this.subscribeToParticipants();
+      this.subscribeToChatsAndUsers(channelId, this.participants$);
     });
   }
 
-  private loadChannelData(channelId: string, channelName: string, participantIds: string[]) {
-    this.channelId = channelId;
-    this.channelName$ = of(channelName);
-    this.participants$ = this.userService.getUsersByIds(participantIds);
-
-    // this.channelName = channelName;
-    // this.participantIds = participantIds;
-
-    this.loadChatsAndUsers(channelId, participantIds).subscribe(([chatsWithAnswers, users]) => {
+  subscribeToParticipants() {
+    this.participants$.subscribe(users => {
       this.participants = users;
-      this.channelChats = chatsWithAnswers;
+    });
+  }
+  
+  private subscribeToChatsAndUsers(channelId: string, participants$: Observable<User[]>) {
+    combineLatest([
+      this.getChatsForChannel(channelId),
+      participants$
+    ]).pipe(
+      switchMap(([chats, users]) => {
+        if (!chats.length || !users.length) return of([]);
+        const chatDetailsObservables = chats.map(chat => this.enrichChat(channelId, chat, users));
+        return forkJoin(chatDetailsObservables);
+      }),
+      map((enrichedChats: ChatWithDetails[]) => enrichedChats.sort((a, b) => a.time - b.time))
+    ).subscribe(sortedChats => {
+      this.chatsSubject.next(sortedChats);
       setTimeout(() => this.scrollToBottom());
-      this.channelChats.forEach((_, index) => this.updateReactionsArrayForChat(index));
     });
   }
 
-  // private subscribeToChatsAndUsers(channelId: string, participantIds: string[]) {
-  //   // console.log('subscribeToChatsAndUsers called with', channelId, participantIds);
-  //   // this.userService.getUsersByIds(participantIds).subscribe(users => {
-  //   //   console.log('Geladene User:', users);
-  //   // });
-  //   this.chats$ = this.channelService.getChatsForChannel(channelId).pipe(
-  //     tap(chats => console.log('Chats vom Service:', chats)),
-  //     switchMap((chats: Chat[]) =>
-  //       this.userService.getUsersByIds(participantIds).pipe(
-  //         tap(users => console.log('Geladene Nutzer:', users)),
-  //         switchMap(users => {
-  //           const chatsWithDetails$ = chats.map(chat =>
-  //             forkJoin({
-  //               reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(catchError(() => of({}))),
-  //               user: of(users.find(u => u.uid === chat.user)), 
-  //               answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(catchError(() => of([]))),
-  //             }).pipe(
-  //               map(({ reactions, user, answers }) => ({
-  //                 ...chat,
-  //                 userName: user?.name,
-  //                 userImg: user?.img,
-  //                 answersCount: answers.length,
-  //                 lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
-  //                 reactions,
-  //                 reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
-  //               }))
-  //             )
-  //           );
-  //           // return forkJoin(chatsWithDetails$);
-  //           return forkJoin(chatsWithDetails$).pipe(
-  //             tap(chatsWithDetails => console.log('Anreicherte Chats:', chatsWithDetails))
-  //           );
-  //         })
-  //       )
-  //     ),
-  //     // Chats nach Zeit sortieren      
-  //     map((enrichedChats: any[]) => enrichedChats.sort((a, b) => a.time - b.time)),
-  //     tap(data => console.log('Chats mit Details geladen:', data))
-  //   );
-  // }
-  private subscribeToChatsAndUsers(channelId: string, participantIds: string[]) {
-    // console.log('subscribeToChatsAndUsers participantIds', participantIds);
-    this.chats$ = this.getChatsForChannel(channelId).pipe(
-      switchMap((chats: Chat[]) =>
-        this.getUsersByIds(participantIds).pipe(
-          switchMap(users => {
-            if (!chats.length) {
-              console.log('[subscribeToChatsAndUsers] Keine Chats vorhanden');
-              return of([]);
-            }
-            if (!users.length) {
-              console.log('[subscribeToChatsAndUsers] Keine Nutzer vorhanden');
-              return of([]);
-            }
-            const chatDetailsObservables = chats.map(chat => this.enrichChat(channelId, chat, users));
-            return forkJoin(chatDetailsObservables).pipe(
-              tap(enrichedChats => console.log('[subscribeToChatsAndUsers] Alle angereicherten Chats:', enrichedChats))
-            );
-          })
-        )
-      ),
-      map((enrichedChats: any[]) => enrichedChats.sort((a, b) => a.time - b.time)),
-      tap(sortedChats => console.log('[subscribeToChatsAndUsers] Final sortierte Chats:', sortedChats))
-    );
-  }
-  // Holt alle Chats für einen Channel und loggt
   private getChatsForChannel(channelId: string): Observable<Chat[]> {
     return this.channelService.getChatsForChannel(channelId).pipe(
-      tap(chats => console.log('[getChatsForChannel] Chats:', chats))
-    );
-  }
-
-  // Holt alle Nutzer nach Ids und loggt
-  private getUsersByIds(participantIds: string[]): Observable<User[]> {
-    console.log('participantIds', participantIds);
-    return this.userService.getUsersByIds(participantIds).pipe(
-      tap(users => console.log('[getUsersByIds] Nutzer:', users))
+      // tap(chats => console.log('[getChatsForChannel] Chats:', chats))
     );
   }
 
@@ -263,11 +146,11 @@ export class ChatsComponent implements OnInit, OnChanges {
   private enrichChat(channelId: string, chat: Chat, users: User[]): Observable<any> {
     return forkJoin({
       reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(take(1),
-        catchError(err => { console.error('[enrichChat] Fehler bei getReactionsForChat', err); return of({}); })
+        // catchError(err => { console.error('[enrichChat] Fehler bei getReactionsForChat', err); return of({}); })
       ),
       user: of(users.find(u => u.uid === chat.user)),
       answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1),
-        catchError(err => { console.error('[enrichChat] Fehler bei getAnswersForChat', err); return of([]); })
+        // catchError(err => { console.error('[enrichChat] Fehler bei getAnswersForChat', err); return of([]); })
       )
     }).pipe(
       map(({ reactions, user, answers }) => {
@@ -280,38 +163,11 @@ export class ChatsComponent implements OnInit, OnChanges {
           reactions,
           reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
         };
-        console.log('[enrichChat] Angereicherter Chat:', result); // Einzel-Chat loggen
+        // console.log('[enrichChat] Angereicherter Chat:', result); // Einzel-Chat loggen
         return result;
       })
     );
   }
-    // this.chats$ = this.channelService.getChatsForChannel(channelId).pipe(
-    //   take(1),
-    //   map(chats => chats.sort((a,b) => Number(a.time) - Number(b.time))),
-    //   switchMap(chats => {
-    //     if (!chats.length) return of([]);
-    //     const chatsWithDetails$ = chats.map(chat =>
-    //       forkJoin({
-    //         reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(catchError(()=>of({}))),
-    //         answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(catchError(()=>of([]))),
-    //         user: this.userService.getUsersByIds(chat.user).pipe(catchError(()=>of(null)))
-    //       }).pipe(
-    //         map(({reactions, answers, user}) => ({
-    //           ...chat,
-    //           time: Number(chat.time),
-    //           userName: user?.name ?? 'Unbekannt',
-    //           userImg: user?.img ?? null,
-    //           answersCount: answers.length,
-    //           lastAnswerTime: answers.length ? answers.sort((x,y)=>Number(x.time)-Number(y.time)).slice(-1)[0].time : null,
-    //           reactions,
-    //           reactionArray: this.transformReactionsToArray(reactions, [user].filter(Boolean), this.currentUserId)
-    //         }))
-    //       )
-    //     );
-    //     return forkJoin(chatsWithDetails$);
-    //   })
-    // );
-
 
   getChatDate(chat: any): Date | undefined {
     return chat.time ? new Date(chat.time * 1000) : undefined;
@@ -345,51 +201,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  // Lädt Chats und Userdaten parallel und verknüpft Antworten mit Chats
-  private loadChatsAndUsers(channelId: string, participantIds: string[]) {
-    return forkJoin([
-      this.channelService.getChatsForChannel(channelId).pipe(take(1)),
-      this.userService.getUsersByIds(participantIds).pipe(take(1))
-    ]).pipe(
-      switchMap(([chats, users]) => {
-        if (!chats.length) {
-          return of([[], users] as [any[], User[]]);
-        }
-
-        // Für jeden Chat parallel Antworten und Reactions laden
-        const chatsWithDetails$ = chats.map(chat =>
-          forkJoin({
-            answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1), catchError(() => of([]))),
-            reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(catchError(() => of({})))
-          }).pipe(
-            map(({ answers, reactions }) => {
-              // console.log('channelId', channelId, 'chat.id', chat.id);
-              const user = users.find(u => u.uid === chat.user);
-              const chatsWithDetails = {
-                ...chat,
-                userName: user?.name,
-                userImg: user?.img,
-                answersCount: answers.length,
-                lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
-                reactions,
-                reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
-              };
-              // console.log('chatWithDetails', chatsWithDetails);
-              return chatsWithDetails;
-            })
-          )
-        );
-
-        return forkJoin(chatsWithDetails$).pipe(
-          map(chatsWithDetails => {
-            chatsWithDetails.sort((a, b) => a.time - b.time);
-            return [chatsWithDetails, users] as [any[], User[]];
-          })
-        );
-      })
-    );
-  }
-
   openReactionsDialogue(chatIndex: number) {
     if (this.activeReactionDialogueIndex === chatIndex) {
       this.activeReactionDialogueIndex = null; // schließe, wenn bereits offen
@@ -399,14 +210,23 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  private parseUserIds(users: string[]): string[] {
-    return users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
-  }
-
-  private findOtherUserName(userIds: string[], currentUserId: string, participants: User[]): string | undefined {
-    const others = userIds.filter(id => id !== currentUserId);
-    if (others.length === 0) return undefined;
-    return participants.find(u => u.uid === others[0])?.name || 'Unbekannt';
+  transformReactionsToArray(
+    reactionsMap: Record<string, string[]>,
+    participants: User[],
+    currentUserId: string
+  ): {
+    type: string,
+    count: number,
+    userIds: string[],
+    currentUserReacted: boolean,
+    otherUserName?: string,
+    otherUserReacted: boolean
+  }[] {
+    if (!reactionsMap) return [];
+    // console.log('transformToArray', reactionsMap, data);
+    return Object.entries(reactionsMap).map(([type, usersRaw]) =>
+      this.buildReactionObject(type, usersRaw, participants, currentUserId)
+    );
   }
 
   private buildReactionObject(
@@ -437,39 +257,14 @@ export class ChatsComponent implements OnInit, OnChanges {
     };
   }
 
-  transformReactionsToArray(
-    reactionsMap: Record<string, string[]>,
-    participants: User[],
-    currentUserId: string
-  ): {
-    type: string,
-    count: number,
-    userIds: string[],
-    currentUserReacted: boolean,
-    otherUserName?: string,
-    otherUserReacted: boolean
-  }[] {
-    if (!reactionsMap) return [];
-    // console.log('transformToArray', reactionsMap, data);
-    return Object.entries(reactionsMap).map(([type, usersRaw]) =>
-      this.buildReactionObject(type, usersRaw, participants, currentUserId)
-    );
+  private parseUserIds(users: string[]): string[] {
+    return users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
   }
 
-  private updateReactionsArrayForChat(chatIndex: number) {
-    if (this.channelChats[chatIndex]?.reactions) {
-      const data = this.transformReactionsToArray(this.channelChats[chatIndex].reactions, this.participants, this.currentUserId);
-      // console.log('data', data);
-    } else {
-      this.reactionArray = [];
-    }
-  }
-
-  private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
-    const usersRaw = reactions[reactionType] || [];
-    return usersRaw.flatMap((u: string) =>
-      u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
-    );
+  private findOtherUserName(userIds: string[], currentUserId: string, participants: User[]): string | undefined {
+    const others = userIds.filter(id => id !== currentUserId);
+    if (others.length === 0) return undefined;
+    return participants.find(u => u.uid === others[0])?.name || 'Unbekannt';
   }
 
   private async saveOrDeleteReaction(channelId: string, chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
@@ -480,18 +275,10 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  private updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[]) {
-    chat.reactions = { ...chat.reactions };
-    if (updatedUsers.length === 0) {
-      delete chat.reactions[reactionType];
-    } else {
-      chat.reactions[reactionType] = updatedUsers;
-    }
-    chat.reactionArray = this.transformReactionsToArray(chat.reactions, this.participants, this.currentUserId);
-  }
-
   private async updateReactionForChat(chatIndex: number, reactionType: string, updatedUsers: string[]): Promise<void> {
-    const chat = this.channelChats[chatIndex];
+    // Hier hole den aktuellen State vom BehaviorSubject (nicht von channelChats)
+    const chats = this.chatsSubject.getValue();
+    const chat = chats[chatIndex];
     if (!chat) return;
 
     const channelId = this.channelId;
@@ -500,15 +287,34 @@ export class ChatsComponent implements OnInit, OnChanges {
     if (!channelId || !chatId || !currentUserId) return;
 
     try {
+      // Speichere oder lösche Reaction in Firestore
       await this.saveOrDeleteReaction(channelId, chatId, reactionType, updatedUsers);
-      this.updateLocalReaction(chat, reactionType, updatedUsers);
+      // Aktuellere lokalen State mit allen Nebenwirkungen
+      this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
     } catch (error) {
       console.error('Fehler beim Aktualisieren der Reaction:', error);
     }
   }
 
+  private updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[], chatIndex: number) {
+    chat.reactions = { ...chat.reactions };
+    if (updatedUsers.length === 0) {
+      delete chat.reactions[reactionType];
+    } else {
+      chat.reactions[reactionType] = updatedUsers;
+    }
+    chat.reactionArray = this.transformReactionsToArray(chat.reactions, this.participants, this.currentUserId);
+
+    // Aktualisiere den BehaviorSubject State mit neuem Chat Objekt
+    const chats = this.chatsSubject.getValue();
+    const newChats = [...chats];
+    newChats[chatIndex] = chat;  // Ersetze den Chat an Index
+    this.chatsSubject.next(newChats); 
+  }
+
   async addReaction(chatIndex: number, reactionType: string) {
-    const chat = this.channelChats[chatIndex];
+    const chats = this.chatsSubject.getValue();
+    const chat = chats[chatIndex];
     if (!chat) return;
 
     this.activeReactionDialogueIndex = null;
@@ -520,7 +326,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
   async toggleReaction(chatIndex: number, reactionType: string) {
-    const chat = this.channelChats[chatIndex];
+    const chat = await this.getChatByIndex(chatIndex);
     if (!chat) return;
 
     const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
@@ -532,6 +338,24 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
 
     await this.updateReactionForChat(chatIndex, reactionType, updatedUsers);
+  }
+
+  private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
+    const usersRaw = reactions[reactionType] || [];
+    return usersRaw.flatMap((u: string) =>
+      u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
+    );
+  }
+
+  // Hilfsmethode, um den Chat aus Observable oder Cache zu erhalten
+  private async getChatByIndex(chatIndex: number): Promise<any> {
+    if (this.channelChats && this.channelChats.length > chatIndex) {
+      return this.channelChats[chatIndex];
+    }
+    // Alternativ Chats aus Observable abrufen, dann Wert zurückgeben
+    return new Promise(resolve => {
+      this.chats$.pipe(take(1)).subscribe((chats: any) => resolve(chats[chatIndex]));
+    })
   }
 
   openAddComment() { }
