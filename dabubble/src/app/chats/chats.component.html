@@ -5,7 +5,7 @@
                 <div class="channel-name-container">
                     <img class="hover-icon" src="assets/icons/tag.svg" alt="">
                     <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
-                    <div id="channel-name" class="font-24 font-w-700">{{ channelName }}</div>
+                    <div id="channel-name" class="font-24 font-w-700">{{ channelName$ | async }}</div>
                 </div>
                 <img class="hover-icon" src="assets/icons/expand_more.svg" alt="">
                 <img class="hover-icon-purple" src="assets/icons/expand_more-purple.svg" alt="">
@@ -15,11 +15,14 @@
                 <div (click)="openDialogueShowUser()" class="users-display"
                     [ngClass]="{'users-display-active': usersDisplayActive}">
                     <div class="user-pics">
-                        <div class="img-box" *ngFor="let user of participants | slice:0:3">
+                        <div class="img-box" *ngFor="let user of participants$ | async | slice:0:3">
                             <img [src]="'/assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
                         </div>
                     </div>
-                    <div class="user-counter">{{ participants.length }}</div>
+                    <!-- <div class="user-counter">{{ participants.length }}</div> -->
+                    <div *ngIf="participants$ | async as participants">
+                        <div class="user-counter">{{ participants.length }}</div>
+                    </div>
                 </div>
 
                 <app-round-btn (click)="openDialogueAddUser()" style="--btn-bg: #eceefe;"
@@ -53,12 +56,12 @@
         </app-profile-overlay>
     </div>
 
-    <div class="chat-content">
+    <div *ngIf="(chats$ | async) as chatList" class="chat-content">
         <div id="chat-history" class="chat-history">
 
-            <div *ngFor="let chat of channelChats; let i = index" class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
+            <div *ngFor="let chat of chatList; let i = index" class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                 <!-- <div class="chat-date-section"> -->
-                <div *ngIf="i === 0 || !isSameDate(getChatDate(chat), getChatDate(channelChats[i-1]))"
+                <div *ngIf="i === 0 || !isSameDate(getChatDate(chat), getChatDate(chatList[i-1]))"
                                 class="chat-date-section">
                     <!-- <div class="chat-date">{{ chat.time * 1000 | date: 'EEEE, d. MMMM':'':'de' }}</div> -->
                     <div class="chat-date">{{ getDisplayDate(getChatDate(chat)) }}</div>
@@ -114,7 +117,7 @@
                         <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}">
                             <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0">
                                 <div (click)="handleOpenThread()" class="answer t-purple">{{ chat.answersCount }} Antworten</div>
-                                <div class="last-answer font-14 t-gray">Letzte Antwort {{ (chat.lastAnswerTime * 1000) | date: 'HH:mm' }}</div>
+                                <div class="last-answer font-14 t-gray">Letzte Antwort {{ chat.lastAnswerTime ? (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}</div>
                             </div>
                             <div class="reactions">
                                 <div class="reaction-btns">

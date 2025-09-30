@@ -16,6 +16,7 @@ import { User } from '../../models/user.class';
 import { catchError, forkJoin, map, Observable, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { reactionIcons } from '../reaction-icons';
 import { Chat } from '../../models/chat.class';
+import { ChatWithDetails } from '../../models/chat-with-details.class';
 import localeDe from '@angular/common/locales/de';
 registerLocaleData(localeDe);
 
@@ -43,9 +44,9 @@ export class ChatsComponent implements OnInit, OnChanges {
   currentUserId: string = '';  
   newMessage: string = '';
 
-  // chats$: Observable<any[]>; // Füge ein Observable Feld hinzu
-  chats$: Observable<Chat[]> = of([]);
-  // chats$: Observable<Chat[]>;
+  channelName$: Observable<string> = of('');
+  participants$: Observable<User[]> = of([]);
+  chats$: Observable<ChatWithDetails[]> = of([]);
 
   channelService = inject(ChannelService);
   userService = inject(UserService);
@@ -63,11 +64,29 @@ export class ChatsComponent implements OnInit, OnChanges {
         this.loadFirstChannelAndData();
       } else {
         // this.loadDataForChannel(this.channelId);
-        this.subscribeToChatsAndUsers(this.channelId, this.participantIds);
+        // this.subscribeToChatsAndUsers(this.channelId, this.participantIds);
+        this.channelService.getChannelById(this.channelId).pipe(take(1)).subscribe(channel => {
+          if (!channel) return;
+          this.participantIds = channel.participants || [];
+          this.subscribeToChatsAndUsers(this.channelId!, this.participantIds);
+        });
       }
     });
   }
 
+  // ngOnChanges(changes: SimpleChanges) {
+  //   if (changes['channelId']) {
+  //     const newChannelId = changes['channelId'].currentValue;
+  //     if (newChannelId) {
+  //       // console.log(newChannelId);
+  //       this.channelChats = [];
+  //       this.participants = [];
+  //       this.channelName = '';
+  //       this.loadDataForChannel(newChannelId);
+  //       this.subscribeToChatsAndUsers(newChannelId, this.participantIds);
+  //     }
+  //   }
+  // }
   ngOnChanges(changes: SimpleChanges) {
     if (changes['channelId']) {
       const newChannelId = changes['channelId'].currentValue;
@@ -75,7 +94,13 @@ export class ChatsComponent implements OnInit, OnChanges {
         this.channelChats = [];
         this.participants = [];
         this.channelName = '';
-        this.loadDataForChannel(newChannelId);
+        this.channelService.getChannelById(newChannelId).pipe(take(1)).subscribe(channel => {
+          if (!channel) return;
+          this.channelId = newChannelId;
+          this.channelName = channel.name || '';
+          this.participantIds = channel.participants || [];
+          this.subscribeToChatsAndUsers(this.channelId!, this.participantIds);
+        });
       }
     }
   }
@@ -85,45 +110,21 @@ export class ChatsComponent implements OnInit, OnChanges {
     if (chatHistory) {
       chatHistory.scrollTop = chatHistory.scrollHeight;
     }
-  }
-
-  private subscribeToChatsAndUsers(channelId: string, participantIds: string[]) {
-    this.chats$ = this.channelService.getChatsForChannel(channelId).pipe(
-      switchMap((chats: Chat[]) =>
-        this.userService.getUsersByIds(participantIds).pipe(
-          map(users => {
-            this.participants = users; // damit auch andere Komponenten Zugriff auf User haben
-            return chats; // Du kannst hier bei Bedarf Chats anreichern mit Nutzerdaten
-          })
-        )
-      )
-    );
-
-    // Optional: scroll to bottom immer, wenn sich chats ändern
-    this.chats$.subscribe(() => {
-      setTimeout(() => this.scrollToBottom());
-    });
-  }
-
-  private loadChannelData(channelId: string, channelName: string, participantIds: string[]) {
-    this.channelId = channelId;
-    this.channelName = channelName;
-    this.participantIds = participantIds;
-
-    this.loadChatsAndUsers(channelId, participantIds).subscribe(([chatsWithAnswers, users]) => {
-      this.participants = users;
-      this.channelChats = chatsWithAnswers;
-      setTimeout(() => this.scrollToBottom());
-      this.channelChats.forEach((_, index) => this.updateReactionsArrayForChat(index));
-    });
-  }
-  
+  }  
 
   private loadFirstChannelAndData() {
     this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
       if (channels.length > 0) {
         const firstChannel = channels[0];
-        this.loadChannelData(firstChannel.id, firstChannel.name, firstChannel.participants);
+        this.channelId = firstChannel.id;
+        this.channelName$ = of(firstChannel.name);
+        this.participants$ = this.userService.getUsersByIds(firstChannel.participants);
+
+        // this.channelName = firstChannel.name;
+        // this.participantIds = firstChannel.participants;
+        // console.log(firstChannel.id, firstChannel.name, firstChannel.participants);
+        this.subscribeToChatsAndUsers(this.channelId, this.participantIds);
+        // this.loadChannelData(firstChannel.id, firstChannel.name, firstChannel.participants);
       } else {
         this.participants = [];
         this.channelChats = [];
@@ -136,8 +137,70 @@ export class ChatsComponent implements OnInit, OnChanges {
       if (!channel) return;
       
       this.channelId = channelId;
-      this.loadChannelData(channel.id, channel.name || '', channel.participants || []);
+      this.channelName = channel.name || '';
+      this.participantIds = channel.participants || [];
+      this.subscribeToChatsAndUsers(channelId, this.participantIds);
+      // this.loadChannelData(channel.id, channel.name || '', channel.participants || []);
     });
+  }
+
+  private loadChannelData(channelId: string, channelName: string, participantIds: string[]) {
+    this.channelId = channelId;
+    this.channelName$ = of(channelName);
+    this.participants$ = this.userService.getUsersByIds(participantIds);
+
+    // this.channelName = channelName;
+    // this.participantIds = participantIds;
+
+    this.loadChatsAndUsers(channelId, participantIds).subscribe(([chatsWithAnswers, users]) => {
+      this.participants = users;
+      this.channelChats = chatsWithAnswers;
+      setTimeout(() => this.scrollToBottom());
+      this.channelChats.forEach((_, index) => this.updateReactionsArrayForChat(index));
+    });
+  }
+
+  private subscribeToChatsAndUsers(channelId: string, participantIds: string[]) {
+    // console.log('subscribeToChatsAndUsers called with', channelId, participantIds);
+    // this.userService.getUsersByIds(participantIds).subscribe(users => {
+    //   console.log('Geladene User:', users);
+    // });
+    this.chats$ = this.channelService.getChatsForChannel(channelId).pipe(
+      tap(chats => console.log('Chats vom Service:', chats)),
+      switchMap((chats: Chat[]) =>
+        this.userService.getUsersByIds(participantIds).pipe(
+          tap(users => console.log('Geladene Nutzer:', users)),
+          switchMap(users => {
+            // Für jede Chat-Nachricht Reaktionen & weitere Infos holen und alles anreichern
+            const chatsWithDetails$ = chats.map(chat =>
+              forkJoin({
+                reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(catchError(() => of({}))),
+                user: of(users.find(u => u.uid === chat.user)), // User aus Nutzerliste
+                // Weitere Details (Answers):
+                answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(catchError(() => of([]))),
+              }).pipe(
+                map(({reactions, user, answers}) => ({
+                  ...chat,
+                  userName: user?.name,
+                  userImg: user?.img,
+                  answersCount: answers.length,
+                  lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
+                  reactions,
+                  reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
+                }))
+              )
+            );
+            // return forkJoin(chatsWithDetails$);
+            return forkJoin(chatsWithDetails$).pipe(
+              tap(chatsWithDetails => console.log('Anreicherte Chats:', chatsWithDetails))
+            );
+          })
+        )
+      ),
+      // Chats nach Zeit sortieren      
+      map((enrichedChats: any[]) => enrichedChats.sort((a, b) => a.time - b.time)),
+      tap(data => console.log('Chats mit Details geladen:', data))
+    );
   }
 
   getChatDate(chat: any): Date | undefined {
