@@ -41,7 +41,7 @@ export class DirectMessageService {
     }
 
     /** Add a message to messages subcollection */
-    async sendMessage(dmId: string, payload: { senderId: string; senderName: string; senderImg?: string; text: string; }) {
+    async sendMessage(dmId: string, payload: { senderId: string; text: string; }) {
         const messagesCol = collection(this.firestore, `dmChats/${dmId}/messages`);
         return addDoc(messagesCol as any, {
             ...payload,

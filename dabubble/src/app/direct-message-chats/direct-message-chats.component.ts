@@ -1,12 +1,14 @@
 import { Component, ElementRef, ViewChild, inject, Input, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Observable, of, combineLatest, firstValueFrom } from 'rxjs';
+import { map, shareReplay } from 'rxjs/operators';
+
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
+import { DmReactionsDialogComponent } from '../dm-reactions-dialog/dm-reactions-dialog.component';
 import { User } from '../../models/user.class';
 import { UserService } from '../../services/user.service';
-import { CommonModule } from '@angular/common';
-import { firstValueFrom, Observable, of } from 'rxjs';
 import { DirectMessageService } from '../../services/direct-messages.service';
-import { FormsModule } from '@angular/forms';
-import { DmReactionsDialogComponent } from '../dm-reactions-dialog/dm-reactions-dialog.component';
 
 @Component({
   selector: 'app-direct-message-chats',
@@ -19,34 +21,67 @@ export class DirectMessageChatsComponent {
   @Input() userId!: string;
 
   dmId?: string;
-  user?: User;
   currentUser?: User;
+  otherUser?: User;
+
   messages$?: Observable<any[]>;
+  users$?: Observable<Record<string, User>>;
   messageText = '';
 
   private userService = inject(UserService);
   private dmService = inject(DirectMessageService);
-  reactionIcons: string[] = ['check', 'thumb'];
 
+  reactionIcons: string[] = ['check', 'thumb'];
 
   async ngOnChanges(changes: SimpleChanges) {
     if (changes['userId'] && this.userId) {
-      this.userService.getSingleUserById(this.userId).subscribe(u => this.user = u);
       this.currentUser = await firstValueFrom(this.userService.getCurrentUser());
       if (!this.currentUser) {
         this.messages$ = of([]);
         return;
       }
+
+      // andere Person laden
+      this.userService.getSingleUserById(this.userId).subscribe(u => this.otherUser = u);
+
+      // DM-ID holen oder erstellen
       this.dmId = await this.dmService.getOrCreateDmId(this.currentUser.uid, this.userId);
-      this.messages$ = this.dmService.getMessages(this.dmId);
+
+      // Nachrichten-Stream
+      const rawMessages$ = this.dmService.getMessages(this.dmId);
+
+      // Teilnehmer-Map laden (beide User)
+      this.users$ = this.userService.getUsersByIds([this.currentUser.uid, this.userId]).pipe(
+        map(users =>
+          users.reduce((map, u) => {
+            map[u.uid] = u;
+            return map;
+          }, {} as Record<string, User>)
+        ),
+        shareReplay(1)
+      );
+
+      // Nachrichten mit User-Daten anreichern
+      this.messages$ = combineLatest([rawMessages$, this.users$]).pipe(
+        map(([messages, users]) =>
+          messages.map(m => ({
+            ...m,
+            senderName: users[m.senderId]?.name || 'Unbekannt',
+            senderImg: users[m.senderId]?.img || 'default-user'
+          }))
+        )
+      );
+
+      // Auto-Scroll
       this.messages$.subscribe(() => {
         setTimeout(() => this.scrollToBottom(), 0);
       });
+
       this.focusMessageInput();
     }
   }
 
-  scrollToBottom() {
+  private scrollToBottom() {
     const container = document.getElementById("dm-chat-content");
     if (container) {
       container.scrollTop = container.scrollHeight;
@@ -60,7 +95,7 @@ export class DirectMessageChatsComponent {
   }
 
   isSelf(): boolean {
-    return this.user?.uid === this.currentUser?.uid;
+    return this.otherUser?.uid === this.currentUser?.uid;
   }
 
   isSameDate(d1: Date | undefined, d2: Date | undefined): boolean {
@@ -82,7 +117,6 @@ export class DirectMessageChatsComponent {
     } else if (this.isSameDate(date, yesterday)) {
       return 'Gestern';
     } else {
-      // normales Datum: Montag, 20. September
       return new Intl.DateTimeFormat('de-DE', {
         weekday: 'long',
         day: 'numeric',
@@ -97,8 +131,6 @@ export class DirectMessageChatsComponent {
 
     await this.dmService.sendMessage(this.dmId, {
       senderId: this.currentUser.uid,
-      senderName: this.currentUser.name,
-      senderImg: this.currentUser.img,
       text
     });
 
@@ -108,13 +140,13 @@ export class DirectMessageChatsComponent {
 
   addReaction(index: number, icon: string) {
     console.log("Index: ", index, "Icon: ", icon);
+  }
 
-  };
   openReactionsDialogue(index: number) {
     console.log("Index: ", index);
-  };
+  }
+
   openEditComment(id: string) {
     console.log("Id: ", id);
-  };
-
+  }
 }
