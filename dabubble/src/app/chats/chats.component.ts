@@ -287,9 +287,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     if (!channelId || !chatId || !currentUserId) return;
 
     try {
-      // Speichere oder lösche Reaction in Firestore
       await this.saveOrDeleteReaction(channelId, chatId, reactionType, updatedUsers);
-      // Aktuellere lokalen State mit allen Nebenwirkungen
       this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
     } catch (error) {
       console.error('Fehler beim Aktualisieren der Reaction:', error);
@@ -404,8 +402,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.showProfileDialogue = false;
     this.selectedProfileUser = undefined;
   }
-
-
 
   submitChatMessage() {
     if (!this.newMessage.trim()) return;      // Leere Eingabe unterdrücken
