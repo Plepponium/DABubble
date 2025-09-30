@@ -59,6 +59,42 @@
                                         </span>
                                     </div>
                                     <div class="chat-text font-18">{{ m.text }}</div>
+
+
+                                    <div class="reactions">
+                                        <div class="reaction-btns">
+                                            <div class="reaction-btn">
+                                                <img src="assets/reaction-icons/check.svg">
+                                                <span>1</span>
+
+
+                                                <div class="r-btn-hover-display">
+                                                    <div class="r-btn-hover-display-content">
+                                                        <img src="assets/reaction-icons/check.svg" alt="reaction">
+                                                        <div class="reaction-btn-t-box no-wrap">
+                                                            <div class="font-w-700">Username und Du</div>
+                                                            <span>haben reagiert</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="reaction-btn">
+                                                <img src="assets/reaction-icons/rocket.svg">
+                                                <span>2</span>
+                                            </div>
+                                            <div class="reaction-btn">
+                                                <img src="assets/reaction-icons/thumb.svg">
+                                                <span>3</span>
+                                            </div>
+                                        </div>
+                                        <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
+                                            iconHoverSrc="assets/message-icons/add_reaction-purple.svg">
+                                        </app-round-btn>
+                                    </div>
+
+
                                 </div>
                                 <app-dm-reactions-dialog class="dm-reactions-dialog"
                                     [class.reverse]="m.senderId === currentUser?.uid" [messageId]="m.id"
