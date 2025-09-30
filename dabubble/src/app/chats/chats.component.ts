@@ -138,11 +138,11 @@ export class ChatsComponent implements OnInit, OnChanges {
         this.channelId = firstChannel.id;
         this.channelName$ = of(firstChannel.name);
         this.participants$ = this.userService.getUsersByIds(firstChannel.participants);
-
+        // console.log('loadFirstChannelAndData this.channelId', this.channelId);
         // this.channelName = firstChannel.name;
         // this.participantIds = firstChannel.participants;
-        // console.log(firstChannel.id, firstChannel.name, firstChannel.participants);
-        this.subscribeToChatsAndUsers(this.channelId, this.participantIds);
+        // console.log('loadFirstChannelAndData', firstChannel.id, firstChannel.name, firstChannel.participants);
+        this.subscribeToChatsAndUsers(this.channelId, firstChannel.participants);
         // this.loadChannelData(firstChannel.id, firstChannel.name, firstChannel.participants);
       } else {
         this.participants = [];
@@ -179,75 +179,139 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
   }
 
+  // private subscribeToChatsAndUsers(channelId: string, participantIds: string[]) {
+  //   // console.log('subscribeToChatsAndUsers called with', channelId, participantIds);
+  //   // this.userService.getUsersByIds(participantIds).subscribe(users => {
+  //   //   console.log('Geladene User:', users);
+  //   // });
+  //   this.chats$ = this.channelService.getChatsForChannel(channelId).pipe(
+  //     tap(chats => console.log('Chats vom Service:', chats)),
+  //     switchMap((chats: Chat[]) =>
+  //       this.userService.getUsersByIds(participantIds).pipe(
+  //         tap(users => console.log('Geladene Nutzer:', users)),
+  //         switchMap(users => {
+  //           const chatsWithDetails$ = chats.map(chat =>
+  //             forkJoin({
+  //               reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(catchError(() => of({}))),
+  //               user: of(users.find(u => u.uid === chat.user)), 
+  //               answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(catchError(() => of([]))),
+  //             }).pipe(
+  //               map(({ reactions, user, answers }) => ({
+  //                 ...chat,
+  //                 userName: user?.name,
+  //                 userImg: user?.img,
+  //                 answersCount: answers.length,
+  //                 lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
+  //                 reactions,
+  //                 reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
+  //               }))
+  //             )
+  //           );
+  //           // return forkJoin(chatsWithDetails$);
+  //           return forkJoin(chatsWithDetails$).pipe(
+  //             tap(chatsWithDetails => console.log('Anreicherte Chats:', chatsWithDetails))
+  //           );
+  //         })
+  //       )
+  //     ),
+  //     // Chats nach Zeit sortieren      
+  //     map((enrichedChats: any[]) => enrichedChats.sort((a, b) => a.time - b.time)),
+  //     tap(data => console.log('Chats mit Details geladen:', data))
+  //   );
+  // }
   private subscribeToChatsAndUsers(channelId: string, participantIds: string[]) {
-    // console.log('subscribeToChatsAndUsers called with', channelId, participantIds);
-    // this.userService.getUsersByIds(participantIds).subscribe(users => {
-    //   console.log('Geladene User:', users);
-    // });
-    this.chats$ = this.channelService.getChatsForChannel(channelId).pipe(
-      tap(chats => console.log('Chats vom Service:', chats)),
+    // console.log('subscribeToChatsAndUsers participantIds', participantIds);
+    this.chats$ = this.getChatsForChannel(channelId).pipe(
       switchMap((chats: Chat[]) =>
-        this.userService.getUsersByIds(participantIds).pipe(
-          tap(users => console.log('Geladene Nutzer:', users)),
+        this.getUsersByIds(participantIds).pipe(
           switchMap(users => {
-            // Für jede Chat-Nachricht Reaktionen & weitere Infos holen und alles anreichern
-            const chatsWithDetails$ = chats.map(chat =>
-              forkJoin({
-                reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(catchError(() => of({}))),
-                user: of(users.find(u => u.uid === chat.user)), // User aus Nutzerliste
-                // Weitere Details (Answers):
-                answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(catchError(() => of([]))),
-              }).pipe(
-                map(({ reactions, user, answers }) => ({
-                  ...chat,
-                  userName: user?.name,
-                  userImg: user?.img,
-                  answersCount: answers.length,
-                  lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
-                  reactions,
-                  reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
-                }))
-              )
-            );
-            // return forkJoin(chatsWithDetails$);
-            return forkJoin(chatsWithDetails$).pipe(
-              tap(chatsWithDetails => console.log('Anreicherte Chats:', chatsWithDetails))
+            if (!chats.length) {
+              console.log('[subscribeToChatsAndUsers] Keine Chats vorhanden');
+              return of([]);
+            }
+            if (!users.length) {
+              console.log('[subscribeToChatsAndUsers] Keine Nutzer vorhanden');
+              return of([]);
+            }
+            const chatDetailsObservables = chats.map(chat => this.enrichChat(channelId, chat, users));
+            return forkJoin(chatDetailsObservables).pipe(
+              tap(enrichedChats => console.log('[subscribeToChatsAndUsers] Alle angereicherten Chats:', enrichedChats))
             );
           })
         )
       ),
-      // Chats nach Zeit sortieren      
       map((enrichedChats: any[]) => enrichedChats.sort((a, b) => a.time - b.time)),
-      tap(data => console.log('Chats mit Details geladen:', data))
+      tap(sortedChats => console.log('[subscribeToChatsAndUsers] Final sortierte Chats:', sortedChats))
+    );
+  }
+  // Holt alle Chats für einen Channel und loggt
+  private getChatsForChannel(channelId: string): Observable<Chat[]> {
+    return this.channelService.getChatsForChannel(channelId).pipe(
+      tap(chats => console.log('[getChatsForChannel] Chats:', chats))
     );
   }
 
-  //   this.chats$ = this.channelService.getChatsForChannel(channelId).pipe(
-  //   take(1),
-  //   map(chats => chats.sort((a,b) => Number(a.time) - Number(b.time))),
-  //   switchMap(chats => {
-  //     if (!chats.length) return of([]);
-  //     const enriched$ = chats.map(chat =>
-  //       forkJoin({
-  //         reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(catchError(()=>of({}))),
-  //         answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(catchError(()=>of([]))),
-  //         user: this.userService.getUserById(chat.user).pipe(catchError(()=>of(null)))
-  //       }).pipe(
-  //         map(({reactions, answers, user}) => ({
-  //           ...chat,
-  //           time: Number(chat.time),
-  //           userName: user?.name ?? 'Unbekannt',
-  //           userImg: user?.img ?? null,
-  //           answersCount: answers.length,
-  //           lastAnswerTime: answers.length ? answers.sort((x,y)=>Number(x.time)-Number(y.time)).slice(-1)[0].time : null,
-  //           reactions,
-  //           reactionArray: this.transformReactionsToArray(reactions, [user].filter(Boolean), this.currentUserId)
-  //         }))
-  //       )
-  //     );
-  //     return forkJoin(enriched$);
-  //   })
-  // );
+  // Holt alle Nutzer nach Ids und loggt
+  private getUsersByIds(participantIds: string[]): Observable<User[]> {
+    console.log('participantIds', participantIds);
+    return this.userService.getUsersByIds(participantIds).pipe(
+      tap(users => console.log('[getUsersByIds] Nutzer:', users))
+    );
+  }
+
+  // Anreichern eines einzelnen Chats um User/Reactions/Answers
+  private enrichChat(channelId: string, chat: Chat, users: User[]): Observable<any> {
+    return forkJoin({
+      reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(take(1),
+        catchError(err => { console.error('[enrichChat] Fehler bei getReactionsForChat', err); return of({}); })
+      ),
+      user: of(users.find(u => u.uid === chat.user)),
+      answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1),
+        catchError(err => { console.error('[enrichChat] Fehler bei getAnswersForChat', err); return of([]); })
+      )
+    }).pipe(
+      map(({ reactions, user, answers }) => {
+        const result = {
+          ...chat,
+          userName: user?.name,
+          userImg: user?.img,
+          answersCount: answers.length,
+          lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
+          reactions,
+          reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
+        };
+        console.log('[enrichChat] Angereicherter Chat:', result); // Einzel-Chat loggen
+        return result;
+      })
+    );
+  }
+    // this.chats$ = this.channelService.getChatsForChannel(channelId).pipe(
+    //   take(1),
+    //   map(chats => chats.sort((a,b) => Number(a.time) - Number(b.time))),
+    //   switchMap(chats => {
+    //     if (!chats.length) return of([]);
+    //     const chatsWithDetails$ = chats.map(chat =>
+    //       forkJoin({
+    //         reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(catchError(()=>of({}))),
+    //         answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(catchError(()=>of([]))),
+    //         user: this.userService.getUsersByIds(chat.user).pipe(catchError(()=>of(null)))
+    //       }).pipe(
+    //         map(({reactions, answers, user}) => ({
+    //           ...chat,
+    //           time: Number(chat.time),
+    //           userName: user?.name ?? 'Unbekannt',
+    //           userImg: user?.img ?? null,
+    //           answersCount: answers.length,
+    //           lastAnswerTime: answers.length ? answers.sort((x,y)=>Number(x.time)-Number(y.time)).slice(-1)[0].time : null,
+    //           reactions,
+    //           reactionArray: this.transformReactionsToArray(reactions, [user].filter(Boolean), this.currentUserId)
+    //         }))
+    //       )
+    //     );
+    //     return forkJoin(chatsWithDetails$);
+    //   })
+    // );
+
 
   getChatDate(chat: any): Date | undefined {
     return chat.time ? new Date(chat.time * 1000) : undefined;
