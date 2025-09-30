@@ -78,7 +78,7 @@
 
         <div class="form-field-wrapper">
             <div class="form-field full-width">
-                <textarea class="input font-18" [(ngModel)]="messageText"
+                <textarea #messageInput class="input font-18" [(ngModel)]="messageText"
                     [placeholder]="'Nachricht an ' + u.name"></textarea>
                 <div class="input-icon-bar">
                     <div class="icon-bar t-gray">

@@ -1,6 +1,7 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
+import { User } from '../../models/user.class';
 
 @Component({
   selector: 'app-profile-overlay',
@@ -11,7 +12,7 @@ import { RoundBtnComponent } from '../round-btn/round-btn.component';
 export class ProfileOverlayComponent {
   animationClass = '';
 
-  // @Input() isOpen = false;              // wird von außen gesetzt
+  @Input() user!: User;
   @Output() close = new EventEmitter<void>();
 
   handleClose() {

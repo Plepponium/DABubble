@@ -41,8 +41,9 @@ export class ChatsComponent implements OnInit, OnChanges {
   channelChats: any[] = [];
   reactionIcons = reactionIcons;
   reactionArray: { type: string, count: number, user: string[] }[] = [];
-  currentUserId: string = '';  
+  currentUserId: string = '';
   newMessage: string = '';
+  selectedProfileUser?: User;
 
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
@@ -112,6 +113,24 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }  
 
+  // private subscribeToChatsAndUsers(channelId: string, participantIds: string[]) {
+  //   this.chats$ = this.channelService.getChatsForChannel(channelId).pipe(
+  //     switchMap((chats: Chat[]) =>
+  //       this.userService.getUsersByIds(participantIds).pipe(
+  //         map(users => {
+  //           this.participants = users; // damit auch andere Komponenten Zugriff auf User haben
+  //           return chats; // Du kannst hier bei Bedarf Chats anreichern mit Nutzerdaten
+  //         })
+  //       )
+  //     )
+  //   );
+
+  //   // Optional: scroll to bottom immer, wenn sich chats ändern
+  //   this.chats$.subscribe(() => {
+  //     setTimeout(() => this.scrollToBottom());
+  //   });
+  // }
+
   private loadFirstChannelAndData() {
     this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
       if (channels.length > 0) {
@@ -135,7 +154,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   private loadDataForChannel(channelId: string) {
     this.channelService.getChannelById(channelId).pipe(take(1)).subscribe(channel => {
       if (!channel) return;
-      
+
       this.channelId = channelId;
       this.channelName = channel.name || '';
       this.participantIds = channel.participants || [];
@@ -245,14 +264,14 @@ export class ChatsComponent implements OnInit, OnChanges {
         if (!chats.length) {
           return of([[], users] as [any[], User[]]);
         }
-        
+
         // Für jeden Chat parallel Antworten und Reactions laden
         const chatsWithDetails$ = chats.map(chat =>
           forkJoin({
             answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1), catchError(() => of([]))),
             reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(catchError(() => of({})))
           }).pipe(
-            map(({answers, reactions}) => {
+            map(({ answers, reactions }) => {
               // console.log('channelId', channelId, 'chat.id', chat.id);
               const user = users.find(u => u.uid === chat.user);
               const chatsWithDetails = {
@@ -328,8 +347,8 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
   transformReactionsToArray(
-    reactionsMap: Record<string, string[]>, 
-    participants: User[], 
+    reactionsMap: Record<string, string[]>,
+    participants: User[],
     currentUserId: string
   ): {
     type: string,
@@ -408,7 +427,7 @@ export class ChatsComponent implements OnInit, OnChanges {
       await this.updateReactionForChat(chatIndex, reactionType, updatedUsers);
     }
   }
-  
+
   async toggleReaction(chatIndex: number, reactionType: string) {
     const chat = this.channelChats[chatIndex];
     if (!chat) return;
@@ -424,7 +443,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     await this.updateReactionForChat(chatIndex, reactionType, updatedUsers);
   }
 
-  openAddComment() {}
+  openAddComment() { }
 
   openEditCommentDialogue() {
     this.activeReactionDialogueIndex = null;
@@ -461,12 +480,14 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.usersDisplayActive = false;
   }
 
-  openDialogueShowProfile() {
+  openDialogueShowProfile(user: User) {
+    this.selectedProfileUser = user;
     this.showProfileDialogue = true;
   }
 
   closeDialogueShowProfile() {
     this.showProfileDialogue = false;
+    this.selectedProfileUser = undefined;
   }
 
 

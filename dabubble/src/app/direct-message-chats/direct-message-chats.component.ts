@@ -15,9 +15,10 @@ import { DmReactionsDialogComponent } from '../dm-reactions-dialog/dm-reactions-
   styleUrl: './direct-message-chats.component.scss'
 })
 export class DirectMessageChatsComponent {
+  @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
   @Input() userId!: string;
-  dmId?: string;
 
+  dmId?: string;
   user?: User;
   currentUser?: User;
   messages$?: Observable<any[]>;
@@ -41,6 +42,7 @@ export class DirectMessageChatsComponent {
       this.messages$.subscribe(() => {
         setTimeout(() => this.scrollToBottom(), 0);
       });
+      this.focusMessageInput();
     }
   }
 
@@ -49,6 +51,12 @@ export class DirectMessageChatsComponent {
     if (container) {
       container.scrollTop = container.scrollHeight;
     }
+  }
+
+  private focusMessageInput() {
+    setTimeout(() => {
+      this.messageInput?.nativeElement.focus();
+    }, 0);
   }
 
   isSelf(): boolean {

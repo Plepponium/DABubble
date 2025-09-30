@@ -2,33 +2,21 @@
     <div class="dialogue-overlay-header">
         <div>Mitglieder</div>
         <app-round-btn (click)="handleClose()" iconSrc="assets/icons/close.svg"
-            iconHoverSrc="assets/icons/close-purple.svg"
-            altText="Schließen">
+            iconHoverSrc="assets/icons/close-purple.svg" altText="Schließen">
         </app-round-btn>
     </div>
 
     <div class="dialogue-content">
         <div class="selected-users">
-            <div class="user" (click)="handleOpenProfile()">
+            <div class="user" *ngFor="let u of participants" (click)="handleOpenProfile(u)">
                 <div class="img-container">
-                    <img class="user-img" src="assets/user-icons/icon3.svg" alt="">
-                    <div class="online-signal online"></div>
+                    <img class="user-img" [src]="'assets/user-icons/' + u.img + '.svg'" alt="">
+                    <div class="online-signal" [ngClass]="u.presence"></div>
                 </div>
-                <div class="user-name">
-                    Frederick Beck
-                </div>
-            </div>
-
-            <div class="user" (click)="handleOpenProfile()">
-                <div class="img-container">
-                    <img class="user-img" src="assets/user-icons/icon5.svg" alt="">
-                    <div class="online-signal offline"></div>
-                </div>
-                <div class="user-name">
-                    Sofia Müller
-                </div>
+                <div class="user-name">{{ u.name }}</div>
             </div>
         </div>
+
         <div class="add-user" (click)="handleOpenAddUser()">
             <div class="add-user-icon-box">
                 <img class="hover-icon" src="assets/icons/person_add.svg" alt="">

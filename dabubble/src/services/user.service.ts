@@ -12,6 +12,11 @@ export class UserService {
   auth = inject(Auth);
   firestore = inject(Firestore);
 
+  async updateUser(userId: string, data: Partial<User>): Promise<void> {
+    const userRef = doc(this.firestore, `users/${userId}`);
+    return updateDoc(userRef, data);
+  }
+
   getCurrentUser(): Observable<User | undefined> {
     return authState(this.auth).pipe(
       switchMap(userAuth => {
