@@ -35,6 +35,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   showProfileDialogue = false;
   editCommentDialogueExpanded = false;
   activeReactionDialogueIndex: number | null = null;
+  activeReactionDialogueBelowIndex: number | null = null;
   channelName = '';
   participantIds: string[] = [];
   participants: User[] = [];
@@ -207,6 +208,15 @@ export class ChatsComponent implements OnInit, OnChanges {
     } else {
       this.editCommentDialogueExpanded = false;
       this.activeReactionDialogueIndex = chatIndex; // öffne aktuellen
+    }
+  }
+
+  openReactionsDialogueBelow(chatIndex: number) {
+    if (this.activeReactionDialogueBelowIndex === chatIndex) {
+      this.activeReactionDialogueBelowIndex = null; // schließe, wenn bereits offen
+    } else {
+      this.editCommentDialogueExpanded = false;
+      this.activeReactionDialogueBelowIndex = chatIndex; // öffne aktuellen
     }
   }
 

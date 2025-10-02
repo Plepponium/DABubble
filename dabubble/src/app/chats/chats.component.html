@@ -180,8 +180,15 @@
                                     </div> -->
                                 </div>
 
-                                <div>
-                                    <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
+                                <div class="reactions-display-container-below">
+                                    <div class="add-reaction-dialogue below" *ngIf="activeReactionDialogueBelowIndex === i">
+                                        <div *ngFor="let icon of reactionIcons" class="reactions-container">
+                                            <button (click)="addReaction(i, icon)" class="add-reaction-btn">
+                                                <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <app-round-btn (click)="openReactionsDialogueBelow(i)" iconSrc="assets/message-icons/add_reaction.svg"
                                         iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
                                         altText="Reaktion hinzufügen">
                                     </app-round-btn>
@@ -197,9 +204,11 @@
 
         <form class="form" (ngSubmit)="submitChatMessage()" #chatForm="ngForm">
             <div class="form-field full-width">
-                <textarea id="chat-message" class="input" name="message" [(ngModel)]="newMessage"
-                    (keydown.enter)="submitChatMessage(); $event.preventDefault();" type="text"
-                    [placeholder]="'Nachricht an #' + channelName"></textarea>
+                <ng-container *ngIf="channelName$ | async as channelName">
+                    <textarea id="chat-message" class="input" name="message" [(ngModel)]="newMessage"
+                        (keydown.enter)="submitChatMessage(); $event.preventDefault();" type="text"
+                        [placeholder]="'Nachricht an #' + channelName"></textarea>
+                </ng-container>
                 <!-- <label for="chat-message" class="floating-label t-gray">Nachricht an #Entwicklerteam</label> -->
                 <div class="input-icon-bar">
                     <div class="icon-bar t-gray">
