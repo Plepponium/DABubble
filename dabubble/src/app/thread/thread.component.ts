@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, OnInit, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
@@ -6,6 +6,13 @@ import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
+import { BehaviorSubject, combineLatest, filter, firstValueFrom, forkJoin, map, Observable, of, switchMap, take } from 'rxjs';
+import { ChannelService } from '../../services/channel.service';
+import { UserService } from '../../services/user.service';
+import { User } from '../../models/user.class';
+import { ChatWithDetails } from '../../models/chat-with-details.class';
+import { AnswerWithDetails } from '../../models/answer-with-details.class';
+import { reactionIcons } from '../reaction-icons';
 
 @Component({
   selector: 'app-thread',
@@ -13,10 +20,322 @@ import { RoundBtnComponent } from '../round-btn/round-btn.component';
   templateUrl: './thread.component.html',
   styleUrl: './thread.component.scss'
 })
-export class ThreadComponent {
+export class ThreadComponent implements OnInit {
   editCommentDialogueExpanded = false;
+  activeReactionDialogueIndex: number | null = null;
+  activeReactionDialogueBelowIndex: number | null = null;
 
+  currentUserId: string = '';
+  participantIds: string[] = [];
+  participants: User[] = [];
+  channelChats: any[] = [];
+  reactionIcons = reactionIcons;
+  reactionArray: { type: string, count: number, user: string[] }[] = [];
+  newMessage: string = '';
+
+  channelName$: Observable<string> = of('');
+  participants$: Observable<User[]> = of([]);
+  // chat$!: Observable<ChatWithDetails>;
+  chat$!: Observable<ChatWithDetails | undefined>;
+  answers$!: Observable<AnswerWithDetails[]>;
+
+  private chatsSubject = new BehaviorSubject<ChatWithDetails[]>([]);
+  public chats$ = this.chatsSubject.asObservable();
+
+  channelService = inject(ChannelService);
+  userService = inject(UserService);
+  
+  @Input() chatId!: string;
+  @Input() channelId!: string;
+  // @Input() participants: User[] = [];
   @Output() closeThread = new EventEmitter<void>();
+
+  ngOnInit() {
+    this.getCurrentUser();
+    this.loadChannel();
+    this.getChatsForChannel();
+    this.getAnswersForChat();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    this.getCurrentUser();
+    this.loadChannel();
+    if (changes['chatId'] || changes['channelId']) {
+      if (this.chatId && this.channelId) {
+        // console.log('ngOnChanges neue chatId', this.chatId);
+        // console.log('ngOnChanges neue channelId', this.channelId);
+        // console.log('ngOnChanges currentUserId', this.currentUserId);
+        this.getChatsForChannel();
+        this.getAnswersForChat();
+      }
+    }
+  }
+
+  getCurrentUser() {
+    this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
+      // console.log(user);
+      if (user) {
+        this.currentUserId = user.uid;
+        // console.log('getCurrentUser', this.currentUserId);
+      }
+    });
+  }
+
+  loadChannel() {
+    if (!this.channelId) {
+      console.log(this.channelId);
+      this.loadFirstChannel();
+      // this.loadFirstChatWithAnswers();
+    } else {
+      this.loadChatById(this.channelId);
+    }
+  }
+
+  private async loadFirstChannel() {
+    this.channelService.getChannels().pipe(take(1)).subscribe(async channels => {
+      if (channels.length > 0) {
+        const firstChannel = channels[0];
+        // this.channelId = firstChannel.id;
+        this.channelName$ = of(firstChannel.name);
+        // const channelName = await firstValueFrom(this.channelName$);
+        // console.log('Channel Name:', channelName);
+        // this.participants$ = this.userService.getUsersByIds(firstChannel.participants);
+        // this.subscribeToParticipants();
+        // this.subscribeToChatsAndUsers(this.channelId, this.participants$);
+      // } else {
+      }
+    });
+  }
+
+  async loadChatById(channelId: string) {
+    this.channelService.getChannelById(channelId).pipe(take(1)).subscribe(async channel => {
+      if (!channel) return;
+
+      this.channelId = channelId;
+      this.channelName$ = of(channel.name);
+      // const channelName = await firstValueFrom(this.channelName$);
+      // console.log('Channel Name:', channelName);
+      // this.participants$ = this.userService.getUsersByIds(channel.participants);
+      // this.subscribeToParticipants();
+      // this.subscribeToChatsAndUsers(channelId, this.participants$);
+    });
+  }
+
+  getChatsForChannel() {
+    // Der aktuelle Chat wird einmalig angereichert (wie im Haupt-Chat)
+    this.chat$ = combineLatest([
+      this.channelService.getChatsForChannel(this.channelId),
+      of(this.participants)
+    ]).pipe(
+      map(([chats]) => chats.find(c => c.id === this.chatId)),
+      switchMap(chat => {
+        if (!chat) return of(undefined);
+        return forkJoin({
+          reactions: this.channelService.getReactionsForChat(this.channelId, chat.id).pipe(take(1)),
+          user: of(this.participants.find(u => u.uid === chat.user)),
+        }).pipe(
+          map(({ reactions, user }) => ({
+            ...chat,
+            userName: user?.name,
+            userImg: user?.img,
+            reactions,
+            reactionArray: this.transformReactionsToArray(reactions, this.participants, this.currentUserId)
+          }))
+        );
+      })
+    );
+  }
+
+  getAnswersForChat() {
+    // Answers aus der Subcollection
+    this.answers$ = this.channelService.getAnswersForChat(this.channelId, this.chatId).pipe(
+      switchMap(answers =>
+        this.userService.getUsersByIds(answers.map((a: any) => a.user)).pipe(
+          switchMap(users => {
+            const answerDetails$ = answers.map(answer =>
+              forkJoin({
+                reactions: this.channelService.getReactionsForAnswer(this.channelId, this.chatId, answer.id).pipe(take(1)),
+                user: of(users.find(u => u.uid === answer.user)),
+              }).pipe(
+                map(({ reactions, user }) => ({
+                  ...answer,
+                  userName: user?.name,
+                  userImg: user?.img,
+                  reactions,
+                  reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
+                }))
+              )
+            );
+            return forkJoin(answerDetails$);
+          })
+        )
+      )
+    );
+  }
+
+  openReactionsDialogue(chatIndex: number) {
+    if (this.activeReactionDialogueIndex === chatIndex) {
+      this.activeReactionDialogueIndex = null; // schließe, wenn bereits offen
+    } else {
+      this.editCommentDialogueExpanded = false;
+      this.activeReactionDialogueIndex = chatIndex; // öffne aktuellen
+    }
+  }
+
+  openReactionsDialogueBelow(chatIndex: number) {
+    if (this.activeReactionDialogueBelowIndex === chatIndex) {
+      this.activeReactionDialogueBelowIndex = null; // schließe, wenn bereits offen
+    } else {
+      this.editCommentDialogueExpanded = false;
+      this.activeReactionDialogueBelowIndex = chatIndex; // öffne aktuellen
+    }
+  }
+
+  transformReactionsToArray(
+    reactionsMap: Record<string, string[]>,
+    participants: User[],
+    currentUserId: string
+  ): {
+    type: string,
+    count: number,
+    userIds: string[],
+    currentUserReacted: boolean,
+    otherUserName?: string,
+    otherUserReacted: boolean
+  }[] {
+    if (!reactionsMap) return [];
+    // console.log('transformToArray', reactionsMap, data);
+    return Object.entries(reactionsMap).map(([type, usersRaw]) =>
+      this.buildReactionObject(type, usersRaw, participants, currentUserId)
+    );
+  }
+
+  private buildReactionObject(
+    type: string,
+    usersRaw: string[],
+    participants: User[],
+    currentUserId: string
+  ): {
+    type: string,
+    count: number,
+    userIds: string[],
+    currentUserReacted: boolean,
+    otherUserName?: string,
+    otherUserReacted: boolean
+  } {
+    const userIds = this.parseUserIds(usersRaw);
+    const currentUserReacted = userIds.includes(currentUserId);
+    const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
+    const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
+
+    return {
+      type,
+      count: userIds.length,
+      userIds,
+      currentUserReacted,
+      otherUserName,
+      otherUserReacted
+    };
+  }
+
+  private parseUserIds(users: string[]): string[] {
+    return users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
+  }
+
+  private findOtherUserName(userIds: string[], currentUserId: string, participants: User[]): string | undefined {
+    const others = userIds.filter(id => id !== currentUserId);
+    if (others.length === 0) return undefined;
+    return participants.find(u => u.uid === others[0])?.name || 'Unbekannt';
+  }
+
+  private async saveOrDeleteReaction(channelId: string, chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
+    if (updatedUsers.length === 0) {
+      await this.channelService.deleteReactionForChat(channelId, chatId, reactionType);
+    } else {
+      await this.channelService.updateReactionForChat(channelId, chatId, reactionType, updatedUsers);
+    }
+  }
+
+  private async updateReactionForChat(chatIndex: number, reactionType: string, updatedUsers: string[]): Promise<void> {
+    // Hier hole den aktuellen State vom BehaviorSubject (nicht von channelChats)
+    const chats = this.chatsSubject.getValue();
+    const chat = chats[chatIndex];
+    if (!chat) return;
+
+    const channelId = this.channelId;
+    const chatId = chat.id;
+    const currentUserId = this.currentUserId;
+    if (!channelId || !chatId || !currentUserId) return;
+
+    try {
+      await this.saveOrDeleteReaction(channelId, chatId, reactionType, updatedUsers);
+      this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
+    } catch (error) {
+      console.error('Fehler beim Aktualisieren der Reaction:', error);
+    }
+  }
+
+  private updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[], chatIndex: number) {
+    chat.reactions = { ...chat.reactions };
+    if (updatedUsers.length === 0) {
+      delete chat.reactions[reactionType];
+    } else {
+      chat.reactions[reactionType] = updatedUsers;
+    }
+    chat.reactionArray = this.transformReactionsToArray(chat.reactions, this.participants, this.currentUserId);
+
+    // Aktualisiere den BehaviorSubject State mit neuem Chat Objekt
+    const chats = this.chatsSubject.getValue();
+    const newChats = [...chats];
+    newChats[chatIndex] = chat;  // Ersetze den Chat an Index
+    this.chatsSubject.next(newChats); 
+  }
+
+  async addReaction(chatIndex: number, reactionType: string) {
+    const chats = this.chatsSubject.getValue();
+    const chat = chats[chatIndex];
+    if (!chat) return;
+
+    this.activeReactionDialogueIndex = null;
+    const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
+    if (!currentReactionUsers.includes(this.currentUserId)) {
+      const updatedUsers = [...currentReactionUsers, this.currentUserId];
+      await this.updateReactionForChat(chatIndex, reactionType, updatedUsers);
+    }
+  }
+
+  async toggleReaction(chatIndex: number, reactionType: string) {
+    const chat = await this.getChatByIndex(chatIndex);
+    if (!chat) return;
+
+    const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
+    let updatedUsers: string[];
+    if (currentReactionUsers.includes(this.currentUserId)) {
+      updatedUsers = currentReactionUsers.filter(uid => uid !== this.currentUserId);
+    } else {
+      updatedUsers = [...currentReactionUsers, this.currentUserId];
+    }
+
+    await this.updateReactionForChat(chatIndex, reactionType, updatedUsers);
+  }
+
+  private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
+    const usersRaw = reactions[reactionType] || [];
+    return usersRaw.flatMap((u: string) =>
+      u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
+    );
+  }
+
+  // Hilfsmethode, um den Chat aus Observable oder Cache zu erhalten
+  private async getChatByIndex(chatIndex: number): Promise<any> {
+    if (this.channelChats && this.channelChats.length > chatIndex) {
+      return this.channelChats[chatIndex];
+    }
+    // Alternativ Chats aus Observable abrufen, dann Wert zurückgeben
+    return new Promise(resolve => {
+      this.chats$.pipe(take(1)).subscribe((chats: any) => resolve(chats[chatIndex]));
+    })
+  }
 
   handleCloseThread() {
     this.closeThread.emit();

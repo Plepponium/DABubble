@@ -27,6 +27,7 @@ export class MainPageComponent {
   userChatOpen = false;
   currentChannelId?: string;
   activeUserId?: string;
+  threadChatId?: string;
 
   get isDmOpen(): boolean {
     return this.userChatOpen && !!this.activeUserId;
@@ -62,4 +63,12 @@ export class MainPageComponent {
     this.threadOpen = false;
   }
 
+  openThread(event: {channelId: string; chatId: string}) {
+    this.threadChatId = event.chatId;
+    this.currentChannelId = event.channelId;
+    this.threadOpen = true;
+    console.log('main openThread event: ', event);
+    // this.channelOpen = true;
+    // this.userChatOpen = false; // optional, falls DM Chats geschlossen werden sollen
+  }
 }

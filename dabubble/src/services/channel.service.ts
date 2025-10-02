@@ -70,6 +70,11 @@ export class ChannelService {
     return collectionData(answersCollection, { idField: 'id' }) as Observable<any[]>;
   }
 
+  getReactionsForAnswer(channelId: string, chatId: string, answerId: string): Observable<any> {
+    const collectionRef = collection(this.firestore, `channels/${channelId}/chats/${chatId}/answers/${answerId}/reactions`);
+    return collectionData(collectionRef, { idField: 'reactionId' }); // Structure analog zu Chat-Reactions
+  }
+
   addChatToChannel(channelId: string, chat: any): Promise<any> {
     const chatsCollection = collection(this.firestore, `channels/${channelId}/chats`);
     return addDoc(chatsCollection, chat);

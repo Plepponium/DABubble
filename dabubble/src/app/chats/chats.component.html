@@ -117,11 +117,12 @@
                         </div>
                         <div class="chat-message"
                             [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 'right': chat.user === currentUserId}">
-                            {{ chat.message }}</div>
+                            {{ chat.message }}
+                        </div>
                         <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}">
                             <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0">
 
-                                <div (click)="handleOpenThread()" class="answer t-purple">{{ chat.answersCount }} Antworten</div>
+                                <div (click)="handleOpenThread(chat.id)" class="answer t-purple">{{ chat.answersCount }} Antworten</div>
                                 <div class="last-answer font-14 t-gray">Letzte Antwort {{ chat.lastAnswerTime ? (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}</div>
                             </div>
                             <div class="reactions">
@@ -170,14 +171,6 @@
 
                                         <!-- <pre>{{ reaction | json }}</pre> -->
                                     </div>
-                                    <!-- <div class="reaction-btn">
-                                        <img src="assets/reaction-icons/check.svg" alt="">
-                                        <div>2</div>
-                                    </div>
-                                    <div class="reaction-btn">
-                                        <img src="assets/reaction-icons/thumb.svg" alt="">
-                                        <div>1</div>
-                                    </div> -->
                                 </div>
 
                                 <div class="reactions-display-container-below">
@@ -199,7 +192,6 @@
                 </div>
             </div>
             <!-- <pre>{{ channelChats | json }}</pre> -->
-
         </div>
 
         <form class="form" (ngSubmit)="submitChatMessage()" #chatForm="ngForm">

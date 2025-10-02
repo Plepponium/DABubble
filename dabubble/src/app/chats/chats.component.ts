@@ -36,7 +36,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   editCommentDialogueExpanded = false;
   activeReactionDialogueIndex: number | null = null;
   activeReactionDialogueBelowIndex: number | null = null;
-  channelName = '';
+  
   participantIds: string[] = [];
   participants: User[] = [];
   channelChats: any[] = [];
@@ -56,7 +56,9 @@ export class ChatsComponent implements OnInit, OnChanges {
   userService = inject(UserService);
 
   @Input() channelId?: string;
-  @Output() openThread = new EventEmitter<void>();
+  // @Output() openThread = new EventEmitter<void>();
+  // @Output() openThread = new EventEmitter<{chatId: string}>();
+  @Output() openThread = new EventEmitter<{channelId: string; chatId: string}>();
   // @ViewChild('chatHistory') chatHistory!: ElementRef<HTMLDivElement>;
 
   ngOnInit() {
@@ -434,7 +436,12 @@ export class ChatsComponent implements OnInit, OnChanges {
       });
   }
 
-  handleOpenThread() {
-    this.openThread.emit();
+  // handleOpenThread(chatId: string) {
+  //   this.openThread.emit({ chatId }); // im ngFor: (click)="handleOpenThread(chat.id)"
+  // }
+  handleOpenThread(chatId: string) {
+    // console.log('channelId', this.channelId);
+    if (!this.channelId) return;
+    this.openThread.emit({ channelId: this.channelId, chatId });
   }
 }

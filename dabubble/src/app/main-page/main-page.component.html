@@ -29,8 +29,9 @@
 
         <div class="content" [class.fullwidth]="!menuOpen" [class.dm-open]="isDmOpen">
             <app-chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId"
-                (openThread)="threadOpen = true"></app-chats>
-            <app-thread id="thread" class="thread" *ngIf="channelOpen" [hidden]="!threadOpen"
+                (openThread)="openThread($event)"></app-chats>
+            <app-thread id="thread" class="thread" *ngIf="threadOpen && currentChannelId && threadChatId" 
+                [chatId]="threadChatId" [channelId]="currentChannelId" [hidden]="!threadOpen"
                 (closeThread)="threadOpen = false"></app-thread>
             <app-direct-message-chats *ngIf="userChatOpen && activeUserId"
                 [userId]="activeUserId"></app-direct-message-chats>
