@@ -185,7 +185,7 @@ export class DirectMessageChatsComponent {
     if (!event?.messageId || !this.currentUser || !this.dmId) return;
 
     try {
-      await this.dmService.reactToMessage(this.dmId, event.messageId, event.icon, this.currentUser.uid);
+      await this.dmService.addReactionToMessage(this.dmId, event.messageId, event.icon, this.currentUser.uid);
     } catch (err) {
       console.error('Fehler beim Hinzufügen der Reaktion:', err);
     }
@@ -194,7 +194,7 @@ export class DirectMessageChatsComponent {
   async onReactionClick(message: any, type: string) {
     if (!this.dmId || !this.currentUser || !message?.id) return;
     try {
-      await this.dmService.reactToMessage(this.dmId, message.id, type, this.currentUser.uid);
+      await this.dmService.reactToMessageToggle(this.dmId, message.id, type, this.currentUser.uid);
     } catch (err) {
       console.error('Reaction Fehler:', err);
     }

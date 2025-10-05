@@ -58,7 +58,7 @@ export class DirectMessageService {
         return updateDoc(msgRef as any, { [`reactions.${type}`]: arrayRemove(userId) });
     }
 
-    async reactToMessage(dmId: string, messageId: string, type: string, userId: string) {
+    async reactToMessageToggle(dmId: string, messageId: string, type: string, userId: string) {
         const msgRef = doc(this.firestore, `dmChats/${dmId}/messages/${messageId}`);
         const snap = await getDoc(msgRef as any);
         if (!snap.exists()) return;
