@@ -15,101 +15,102 @@
     <div class="dm-chat-container">
 
         <ng-container *ngIf="messages$ | async as messages; else loading">
-            <div *ngIf="messages.length === 0; else chatContent" class="empty-conversation">
-                <div class="recipient">
-                    <img class="recipient-img" [src]="'assets/user-icons/' + (u.img || 'default-user') + '.svg'" />
-                    <span class="font-w-700 font-24">
-                        {{ u.name }} <span *ngIf="isSelf()">(Du)</span>
+            <ng-container *ngIf="users$ | async as users">
+                <div *ngIf="messages.length === 0; else chatContent" class="empty-conversation">
+                    <div class="recipient">
+                        <img class="recipient-img" [src]="'assets/user-icons/' + (u.img || 'default-user') + '.svg'" />
+                        <span class="font-w-700 font-24">
+                            {{ u.name }} <span *ngIf="isSelf()">(Du)</span>
+                        </span>
+                    </div>
+
+                    <span class="t-gray" *ngIf="!isSelf()">
+                        Diese Unterhaltung findet nur zwischen
+                        <span class="t-purple at-name">&#64;{{ u.name }}</span>
+                        und dir statt.
+                    </span>
+
+                    <span class="t-gray" *ngIf="isSelf()">
+                        <span class="font-w-700">Dieser Raum ist nur für dich da.</span>
+                        Mache dir Notizen, liste deine To-dos auf oder bewahre Links und Dateien griffbereit auf.
+                        Du kannst hier auch gerne Dinge mit dir selbst besprechen.
                     </span>
                 </div>
 
-                <span class="t-gray" *ngIf="!isSelf()">
-                    Diese Unterhaltung findet nur zwischen
-                    <span class="t-purple at-name">&#64;{{ u.name }}</span>
-                    und dir statt.
-                </span>
-
-                <span class="t-gray" *ngIf="isSelf()">
-                    <span class="font-w-700">Dieser Raum ist nur für dich da.</span>
-                    Mache dir Notizen, liste deine To-dos auf oder bewahre Links und Dateien griffbereit auf.
-                    Du kannst hier auch gerne Dinge mit dir selbst besprechen.
-                </span>
-            </div>
-
-            <ng-template #chatContent>
-                <div class="chat-content" id="dm-chat-content">
-                    <div class="chat-history">
-                        <div *ngFor="let m of messages; let i = index" class="chat-day-section">
-                            <div *ngIf="i === 0 || !isSameDate(m.sentAt?.toDate(), messages[i-1]?.sentAt?.toDate())"
-                                class="chat-date-section">
-                                <div class="line"></div>
-                                <div class="chat-date">
-                                    {{ getDisplayDate(m.sentAt?.toDate()) }}
-                                </div>
-                                <div class="line"></div>
-                            </div>
-                            <div class="chat-message-row" [class.me]="m.senderId === currentUser?.uid">
-                                <img class="chat-user-img"
-                                    [src]="'assets/user-icons/' + (m.senderImg || 'default-user') + '.svg'" />
-                                <div class="chat-bubble">
-                                    <div class="chat-meta">
-                                        <span class="sender-name font-w-700 font-18">{{ m.senderName }} </span>
-                                        <span class="time t-gray font-14">
-                                            {{ m.sentAt?.toDate ? (m.sentAt.toDate() | date:'HH:mm') : '' }} Uhr
-                                        </span>
+                <ng-template #chatContent>
+                    <div class="chat-content" id="dm-chat-content">
+                        <div class="chat-history">
+                            <div *ngFor="let m of messages; let i = index" class="chat-day-section">
+                                <div *ngIf="i === 0 || !isSameDate(m.sentAt?.toDate(), messages[i-1]?.sentAt?.toDate())"
+                                    class="chat-date-section">
+                                    <div class="line"></div>
+                                    <div class="chat-date">
+                                        {{ getDisplayDate(m.sentAt?.toDate()) }}
                                     </div>
-                                    <div class="chat-text font-18">{{ m.text }}</div>
+                                    <div class="line"></div>
+                                </div>
+
+                                <div class="chat-message-row" [class.me]="m.senderId === currentUser?.uid">
+                                    <img class="chat-user-img"
+                                        [src]="'assets/user-icons/' + (m.senderImg || 'default-user') + '.svg'" />
+                                    <div class="chat-bubble">
+                                        <div class="chat-meta">
+                                            <span class="sender-name font-w-700 font-18">{{ m.senderName }} </span>
+                                            <span class="time t-gray font-14">
+                                                {{ m.sentAt?.toDate ? (m.sentAt.toDate() | date:'HH:mm') : '' }} Uhr
+                                            </span>
+                                        </div>
+                                        <div class="chat-text font-18">{{ m.text }}</div>
 
 
-                                    <div class="reactions">
-                                        <div class="reaction-btns">
-                                            <div class="reaction-btn">
-                                                <img src="assets/reaction-icons/check.svg">
-                                                <span>1</span>
+                                        <div class="reactions">
+                                            <div class="reaction-btns">
+                                                <ng-container *ngFor="let icon of reactionIcons">
+                                                    <div class="reaction-btn"
+                                                        *ngIf="m.reactions && m.reactions[icon]?.length > 0"
+                                                        (click)="onReactionClick(m, icon)">
+                                                        <img [src]="'assets/reaction-icons/' + icon + '.svg'"
+                                                            alt="reaction icon" />
+                                                        <span>{{ m.reactions[icon].length }}</span>
 
-
-                                                <div class="r-btn-hover-display">
-                                                    <div class="r-btn-hover-display-content">
-                                                        <img src="assets/reaction-icons/check.svg" alt="reaction">
-                                                        <div class="reaction-btn-t-box no-wrap">
-                                                            <div class="font-w-700">Username und Du</div>
-                                                            <span>haben reagiert</span>
+                                                        <div class="r-btn-hover-display">
+                                                            <div class="r-btn-hover-display-content">
+                                                                <img [src]="'assets/reaction-icons/' + icon + '.svg'"
+                                                                    alt="reaction" />
+                                                                <div class="reaction-btn-t-box">
+                                                                    <div class="font-w-700">{{
+                                                                        getReactionHoverText(m.reactions[icon]) }}</div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </ng-container>
                                             </div>
 
-
-                                            <div class="reaction-btn">
-                                                <img src="assets/reaction-icons/rocket.svg">
-                                                <span>2</span>
-                                            </div>
-                                            <div class="reaction-btn">
-                                                <img src="assets/reaction-icons/thumb.svg">
-                                                <span>3</span>
-                                            </div>
+                                            <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
+                                                iconHoverSrc="assets/message-icons/add_reaction-purple.svg">
+                                            </app-round-btn>
                                         </div>
-                                        <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
-                                            iconHoverSrc="assets/message-icons/add_reaction-purple.svg">
-                                        </app-round-btn>
+
+
+
                                     </div>
 
+                                    <app-dm-reactions-dialog class="dm-reactions-dialog" *ngIf="m.id"
+                                        [class.reverse]="m.senderId === currentUser?.uid" [messageId]="m.id"
+                                        [isOwnMessage]="m.senderId === currentUser?.uid" [index]="i"
+                                        [reactionIcons]="reactionIcons" (addReactionEvent)="addReaction($event)"
+                                        (openReactionsEvent)="openReactionsDialogue($event)"
+                                        (editMessageEvent)="openEditComment($event)">
+                                    </app-dm-reactions-dialog>
 
                                 </div>
-                                <app-dm-reactions-dialog class="dm-reactions-dialog"
-                                    [class.reverse]="m.senderId === currentUser?.uid" [messageId]="m.id"
-                                    [isOwnMessage]="m.senderId === currentUser?.uid" [index]="i"
-                                    [reactionIcons]="reactionIcons"
-                                    (addReactionEvent)="addReaction($event.index, $event.icon)"
-                                    (openReactionsEvent)="openReactionsDialogue($event)"
-                                    (editMessageEvent)="openEditComment($event)">
-                                </app-dm-reactions-dialog>
                             </div>
                         </div>
                     </div>
-                </div>
-            </ng-template>
+                </ng-template>
 
+            </ng-container>
         </ng-container>
 
         <div class="form-field-wrapper">

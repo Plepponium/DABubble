@@ -14,13 +14,15 @@ export class DmReactionsDialogComponent {
   @Input() index!: number;
   @Input() reactionIcons: string[] = [];   // Standard-Reactions
 
-  @Output() addReactionEvent = new EventEmitter<{ index: number, icon: string }>();
+  @Output() addReactionEvent = new EventEmitter<{ messageId: string, icon: string }>();
+
   @Output() openReactionsEvent = new EventEmitter<number>();
   @Output() editMessageEvent = new EventEmitter<string>();
 
   addReaction(icon: string) {
-    this.addReactionEvent.emit({ index: this.index, icon });
+    this.addReactionEvent.emit({ messageId: this.messageId, icon });
   }
+
 
   openReactions() {
     this.openReactionsEvent.emit(this.index);

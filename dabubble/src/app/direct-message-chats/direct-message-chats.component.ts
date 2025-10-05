@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable, of, combineLatest, firstValueFrom } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { DmReactionsDialogComponent } from '../dm-reactions-dialog/dm-reactions-dialog.component';
 import { User } from '../../models/user.class';
 import { UserService } from '../../services/user.service';
 import { DirectMessageService } from '../../services/direct-messages.service';
+import { reactionIcons } from '../reaction-icons';
 
 @Component({
   selector: 'app-direct-message-chats',
@@ -27,59 +27,102 @@ export class DirectMessageChatsComponent {
   messages$?: Observable<any[]>;
   users$?: Observable<Record<string, User>>;
   messageText = '';
+  latestMessages: any[] = [];
+
 
   private userService = inject(UserService);
   private dmService = inject(DirectMessageService);
 
-  reactionIcons: string[] = ['check', 'thumb'];
+  reactionIcons: string[] = reactionIcons;
+
+  private firstLoad = true;
+  private lastMessageCount = 0;
 
   async ngOnChanges(changes: SimpleChanges) {
     if (changes['userId'] && this.userId) {
-      this.currentUser = await firstValueFrom(this.userService.getCurrentUser());
-      if (!this.currentUser) {
-        this.messages$ = of([]);
-        return;
-      }
-
-      // andere Person laden
-      this.userService.getSingleUserById(this.userId).subscribe(u => this.otherUser = u);
-
-      // DM-ID holen oder erstellen
-      this.dmId = await this.dmService.getOrCreateDmId(this.currentUser.uid, this.userId);
-
-      // Nachrichten-Stream
-      const rawMessages$ = this.dmService.getMessages(this.dmId);
-
-      // Teilnehmer-Map laden (beide User)
-      this.users$ = this.userService.getUsersByIds([this.currentUser.uid, this.userId]).pipe(
-        map(users =>
-          users.reduce((map, u) => {
-            map[u.uid] = u;
-            return map;
-          }, {} as Record<string, User>)
-        ),
-        shareReplay(1)
-      );
-
-      // Nachrichten mit User-Daten anreichern
-      this.messages$ = combineLatest([rawMessages$, this.users$]).pipe(
-        map(([messages, users]) =>
-          messages.map(m => ({
-            ...m,
-            senderName: users[m.senderId]?.name || 'Unbekannt',
-            senderImg: users[m.senderId]?.img || 'default-user'
-          }))
-        )
-      );
-
-      // Auto-Scroll
-      this.messages$.subscribe(() => {
-        setTimeout(() => this.scrollToBottom(), 0);
-      });
-
-      this.focusMessageInput();
+      await this.initializeChat();
     }
   }
+
+  private async initializeChat() {
+    this.currentUser = await this.fetchCurrentUser();
+    if (!this.currentUser) return this.clearMessages();
+
+    this.subscribeToOtherUser();
+    await this.initializeDmId();
+    this.setupUsersObservable();
+    this.setupMessagesObservable();
+    this.focusMessageInput();
+  }
+
+  private async fetchCurrentUser(): Promise<User | undefined> {
+    return firstValueFrom(this.userService.getCurrentUser());
+  }
+
+  private clearMessages() {
+    this.messages$ = of([]);
+  }
+
+  private subscribeToOtherUser() {
+    this.userService.getSingleUserById(this.userId).subscribe(u => this.otherUser = u);
+  }
+
+  private async initializeDmId() {
+    this.dmId = await this.dmService.getOrCreateDmId(this.currentUser!.uid, this.userId);
+  }
+
+  private setupUsersObservable() {
+    this.users$ = this.userService.getUsersByIds([this.currentUser!.uid, this.userId]).pipe(
+      map(users =>
+        users.reduce((map, u) => {
+          map[u.uid] = u;
+          return map;
+        }, {} as Record<string, User>)
+      ),
+      shareReplay(1)
+    );
+  }
+
+  private setupMessagesObservable() {
+    if (!this.dmId || !this.users$) return;
+    const rawMessages$ = this.dmService.getMessages(this.dmId);
+    this.messages$ = combineLatest([rawMessages$, this.users$]).pipe(
+      map(([messages, users]) => this.enrichMessages(messages, users))
+    );
+    this.subscribeToMessages();
+  }
+
+
+  private enrichMessages(messages: any[], users: Record<string, User>): any[] {
+    return messages.map(m => ({
+      ...m,
+      senderName: users[m.senderId]?.name || 'Unbekannt',
+      senderImg: users[m.senderId]?.img || 'default-user',
+      reactions: m.reactions || {}
+    }));
+  }
+
+  private subscribeToMessages() {
+    if (!this.messages$) return;
+    this.messages$.subscribe(msgs => this.handleNewMessages(msgs));
+  }
+
+
+  private handleNewMessages(msgs: any[]) {
+    if (!msgs) return;
+    const newMessageCount = msgs.length;
+    const isNewMessage = newMessageCount > this.lastMessageCount;
+
+    this.latestMessages = msgs;
+    this.lastMessageCount = newMessageCount;
+
+    if (this.firstLoad || isNewMessage) {
+      setTimeout(() => this.scrollToBottom(), 0);
+      this.firstLoad = false;
+    }
+  }
+
+
 
   private scrollToBottom() {
     const container = document.getElementById("dm-chat-content");
@@ -138,8 +181,42 @@ export class DirectMessageChatsComponent {
     this.scrollToBottom();
   }
 
-  addReaction(index: number, icon: string) {
-    console.log("Index: ", index, "Icon: ", icon);
+  async addReaction(event: { messageId: string; icon: string }) {
+    if (!event?.messageId || !this.currentUser || !this.dmId) return;
+
+    try {
+      await this.dmService.reactToMessage(this.dmId, event.messageId, event.icon, this.currentUser.uid);
+    } catch (err) {
+      console.error('Fehler beim Hinzufügen der Reaktion:', err);
+    }
+  }
+
+  async onReactionClick(message: any, type: string) {
+    if (!this.dmId || !this.currentUser || !message?.id) return;
+    try {
+      await this.dmService.reactToMessage(this.dmId, message.id, type, this.currentUser.uid);
+    } catch (err) {
+      console.error('Reaction Fehler:', err);
+    }
+  }
+
+  getReactionHoverText(userIds: string[]): string {
+    if (!userIds || userIds.length === 0) return '';
+
+    const currentUid = this.currentUser?.uid;
+    const otherUser = this.otherUser;
+    const currentUserReacted = userIds.includes(currentUid || '');
+    const otherUserReacted = userIds.includes(otherUser?.uid || '');
+    if (currentUserReacted && !otherUserReacted) {
+      return 'Du hast reagiert';
+    }
+    if (!currentUserReacted && otherUserReacted) {
+      return `${otherUser?.name || 'Unbekannt'} hat reagiert`;
+    }
+    if (currentUserReacted && otherUserReacted) {
+      return `${otherUser?.name || 'Unbekant'} und Du haben reagiert`;
+    }
+    return '';
   }
 
   openReactionsDialogue(index: number) {
@@ -149,4 +226,6 @@ export class DirectMessageChatsComponent {
   openEditComment(id: string) {
     console.log("Id: ", id);
   }
+
+
 }
