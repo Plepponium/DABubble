@@ -10,23 +10,22 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 export class DmReactionsDialogComponent {
   @Input() messageId!: string;
   @Input() isOwnMessage = false;
-  @Input() activeReactionDialogueIndex!: number | null;
   @Input() index!: number;
-  @Input() reactionIcons: string[] = [];   // Standard-Reactions
+  @Input() reactionIcons: string[] = [];
+  @Input() isOpen = false;
 
-  @Output() addReactionEvent = new EventEmitter<{ messageId: string, icon: string }>();
-
-  @Output() openReactionsEvent = new EventEmitter<number>();
+  @Output() addReactionEvent = new EventEmitter<{ icon: string; messageId: string }>();
+  @Output() toggleReactionsEvent = new EventEmitter<string>();
   @Output() editMessageEvent = new EventEmitter<string>();
 
   addReaction(icon: string) {
-    this.addReactionEvent.emit({ messageId: this.messageId, icon });
+    this.addReactionEvent.emit({ icon, messageId: this.messageId });
   }
 
-
-  openReactions() {
-    this.openReactionsEvent.emit(this.index);
+  toggleReactions() {
+    this.toggleReactionsEvent.emit(this.messageId);
   }
+
 
   editMessage() {
     this.editMessageEvent.emit(this.messageId);

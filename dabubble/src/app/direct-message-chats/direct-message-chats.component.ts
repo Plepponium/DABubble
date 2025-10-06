@@ -19,21 +19,19 @@ import { reactionIcons } from '../reaction-icons';
 export class DirectMessageChatsComponent {
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
   @Input() userId!: string;
+  private userService = inject(UserService);
+  private dmService = inject(DirectMessageService);
 
   dmId?: string;
   currentUser?: User;
   otherUser?: User;
-
   messages$?: Observable<any[]>;
   users$?: Observable<Record<string, User>>;
   messageText = '';
   latestMessages: any[] = [];
-
-
-  private userService = inject(UserService);
-  private dmService = inject(DirectMessageService);
-
   reactionIcons: string[] = reactionIcons;
+  activeIconDialogMessageId: string | null = null;
+
 
   private firstLoad = true;
   private lastMessageCount = 0;
@@ -219,9 +217,18 @@ export class DirectMessageChatsComponent {
     return '';
   }
 
-  openReactionsDialogue(index: number) {
-    console.log("Index: ", index);
+  toggleReactionDialog(messageId: string) {
+    if (this.activeIconDialogMessageId === messageId) {
+      this.activeIconDialogMessageId = null;
+    } else {
+      this.activeIconDialogMessageId = messageId;
+    }
   }
+
+
+  // openIconDialogFromRoundBtn(messageId: string) {
+  //   this.openReactionsDialogue(messageId);
+  // }
 
   openEditComment(id: string) {
     console.log("Id: ", id);

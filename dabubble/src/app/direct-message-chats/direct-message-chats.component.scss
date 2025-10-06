@@ -193,7 +193,7 @@
       position: relative;
       transition: background-color 125ms ease-in-out;
 
-      .dm-reactions-dialog {
+      .dm-reactions-dialog-hover {
         display: none;
         position: absolute;
         top: -20px;
@@ -214,7 +214,7 @@
           }
         }
 
-        .dm-reactions-dialog {
+        .dm-reactions-dialog-hover {
           display: block;
         }
       }

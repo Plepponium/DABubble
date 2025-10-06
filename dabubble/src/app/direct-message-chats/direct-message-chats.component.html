@@ -91,19 +91,16 @@
                                                 iconHoverSrc="assets/message-icons/add_reaction-purple.svg">
                                             </app-round-btn>
                                         </div>
-
-
-
                                     </div>
 
-                                    <app-dm-reactions-dialog class="dm-reactions-dialog" *ngIf="m.id"
+                                    <app-dm-reactions-dialog class="dm-reactions-dialog-hover" *ngIf="m.id"
                                         [class.reverse]="m.senderId === currentUser?.uid" [messageId]="m.id"
-                                        [isOwnMessage]="m.senderId === currentUser?.uid" [index]="i"
-                                        [reactionIcons]="reactionIcons" (addReactionEvent)="addReaction($event)"
-                                        (openReactionsEvent)="openReactionsDialogue($event)"
+                                        [isOwnMessage]="m.senderId === currentUser?.uid"
+                                        [isOpen]="activeIconDialogMessageId === m.id" [reactionIcons]="reactionIcons"
+                                        (addReactionEvent)="addReaction($event)"
+                                        (toggleReactionsEvent)="toggleReactionDialog($event)"
                                         (editMessageEvent)="openEditComment($event)">
                                     </app-dm-reactions-dialog>
-
                                 </div>
                             </div>
                         </div>

@@ -1,5 +1,4 @@
 <div class="dm-reactions-dialog">
-
     <button (click)="addReaction('check')" class="add-reaction-btn">
         <img src="assets/reaction-icons/check.svg" alt="check" />
     </button>
@@ -9,17 +8,15 @@
     </button>
 
     <div class="reactions-display-container">
-        <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === index">
-            <div *ngFor="let icon of reactionIcons" class="reactions-container">
-                <button (click)="addReaction(icon)" class="add-reaction-btn">
-                    <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon" />
-                </button>
-            </div>
-        </div>
-        <button (click)="openReactions()" class="add-reaction-btn">
+        <button (click)="toggleReactions()" class="add-reaction-btn">
             <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="+" />
             <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg" alt="+" />
         </button>
+        <div class="reaction-icons-dialog" *ngIf="isOpen" [class.me]="isOwnMessage">
+            <button *ngFor="let icon of reactionIcons" (click)="addReaction(icon)" class="add-reaction-btn">
+                <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon" />
+            </button>
+        </div>
     </div>
 
     <div class="edit-message-container" *ngIf="isOwnMessage">
