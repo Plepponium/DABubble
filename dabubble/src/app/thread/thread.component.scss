@@ -152,6 +152,16 @@
     .add-reaction-btn.reverse {
         display: flex;
     }
+    .add-reaction-dialogue {
+        // position: absolute;
+        // top: 20px;
+        left: 28px;
+        // background-color: #ffffff;
+        border-top-left-radius: unset;
+        border-top-right-radius: 30px;
+        border-bottom-left-radius: 30px;
+        border-bottom-right-radius: 30px;
+    }
     .edit-comment-dialogue {
         display: flex;
     }
@@ -187,6 +197,19 @@
 //     cursor: pointer;
 // }
 
+
+// .add-reaction-btn {
+//     width: 36px !important;
+//     height: 34px;
+//     box-sizing: border-box;
+// }
+
+// .add-reaction {
+//     width: 24px;
+//     height: 24px;
+//     cursor: pointer;
+// }
+
 .reactions-display-container, .reactions-display-container-below {
     position: relative;
 }
@@ -214,7 +237,7 @@
     top: unset;
     bottom: 20px;
     border-top-right-radius: 30px;
-    border-bottom-right-radius: 0px;
+    border-bottom-right-radius: unset;
 }
 
 .edit-comment-container {
@@ -335,16 +358,46 @@
     }
 }
 
-// .add-reaction-btn {
-//     width: 36px !important;
-//     height: 34px;
-//     box-sizing: border-box;
-// }
+.reaction-btn.reacted {
+    border-color: #797ef3;
+}
 
-.add-reaction {
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
+.r-btn-hover-display {
+    display: none;
+}
+
+.r-btn-hover-display-content {
+    min-width: 158px;
+    width: fit-content;
+    height: 112px;
+    background-color: #444df2;
+    padding: 15px 10px;
+    box-sizing: border-box;
+    position: absolute;
+    bottom: 33px;
+    left: 32px;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    color: #ffffff;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    z-index: 1;
+}
+
+.reaction-btn-t-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.no-wrap {
+    white-space: nowrap;
 }
 
 .hidden-answers-line {

@@ -41,7 +41,7 @@ export class UserService {
       return docData(userDocRef, { idField: 'uid' }).pipe(
         take(1), // wichtig für forkJoin
         map(data => {
-          if (!data) throw new Error(`Kein Nutzer gefunden mit uid ${uid}`);
+          if (!data) throw new Error(`getUsersByIds Kein Nutzer gefunden mit uid ${uid}`);
           return new User(data);
         })
       );

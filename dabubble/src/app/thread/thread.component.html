@@ -16,16 +16,31 @@
         </app-round-btn>
     </div>
 
-    <div *ngIf="(chats$ | async) as chatList"  class="chat-content">
+    <div *ngIf="(chat$ | async) as chat"  class="chat-content">
         <!-- <div class="chat-history"> -->
-            <!-- <ng-container *ngIf="chat$ | async as thisChat"> -->
-                <div *ngFor="let chat of chatList; let i = index" class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
+            <!-- <ng-container *ngIf="chat$ | async as chat"> -->
+                <div class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                     <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                         <div class="chat-dialogue" [ngClass]="{'reverse': chat.user === currentUserId}">
-                            <button (click)="openReactionsDialogue(i)" class="add-reaction-btn">
+                            <!-- <button (click)="openReactionsDialogue(chat.id)" class="add-reaction-btn">
                                 <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
                                 <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg" alt="">
-                            </button>
+                            </button> -->
+                            <div class="reactions-display-container">
+                                <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === chat.id">
+                                    <div *ngFor="let icon of reactionIcons" class="reactions-container">
+                                        <button (click)="addReaction(chat.id, icon)" class="add-reaction-btn">
+                                            <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                        </button>
+                                    </div>
+                                </div>
+                                <button (click)="openReactionsDialogue(chat.id)" class="add-reaction-btn">
+                                    <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
+                                    <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg"
+                                        alt="">
+                                </button>
+                            </div>
+
                             <div class="edit-comment-container">
                                 <div class="edit-comment-dialogue" *ngIf="editCommentDialogueExpanded">
                                     <div class="edit-comment">Nachricht bearbeiten</div>
@@ -57,7 +72,7 @@
                                 <!-- </div> -->
                                 <div class="reactions">
                                     <div class="reaction-btns">
-                                        <div (click)="toggleReaction(i, reaction.type)"
+                                        <div (click)="toggleReaction(chat.id, reaction.type)"
                                             *ngFor="let reaction of chat.reactionArray" class="reaction-btn"
                                             [ngClass]="{'reacted': reaction.currentUserReacted}">
                                             <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
@@ -104,14 +119,14 @@
                                     </div>
 
                                     <div class="reactions-display-container-below">
-                                        <div class="add-reaction-dialogue below" *ngIf="activeReactionDialogueBelowIndex === i">
+                                        <div class="add-reaction-dialogue below" *ngIf="activeReactionDialogueBelowIndex === chat.id">
                                             <div *ngFor="let icon of reactionIcons" class="reactions-container">
-                                                <button (click)="addReaction(i, icon)" class="add-reaction-btn">
+                                                <button (click)="addReaction(chat.id, icon)" class="add-reaction-btn">
                                                     <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
                                                 </button>
                                             </div>
                                         </div>
-                                        <app-round-btn (click)="openReactionsDialogueBelow(i)" iconSrc="assets/message-icons/add_reaction.svg"
+                                        <app-round-btn (click)="openReactionsDialogueBelow(chat.id)" iconSrc="assets/message-icons/add_reaction.svg"
                                             iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
                                             altText="Reaktion hinzufügen">
                                         </app-round-btn>
@@ -128,6 +143,7 @@
                         </div>
                         <div class="line"></div>
                     </div>
+                    <!-- <pre>{{ this.answers$ | json }}</pre> -->
                 </div>
             <!-- </ng-container> -->
 

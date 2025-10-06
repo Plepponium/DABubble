@@ -5,7 +5,6 @@ export interface ChatWithDetails extends Chat {
   userImg?: string;
   answersCount?: number;
   lastAnswerTime?: number;
-  message: string;
   reactions?: any;
   reactionArray?: any[];
 }

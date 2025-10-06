@@ -13,9 +13,9 @@ import { ChannelDescriptionOverlayComponent } from '../channel-description-overl
 import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.class';
+import { Chat } from '../../models/chat.class';
 import { BehaviorSubject, catchError, combineLatest, forkJoin, map, Observable, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { reactionIcons } from '../reaction-icons';
-import { Chat } from '../../models/chat.class';
 import { ChatWithDetails } from '../../models/chat-with-details.class';
 import localeDe from '@angular/common/locales/de';
 registerLocaleData(localeDe);
@@ -56,22 +56,22 @@ export class ChatsComponent implements OnInit, OnChanges {
   userService = inject(UserService);
 
   @Input() channelId?: string;
-  // @Output() openThread = new EventEmitter<void>();
-  // @Output() openThread = new EventEmitter<{chatId: string}>();
   @Output() openThread = new EventEmitter<{channelId: string; chatId: string}>();
   // @ViewChild('chatHistory') chatHistory!: ElementRef<HTMLDivElement>;
 
   ngOnInit() {
-    this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
-      if (user) {
-        this.currentUserId = user.uid;
-      }
-      if (!this.channelId) {
-        this.loadFirstChannelWithoutId();
-      } else {
-        this.loadChannelWithId(this.channelId);
-      }
-    });
+    this.getCurrentUser();
+    this.loadChannel();
+    // this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
+    //   if (user) {
+    //     this.currentUserId = user.uid;
+    //   }
+      // if (!this.channelId) {
+      //   this.loadFirstChannel();
+      // } else {
+      //   this.loadChannelWithId(this.channelId);
+      // }
+    // });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -90,7 +90,32 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  private loadFirstChannelWithoutId() {
+  getCurrentUser() {
+    this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
+      // console.log(user);
+      if (user) {
+        this.currentUserId = user.uid;
+        // console.log('getCurrentUser', this.currentUserId);
+      }
+    });
+  }
+
+  loadChannel() {
+    // if (!this.channelId) {
+    //   console.log(this.channelId);
+    //   this.loadFirstChannel();
+    //   // this.loadFirstChatWithAnswers();
+    // } else {
+    //   this.loadChatById(this.channelId);
+    // }
+    if (!this.channelId) {
+        this.loadFirstChannel();
+      } else {
+        this.loadChannelWithId(this.channelId);
+      }
+  }
+
+  private loadFirstChannel() {
     this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
       if (channels.length > 0) {
         const firstChannel = channels[0];
