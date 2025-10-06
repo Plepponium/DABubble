@@ -51,6 +51,7 @@ export class ThreadComponent implements OnInit {
   @Output() closeThread = new EventEmitter<void>();
 
   ngOnInit() {
+    console.log(this.chatId);
     this.getCurrentUser();
     this.loadChannel();
     this.getChatsForChannel();
@@ -100,7 +101,7 @@ export class ThreadComponent implements OnInit {
         // const channelName = await firstValueFrom(this.channelName$);
         // console.log('Channel Name:', channelName);
         // this.participants$ = this.userService.getUsersByIds(firstChannel.participants);
-        // this.subscribeToParticipants();
+        this.subscribeToParticipants();
         // this.subscribeToChatsAndUsers(this.channelId, this.participants$);
       // } else {
       }
@@ -116,8 +117,14 @@ export class ThreadComponent implements OnInit {
       // const channelName = await firstValueFrom(this.channelName$);
       // console.log('Channel Name:', channelName);
       // this.participants$ = this.userService.getUsersByIds(channel.participants);
-      // this.subscribeToParticipants();
+      this.subscribeToParticipants();
       // this.subscribeToChatsAndUsers(channelId, this.participants$);
+    });
+  }
+
+  subscribeToParticipants() {
+    this.participants$.subscribe(users => {
+      this.participants = users;
     });
   }
 

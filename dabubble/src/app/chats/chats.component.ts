@@ -36,13 +36,13 @@ export class ChatsComponent implements OnInit, OnChanges {
   editCommentDialogueExpanded = false;
   activeReactionDialogueIndex: number | null = null;
   activeReactionDialogueBelowIndex: number | null = null;
-  
+
+  currentUserId: string = '';
   participantIds: string[] = [];
   participants: User[] = [];
   channelChats: any[] = [];
   reactionIcons = reactionIcons;
   reactionArray: { type: string, count: number, user: string[] }[] = [];
-  currentUserId: string = '';
   newMessage: string = '';
   selectedProfileUser?: User;
 
@@ -124,7 +124,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   
   private subscribeToChatsAndUsers(channelId: string, participants$: Observable<User[]>) {
     combineLatest([
-      this.getChatsForChannel(channelId),
+      this.channelService.getChatsForChannel(channelId),
       participants$
     ]).pipe(
       switchMap(([chats, users]) => {
@@ -139,11 +139,11 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
   }
 
-  private getChatsForChannel(channelId: string): Observable<Chat[]> {
-    return this.channelService.getChatsForChannel(channelId).pipe(
-      // tap(chats => console.log('[getChatsForChannel] Chats:', chats))
-    );
-  }
+  // private getChatsForChannel(channelId: string): Observable<Chat[]> {
+  //   return this.channelService.getChatsForChannel(channelId).pipe(
+  //     // tap(chats => console.log('[getChatsForChannel] Chats:', chats))
+  //   );
+  // }
 
   // Anreichern eines einzelnen Chats um User/Reactions/Answers
   private enrichChat(channelId: string, chat: Chat, users: User[]): Observable<any> {

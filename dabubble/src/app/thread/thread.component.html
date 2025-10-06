@@ -17,8 +17,8 @@
     </div>
 
     <div *ngIf="(chats$ | async) as chatList"  class="chat-content">
-        <div class="chat-history">
-            <ng-container *ngIf="chat$ | async as chat">
+        <!-- <div class="chat-history"> -->
+            <!-- <ng-container *ngIf="chat$ | async as thisChat"> -->
                 <div *ngFor="let chat of chatList; let i = index" class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                     <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                         <div class="chat-dialogue" [ngClass]="{'reverse': chat.user === currentUserId}">
@@ -50,11 +50,11 @@
                                 {{ chat.message }}
                             </div>
                             <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}">
-                                <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0">
+                                <!-- <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0"> -->
 
-                                    <div class="answer t-purple">{{ chat.answersCount }} Antworten</div>
-                                    <div class="last-answer font-14 t-gray">Letzte Antwort {{ chat.lastAnswerTime ? (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}</div>
-                                </div>
+                                    <!-- <div class="answer t-purple">{{ chat.answersCount }} Antworten</div> -->
+                                    <!-- <div class="last-answer font-14 t-gray">Letzte Antwort {{ chat.lastAnswerTime ? (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}</div> -->
+                                <!-- </div> -->
                                 <div class="reactions">
                                     <div class="reaction-btns">
                                         <div (click)="toggleReaction(i, reaction.type)"
@@ -119,12 +119,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Reactions analog -->
-                        <div class="reactions">
-                            <ng-container *ngFor="let reaction of chat.reactionArray">
-                                <div>{{ reaction.type }}: {{ reaction.count }}</div>
-                            </ng-container>
-                        </div>
                     </div>
 
                     <!-- 2. Hidden Answers Line -->
@@ -135,9 +129,9 @@
                         <div class="line"></div>
                     </div>
                 </div>
-            </ng-container>
+            <!-- </ng-container> -->
 
-            <div class="chat-day-section">
+            <!-- <div class="chat-day-section">
                 <div class="chat-section">
                     <div class="chat-dialogue">
                         <button class="add-reaction-btn">
@@ -190,7 +184,7 @@
                     <div class="hidden-answers t-light-purple">2 Antworten</div>
                     <div class="line"></div>
                 </div>
-            </div>
+            </div> -->
 
 
             <!-- <ng-container *ngFor="let answer of answers$ | async">
@@ -207,7 +201,7 @@
                     </div>
                 </div>
             </ng-container> -->
-
+        <div id="chat-history" class="chat-history">
             <div class="chat-day-section">
                 <!-- <div class="chat-date-section">
                     <div class="chat-date">Dienstag, 14. Januar</div>
