@@ -210,6 +210,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     } else {
       this.editCommentDialogueExpanded = false;
       this.activeReactionDialogueIndex = chatIndex; // öffne aktuellen
+      this.activeReactionDialogueBelowIndex = null;
     }
   }
 
@@ -219,6 +220,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     } else {
       this.editCommentDialogueExpanded = false;
       this.activeReactionDialogueBelowIndex = chatIndex; // öffne aktuellen
+      this.activeReactionDialogueIndex = null;
     }
   }
 
