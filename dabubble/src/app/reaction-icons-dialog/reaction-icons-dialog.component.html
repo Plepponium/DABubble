@@ -1,0 +1,6 @@
+<div class="reaction-icons-container" *ngIf="isOpen" [class.left]="position==='left'" [class.right]="position==='right'"
+    [class.over]="source === 'chat'" [class.under]="source === 'hover'">
+    <button *ngFor="let icon of reactionIcons" class="reaction-icon-btn" (click)="addReaction(icon)">
+        <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon" />
+    </button>
+</div>

@@ -87,18 +87,31 @@
                                                 </ng-container>
                                             </div>
 
-                                            <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
-                                                iconHoverSrc="assets/message-icons/add_reaction-purple.svg">
-                                            </app-round-btn>
+                                            <div class="reaction-display-container">
+                                                <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
+                                                    iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
+                                                    (click)="toggleReactionDialog(m.id, 'chat')">
+                                                </app-round-btn>
+
+                                                <app-reaction-icons-dialog [reactionIcons]="reactionIcons"
+                                                    [isOpen]="activeReactionDialog.messageId === m.id && activeReactionDialog.source === 'chat'"
+                                                    [position]="m.senderId === currentUser?.uid ? 'right' : 'left'"
+                                                    [source]="'chat'" [messageId]="m.id"
+                                                    (addReactionEvent)="addReaction($event)"
+                                                    (toggleEvent)="toggleReactionDialog(m.id, 'chat')">
+                                                </app-reaction-icons-dialog>
+                                            </div>
+
                                         </div>
+
                                     </div>
 
                                     <app-dm-reactions-dialog class="dm-reactions-dialog-hover" *ngIf="m.id"
                                         [class.reverse]="m.senderId === currentUser?.uid" [messageId]="m.id"
                                         [isOwnMessage]="m.senderId === currentUser?.uid"
-                                        [isOpen]="activeIconDialogMessageId === m.id" [reactionIcons]="reactionIcons"
-                                        (addReactionEvent)="addReaction($event)"
-                                        (toggleReactionsEvent)="toggleReactionDialog($event)"
+                                        [isOpen]="activeReactionDialog.messageId === m.id && activeReactionDialog.source === 'hover'"
+                                        [reactionIcons]="reactionIcons" (addReactionEvent)="addReaction($event)"
+                                        (toggleReactionsEvent)="toggleReactionDialog($event, 'hover')"
                                         (editMessageEvent)="openEditComment($event)">
                                     </app-dm-reactions-dialog>
                                 </div>

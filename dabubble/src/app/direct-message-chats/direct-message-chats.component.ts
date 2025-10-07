@@ -4,17 +4,18 @@ import { FormsModule } from '@angular/forms';
 import { Observable, of, combineLatest, firstValueFrom } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
-import { DmReactionsDialogComponent } from '../dm-reactions-dialog/dm-reactions-dialog.component';
 import { User } from '../../models/user.class';
 import { UserService } from '../../services/user.service';
 import { DirectMessageService } from '../../services/direct-messages.service';
 import { reactionIcons } from '../reaction-icons';
+import { ReactionIconsDialogComponent } from '../reaction-icons-dialog/reaction-icons-dialog.component';
+import { DmReactionsDialogComponent } from '../dm-reactions-dialog/dm-reactions-dialog.component';
 
 @Component({
   selector: 'app-direct-message-chats',
-  imports: [RoundBtnComponent, CommonModule, FormsModule, DmReactionsDialogComponent],
+  imports: [RoundBtnComponent, CommonModule, FormsModule, DmReactionsDialogComponent, ReactionIconsDialogComponent],
   templateUrl: './direct-message-chats.component.html',
-  styleUrl: './direct-message-chats.component.scss'
+  styleUrls: ['./direct-message-chats.component.scss']
 })
 export class DirectMessageChatsComponent {
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
@@ -30,7 +31,10 @@ export class DirectMessageChatsComponent {
   messageText = '';
   latestMessages: any[] = [];
   reactionIcons: string[] = reactionIcons;
-  activeIconDialogMessageId: string | null = null;
+  activeReactionDialog: { messageId: string | null; source: 'chat' | 'hover' | null } = {
+    messageId: null,
+    source: null
+  };
 
 
   private firstLoad = true;
@@ -184,6 +188,7 @@ export class DirectMessageChatsComponent {
 
     try {
       await this.dmService.addReactionToMessage(this.dmId, event.messageId, event.icon, this.currentUser.uid);
+      this.activeReactionDialog = { messageId: null, source: null };
     } catch (err) {
       console.error('Fehler beim Hinzufügen der Reaktion:', err);
     }
@@ -217,18 +222,13 @@ export class DirectMessageChatsComponent {
     return '';
   }
 
-  toggleReactionDialog(messageId: string) {
-    if (this.activeIconDialogMessageId === messageId) {
-      this.activeIconDialogMessageId = null;
+  toggleReactionDialog(messageId: string, source: 'chat' | 'hover') {
+    if (this.activeReactionDialog.messageId === messageId && this.activeReactionDialog.source === source) {
+      this.activeReactionDialog = { messageId: null, source: null };
     } else {
-      this.activeIconDialogMessageId = messageId;
+      this.activeReactionDialog = { messageId, source };
     }
   }
-
-
-  // openIconDialogFromRoundBtn(messageId: string) {
-  //   this.openReactionsDialogue(messageId);
-  // }
 
   openEditComment(id: string) {
     console.log("Id: ", id);

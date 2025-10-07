@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { ReactionIconsDialogComponent } from '../reaction-icons-dialog/reaction-icons-dialog.component';
+
+
 
 @Component({
   selector: 'app-dm-reactions-dialog',
-  imports: [CommonModule],
   templateUrl: './dm-reactions-dialog.component.html',
-  styleUrl: './dm-reactions-dialog.component.scss'
+  styleUrls: ['./dm-reactions-dialog.component.scss'],
+  imports: [CommonModule, ReactionIconsDialogComponent]
 })
 export class DmReactionsDialogComponent {
   @Input() messageId!: string;
@@ -14,20 +17,23 @@ export class DmReactionsDialogComponent {
   @Input() reactionIcons: string[] = [];
   @Input() isOpen = false;
 
-  @Output() addReactionEvent = new EventEmitter<{ icon: string; messageId: string }>();
+  @Output() addReactionEvent = new EventEmitter<{ messageId: string; icon: string }>();
   @Output() toggleReactionsEvent = new EventEmitter<string>();
   @Output() editMessageEvent = new EventEmitter<string>();
 
   addReaction(icon: string) {
-    this.addReactionEvent.emit({ icon, messageId: this.messageId });
+    if (!this.messageId) return;
+    this.addReactionEvent.emit({ messageId: this.messageId, icon });
   }
 
+
   toggleReactions() {
-    this.toggleReactionsEvent.emit(this.messageId);
-  }
+  this.toggleReactionsEvent.emit(this.messageId);
+}
 
 
   editMessage() {
+    if (!this.messageId) return;
     this.editMessageEvent.emit(this.messageId);
   }
 }

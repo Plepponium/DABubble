@@ -319,6 +319,10 @@
   align-items: center;
   gap: 8px;
 
+  .reaction-display-container {
+    position: relative;
+  }
+
   .reaction-btns {
     display: flex;
     align-items: center;
