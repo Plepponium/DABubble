@@ -46,35 +46,53 @@ export class ThreadComponent implements OnInit {
   channelService = inject(ChannelService);
   userService = inject(UserService);
   
-  @Input() chatId!: string;
   @Input() channelId!: string;
+  @Input() chatId!: string;
   // @Input() participants: User[] = [];
   @Output() closeThread = new EventEmitter<void>();
 
+  // constructor(
+  //   private channelService: ChannelService,
+  //   private userService: UserService
+  // ) {}
+
+  // ngOnInit() {
+  //   // console.log('ngOnInit chatId', this.chatId, 'ngOnInit channelId', this.channelId);
+  //   this.getCurrentUser();
+  //   // this.loadChannel();
+  //   this.loadChannelWithId(this.channelId);
+  //   this.loadChatById(this.channelId);
+  //   this.chat$ = this.getChatObservable();
+  //   this.getAnswersForChat();
+  // }
   ngOnInit() {
-    // console.log('ngOnInit chatId', this.chatId, 'ngOnInit channelId', this.channelId);
     this.getCurrentUser();
-    // this.loadChannel();
     this.loadChannelWithId(this.channelId);
-    this.loadChatById(this.channelId);
-    this.chat$ = this.getChatObservable();
-    this.getAnswersForChat();
+    this.chat$ = this.getEnrichedChat();
+    this.answers$ = this.getEnrichedAnswers();
+    
+    this.answers$.pipe(take(1)).subscribe(answers => {
+      console.log('Thread Answers:', answers);
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
     this.getCurrentUser();
-    // this.loadChannel();
     this.loadChannelWithId(this.channelId);
-    this.loadChatById(this.channelId);
-    if (changes['chatId'] || changes['channelId']) {
-      if (this.chatId && this.channelId) {
-        // console.log('ngOnChanges neue chatId', this.chatId);
-        // console.log('ngOnChanges neue channelId', this.channelId);
-        // console.log('ngOnChanges currentUserId', this.currentUserId);
-        this.chat$ = this.getChatObservable();
-        this.getAnswersForChat();
-      }
-    }
+    this.chat$ = this.getEnrichedChat();
+    this.answers$ = this.getEnrichedAnswers();
+    // this.loadChannel();
+    // this.loadChannelWithId(this.channelId);
+    // this.loadChatById(this.channelId);
+    // if (changes['chatId'] || changes['channelId']) {
+    //   if (this.chatId && this.channelId) {
+    //     // console.log('ngOnChanges neue chatId', this.chatId);
+    //     // console.log('ngOnChanges neue channelId', this.channelId);
+    //     // console.log('ngOnChanges currentUserId', this.currentUserId);
+    //     this.chat$ = this.getChatObservable();
+    //     this.getAnswersForChat();
+    //   }
+    // }
   }
 
   scrollToBottom() {
@@ -126,13 +144,60 @@ export class ThreadComponent implements OnInit {
 
     this.channelService.getChannelById(channelId).pipe(take(1)).subscribe(channel => {
       if (!channel) return;
-      console.log('loadChannelWithId channel participants', channel.participants);
+      // console.log('loadChannelWithId channel participants', channel.participants);
       this.channelId = channelId;
       this.channelName$ = of(channel.name);
       this.participants$ = this.userService.getUsersByIds(channel.participants);
       this.subscribeToParticipants();
       this.subscribeToChatsAndUsers(channelId, this.participants$);
     });
+  }
+
+  getEnrichedChat(): Observable<ChatWithDetails | undefined> {
+    return this.channelService.getChatsForChannel(this.channelId).pipe(
+      switchMap(chats =>
+        this.userService.getUsersByIds(chats.map(c => c.user)).pipe(
+          map(users => {
+            const chat = chats.find(c => c.id === this.chatId);
+            if (!chat) return undefined;
+            const user = users.find(u => u.uid === chat.user);
+            return {
+              ...chat,
+              userName: user?.name,
+              userImg: user?.img
+              // Hier können weitere Felder aus Reactions etc. nach Bedarf ergänzt werden
+            };
+          })
+        )
+      )
+    );
+  }
+
+  getEnrichedAnswers(): Observable<AnswerWithDetails[]> {
+    return this.channelService.getAnswersForChat(this.channelId, this.chatId).pipe(
+      switchMap(answers =>
+        answers.length
+          ? this.userService.getUsersByIds(answers.map(a => a.user)).pipe(
+              switchMap(users => forkJoin(
+                answers.map(answer =>
+                  forkJoin({
+                    reactions: this.channelService.getReactionsForAnswer(this.channelId, this.chatId, answer.id).pipe(take(1)),
+                    user: of(users.find(u => u.uid === answer.user))
+                  }).pipe(
+                    map(({ reactions, user }) => ({
+                      ...answer,
+                      userName: user?.name,
+                      userImg: user?.img,
+                      reactions,
+                      reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
+                    }))
+                  )
+                )
+              ))
+            )
+          : of([])
+      )
+    );
   }
 
   async loadChatById(channelId: string) {
@@ -152,7 +217,7 @@ export class ThreadComponent implements OnInit {
   subscribeToParticipants() {
     this.participants$.subscribe(users => {
       this.participants = users;
-      console.log('participants', this.participants)
+      // console.log('participants', this.participants)
     });
   }
 
@@ -179,12 +244,12 @@ export class ThreadComponent implements OnInit {
     ]).pipe(
       switchMap(([chats, users]) => {
         if (!chats.length || !users.length) return of([]);
-        const chatDetailsObservables = chats.map(chat => this.enrichChat(channelId, chat, users));
+        const chatDetailsObservables = chats.map(chat => this.enrichThread(channelId, chat, users));
         return forkJoin(chatDetailsObservables);
       }),
-      map((enrichedChats: ChatWithDetails[]) => enrichedChats.sort((a, b) => a.time - b.time))
-    ).subscribe(sortedChats => {
-      this.chatsSubject.next(sortedChats);
+      map((enrichedAnswers: ChatWithDetails[]) => enrichedAnswers.sort((a, b) => a.time - b.time))
+    ).subscribe(sortedAnswers => {
+      this.chatsSubject.next(sortedAnswers);
       setTimeout(() => this.scrollToBottom());
     });
   }
@@ -295,6 +360,34 @@ export class ThreadComponent implements OnInit {
       console.log('Chats:', answers);
     });
   }
+  // getAnswersForThread(): Observable<AnswerWithDetails[]> {
+  //   return this.channelService.getAnswersForChat(this.channelId, this.chatId).pipe(
+  //     switchMap((answers: Answer[]) =>
+  //       this.userService.getUsersByIds(answers.map(a => a.user)).pipe(
+  //         switchMap(users =>
+  //           answers.length
+  //             ? forkJoin(
+  //                 answers.map(answer =>
+  //                   forkJoin({
+  //                     reactions: this.channelService.getReactionsForAnswer(this.channelId, this.chatId, answer.id).pipe(take(1)),
+  //                     user: of(users.find(u => u.uid === answer.user))
+  //                   }).pipe(
+  //                     map(({ reactions, user }) => ({
+  //                       ...answer,
+  //                       userName: user?.name,
+  //                       userImg: user?.img,
+  //                       reactions,
+  //                       reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
+  //                     }))
+  //                   )
+  //                 )
+  //               )
+  //             : of([])
+  //         )
+  //       )
+  //     )
+  //   );
+  // }
 
   // openReactionsDialogue(chatIndex: number) {
   //   if (this.activeReactionDialogueIndex === chatIndex) {
@@ -342,6 +435,26 @@ export class ThreadComponent implements OnInit {
       this.buildReactionObject(type, usersRaw, participants, currentUserId)
     );
   }
+  // transformReactionsToArray(
+  //   reactionsMap: Record<string, string[]>,
+  //   users: User[],
+  //   currentUserId: string
+  // ): any[] {
+  //   if (!reactionsMap) return [];
+  //   return Object.entries(reactionsMap).map(([type, userIds]) => {
+  //     const currentUserReacted = userIds.includes(currentUserId);
+  //     const otherUsers = userIds.filter(uid => uid !== currentUserId);
+  //     return {
+  //       type,
+  //       count: userIds.length,
+  //       currentUserReacted,
+  //       otherUserName: otherUsers.length
+  //         ? users.find(u => u.uid === otherUsers[0])?.name
+  //         : undefined,
+  //       // weitere Felder nach Bedarf...
+  //     };
+  //   });
+  // }
 
   private buildReactionObject(
     type: string,
@@ -458,7 +571,8 @@ export class ThreadComponent implements OnInit {
     const chat = await firstValueFrom(this.chat$);
     if (!chat) return;
 
-    // this.activeReactionDialogueIndex = null;
+    this.activeReactionDialogueIndex = null;
+    this.activeReactionDialogueBelowIndex = null;
     const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
     if (!currentReactionUsers.includes(this.currentUserId)) {
       const updatedUsers = [...currentReactionUsers, this.currentUserId];
@@ -482,6 +596,22 @@ export class ThreadComponent implements OnInit {
 
     await this.saveOrDeleteReaction(this.channelId, chatId, reactionType, updatedUsers);
     await this.updateReactionForChat(chatId, reactionType, updatedUsers);
+  }
+  async toggleReactionforAnswer(answerId: string, reactionType: string) {
+    // const chat = await this.getChatByIndex(chatIndex);
+    const chat = await firstValueFrom(this.chat$);
+    if (!chat) return;
+
+    const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
+    let updatedUsers: string[];
+    if (currentReactionUsers.includes(this.currentUserId)) {
+      updatedUsers = currentReactionUsers.filter(uid => uid !== this.currentUserId);
+    } else {
+      updatedUsers = [...currentReactionUsers, this.currentUserId];
+    }
+
+    await this.saveOrDeleteReaction(this.channelId, answerId, reactionType, updatedUsers);
+    await this.updateReactionForChat(answerId, reactionType, updatedUsers);
   }
 
   private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {

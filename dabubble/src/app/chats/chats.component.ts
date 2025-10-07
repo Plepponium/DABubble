@@ -355,6 +355,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     if (!chat) return;
 
     this.activeReactionDialogueIndex = null;
+    this.activeReactionDialogueBelowIndex = null;
     const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
     if (!currentReactionUsers.includes(this.currentUserId)) {
       const updatedUsers = [...currentReactionUsers, this.currentUserId];

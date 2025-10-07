@@ -176,6 +176,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
     &:hover {
         background-color: #eceefe;
         .hover-icon {
@@ -197,18 +198,12 @@
 //     cursor: pointer;
 // }
 
-
 // .add-reaction-btn {
 //     width: 36px !important;
 //     height: 34px;
 //     box-sizing: border-box;
 // }
 
-// .add-reaction {
-//     width: 24px;
-//     height: 24px;
-//     cursor: pointer;
-// }
 
 .reactions-display-container, .reactions-display-container-below {
     position: relative;
@@ -346,9 +341,14 @@
     border: 1px solid #ADB0D9;
     border-radius: 20px;
     padding: 5px 10px;
+    background-color: #ffffff;
+    position: relative;
     cursor: pointer;
     &:hover {
         border-color: #797ef3;
+        .r-btn-hover-display {
+            display: block;
+        }
     }
 
     img {
