@@ -183,6 +183,18 @@ export class DirectMessageChatsComponent {
     this.scrollToBottom();
   }
 
+  async updateMessageText(event: { messageId: string; newText: string }) {
+    if (!this.dmId || !event.messageId || !event.newText.trim()) return;
+
+    try {
+      await this.dmService.updateMessageText(this.dmId, event.messageId, event.newText.trim());
+      console.log('Nachricht erfolgreich aktualisiert');
+    } catch (err) {
+      console.error('Fehler beim Aktualisieren der Nachricht:', err);
+    }
+  }
+
+
   async addReaction(event: { messageId: string; icon: string }) {
     if (!event?.messageId || !this.currentUser || !this.dmId) return;
 
@@ -230,9 +242,26 @@ export class DirectMessageChatsComponent {
     }
   }
 
-  openEditComment(id: string) {
-    console.log("Id: ", id);
+  enableEditMessage(message: any) {
+    this.latestMessages.forEach(m => m.isEditing = false);
+    message.isEditing = true;
+    message.editedText = message.text;
   }
+
+  cancelEditMessage(message: any) {
+    message.isEditing = false;
+    message.editedText = message.text;
+  }
+
+  saveEditedMessage(message: any) {
+    const newText = message.editedText.trim();
+    if (!newText) return;
+
+    this.updateMessageText({ messageId: message.id, newText });
+    message.text = newText;
+    message.isEditing = false;
+  }
+
 
 
 }

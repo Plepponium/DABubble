@@ -48,6 +48,15 @@ export class DirectMessageService {
         return docData(docRef as any, { idField: 'id' }) as Observable<any>;
     }
 
+    async updateMessageText(dmId: string, messageId: string, newText: string) {
+        const msgRef = doc(this.firestore, `dmChats/${dmId}/messages/${messageId}`);
+        return updateDoc(msgRef as any, {
+            text: newText,
+            // editedAt: serverTimestamp()
+        });
+    }
+
+
     async addReactionToMessage(dmId: string, messageId: string, type: string, userId: string) {
         const msgRef = doc(this.firestore, `dmChats/${dmId}/messages/${messageId}`);
         return updateDoc(msgRef as any, { [`reactions.${type}`]: arrayUnion(userId) });

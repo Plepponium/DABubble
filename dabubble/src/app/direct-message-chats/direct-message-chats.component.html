@@ -53,66 +53,88 @@
                                 <div class="chat-message-row" [class.me]="m.senderId === currentUser?.uid">
                                     <img class="chat-user-img"
                                         [src]="'assets/user-icons/' + (m.senderImg || 'default-user') + '.svg'" />
-                                    <div class="chat-bubble">
-                                        <div class="chat-meta">
-                                            <span class="sender-name font-w-700 font-18">{{ m.senderName }} </span>
-                                            <span class="time t-gray font-14">
-                                                {{ m.sentAt?.toDate ? (m.sentAt.toDate() | date:'HH:mm') : '' }} Uhr
-                                            </span>
-                                        </div>
-                                        <div class="chat-text font-18">{{ m.text }}</div>
+
+                                    <ng-container *ngIf="!m.isEditing; else editMode">
+                                        <div class="chat-bubble">
+                                            <div class="chat-meta">
+                                                <span class="sender-name font-w-700 font-18">{{ m.senderName }}</span>
+                                                <span class="time t-gray font-14">
+                                                    {{ m.sentAt?.toDate ? (m.sentAt.toDate() | date:'HH:mm') : '' }} Uhr
+                                                </span>
+                                            </div>
+
+                                            <div class="chat-text font-18">{{ m.text }}</div>
 
 
-                                        <div class="reactions">
-                                            <div class="reaction-btns">
-                                                <ng-container *ngFor="let icon of reactionIcons">
-                                                    <div class="reaction-btn"
-                                                        *ngIf="m.reactions && m.reactions[icon]?.length > 0"
-                                                        (click)="onReactionClick(m, icon)">
-                                                        <img [src]="'assets/reaction-icons/' + icon + '.svg'"
-                                                            alt="reaction icon" />
-                                                        <span>{{ m.reactions[icon].length }}</span>
 
-                                                        <div class="r-btn-hover-display">
-                                                            <div class="r-btn-hover-display-content">
-                                                                <img [src]="'assets/reaction-icons/' + icon + '.svg'"
-                                                                    alt="reaction" />
-                                                                <div class="reaction-btn-t-box">
-                                                                    <div class="font-w-700">{{
-                                                                        getReactionHoverText(m.reactions[icon]) }}</div>
+                                            <div class="reactions">
+                                                <div class="reaction-btns">
+                                                    <ng-container *ngFor="let icon of reactionIcons">
+                                                        <div class="reaction-btn"
+                                                            *ngIf="m.reactions && m.reactions[icon]?.length > 0"
+                                                            (click)="onReactionClick(m, icon)">
+                                                            <img [src]="'assets/reaction-icons/' + icon + '.svg'"
+                                                                alt="reaction icon" />
+                                                            <span>{{ m.reactions[icon].length }}</span>
+
+                                                            <div class="r-btn-hover-display">
+                                                                <div class="r-btn-hover-display-content">
+                                                                    <img [src]="'assets/reaction-icons/' + icon + '.svg'"
+                                                                        alt="reaction" />
+                                                                    <div class="reaction-btn-t-box">
+                                                                        <div class="font-w-700">{{
+                                                                            getReactionHoverText(m.reactions[icon]) }}
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </ng-container>
+                                                    </ng-container>
+                                                </div>
+
+                                                <div class="reaction-display-container">
+                                                    <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
+                                                        iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
+                                                        (click)="toggleReactionDialog(m.id, 'chat')">
+                                                    </app-round-btn>
+
+                                                    <app-reaction-icons-dialog [reactionIcons]="reactionIcons"
+                                                        [isOpen]="activeReactionDialog.messageId === m.id && activeReactionDialog.source === 'chat'"
+                                                        [position]="m.senderId === currentUser?.uid ? 'right' : 'left'"
+                                                        [source]="'chat'" [messageId]="m.id"
+                                                        (addReactionEvent)="addReaction($event)"
+                                                        (toggleEvent)="toggleReactionDialog(m.id, 'chat')"
+                                                        (editMessageEvent)="enableEditMessage(m)">
+                                                    </app-reaction-icons-dialog>
+                                                </div>
                                             </div>
-
-                                            <div class="reaction-display-container">
-                                                <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
-                                                    iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
-                                                    (click)="toggleReactionDialog(m.id, 'chat')">
-                                                </app-round-btn>
-
-                                                <app-reaction-icons-dialog [reactionIcons]="reactionIcons"
-                                                    [isOpen]="activeReactionDialog.messageId === m.id && activeReactionDialog.source === 'chat'"
-                                                    [position]="m.senderId === currentUser?.uid ? 'right' : 'left'"
-                                                    [source]="'chat'" [messageId]="m.id"
-                                                    (addReactionEvent)="addReaction($event)"
-                                                    (toggleEvent)="toggleReactionDialog(m.id, 'chat')">
-                                                </app-reaction-icons-dialog>
-                                            </div>
-
                                         </div>
+                                    </ng-container>
 
-                                    </div>
+                                    <ng-template #editMode>
+                                        <div class="chat-edit-wrapper">
+                                            <textarea class="edit-textarea" [(ngModel)]="m.editedText" rows="2"
+                                                [placeholder]="m.text"></textarea>
+                                            <div class="edit-actions">
+                                                <button class="btn cancel"
+                                                    (click)="cancelEditMessage(m)">Abbrechen</button>
+                                                <button class="btn save"
+                                                    (click)="saveEditedMessage(m)">Speichern</button>
+
+                                            </div>
+                                        </div>
+                                    </ng-template>
+
+
 
                                     <app-dm-reactions-dialog class="dm-reactions-dialog-hover" *ngIf="m.id"
                                         [class.reverse]="m.senderId === currentUser?.uid" [messageId]="m.id"
-                                        [isOwnMessage]="m.senderId === currentUser?.uid"
+                                        [messageText]="m.text" [isOwnMessage]="m.senderId === currentUser?.uid"
                                         [isOpen]="activeReactionDialog.messageId === m.id && activeReactionDialog.source === 'hover'"
                                         [reactionIcons]="reactionIcons" (addReactionEvent)="addReaction($event)"
                                         (toggleReactionsEvent)="toggleReactionDialog($event, 'hover')"
-                                        (editMessageEvent)="openEditComment($event)">
+                                        (startEditEvent)="enableEditMessage(m)"
+                                        (saveEditEvent)="updateMessageText($event)">
                                     </app-dm-reactions-dialog>
                                 </div>
                             </div>

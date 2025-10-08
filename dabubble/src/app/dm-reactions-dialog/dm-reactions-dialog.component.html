@@ -20,9 +20,15 @@
     </div>
 
     <div class="edit-message-container" *ngIf="isOwnMessage">
-        <button (click)="editMessage()" class="add-reaction-btn">
+        <button (click)="toggleEditDialog()" class="add-reaction-btn">
             <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="edit" />
             <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg" alt="edit" />
         </button>
+
+        <div class="edit-dialog" *ngIf="editDialogOpen">
+            <button type="button" class="btn" (click)="startEditing()">Nachricht bearbeiten</button>
+        </div>
+
     </div>
+
 </div>

@@ -40,3 +40,34 @@
 .hover-icon-purple {
   display: none;
 }
+
+.edit-message-container {
+  position: relative;
+
+  .edit-dialog {
+    position: absolute;
+    top: 18px;
+    left: 27px;
+    width: max-content;
+    border-radius: 0 30px 30px 30px;
+    background-color: white;
+    padding: 10px 20px;
+    filter: drop-shadow(0px 6px 14px rgba(0, 0, 0, 0.2));
+
+    .btn {
+      cursor: pointer;
+      border-radius: 100px;
+      padding: 10px 20px;
+      border: none;
+      background-color: white;
+      font-size: 20px;
+      font-weight: 500;
+      font-family: "Nunito";
+
+      &:hover {
+        background-color: #eceefe;
+        color: #535af1;
+      }
+    }
+  }
+}

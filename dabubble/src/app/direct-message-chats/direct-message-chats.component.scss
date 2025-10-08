@@ -186,7 +186,7 @@
 
     .chat-message-row {
       display: flex;
-      gap: 8px;
+      gap: 30px;
       align-items: flex-start;
       padding: 12px 45px;
       margin: 0 -45px;
@@ -246,7 +246,6 @@
       }
 
       .chat-bubble {
-        padding: 0.5rem 1rem;
         position: relative;
         display: flex;
         flex-direction: column;
@@ -390,6 +389,70 @@
 
     .no-wrap {
       white-space: nowrap;
+    }
+  }
+}
+
+.chat-edit-wrapper {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid #adb0d9;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .edit-textarea {
+    width: 100%;
+    min-width: 300px;
+    border: none;
+    border-radius: 8px;
+    padding: 0;
+    font-size: 18px;
+    color: #686868;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+
+    &:focus {
+      border-color: #8a2be2;
+    }
+  }
+
+  .edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+
+    .btn {
+      padding: 12px 25px;
+      border-radius: 50px;
+      border: 1px solid #797ef3;
+      cursor: pointer;
+      font-family: "Nunito";
+      font-size: 18px;
+      font-weight: 700;
+      transition: all 0.2s ease;
+
+      &.save {
+        background-color: #444df2;
+        color: #fff;
+
+        &:hover {
+          filter: opacity(80%);
+        }
+      }
+
+      &.cancel {
+        background-color: white;
+        color: #444df2;
+
+        &:hover {
+          background-color: #444df2;
+          color: white;
+        }
+      }
     }
   }
 }
