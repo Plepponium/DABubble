@@ -17,144 +17,29 @@
     </div>
 
     <div *ngIf="(chat$ | async) as chat"  class="chat-content">
-        <!-- <div class="chat-history"> -->
-            <!-- <ng-container *ngIf="chat$ | async as chat"> -->
-                <div class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
-                    <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}">
-                        <div class="chat-dialogue" [ngClass]="{'reverse': chat.user === currentUserId}">
-                            <!-- <button (click)="openReactionsDialogue(chat.id)" class="add-reaction-btn">
-                                <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
-                                <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg" alt="">
-                            </button> -->
-                            <div class="reactions-display-container">
-                                <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === chat.id">
-                                    <div *ngFor="let icon of reactionIcons" class="reactions-container">
-                                        <button (click)="addReaction(chat.id, icon)" class="add-reaction-btn">
-                                            <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
-                                        </button>
-                                    </div>
-                                </div>
-                                <button (click)="openReactionsDialogue(chat.id)" class="add-reaction-btn">
-                                    <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
-                                    <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg"
-                                        alt="">
-                                </button>
-                            </div>
-
-                            <div class="edit-comment-container">
-                                <div class="edit-comment-dialogue" *ngIf="editCommentDialogueExpanded">
-                                    <div class="edit-comment">Nachricht bearbeiten</div>
-                                </div>
-                                <button (click)="openEditCommentDialogue()" class="add-reaction-btn reverse">
-                                    <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="">
-                                    <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg" alt="">
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Chatanzeigen analog zum Chat-Template -->
-                        <img class="chat-user-img" [src]="'assets/user-icons/' + chat.userImg + '.svg'" [alt]="chat.userName">
-                        
-                        <div class="chat-info-container">
-                            <div class="chat-start" [ngClass]="{'reverse': chat.user === currentUserId}">
-                                <div class="font-w-700">{{ chat.userName }}</div> 
-                                <div class="font-14 t-gray">{{ chat.time * 1000 | date: 'HH:mm' }} Uhr</div>
-                            </div>
-                            <div class="chat-message"
-                                [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 'right': chat.user === currentUserId}">
-                                {{ chat.message }}
-                            </div>
-                            <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}">
-                                <!-- <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0"> -->
-
-                                    <!-- <div class="answer t-purple">{{ chat.answersCount }} Antworten</div> -->
-                                    <!-- <div class="last-answer font-14 t-gray">Letzte Antwort {{ chat.lastAnswerTime ? (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}</div> -->
-                                <!-- </div> -->
-                                <div class="reactions">
-                                    <div class="reaction-btns">
-                                        <div (click)="toggleReactionForChat(chat.id, reaction.type)"
-                                            *ngFor="let reaction of chat.reactionArray" class="reaction-btn"
-                                            [ngClass]="{'reacted': reaction.currentUserReacted}">
-                                            <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
-                                                [alt]="reaction.type">
-                                            <div>{{ reaction.count }}</div>
-
-                                            <div class="r-btn-hover-display">
-                                                <div class="r-btn-hover-display-content">
-                                                    <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
-                                                        [alt]="reaction.type">
-                                                    <div class="reaction-btn-t-box no-wrap">
-                                                        <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count <= 2"
-                                                            class="font-w-700">
-                                                            {{ reaction.otherUserName }} und Du
-                                                        </div>
-                                                        <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count > 2"
-                                                            class="font-w-700">
-                                                            {{ reaction.otherUserName }}, Du
-                                                        </div>
-                                                        <div *ngIf="!reaction.currentUserReacted && reaction.otherUserName"
-                                                            class="font-w-700">
-                                                            {{ reaction.otherUserName }}
-                                                        </div>
-                                                        <div *ngIf="reaction.currentUserReacted && !reaction.otherUserName"
-                                                            class="font-w-700">
-                                                            Du
-                                                        </div>
-                                                        <span
-                                                            *ngIf="reaction.count === 1 && reaction.currentUserReacted">hast
-                                                            reagiert</span>
-                                                        <span
-                                                            *ngIf="reaction.count === 1 && !reaction.currentUserReacted">hat
-                                                            reagiert</span>
-                                                        <span
-                                                            *ngIf="reaction.count - (reaction.currentUserReacted ? 1 : 0) >= 2"
-                                                            class="font-w-700">und andere</span>
-                                                        <span *ngIf="reaction.count > 1">haben reagiert</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- <pre>{{ reaction | json }}</pre> -->
-                                             <!-- <pre>{{ chat.reactionArray | json }}</pre> -->
-                                        </div>
-                                    </div>
-
-                                    <div class="reactions-display-container-below">
-                                        <div class="add-reaction-dialogue below" *ngIf="activeReactionDialogueBelowIndex === chat.id">
-                                            <div *ngFor="let icon of reactionIcons" class="reactions-container">
-                                                <button (click)="addReaction(chat.id, icon)" class="add-reaction-btn">
-                                                    <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <app-round-btn (click)="openReactionsDialogueBelow(chat.id)" iconSrc="assets/message-icons/add_reaction.svg"
-                                            iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
-                                            altText="Reaktion hinzufügen">
-                                        </app-round-btn>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. Hidden Answers Line -->
-                    <div class="hidden-answers-line">
-                        <div class="hidden-answers t-light-purple">
-                            {{ (answers$ | async)?.length }} Antworten
-                        </div>
-                        <div class="line"></div>
-                    </div>
-                    <!-- <pre>{{ this.answers$ | json }}</pre> -->
-                </div>
-            <!-- </ng-container> -->
-
-            <!-- <div class="chat-day-section">
-                <div class="chat-section">
-                    <div class="chat-dialogue">
-                        <button class="add-reaction-btn">
+        <!-- <ng-container *ngIf="chat$ | async as chat"> -->
+            <div class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
+                <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}">
+                    <div class="chat-dialogue" [ngClass]="{'reverse': chat.user === currentUserId}">
+                        <!-- <button (click)="openReactionsDialogue(chat.id)" class="add-reaction-btn">
                             <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
                             <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg" alt="">
-                        </button>
+                        </button> -->
+                        <div class="reactions-display-container">
+                            <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === chat.id">
+                                <div *ngFor="let icon of reactionIcons" class="reactions-container">
+                                    <button (click)="addReaction(chat.id, icon)" class="add-reaction-btn">
+                                        <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                    </button>
+                                </div>
+                            </div>
+                            <button (click)="openReactionsDialogue(chat.id)" class="add-reaction-btn">
+                                <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
+                                <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg"
+                                    alt="">
+                            </button>
+                        </div>
+
                         <div class="edit-comment-container">
                             <div class="edit-comment-dialogue" *ngIf="editCommentDialogueExpanded">
                                 <div class="edit-comment">Nachricht bearbeiten</div>
@@ -166,75 +51,121 @@
                         </div>
                     </div>
 
-                    <img class="chat-user-img" src="assets/user-icons/icon4.svg" alt="">
-
+                    <!-- Chatanzeigen analog zum Chat-Template -->
+                    <img class="chat-user-img" [src]="'assets/user-icons/' + chat.userImg + '.svg'" [alt]="chat.userName">
+                    
                     <div class="chat-info-container">
-                        <div class="chat-start">
-                            <div class="font-w-700">Noah Braun</div> 
-                            <div class="font-14 t-gray">14:25 Uhr</div>
+                        <div class="chat-start" [ngClass]="{'reverse': chat.user === currentUserId}">
+                            <div class="font-w-700">{{ chat.userName }}</div> 
+                            <div class="font-14 t-gray">{{ chat.time * 1000 | date: 'HH:mm' }} Uhr</div>
                         </div>
-                        <div class="chat-message left bg-light-purple">Chat</div>
-                        <div class="chat-answered">
+                        <div class="chat-message"
+                            [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 'right': chat.user === currentUserId}">
+                            {{ chat.message }}
+                        </div>
+                        <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}">
+                            <!-- <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0"> -->
+
+                                <!-- <div class="answer t-purple">{{ chat.answersCount }} Antworten</div> -->
+                                <!-- <div class="last-answer font-14 t-gray">Letzte Antwort {{ chat.lastAnswerTime ? (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}</div> -->
+                            <!-- </div> -->
                             <div class="reactions">
                                 <div class="reaction-btns">
-                                    <div class="reaction-btn">
-                                        <img src="assets/reaction-icons/check.svg" alt="">
-                                        <div>2</div>
-                                    </div>
-                                    <div class="reaction-btn">
-                                        <img src="assets/reaction-icons/thumb.svg" alt="">
-                                        <div>1</div>
+                                    <div (click)="toggleReactionForChat(chat.id, reaction.type)"
+                                        *ngFor="let reaction of chat.reactionArray" class="reaction-btn"
+                                        [ngClass]="{'reacted': reaction.currentUserReacted}">
+                                        <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
+                                            [alt]="reaction.type">
+                                        <div>{{ reaction.count }}</div>
+
+                                        <div class="r-btn-hover-display">
+                                            <div class="r-btn-hover-display-content">
+                                                <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
+                                                    [alt]="reaction.type">
+                                                <div class="reaction-btn-t-box no-wrap">
+                                                    <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count <= 2"
+                                                        class="font-w-700">
+                                                        {{ reaction.otherUserName }} und Du
+                                                    </div>
+                                                    <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count > 2"
+                                                        class="font-w-700">
+                                                        {{ reaction.otherUserName }}, Du
+                                                    </div>
+                                                    <div *ngIf="!reaction.currentUserReacted && reaction.otherUserName"
+                                                        class="font-w-700">
+                                                        {{ reaction.otherUserName }}
+                                                    </div>
+                                                    <div *ngIf="reaction.currentUserReacted && !reaction.otherUserName"
+                                                        class="font-w-700">
+                                                        Du
+                                                    </div>
+                                                    <span
+                                                        *ngIf="reaction.count === 1 && reaction.currentUserReacted">hast
+                                                        reagiert</span>
+                                                    <span
+                                                        *ngIf="reaction.count === 1 && !reaction.currentUserReacted">hat
+                                                        reagiert</span>
+                                                    <span
+                                                        *ngIf="reaction.count - (reaction.currentUserReacted ? 1 : 0) >= 2"
+                                                        class="font-w-700">und andere</span>
+                                                    <span *ngIf="reaction.count > 1">haben reagiert</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- <pre>{{ reaction | json }}</pre> -->
+                                            <!-- <pre>{{ chat.reactionArray | json }}</pre> -->
                                     </div>
                                 </div>
 
-                                <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
-                                    iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
-                                    altText="Reaktion hinzufügen">
-                                </app-round-btn>
+                                <div class="reactions-display-container-below">
+                                    <div class="add-reaction-dialogue below" *ngIf="activeReactionDialogueBelowIndex === chat.id">
+                                        <div *ngFor="let icon of reactionIcons" class="reactions-container">
+                                            <button (click)="addReaction(chat.id, icon)" class="add-reaction-btn">
+                                                <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <app-round-btn (click)="openReactionsDialogueBelow(chat.id)" iconSrc="assets/message-icons/add_reaction.svg"
+                                        iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
+                                        altText="Reaktion hinzufügen">
+                                    </app-round-btn>
+                                </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
 
+                <!-- 2. Hidden Answers Line -->
                 <div class="hidden-answers-line">
-                    <div class="hidden-answers t-light-purple">2 Antworten</div>
+                    <div class="hidden-answers t-light-purple">
+                        {{ (answers$ | async)?.length }} Antworten
+                    </div>
                     <div class="line"></div>
                 </div>
-            </div> -->
+                <!-- <pre>{{ this.answers$ | json }}</pre> -->
+            </div>
+        <!-- </ng-container> -->
 
 
-            <!-- <ng-container *ngFor="let answer of answers$ | async">
-                <div class="chat-day-section">
-                    <div class="chat-section">
-                        <img class="chat-user-img" [src]="'assets/user-icons/' + answer.userImg + '.svg'" [alt]="answer.userName">
-                        <div class="font-w-700">{{ answer.userName }}</div>
-                        <div class="chat-message">{{ answer.message }}</div>
-                        <div class="reactions">
-                            <ng-container *ngFor="let reaction of answer.reactionArray">
-                                <div>{{ reaction.type }}: {{ reaction.count }}</div>
-                            </ng-container>
-                        </div>
-                    </div>
-                </div>
-            </ng-container> -->
         <div *ngIf="answers$ | async as answers" id="chat-history" class="chat-history">
-            <div *ngFor="let answer of answers" class="chat-day-section">
-                <!-- <div class="chat-date-section">
-                    <div class="chat-date">Dienstag, 14. Januar</div>
-                </div> -->
-                <div class="chat-section">
-                    <div class="chat-dialogue">
-                        <!-- <button class="add-reaction-btn">
-                            <img class="" src="assets/reaction-icons/check.svg" alt="">
-                        </button>
-                        <button class="add-reaction-btn">
-                            <img class="" src="assets/reaction-icons/thumb.svg" alt="">
-                        </button> -->
-                        <button class="add-reaction-btn">
-                            <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
-                            <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg" alt="">
-                        </button>
+            <div *ngFor="let answer of answers; let i = index" class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
+                <div class="chat-section" [ngClass]="{'reverse': answer.user === currentUserId}">
+                    <div class="chat-dialogue" [ngClass]="{'reverse': answer.user === currentUserId}">
+                        <div class="reactions-display-container">
+                            <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueAnswersIndex === i">
+                                <div *ngFor="let icon of reactionIcons" class="reactions-container">
+                                    <button (click)="addReaction(answer.id, icon)" class="add-reaction-btn">
+                                        <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                    </button>
+                                </div>
+                            </div>
+                            <button (click)="openReactionsDialogueAnswers(i)" class="add-reaction-btn">
+                                <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
+                                <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg"
+                                    alt="">
+                            </button>
+                        </div>
                         <!-- <button class="add-reaction-btn">
                             <img class="hover-icon" src="assets/icons/comment.svg" alt="">
                             <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="">
@@ -253,122 +184,83 @@
                     <img class="chat-user-img" [src]="'assets/user-icons/' + answer.userImg + '.svg'" [alt]="answer.userName">
 
                     <div class="chat-info-container">
-                        <div class="chat-start">
+                        <div class="chat-start" [ngClass]="{'reverse': answer.user === currentUserId}">
                             <div class="font-w-700">{{ answer.userName }}</div> 
                             <div class="font-14 t-gray">{{ answer.time * 1000 | date: 'HH:mm' }} Uhr</div>
                         </div>
-                        <div class="chat-message left bg-light-purple">{{ answer.message }}</div>
-                        <div class="chat-answered">
+                        <div class="chat-message" [ngClass]="{'left bg-light-purple': answer.user !== currentUserId, 'right': answer.user === currentUserId}">{{ answer.message }}</div>
+                        <div class="chat-answered" [ngClass]="{'right': answer.user === currentUserId}">
+                            
                             <div class="reactions">
                                 <div class="reaction-btns">
-                                    <!-- <div *ngFor="let reaction of answer.reactionArray" class="reaction-btn">
-                                        <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'" [alt]="reaction.type">
-                                        <div>{{ reaction.count }}</div>
-                                    </div> -->
-                                    <!-- <div class="reaction-btn">
-                                        <img src="assets/reaction-icons/thumb.svg" alt="">
-                                        <div>1</div>
-                                    </div> -->
                                     <div (click)="toggleReactionForAnswer(answer.id, reaction.type)"
-                                            *ngFor="let reaction of answer.reactionArray" class="reaction-btn"
-                                            [ngClass]="{'reacted': reaction.currentUserReacted}">
-                                            <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
-                                                [alt]="reaction.type">
-                                            <div>{{ reaction.count }}</div>
+                                        *ngFor="let reaction of answer.reactionArray" class="reaction-btn"
+                                        [ngClass]="{'reacted': reaction.currentUserReacted}">
+                                        <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
+                                            [alt]="reaction.type">
+                                        <div>{{ reaction.count }}</div>
 
-                                            <div class="r-btn-hover-display">
-                                                <div class="r-btn-hover-display-content">
-                                                    <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
-                                                        [alt]="reaction.type">
-                                                    <div class="reaction-btn-t-box no-wrap">
-                                                        <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count <= 2"
-                                                            class="font-w-700">
-                                                            {{ reaction.otherUserName }} und Du
-                                                        </div>
-                                                        <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count > 2"
-                                                            class="font-w-700">
-                                                            {{ reaction.otherUserName }}, Du
-                                                        </div>
-                                                        <div *ngIf="!reaction.currentUserReacted && reaction.otherUserName"
-                                                            class="font-w-700">
-                                                            {{ reaction.otherUserName }}
-                                                        </div>
-                                                        <div *ngIf="reaction.currentUserReacted && !reaction.otherUserName"
-                                                            class="font-w-700">
-                                                            Du
-                                                        </div>
-                                                        <span
-                                                            *ngIf="reaction.count === 1 && reaction.currentUserReacted">hast
-                                                            reagiert</span>
-                                                        <span
-                                                            *ngIf="reaction.count === 1 && !reaction.currentUserReacted">hat
-                                                            reagiert</span>
-                                                        <span
-                                                            *ngIf="reaction.count - (reaction.currentUserReacted ? 1 : 0) >= 2"
-                                                            class="font-w-700">und andere</span>
-                                                        <span *ngIf="reaction.count > 1">haben reagiert</span>
+                                        <div class="r-btn-hover-display">
+                                            <div class="r-btn-hover-display-content">
+                                                <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
+                                                    [alt]="reaction.type">
+                                                <div class="reaction-btn-t-box no-wrap">
+                                                    <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count <= 2"
+                                                        class="font-w-700">
+                                                        {{ reaction.otherUserName }} und Du
                                                     </div>
+                                                    <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count > 2"
+                                                        class="font-w-700">
+                                                        {{ reaction.otherUserName }}, Du
+                                                    </div>
+                                                    <div *ngIf="!reaction.currentUserReacted && reaction.otherUserName"
+                                                        class="font-w-700">
+                                                        {{ reaction.otherUserName }}
+                                                    </div>
+                                                    <div *ngIf="reaction.currentUserReacted && !reaction.otherUserName"
+                                                        class="font-w-700">
+                                                        Du
+                                                    </div>
+                                                    <span
+                                                        *ngIf="reaction.count === 1 && reaction.currentUserReacted">hast
+                                                        reagiert</span>
+                                                    <span
+                                                        *ngIf="reaction.count === 1 && !reaction.currentUserReacted">hat
+                                                        reagiert</span>
+                                                    <span
+                                                        *ngIf="reaction.count - (reaction.currentUserReacted ? 1 : 0) >= 2"
+                                                        class="font-w-700">und andere</span>
+                                                    <span *ngIf="reaction.count > 1">haben reagiert</span>
                                                 </div>
                                             </div>
-
-                                            <!-- <pre>{{ reaction | json }}</pre> -->
                                         </div>
+
+                                        <!-- <pre>{{ reaction | json }}</pre> -->
+                                    </div>
                                 </div>
 
-                                <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
+                                <div class="reactions-display-container-below">
+                                    <div class="add-reaction-dialogue below" *ngIf="activeReactionDialogueBelowAnswersIndex === i">
+                                        <div *ngFor="let icon of reactionIcons" class="reactions-container">
+                                            <button (click)="addReaction(answer.id, icon)" class="add-reaction-btn">
+                                                <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <app-round-btn (click)="openReactionsDialogueBelowAnswers(i)" iconSrc="assets/message-icons/add_reaction.svg"
+                                        iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
+                                        altText="Reaktion hinzufügen">
+                                    </app-round-btn>
+                                </div>
+                                <!-- <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
                                     iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
                                     altText="Reaktion hinzufügen">
-                                </app-round-btn>
+                                </app-round-btn> -->
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-
-
-            <!-- <div class="chat-day-section">
-                
-                <div class="chat-section reverse">
-                    <div class="chat-dialogue reverse">
-                        <button class="add-reaction-btn">
-                            <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
-                            <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg" alt="">
-                        </button>
-                        <div class="edit-comment-container">
-                            <div class="edit-comment-dialogue" *ngIf="editCommentDialogueExpanded">
-                                <div class="edit-comment">Nachricht bearbeiten</div>
-                            </div>
-                            <button (click)="openEditCommentDialogue()" class="add-reaction-btn reverse">
-                                <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="">
-                                <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg" alt="">
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <img class="chat-user-img" src="assets/user-icons/icon3.svg" alt="">
-
-                    <div class="chat-info-container">
-                        <div class="chat-start reverse">
-                            <div class="font-w-700">Frederik Beck</div> 
-                            <div class="font-14 t-gray">14:56 Uhr</div>
-                        </div>
-                        <div class="chat-message right">Ja... </div>
-                        <div class="chat-answered right">
-                            <div class="reactions">
-                                <div class="reaction-btn">
-                                    <img src="assets/reaction-icons/thumb.svg" alt="">
-                                    <div>1</div>
-                                </div>
-                                <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
-                                    iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
-                                    altText="Reaktion hinzufügen">
-                                </app-round-btn>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
         </div>
 
         <form class="form">

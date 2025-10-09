@@ -25,6 +25,8 @@ export class ThreadComponent implements OnInit {
   editCommentDialogueExpanded = false;
   activeReactionDialogueIndex: string | null = null;
   activeReactionDialogueBelowIndex: string | null = null;
+  activeReactionDialogueAnswersIndex: number | null = null;
+  activeReactionDialogueBelowAnswersIndex: number | null = null;
 
   currentUserId: string = '';
   participantIds: string[] = [];
@@ -36,7 +38,6 @@ export class ThreadComponent implements OnInit {
 
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
-  // chat$!: Observable<ChatWithDetails>;
   chat$!: Observable<Chat | undefined>;
   answers$!: Observable<Answer[]>;
 
@@ -149,7 +150,7 @@ export class ThreadComponent implements OnInit {
       this.channelName$ = of(channel.name);
       this.participants$ = this.userService.getUsersByIds(channel.participants);
       this.subscribeToParticipants();
-      this.subscribeToChatsAndUsers(channelId, this.participants$);
+      // this.subscribeToChatsAndUsers(channelId, this.participants$);
     });
   }
 
@@ -215,115 +216,147 @@ export class ThreadComponent implements OnInit {
     });
   }
 
-  private subscribeToChatsAndUsers(channelId: string, participants$: Observable<User[]>) {
-    combineLatest([
-      this.channelService.getChatsForChannel(channelId),
-      participants$
-    ]).pipe(
-      switchMap(([chats, users]) => {
-        if (!chats.length || !users.length) return of([]);
-        const chatDetailsObservables = chats.map(chat => this.enrichChat(channelId, chat, users));
-        return forkJoin(chatDetailsObservables);
-      }),
-      map((enrichedChats: ChatWithDetails[]) => enrichedChats.sort((a, b) => a.time - b.time))
-    ).subscribe(sortedChats => {
-      this.chatsSubject.next(sortedChats);
-      setTimeout(() => this.scrollToBottom());
-    });
-  }
-  private subscribeToThreadAndUsers(channelId: string, participants$: Observable<User[]>) {
-    combineLatest([
-      this.channelService.getChatsForChannel(channelId),
-      participants$
-    ]).pipe(
-      switchMap(([chats, users]) => {
-        if (!chats.length || !users.length) return of([]);
-        const chatDetailsObservables = chats.map(chat => this.enrichThread(channelId, chat, users));
-        return forkJoin(chatDetailsObservables);
-      }),
-      map((enrichedAnswers: ChatWithDetails[]) => enrichedAnswers.sort((a, b) => a.time - b.time))
-    ).subscribe(sortedAnswers => {
-      this.chatsSubject.next(sortedAnswers);
-      setTimeout(() => this.scrollToBottom());
-    });
-  }
+  // private subscribeToChatsAndUsers(channelId: string, participants$: Observable<User[]>) {
+  //   combineLatest([
+  //     this.channelService.getChatsForChannel(channelId),
+  //     participants$
+  //   ]).pipe(
+  //     switchMap(([chats, users]) => {
+  //       if (!chats.length || !users.length) return of([]);
+  //       const chatDetailsObservables = chats.map(chat => this.enrichChat(channelId, chat, users));
+  //       return forkJoin(chatDetailsObservables);
+  //     }),
+  //     map((enrichedChats: Chat[]) => enrichedChats.sort((a, b) => a.time - b.time))
+  //   ).subscribe(sortedChats => {
+  //     this.chatsSubject.next(sortedChats);
+  //     setTimeout(() => this.scrollToBottom());
+  //   });
+  // }
+  // private subscribeToThreadAndUsers(channelId: string, participants$: Observable<User[]>) {
+  //   combineLatest([
+  //     this.channelService.getChatsForChannel(channelId),
+  //     participants$
+  //   ]).pipe(
+  //     switchMap(([chats, users]) => {
+  //       if (!chats.length || !users.length) return of([]);
+  //       const chatDetailsObservables = chats.map(chat => this.enrichThread(channelId, chat, users));
+  //       return forkJoin(chatDetailsObservables);
+  //     }),
+  //     map((enrichedAnswers: ChatWithDetails[]) => enrichedAnswers.sort((a, b) => a.time - b.time))
+  //   ).subscribe(sortedAnswers => {
+  //     this.chatsSubject.next(sortedAnswers);
+  //     setTimeout(() => this.scrollToBottom());
+  //   });
+  // }
 
 
-  private enrichChat(channelId: string, chat: Chat, users: User[]): Observable<any> {
+  // private enrichChat(channelId: string, chat: Chat, users: User[]): Observable<any> {
+  //   return forkJoin({
+  //     reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(take(1),
+  //       // catchError(err => { console.error('[enrichChat] Fehler bei getReactionsForChat', err); return of({}); })
+  //     ),
+  //     user: of(users.find(u => u.uid === chat.user)),
+  //     answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1),
+  //       // catchError(err => { console.error('[enrichChat] Fehler bei getAnswersForChat', err); return of([]); })
+  //     )
+  //   }).pipe(
+  //     map(({ reactions, user, answers }) => {
+  //       const result = {
+  //         ...chat,
+  //         userName: user?.name,
+  //         userImg: user?.img,
+  //         answersCount: answers.length,
+  //         lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
+  //         reactions,
+  //         reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
+  //       };
+  //       // console.log('[enrichChat] Angereicherter Chat:', result); // Einzel-Chat loggen
+  //       return result;
+  //     })
+  //   );
+  // }
+  private enrichChat(channelId: string, chat: Chat, users: User[]): Observable<Chat> {
+    const normalizedReactions: Record<string, string[]> = {};
+    // Reaktionen normalisieren: Falls Wert einzelner String ist, in Array umwandeln
+    Object.entries(chat.reactions || {}).forEach(([key, val]) => {
+      if (Array.isArray(val)) {
+        normalizedReactions[key] = val;
+      } else if (typeof val === 'string') {
+        normalizedReactions[key] = [val];
+      } else {
+        normalizedReactions[key] = [];
+      }
+    });
+
     return forkJoin({
-      reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(take(1),
-        // catchError(err => { console.error('[enrichChat] Fehler bei getReactionsForChat', err); return of({}); })
-      ),
+      reactions: of(normalizedReactions), // kein weiterer Firestore Call nötig
       user: of(users.find(u => u.uid === chat.user)),
-      answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1),
-        // catchError(err => { console.error('[enrichChat] Fehler bei getAnswersForChat', err); return of([]); })
-      )
+      answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1))
     }).pipe(
       map(({ reactions, user, answers }) => {
-        const result = {
+        const enriched: Chat = {
           ...chat,
           userName: user?.name,
           userImg: user?.img,
           answersCount: answers.length,
-          lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
-          reactions,
+          lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : undefined,
+          reactions: reactions,
           reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
         };
-        // console.log('[enrichChat] Angereicherter Chat:', result); // Einzel-Chat loggen
-        return result;
+        return enriched;
       })
     );
   }
-  private enrichThread(channelId: string, chat: Chat, users: User[]): Observable<any> {
-    return forkJoin({
-      reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(take(1),
-        // catchError(err => { console.error('[enrichChat] Fehler bei getReactionsForChat', err); return of({}); })
-      ),
-      user: of(users.find(u => u.uid === chat.user)),
-      answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1),
-        // catchError(err => { console.error('[enrichChat] Fehler bei getAnswersForChat', err); return of([]); })
-      )
-    }).pipe(
-      map(({ reactions, user, answers }) => {
-        const result = {
-          ...chat,
-          userName: user?.name,
-          userImg: user?.img,
-          answersCount: answers.length,
-          lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
-          reactions,
-          reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
-        };
-        // console.log('[enrichChat] Angereicherter Chat:', result); // Einzel-Chat loggen
-        return result;
-      })
-    );
-  }
+  // private enrichThread(channelId: string, chat: Chat, users: User[]): Observable<any> {
+  //   return forkJoin({
+  //     reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(take(1),
+  //       // catchError(err => { console.error('[enrichChat] Fehler bei getReactionsForChat', err); return of({}); })
+  //     ),
+  //     user: of(users.find(u => u.uid === chat.user)),
+  //     answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1),
+  //       // catchError(err => { console.error('[enrichChat] Fehler bei getAnswersForChat', err); return of([]); })
+  //     )
+  //   }).pipe(
+  //     map(({ reactions, user, answers }) => {
+  //       const result = {
+  //         ...chat,
+  //         userName: user?.name,
+  //         userImg: user?.img,
+  //         answersCount: answers.length,
+  //         lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
+  //         reactions,
+  //         reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
+  //       };
+  //       // console.log('[enrichChat] Angereicherter Chat:', result); // Einzel-Chat loggen
+  //       return result;
+  //     })
+  //   );
+  // }
 
 
-  getChatObservable(): Observable<Chat | undefined> {
-    return combineLatest([
-      this.channelService.getChatsForChannel(this.channelId),
-      of(this.participants)
-    ]).pipe(
-      map(([chats, participants]) => chats.find(c => c.id === this.chatId)),
-      switchMap(chat => {
-        if (!chat) return of(undefined);
-        return forkJoin({
-          reactions: this.channelService.getReactionsForChat(this.channelId, chat.id).pipe(take(1)),
-          user: of(this.participants.find(u => u.uid === chat.user)),
-        }).pipe(
-          map(({ reactions, user }) => ({
-            ...chat,
-            userName: user?.name,
-            userImg: user?.img,
-            reactions,
-            reactionArray: this.transformReactionsToArray(reactions, this.participants, this.currentUserId)
-          }))
-        );
-      })
-    );
-  }
+  // getChatObservable(): Observable<Chat | undefined> {
+  //   return combineLatest([
+  //     this.channelService.getChatsForChannel(this.channelId),
+  //     of(this.participants)
+  //   ]).pipe(
+  //     map(([chats, participants]) => chats.find(c => c.id === this.chatId)),
+  //     switchMap(chat => {
+  //       if (!chat) return of(undefined);
+  //       return forkJoin({
+  //         reactions: this.channelService.getReactionsForChat(this.channelId, chat.id).pipe(take(1)),
+  //         user: of(this.participants.find(u => u.uid === chat.user)),
+  //       }).pipe(
+  //         map(({ reactions, user }) => ({
+  //           ...chat,
+  //           userName: user?.name,
+  //           userImg: user?.img,
+  //           reactions,
+  //           reactionArray: this.transformReactionsToArray(reactions, this.participants, this.currentUserId)
+  //         }))
+  //       );
+  //     })
+  //   );
+  // }
 
   getAnswersForChat() {
     // Answers aus der Subcollection
@@ -400,6 +433,15 @@ export class ThreadComponent implements OnInit {
       this.activeReactionDialogueBelowIndex = null;
     }
   }
+  openReactionsDialogueAnswers(i: number) {
+    if (this.activeReactionDialogueAnswersIndex === i) {
+      this.activeReactionDialogueAnswersIndex = null;
+    } else {
+      this.editCommentDialogueExpanded = false;
+      this.activeReactionDialogueAnswersIndex = i;
+      this.activeReactionDialogueBelowAnswersIndex = null;
+    }
+  }
 
   openReactionsDialogueBelow(chatId: string) {
     if (this.activeReactionDialogueBelowIndex === chatId) {
@@ -408,6 +450,16 @@ export class ThreadComponent implements OnInit {
       this.editCommentDialogueExpanded = false;
       this.activeReactionDialogueBelowIndex = chatId; // öffne aktuellen
       this.activeReactionDialogueIndex = null;
+    }
+  }
+
+  openReactionsDialogueBelowAnswers(i: number) {
+    if (this.activeReactionDialogueBelowAnswersIndex === i) {
+      this.activeReactionDialogueBelowAnswersIndex = null; // schließe, wenn bereits offen
+    } else {
+      this.editCommentDialogueExpanded = false;
+      this.activeReactionDialogueBelowAnswersIndex = i; // öffne aktuellen
+      this.activeReactionDialogueAnswersIndex = null;
     }
   }
 
@@ -493,32 +545,19 @@ export class ThreadComponent implements OnInit {
     return participants.find(u => u.uid === others[0])?.name || 'Unbekannt';
   }
 
-  private async saveOrDeleteReaction(channelId: string, chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
-    if (updatedUsers.length === 0) {
-      await this.channelService.deleteReactionForChat(channelId, chatId, reactionType);
-    } else {
-      await this.channelService.updateReactionForChat(channelId, chatId, reactionType, updatedUsers);
-    }
-  }
-
-  // private async updateReactionForChat(chatIndex: number, reactionType: string, updatedUsers: string[]): Promise<void> {
-  //   // Hier hole den aktuellen State vom BehaviorSubject (nicht von channelChats)
-  //   const chats = this.chatsSubject.getValue();
-  //   const chat = chats[chatIndex];
-  //   if (!chat) return;
-
-  //   const channelId = this.channelId;
-  //   const chatId = chat.id;
-  //   const currentUserId = this.currentUserId;
-  //   if (!channelId || !chatId || !currentUserId) return;
-
-  //   try {
-  //     await this.saveOrDeleteReaction(channelId, chatId, reactionType, updatedUsers);
-  //     this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
-  //   } catch (error) {
-  //     console.error('Fehler beim Aktualisieren der Reaction:', error);
+  // private async saveOrDeleteReaction(channelId: string, chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
+  //   if (updatedUsers.length === 0) {
+  //     await this.channelService.deleteReactionForChat(channelId, chatId, reactionType);
+  //   } else {
+  //     await this.channelService.updateReactionForChat(channelId, chatId, reactionType, updatedUsers);
   //   }
   // }
+  private async saveOrDeleteReaction(channelId: string, chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
+    // Methode passt sich an die Map-Struktur an und ruft setReaction auf
+    await this.channelService.setReaction(channelId, chatId, reactionType, updatedUsers);
+  }
+
+
   private async updateReactionForChat(chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
     // Hole den aktuellen Chat direkt über das Observable (du hast nur einen Chat im Thread)
     const chat = await firstValueFrom(this.chat$);

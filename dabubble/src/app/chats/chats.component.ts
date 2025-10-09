@@ -231,10 +231,20 @@ export class ChatsComponent implements OnInit, OnChanges {
   //   );
   // }
   private enrichChat(channelId: string, chat: Chat, users: User[]): Observable<Chat> {
+    const normalizedReactions: Record<string, string[]> = {};
+    // Reaktionen normalisieren: Falls Wert einzelner String ist, in Array umwandeln
+    Object.entries(chat.reactions || {}).forEach(([key, val]) => {
+      if (Array.isArray(val)) {
+        normalizedReactions[key] = val;
+      } else if (typeof val === 'string') {
+        normalizedReactions[key] = [val];
+      } else {
+        normalizedReactions[key] = [];
+      }
+    });
+
     return forkJoin({
-      // reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(take(1)),
-      // Reactions werden als Map im chat geladen
-      reactions: of(chat.reactions || {}), // kein weiterer Firestore Call nötig
+      reactions: of(normalizedReactions), // kein weiterer Firestore Call nötig
       user: of(users.find(u => u.uid === chat.user)),
       answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1))
     }).pipe(
@@ -252,6 +262,28 @@ export class ChatsComponent implements OnInit, OnChanges {
       })
     );
   }
+  // private enrichChat(channelId: string, chat: Chat, users: User[]): Observable<Chat> {
+  //   return forkJoin({
+  //     // reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(take(1)),
+  //     // Reactions werden als Map im chat geladen
+  //     reactions: of(chat.reactions || {}), // kein weiterer Firestore Call nötig
+  //     user: of(users.find(u => u.uid === chat.user)),
+  //     answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1))
+  //   }).pipe(
+  //     map(({ reactions, user, answers }) => {
+  //       const enriched: Chat = {
+  //         ...chat,
+  //         userName: user?.name,
+  //         userImg: user?.img,
+  //         answersCount: answers.length,
+  //         lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
+  //         reactions: reactions,
+  //         reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
+  //       };
+  //       return enriched;
+  //     })
+  //   );
+  // }
 
   getChatDate(chat: any): Date | undefined {
     return chat.time ? new Date(chat.time * 1000) : undefined;
@@ -305,8 +337,9 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  transformReactionsToArray(
-  //   reactionsMap: Record<string, string[]>,
+  // transformReactionsToArray(
+    // reactionsMap: Record<string, string[]>,
+  //   reactionsMap: Record<string, string[] | string>,
   //   participants: User[],
   //   currentUserId: string
   // ): {
@@ -357,7 +390,64 @@ export class ChatsComponent implements OnInit, OnChanges {
   //   });
   // }
   // transformReactions(
-    reactionsMap: Record<string, string[] | string>,
+  //   reactionsMap: Record<string, string[] | string>,
+  //   participants: User[],
+  //   currentUserId: string
+  // ): {
+  //   type: string,
+  //   count: number,
+  //   userIds: string[],
+  //   currentUserReacted: boolean,
+  //   otherUserName?: string,
+  //   otherUserReacted: boolean
+  // }[] {
+  //   if (!reactionsMap) return [];
+
+  //   return Object.entries(reactionsMap).map(([type, usersRaw]) => {
+  //     const userIds = this.parseUserIds(Array.isArray(usersRaw) ? usersRaw : [usersRaw]);
+
+  //     const currentUserReacted = userIds.includes(currentUserId);
+  //     const otherUserIds = userIds.filter(id => id !== currentUserId);
+  //     const otherUserReacted = otherUserIds.length > 1;
+  //     const otherUserName = otherUserIds.length > 0
+  //       ? participants.find(u => u.uid === otherUserIds[0])?.name
+  //       : undefined;
+
+  //     return {
+  //       type,
+  //       count: userIds.length,
+  //       userIds,
+  //       currentUserReacted,
+  //       otherUserName,
+  //       otherUserReacted
+  //     };
+  //   });
+  // }
+  // transformReactionsToArray(
+  //   reactionsMap: Record<string, string[]>,
+  //   participants: User[],
+  //   currentUserId: string
+  // ) {
+  //   if (!reactionsMap) return [];
+  //   return Object.entries(reactionsMap).map(([type, userIds]) => {
+  //     const currentUserReacted = userIds.includes(currentUserId);
+  //     const otherUserIds = userIds.filter(id => id !== currentUserId);
+  //     const otherUserName = otherUserIds.length > 0
+  //       ? participants.find(u => u.uid === otherUserIds[0])?.name
+  //       : undefined;
+
+  //     return {
+  //       type,
+  //       count: userIds.length,
+  //       userIds,
+  //       currentUserReacted,
+  //       otherUserName,
+  //       otherUserReacted: otherUserIds.length > 0
+  //     };
+  //   });
+  // }
+  transformReactionsToArray(
+    reactionsMap: Record<string, string[]>,
     participants: User[],
     currentUserId: string
   ): {
@@ -372,13 +462,14 @@ export class ChatsComponent implements OnInit, OnChanges {
 
     return Object.entries(reactionsMap).map(([type, usersRaw]) => {
       const userIds = this.parseUserIds(Array.isArray(usersRaw) ? usersRaw : [usersRaw]);
-
       const currentUserReacted = userIds.includes(currentUserId);
-      const otherUserIds = userIds.filter(id => id !== currentUserId);
-      const otherUserReacted = otherUserIds.length > 1;
-      const otherUserName = otherUserIds.length > 0
-        ? participants.find(u => u.uid === otherUserIds[0])?.name
-        : undefined;
+      // const otherUserIds = userIds.filter(id => id !== currentUserId);
+      const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
+      const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
+      // const otherUserName = otherUserIds.length > 0
+      //   ? participants.find(u => u.uid === otherUserIds[0])?.name
+      //   : undefined;
+      // const otherUserReacted = otherUserIds.length > 0;
 
       return {
         type,
@@ -391,33 +482,33 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
   }
 
-  private buildReactionObject(
-    type: string,
-    usersRaw: string[],
-    participants: User[],
-    currentUserId: string
-  ): {
-    type: string,
-    count: number,
-    userIds: string[],
-    currentUserReacted: boolean,
-    otherUserName?: string,
-    otherUserReacted: boolean
-  } {
-    const userIds = this.parseUserIds(usersRaw);
-    const currentUserReacted = userIds.includes(currentUserId);
-    const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
-    const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
+  // private buildReactionObject(
+  //   type: string,
+  //   usersRaw: string[],
+  //   participants: User[],
+  //   currentUserId: string
+  // ): {
+  //   type: string,
+  //   count: number,
+  //   userIds: string[],
+  //   currentUserReacted: boolean,
+  //   otherUserName?: string,
+  //   otherUserReacted: boolean
+  // } {
+  //   const userIds = this.parseUserIds(usersRaw);
+  //   const currentUserReacted = userIds.includes(currentUserId);
+  //   const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
+  //   const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
 
-    return {
-      type,
-      count: userIds.length,
-      userIds,
-      currentUserReacted,
-      otherUserName,
-      otherUserReacted
-    };
-  }
+  //   return {
+  //     type,
+  //     count: userIds.length,
+  //     userIds,
+  //     currentUserReacted,
+  //     otherUserName,
+  //     otherUserReacted
+  //   };
+  // }
 
   private parseUserIds(users: string[]): string[] {
     return users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
@@ -429,32 +520,32 @@ export class ChatsComponent implements OnInit, OnChanges {
     return participants.find(u => u.uid === others[0])?.name || 'Unbekannt';
   }
 
-  private async saveOrDeleteReaction(channelId: string, chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
-    if (updatedUsers.length === 0) {
-      await this.channelService.deleteReactionForChat(channelId, chatId, reactionType);
-    } else {
-      await this.channelService.updateReactionForChat(channelId, chatId, reactionType, updatedUsers);
-    }
-  }
+  // private async saveOrDeleteReaction(channelId: string, chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
+  //   if (updatedUsers.length === 0) {
+  //     await this.channelService.deleteReactionForChat(channelId, chatId, reactionType);
+  //   } else {
+  //     await this.channelService.updateReactionForChat(channelId, chatId, reactionType, updatedUsers);
+  //   }
+  // }
 
-  private async updateReactionForChat(chatIndex: number, reactionType: string, updatedUsers: string[]): Promise<void> {
-    // Hier hole den aktuellen State vom BehaviorSubject (nicht von channelChats)
-    const chats = this.chatsSubject.getValue();
-    const chat = chats[chatIndex];
-    if (!chat) return;
+  // private async updateReactionForChat(chatIndex: number, reactionType: string, updatedUsers: string[]): Promise<void> {
+  //   // Hier hole den aktuellen State vom BehaviorSubject (nicht von channelChats)
+  //   const chats = this.chatsSubject.getValue();
+  //   const chat = chats[chatIndex];
+  //   if (!chat) return;
 
-    const channelId = this.channelId;
-    const chatId = chat.id;
-    const currentUserId = this.currentUserId;
-    if (!channelId || !chatId || !currentUserId) return;
+  //   const channelId = this.channelId;
+  //   const chatId = chat.id;
+  //   const currentUserId = this.currentUserId;
+  //   if (!channelId || !chatId || !currentUserId) return;
 
-    try {
-      await this.saveOrDeleteReaction(channelId, chatId, reactionType, updatedUsers);
-      this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
-    } catch (error) {
-      console.error('Fehler beim Aktualisieren der Reaction:', error);
-    }
-  }
+  //   try {
+  //     await this.saveOrDeleteReaction(channelId, chatId, reactionType, updatedUsers);
+  //     this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
+  //   } catch (error) {
+  //     console.error('Fehler beim Aktualisieren der Reaction:', error);
+  //   }
+  // }
 
   private updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[], chatIndex: number) {
     chat.reactions = { ...chat.reactions };
@@ -471,7 +562,21 @@ export class ChatsComponent implements OnInit, OnChanges {
     newChats[chatIndex] = chat;  // Ersetze den Chat an Index
     this.chatsSubject.next(newChats); 
   }
+  
 
+  // async addReaction(chatIndex: number, reactionType: string) {
+  //   const chats = this.chatsSubject.getValue();
+  //   const chat = chats[chatIndex];
+  //   if (!chat) return;
+
+  //   this.activeReactionDialogueIndex = null;
+  //   this.activeReactionDialogueBelowIndex = null;
+  //   const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
+  //   if (!currentReactionUsers.includes(this.currentUserId)) {
+  //     const updatedUsers = [...currentReactionUsers, this.currentUserId];
+  //     await this.updateReactionForChat(chatIndex, reactionType, updatedUsers);
+  //   }
+  // }
   async addReaction(chatIndex: number, reactionType: string) {
     const chats = this.chatsSubject.getValue();
     const chat = chats[chatIndex];
@@ -479,45 +584,80 @@ export class ChatsComponent implements OnInit, OnChanges {
 
     this.activeReactionDialogueIndex = null;
     this.activeReactionDialogueBelowIndex = null;
-    const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
+
+    const currentReactionUsers = chat.reactions?.[reactionType] || [];
     if (!currentReactionUsers.includes(this.currentUserId)) {
       const updatedUsers = [...currentReactionUsers, this.currentUserId];
-      await this.updateReactionForChat(chatIndex, reactionType, updatedUsers);
+      await this.channelService.setReaction(this.channelId!, chat.id, reactionType, updatedUsers);
+      this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
     }
   }
 
-  async toggleReaction(chatIndex: number, reactionType: string) {
-    const chat = await this.getChatByIndex(chatIndex);
-    if (!chat) return;
-
-    const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
-    let updatedUsers: string[];
-    if (currentReactionUsers.includes(this.currentUserId)) {
-      updatedUsers = currentReactionUsers.filter(uid => uid !== this.currentUserId);
-    } else {
-      updatedUsers = [...currentReactionUsers, this.currentUserId];
-    }
-
-    await this.updateReactionForChat(chatIndex, reactionType, updatedUsers);
-  }
+  
   // async toggleReaction(chatIndex: number, reactionType: string) {
   //   const chat = await this.getChatByIndex(chatIndex);
   //   if (!chat) return;
 
-  //   const currentUsers = this.extractUserIds(chat.reactions || {}, reactionType);
+  //   const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
   //   let updatedUsers: string[];
-  //   if (currentUsers.includes(this.currentUserId)) {
-  //     updatedUsers = currentUsers.filter(uid => uid !== this.currentUserId);
+  //   if (currentReactionUsers.includes(this.currentUserId)) {
+  //     updatedUsers = currentReactionUsers.filter(uid => uid !== this.currentUserId);
   //   } else {
-  //     updatedUsers = [...currentUsers, this.currentUserId];
+  //     updatedUsers = [...currentReactionUsers, this.currentUserId];
   //   }
 
-  //   await this.channelService.updateReaction(this.channelId!, chat.id, reactionType, updatedUsers);
-  //   this.updateLocalReaction(chat, reactionType, updatedUsers);
+  //   await this.updateReactionForChat(chatIndex, reactionType, updatedUsers);
+  // }
+  async toggleReaction(chatIndex: number, reactionType: string) {
+    const chat = await this.getChatByIndex(chatIndex);
+    if (!chat) return;
+    console.log(chatIndex, reactionType);
+    const currentUsers = this.extractUserIds(chat.reactions || {}, reactionType);
+    let updatedUsers: string[];
+    if (currentUsers.includes(this.currentUserId)) {
+      updatedUsers = currentUsers.filter(uid => uid !== this.currentUserId);
+    } else {
+      updatedUsers = [...currentUsers, this.currentUserId];
+    }
+
+    // await this.channelService.updateReaction(this.channelId!, chat.id, reactionType, updatedUsers);
+    // this.updateLocalReaction(chat, reactionType, updatedUsers);
+
+    await this.channelService.setReaction(this.channelId!, chat.id, reactionType, updatedUsers);
+    this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
+  }
+  // async toggleReaction(chatIndex: number, reactionType: string) {
+  //   const chats = this.chatsSubject.getValue();
+  //   const chat = chats[chatIndex];
+  //   if (!chat) return;
+
+  //   const currentReactionUsers = chat.reactions?.[reactionType] || [];
+  //   let updatedUsers: string[];
+  //   if (currentReactionUsers.includes(this.currentUserId)) {
+  //     updatedUsers = currentReactionUsers.filter(uid => uid !== this.currentUserId);
+  //   } else {
+  //     updatedUsers = [...currentReactionUsers, this.currentUserId];
+  //   }
+
+  //   await this.channelService.setReaction(this.channelId!, chat.id, reactionType, updatedUsers);
+  //   this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
   // }
 
+  // private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
+  //   const usersRaw = reactions[reactionType] || [];
+  //   return usersRaw.flatMap((u: string) =>
+  //     u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
+  //   );
+  // }
   private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
-    const usersRaw = reactions[reactionType] || [];
+    let usersRaw = reactions[reactionType];
+    if (!usersRaw) return [];
+
+    // usersRaw in Array umwandeln, falls es ein String ist
+    if (!Array.isArray(usersRaw)) {
+      usersRaw = [usersRaw];
+    }
+
     return usersRaw.flatMap((u: string) =>
       u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
     );

@@ -125,6 +125,7 @@
                                 <div (click)="handleOpenThread(chat.id)" class="answer t-purple">{{ chat.answersCount }} Antworten</div>
                                 <div class="last-answer font-14 t-gray">Letzte Antwort {{ chat.lastAnswerTime ? (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}</div>
                             </div>
+                            
                             <div class="reactions">
                                 <div class="reaction-btns">
                                     <div (click)="toggleReaction(i, reaction.type)"
