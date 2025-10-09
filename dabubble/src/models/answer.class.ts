@@ -1,4 +1,4 @@
-export interface AnswerWithDetails {
+export interface Answer {
   id: string;
   message: string;
   time: number;

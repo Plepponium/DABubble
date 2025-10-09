@@ -12,7 +12,7 @@ import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.class';
 import { Chat } from '../../models/chat.class';
 import { ChatWithDetails } from '../../models/chat-with-details.class';
-import { AnswerWithDetails } from '../../models/answer-with-details.class';
+import { Answer } from '../../models/answer.class';
 import { reactionIcons } from '../reaction-icons';
 
 @Component({
@@ -37,8 +37,8 @@ export class ThreadComponent implements OnInit {
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
   // chat$!: Observable<ChatWithDetails>;
-  chat$!: Observable<ChatWithDetails | undefined>;
-  answers$!: Observable<AnswerWithDetails[]>;
+  chat$!: Observable<Chat | undefined>;
+  answers$!: Observable<Answer[]>;
 
   private chatsSubject = new BehaviorSubject<ChatWithDetails[]>([]);
   public chats$ = this.chatsSubject.asObservable();
@@ -153,7 +153,7 @@ export class ThreadComponent implements OnInit {
     });
   }
 
-  getEnrichedChat(): Observable<ChatWithDetails | undefined> {
+  getEnrichedChat(): Observable<Chat | undefined> {
     return this.channelService.getChatsForChannel(this.channelId).pipe(
       switchMap(chats =>
         this.userService.getUsersByIds(chats.map(c => c.user)).pipe(
@@ -174,7 +174,7 @@ export class ThreadComponent implements OnInit {
     );
   }
 
-  getEnrichedAnswers(): Observable<AnswerWithDetails[]> {
+  getEnrichedAnswers(): Observable<Answer[]> {
     return this.channelService.getAnswersForChat(this.channelId, this.chatId).pipe(
       switchMap(answers =>
         answers.length
@@ -301,7 +301,7 @@ export class ThreadComponent implements OnInit {
   }
 
 
-  getChatObservable(): Observable<ChatWithDetails | undefined> {
+  getChatObservable(): Observable<Chat | undefined> {
     return combineLatest([
       this.channelService.getChatsForChannel(this.channelId),
       of(this.participants)
