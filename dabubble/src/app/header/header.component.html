@@ -22,24 +22,4 @@
             <img class="hover-icon-purple" src="assets/icons/expand_more-purple.svg" alt="">
         </div>
     </div>
-
-    <div (click)="closeDialogueLogout()" *ngIf="showLogoutDialogue" class="dialogue-backdrop"></div>
-    <app-logout-overlay
-        *ngIf="showLogoutDialogue"
-        (close)="closeDialogueLogout()" 
-        (openUser)="openDialogueUser()"
-        (logout)="logout()">
-    </app-logout-overlay>
-
-    <div (click)="closeDialogueUser(); closeEditUser()" *ngIf="showUserDialogue || showEditDialogue" class="dialogue-backdrop2"></div>
-    <app-user-profile
-        *ngIf="showUserDialogue"
-        (close)="closeDialogueUser()" 
-        (openEdit)="openEditUser()">
-    </app-user-profile>
-
-    <app-edit-user
-        *ngIf="showEditDialogue"
-        (close)="closeEditUser()">
-    </app-edit-user>
 </div>

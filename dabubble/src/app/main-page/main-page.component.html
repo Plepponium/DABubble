@@ -1,8 +1,8 @@
 <div class="main-page">
-    <app-header class="header"></app-header>
+    <app-header class="header" (openLogoutOverlay)="openLogoutOverlay()"
+        (openUserProfile)="openUserProfile()"></app-header>
 
     <button class="toggle-menu-btn" type="button" (click)="toggleMenu()">
-        <!-- <button class="toggle-menu-btn" type="button" (click)="drawer.toggle()"> -->
         <div class="toggle-btn-container">
             <div *ngIf="menuOpen" class="toggle-btn-content menu-open">
                 <div class="toggle-btn-text font-20 f-nunito">Workspace-Menü schließen</div>
@@ -19,43 +19,37 @@
     </button>
 
     <div class="container">
-        <!-- <div #drawer class="sidenav" (openMenu)="menuOpen = true" mode="side">
-            <app-menu></app-menu>
-        </div> -->
         <div #drawer class="sidenav" [class.closed]="!menuOpen" mode="side">
             <app-menu (openAddChannel)="openAddChannel()" (openChannel)="openChannel($event)"
                 (openUserChat)="openUserChat($event)"></app-menu>
         </div>
-
         <div class="content" [class.fullwidth]="!menuOpen" [class.dm-open]="isDmOpen">
             <app-chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId"
                 (openThread)="openThread($event)"></app-chats>
-            <app-thread id="thread" class="thread" *ngIf="threadOpen && currentChannelId && threadChatId" 
+            <app-thread id="thread" class="thread" *ngIf="threadOpen && currentChannelId && threadChatId"
                 [chatId]="threadChatId" [channelId]="currentChannelId" [hidden]="!threadOpen"
                 (closeThread)="threadOpen = false"></app-thread>
-            <app-direct-message-chats *ngIf="userChatOpen && activeUserId"
-                [userId]="activeUserId"></app-direct-message-chats>
+
+
+            <app-direct-message-chats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
+                (openProfile)="openProfileOverlay($event)"></app-direct-message-chats>
+
+
         </div>
     </div>
-    <!-- <mat-drawer-container class="container" autosize>
-        <mat-drawer #drawer class="sidenav" [opened]="true" mode="side">
-            <app-menu></app-menu>
-        </mat-drawer>
-
-        <div class="content">
-            <app-chats id="chats" class="chats" (openThread)="threadOpen = true"></app-chats>
-            <app-thread id="thread" class="thread" [hidden]="!threadOpen" (closeThread)="threadOpen = false"></app-thread>
-        </div>
-    </mat-drawer-container> -->
 
 
-    <div (click)="closeAddChannel()" *ngIf="showAddChannelDialogue" class="dialogue-backdrop"></div>
-    <!-- <app-logout-overlay
-        *ngIf="showLogoutDialogue"
-        (close)="closeDialogueLogout()" 
-        (openUser)="openDialogueUser()"
+    <div (click)="closeAllOverlays()" *ngIf="anyOverlayOpen()" class="dialogue-backdrop"></div>
+
+    <app-logout-overlay *ngIf="showLogoutOverlay" (close)="closeAllOverlays()" (openUser)="openUserProfile()"
         (logout)="logout()">
-    </app-logout-overlay> -->
+    </app-logout-overlay>
+    <app-user-profile *ngIf="showUserProfile" (close)="closeAllOverlays()"
+        (openEdit)="openEditUser()"></app-user-profile>
+    <app-edit-user *ngIf="showEditUser" (close)="closeAllOverlays()"></app-edit-user>
+    <app-profile-overlay *ngIf="showProfileOverlay" [user]="selectedProfile"
+        (close)="closeAllOverlays()"></app-profile-overlay>
+
     <app-add-channel-overlay *ngIf="showAddChannelDialogue" (close)="closeAddChannel()">
     </app-add-channel-overlay>
 

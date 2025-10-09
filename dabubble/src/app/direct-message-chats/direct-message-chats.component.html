@@ -57,7 +57,9 @@
                                     <ng-container *ngIf="!m.isEditing; else editMode">
                                         <div class="chat-bubble">
                                             <div class="chat-meta">
-                                                <span class="sender-name font-w-700 font-18">{{ m.senderName }}</span>
+                                                <span class="sender-name font-w-700 font-18"
+                                                    (click)="openProfile.emit(m.senderId)">{{ m.senderName }}
+                                                </span>
                                                 <span class="time t-gray font-14">
                                                     {{ m.sentAt?.toDate ? (m.sentAt.toDate() | date:'HH:mm') : '' }} Uhr
                                                 </span>

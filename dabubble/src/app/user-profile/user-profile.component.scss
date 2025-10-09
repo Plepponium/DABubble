@@ -1,86 +1,82 @@
 .dialogue-overlay {
-    // max-width: 500px;
-    // width: 100%;
-    position: absolute;
-    top: 116px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 45px;
-    padding: 40px;
-    background-color: #ffffff;
-    border-top-left-radius: 30px;
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
-    box-shadow: 4px 4px 7px 0px rgba(0, 0, 0, 0.2);
-    z-index: 7;
+  position: absolute;
+  top: 116px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 45px;
+  padding: 40px;
+  background-color: #ffffff;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  box-shadow: 4px 4px 7px 0px rgba(0, 0, 0, 0.2);
+  z-index: 7;
 }
 
 .dialogue-overlay-header {
-    // width: 335px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 24px;
-    font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  font-size: 24px;
+  font-weight: 700;
 }
 
 .user-img-container {
- width: 100%;
- display: flex;
- justify-content: center;
-} 
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
 
 .user-img {
-    width: 200px;
-    height: 200px;
-    border-radius: 100%;
+  width: 200px;
+  height: 200px;
+  border-radius: 100%;
 }
 
 .name-container {
-    width: 420px;
-    // pointer-events: none;
+  width: 420px;
 }
 
 .name-edit {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .user-name {
-    font-size: 32px;
-    font-weight: 700;
+  font-size: 32px;
+  font-weight: 700;
 }
 
 .edit {
-    color: #535af1;
-    cursor: pointer;
+  color: #535af1;
+  cursor: pointer;
 }
 
 .online-info {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .online-signal-solo {
-    width: 16px;
-    height: 16px;
-    border-radius: 100%;
+  width: 16px;
+  height: 16px;
+  border-radius: 100%;
 }
 
 .mail-container {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 .mail-address {
-    display: flex;
-    gap: 20px;
-    font-size: 20px;
-    font-weight: 700;
+  display: flex;
+  gap: 20px;
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .mail {
-    color: #1381ff;
-    padding-left: 50px;
-    padding-right: 10px;
+  color: #1381ff;
+  padding-left: 50px;
+  padding-right: 10px;
 }

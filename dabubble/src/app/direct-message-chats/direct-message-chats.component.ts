@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, inject, Input, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject, Input, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable, of, combineLatest, firstValueFrom } from 'rxjs';
@@ -20,6 +20,7 @@ import { DmReactionsDialogComponent } from '../dm-reactions-dialog/dm-reactions-
 export class DirectMessageChatsComponent {
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
   @Input() userId!: string;
+  @Output() openProfile = new EventEmitter<string>();
   private userService = inject(UserService);
   private dmService = inject(DirectMessageService);
 

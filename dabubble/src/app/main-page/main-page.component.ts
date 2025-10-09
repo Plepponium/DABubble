@@ -11,10 +11,17 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { AddChannelOverlayComponent } from '../add-channel-overlay/add-channel-overlay.component';
 import { DirectMessageChatsComponent } from '../direct-message-chats/direct-message-chats.component';
 import { User } from '../../models/user.class';
+import { UserProfileComponent } from '../user-profile/user-profile.component';
+import { EditUserComponent } from '../edit-user/edit-user.component';
+import { ProfileOverlayComponent } from '../profile-overlay/profile-overlay.component';
+import { LogoutOverlayComponent } from '../logout-overlay/logout-overlay.component';
+import { UserService } from '../../services/user.service';
+import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-main-page',
-  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, DirectMessageChatsComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent],
+  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, DirectMessageChatsComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent, UserProfileComponent, EditUserComponent, ProfileOverlayComponent, LogoutOverlayComponent],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss',
 })
@@ -29,6 +36,16 @@ export class MainPageComponent {
   activeUserId?: string;
   threadChatId?: string;
 
+  showLogoutOverlay = false;
+  showUserProfile = false;
+  showEditUser = false;
+  showProfileOverlay = false;
+
+  selectedProfile: any = null;
+
+  private userService = inject(UserService);
+  private router = inject(Router);
+
   get isDmOpen(): boolean {
     return this.userChatOpen && !!this.activeUserId;
   }
@@ -38,9 +55,7 @@ export class MainPageComponent {
   }
 
   openAddChannel() {
-    // event.stopPropagation(); // Verhindert, dass das click-Event der list-header-container ausgelöst wird
     this.showAddChannelDialogue = true;
-    // this.openAddChannel.emit();
   }
 
   closeAddChannel() {
@@ -63,12 +78,61 @@ export class MainPageComponent {
     this.threadOpen = false;
   }
 
-  openThread(event: {channelId: string; chatId: string}) {
+  openThread(event: { channelId: string; chatId: string }) {
     this.threadChatId = event.chatId;
     this.currentChannelId = event.channelId;
     this.threadOpen = true;
-    // console.log('main openThread event: ', event);
-    // this.channelOpen = true;
-    // this.userChatOpen = false; // optional, falls DM Chats geschlossen werden sollen
   }
+
+  openLogoutOverlay() {
+    this.closeAllOverlays();
+    this.showLogoutOverlay = true;
+  }
+
+  openUserProfile() {
+    this.closeAllOverlays();
+    this.showUserProfile = true;
+  }
+
+  async openProfileOverlay(userId: string) {
+    this.closeAllOverlays();
+
+    const currentUser = await firstValueFrom(this.userService.getCurrentUser());
+    if (currentUser?.uid === userId) {
+      this.openUserProfile();
+      return;
+    }
+
+    const user = await firstValueFrom(this.userService.getSingleUserById(userId));
+    if (user) {
+      this.selectedProfile = user;
+      this.showProfileOverlay = true;
+    }
+  }
+
+
+  openEditUser() {
+    this.closeAllOverlays();
+    this.showEditUser = true;
+  }
+
+  closeAllOverlays() {
+    this.showUserProfile = false;
+    this.showEditUser = false;
+    this.showProfileOverlay = false;
+    this.showLogoutOverlay = false;
+    this.showAddChannelDialogue = false;
+    this.selectedProfile = null;
+  }
+
+  anyOverlayOpen() {
+    return this.showUserProfile || this.showEditUser || this.showProfileOverlay || this.showLogoutOverlay || this.showAddChannelDialogue;
+  }
+
+  logout() {
+    this.userService.logout().then(() => {
+      this.router.navigate(['/']);
+    });
+  }
+
 }

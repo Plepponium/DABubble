@@ -1,25 +1,23 @@
-import { Component, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { User } from '../../models/user.class';
 import { UserService } from '../../services/user.service';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { LogoutOverlayComponent } from '../logout-overlay/logout-overlay.component';
-import { UserProfileComponent } from '../user-profile/user-profile.component';
-import { EditUserComponent } from '../edit-user/edit-user.component';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
-  imports: [MatIconModule, MatButtonModule, CommonModule, LogoutOverlayComponent, UserProfileComponent, EditUserComponent],
+  imports: [MatIconModule, MatButtonModule, CommonModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  showLogoutDialogue = false;
-  showUserDialogue = false;
-  showEditDialogue = false;
+
+  @Output() openLogoutOverlay = new EventEmitter<void>();
+  @Output() openUserProfile = new EventEmitter<void>();
+
   currentUser$: Observable<User | undefined>;
 
   constructor(private userService: UserService, private router: Router) {
@@ -31,28 +29,11 @@ export class HeaderComponent {
   }
 
   openDialogueLogout() {
-    this.showLogoutDialogue = true;
+    this.openLogoutOverlay.emit();
   }
 
-  closeDialogueLogout() {
-    this.showLogoutDialogue = false;
-  }
-
-  openDialogueUser() {
-    this.showUserDialogue = true;
-  }
-
-  closeDialogueUser() {
-    this.showUserDialogue = false;
-  }
-
-  openEditUser() {
-    this.showEditDialogue = true;
-    this.showUserDialogue = false;
-  }
-
-  closeEditUser() {
-    this.showEditDialogue = false;
+  openProfileFromHeader() {
+    this.openUserProfile.emit();
   }
 
   logout() {
