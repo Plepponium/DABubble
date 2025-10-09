@@ -2,10 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { Auth, authState, signOut } from '@angular/fire/auth';
 import { Firestore, collectionData, collection, serverTimestamp } from '@angular/fire/firestore';
 import { doc, docData, updateDoc } from '@angular/fire/firestore';
-import { Observable, switchMap, of, shareReplay, merge, map, forkJoin, tap, take } from 'rxjs';
+import { Observable, switchMap, of, shareReplay, map, forkJoin, take } from 'rxjs';
 import { User } from '../models/user.class';
-
-// import { tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -27,6 +25,11 @@ export class UserService {
     );
   }
 
+  getSingleUserById(userId: string): Observable<User | undefined> {
+    const userRef = doc(this.firestore, `users/${userId}`);
+    return docData(userRef, { idField: 'uid' }) as Observable<User | undefined>;
+  }
+
   getUsers(): Observable<User[]> {
     const usersCollection = collection(this.firestore, 'users');
     return collectionData(usersCollection, { idField: 'uid' }) as Observable<User[]>;
@@ -46,13 +49,8 @@ export class UserService {
         })
       );
     });
-    
-    return forkJoin(observables);
-  }
 
-  getSingleUserById(userId: string): Observable<User | undefined> {
-    const userRef = doc(this.firestore, `users/${userId}`);
-    return docData(userRef, { idField: 'uid' }) as Observable<User | undefined>;
+    return forkJoin(observables);
   }
 
   async logout(): Promise<void> {

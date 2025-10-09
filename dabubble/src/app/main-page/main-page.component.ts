@@ -17,7 +17,7 @@ import { ProfileOverlayComponent } from '../profile-overlay/profile-overlay.comp
 import { LogoutOverlayComponent } from '../logout-overlay/logout-overlay.component';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-main-page',
@@ -45,6 +45,19 @@ export class MainPageComponent {
 
   private userService = inject(UserService);
   private router = inject(Router);
+  private authSub?: Subscription;
+
+  ngOnInit() {
+    this.authSub = this.userService.getCurrentUser().subscribe(user => {
+      if (!user) {
+        this.router.navigate(['/']);
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.authSub?.unsubscribe();
+  }
 
   get isDmOpen(): boolean {
     return this.userChatOpen && !!this.activeUserId;
@@ -130,9 +143,11 @@ export class MainPageComponent {
   }
 
   logout() {
+    this.authSub?.unsubscribe();
     this.userService.logout().then(() => {
       this.router.navigate(['/']);
     });
   }
+
 
 }
