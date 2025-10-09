@@ -72,7 +72,7 @@
                                 <!-- </div> -->
                                 <div class="reactions">
                                     <div class="reaction-btns">
-                                        <div (click)="toggleReaction(chat.id, reaction.type)"
+                                        <div (click)="toggleReactionForChat(chat.id, reaction.type)"
                                             *ngFor="let reaction of chat.reactionArray" class="reaction-btn"
                                             [ngClass]="{'reacted': reaction.currentUserReacted}">
                                             <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
@@ -115,6 +115,7 @@
                                             </div>
 
                                             <!-- <pre>{{ reaction | json }}</pre> -->
+                                             <!-- <pre>{{ chat.reactionArray | json }}</pre> -->
                                         </div>
                                     </div>
 
@@ -268,8 +269,8 @@
                                         <img src="assets/reaction-icons/thumb.svg" alt="">
                                         <div>1</div>
                                     </div> -->
-                                    <div (click)="toggleReactionforAnswer(answer.id, reaction.type)"
-                                            *ngFor="let reaction of chat.reactionArray" class="reaction-btn"
+                                    <div (click)="toggleReactionForAnswer(answer.id, reaction.type)"
+                                            *ngFor="let reaction of answer.reactionArray" class="reaction-btn"
                                             [ngClass]="{'reacted': reaction.currentUserReacted}">
                                             <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
                                                 [alt]="reaction.type">

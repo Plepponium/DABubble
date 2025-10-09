@@ -161,11 +161,12 @@ export class ThreadComponent implements OnInit {
             const chat = chats.find(c => c.id === this.chatId);
             if (!chat) return undefined;
             const user = users.find(u => u.uid === chat.user);
+            // chat.reactions wird erwartet als Map: { reactionType: [userId, ...] } oder { reactionType: userId }
             return {
               ...chat,
               userName: user?.name,
-              userImg: user?.img
-              // Hier können weitere Felder aus Reactions etc. nach Bedarf ergänzt werden
+              userImg: user?.img,
+              reactionArray: this.transformReactionsToArray(chat.reactions, users, this.currentUserId)
             };
           })
         )
@@ -178,22 +179,15 @@ export class ThreadComponent implements OnInit {
       switchMap(answers =>
         answers.length
           ? this.userService.getUsersByIds(answers.map(a => a.user)).pipe(
-              switchMap(users => forkJoin(
-                answers.map(answer =>
-                  forkJoin({
-                    reactions: this.channelService.getReactionsForAnswer(this.channelId, this.chatId, answer.id).pipe(take(1)),
-                    user: of(users.find(u => u.uid === answer.user))
-                  }).pipe(
-                    map(({ reactions, user }) => ({
-                      ...answer,
-                      userName: user?.name,
-                      userImg: user?.img,
-                      reactions,
-                      reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
-                    }))
-                  )
-                )
-              ))
+              map(users =>
+                answers.map(answer => ({
+                  ...answer,
+                  userName: users.find(u => u.uid === answer.user)?.name,
+                  userImg: users.find(u => u.uid === answer.user)?.img,
+                  // answer.reactions direkt als Map
+                  reactionArray: this.transformReactionsToArray(answer.reactions, users, this.currentUserId)
+                }))
+              )
             )
           : of([])
       )
@@ -417,8 +411,26 @@ export class ThreadComponent implements OnInit {
     }
   }
 
+  // transformReactionsToArray(
+  //   reactionsMap: Record<string, string[]>,
+  //   participants: User[],
+  //   currentUserId: string
+  // ): {
+  //   type: string,
+  //   count: number,
+  //   userIds: string[],
+  //   currentUserReacted: boolean,
+  //   otherUserName?: string,
+  //   otherUserReacted: boolean
+  // }[] {
+  //   if (!reactionsMap) return [];
+  //   // console.log('transformToArray', reactionsMap, data);
+  //   return Object.entries(reactionsMap).map(([type, usersRaw]) =>
+  //     this.buildReactionObject(type, usersRaw, participants, currentUserId)
+  //   );
+  // }
   transformReactionsToArray(
-    reactionsMap: Record<string, string[]>,
+    reactionsMap: Record<string, string[] | string> | undefined,
     participants: User[],
     currentUserId: string
   ): {
@@ -430,31 +442,18 @@ export class ThreadComponent implements OnInit {
     otherUserReacted: boolean
   }[] {
     if (!reactionsMap) return [];
-    // console.log('transformToArray', reactionsMap, data);
-    return Object.entries(reactionsMap).map(([type, usersRaw]) =>
-      this.buildReactionObject(type, usersRaw, participants, currentUserId)
-    );
+    return Object.entries(reactionsMap).map(([type, usersRaw]) => {
+      // Fallback: falls single userId als String, dann Array draus machen
+      let userIds: string[] = [];
+      if (Array.isArray(usersRaw)) userIds = usersRaw;
+      else if (typeof usersRaw === 'string') userIds = [usersRaw];
+      else userIds = [];
+      const currentUserReacted = userIds.includes(currentUserId);
+      const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
+      const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
+      return { type, count: userIds.length, userIds, currentUserReacted, otherUserName, otherUserReacted };
+    });
   }
-  // transformReactionsToArray(
-  //   reactionsMap: Record<string, string[]>,
-  //   users: User[],
-  //   currentUserId: string
-  // ): any[] {
-  //   if (!reactionsMap) return [];
-  //   return Object.entries(reactionsMap).map(([type, userIds]) => {
-  //     const currentUserReacted = userIds.includes(currentUserId);
-  //     const otherUsers = userIds.filter(uid => uid !== currentUserId);
-  //     return {
-  //       type,
-  //       count: userIds.length,
-  //       currentUserReacted,
-  //       otherUserName: otherUsers.length
-  //         ? users.find(u => u.uid === otherUsers[0])?.name
-  //         : undefined,
-  //       // weitere Felder nach Bedarf...
-  //     };
-  //   });
-  // }
 
   private buildReactionObject(
     type: string,
@@ -581,7 +580,7 @@ export class ThreadComponent implements OnInit {
     }
   }
 
-  async toggleReaction(chatId: string, reactionType: string) {
+  async toggleReactionForChat(chatId: string, reactionType: string) {
     // const chat = await this.getChatByIndex(chatIndex);
     const chat = await firstValueFrom(this.chat$);
     if (!chat) return;
@@ -597,21 +596,20 @@ export class ThreadComponent implements OnInit {
     await this.saveOrDeleteReaction(this.channelId, chatId, reactionType, updatedUsers);
     await this.updateReactionForChat(chatId, reactionType, updatedUsers);
   }
-  async toggleReactionforAnswer(answerId: string, reactionType: string) {
-    // const chat = await this.getChatByIndex(chatIndex);
-    const chat = await firstValueFrom(this.chat$);
-    if (!chat) return;
+  async toggleReactionForAnswer(answerId: string, reactionType: string) {
+    // const chat = await firstValueFrom(this.chat$);
+    // if (!chat) return;
 
-    const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
-    let updatedUsers: string[];
-    if (currentReactionUsers.includes(this.currentUserId)) {
-      updatedUsers = currentReactionUsers.filter(uid => uid !== this.currentUserId);
-    } else {
-      updatedUsers = [...currentReactionUsers, this.currentUserId];
-    }
+    // const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
+    // let updatedUsers: string[];
+    // if (currentReactionUsers.includes(this.currentUserId)) {
+    //   updatedUsers = currentReactionUsers.filter(uid => uid !== this.currentUserId);
+    // } else {
+    //   updatedUsers = [...currentReactionUsers, this.currentUserId];
+    // }
 
-    await this.saveOrDeleteReaction(this.channelId, answerId, reactionType, updatedUsers);
-    await this.updateReactionForChat(answerId, reactionType, updatedUsers);
+    // await this.saveOrDeleteReaction(this.channelId, answerId, reactionType, updatedUsers);
+    // await this.updateReactionForChat(answerId, reactionType, updatedUsers);
   }
 
   private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
