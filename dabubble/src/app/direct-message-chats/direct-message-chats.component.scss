@@ -403,21 +403,25 @@
   flex-direction: column;
   gap: 16px;
 
+  &:focus-within {
+    border-color: #535af1;
+  }
+
   .edit-textarea {
+    min-height: 40px;
+    max-height: 300px;
     width: 100%;
     min-width: 300px;
     border: none;
     border-radius: 8px;
     padding: 0;
+    font-family: "Nunito";
     font-size: 18px;
     color: #686868;
-    resize: vertical;
+    resize: none;
+    overflow: auto;
     outline: none;
     transition: border-color 0.2s ease-in-out;
-
-    &:focus {
-      border-color: #8a2be2;
-    }
   }
 
   .edit-actions {

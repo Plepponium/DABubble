@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild, inject, Input, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Observable, of, combineLatest, firstValueFrom } from 'rxjs';
+import { Observable, of, combineLatest, firstValueFrom, Subscription } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { User } from '../../models/user.class';
@@ -21,6 +21,7 @@ export class DirectMessageChatsComponent {
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
   @Input() userId!: string;
   @Output() openProfile = new EventEmitter<string>();
+
   private userService = inject(UserService);
   private dmService = inject(DirectMessageService);
 
@@ -30,6 +31,7 @@ export class DirectMessageChatsComponent {
   messages$?: Observable<any[]>;
   users$?: Observable<Record<string, User>>;
   messageText = '';
+
   latestMessages: any[] = [];
   reactionIcons: string[] = reactionIcons;
   activeReactionDialog: { messageId: string | null; source: 'chat' | 'hover' | null } = {
@@ -37,19 +39,42 @@ export class DirectMessageChatsComponent {
     source: null
   };
 
+  private authSub?: Subscription;
+  private subs = new Subscription();
+
+  private initializedForUserId?: string;
 
   private firstLoad = true;
   private lastMessageCount = 0;
 
-  async ngOnChanges(changes: SimpleChanges) {
-    if (changes['userId'] && this.userId) {
-      await this.initializeChat();
-    }
+  ngOnInit(): void {
+    this.authSub = this.userService.getCurrentUser().subscribe(user => {
+      this.currentUser = user;
+      this.ensureInitialized();
+    });
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    this.ensureInitialized();
+  }
+
+  ngOnDestroy(): void {
+    this.authSub?.unsubscribe();
+    this.subs.unsubscribe();
+  }
+
+  private ensureInitialized() {
+    if (!this.userId || !this.currentUser) return;
+    if (this.initializedForUserId === this.userId) return;
+    this.initializedForUserId = this.userId;
+    void this.initializeChat();
+  }
+
+
   private async initializeChat() {
-    this.currentUser = await this.fetchCurrentUser();
-    if (!this.currentUser) return this.clearMessages();
+    if (!this.currentUser) return;
+    this.subs.unsubscribe();
+    this.subs = new Subscription();
 
     this.subscribeToOtherUser();
     await this.initializeDmId();
@@ -58,23 +83,13 @@ export class DirectMessageChatsComponent {
     this.focusMessageInput();
   }
 
-  private async fetchCurrentUser(): Promise<User | undefined> {
-    return firstValueFrom(this.userService.getCurrentUser());
-  }
-
-  private clearMessages() {
-    this.messages$ = of([]);
-  }
-
-  private subscribeToOtherUser() {
-    this.userService.getSingleUserById(this.userId).subscribe(u => this.otherUser = u);
-  }
-
   private async initializeDmId() {
+    if (!this.currentUser) return;
     this.dmId = await this.dmService.getOrCreateDmId(this.currentUser!.uid, this.userId);
   }
 
   private setupUsersObservable() {
+    if (!this.currentUser) return;
     this.users$ = this.userService.getUsersByIds([this.currentUser!.uid, this.userId]).pipe(
       map(users =>
         users.reduce((map, u) => {
@@ -86,6 +101,14 @@ export class DirectMessageChatsComponent {
     );
   }
 
+  // private async fetchCurrentUser(): Promise<User | undefined> {
+  //   return firstValueFrom(this.userService.getCurrentUser());
+  // }
+
+  // private clearMessages() {
+  //   this.messages$ = of([]);
+  // }
+
   private setupMessagesObservable() {
     if (!this.dmId || !this.users$) return;
     const rawMessages$ = this.dmService.getMessages(this.dmId);
@@ -93,6 +116,11 @@ export class DirectMessageChatsComponent {
       map(([messages, users]) => this.enrichMessages(messages, users))
     );
     this.subscribeToMessages();
+  }
+
+  private subscribeToOtherUser() {
+    const s = this.userService.getSingleUserById(this.userId).subscribe(u => this.otherUser = u);
+    this.subs.add(s);
   }
 
 
@@ -107,9 +135,9 @@ export class DirectMessageChatsComponent {
 
   private subscribeToMessages() {
     if (!this.messages$) return;
-    this.messages$.subscribe(msgs => this.handleNewMessages(msgs));
+    const s = this.messages$.subscribe(msgs => this.handleNewMessages(msgs));
+    this.subs.add(s);
   }
-
 
   private handleNewMessages(msgs: any[]) {
     if (!msgs) return;
@@ -125,7 +153,109 @@ export class DirectMessageChatsComponent {
     }
   }
 
+  async sendMessage() {
+    const text = (this.messageText || '').trim();
+    if (!text || !this.dmId || !this.currentUser) return;
 
+    await this.dmService.sendMessage(this.dmId, {
+      senderId: this.currentUser.uid,
+      text
+    });
+
+    this.messageText = '';
+    this.scrollToBottom();
+  }
+
+  async updateMessageText(event: { messageId: string; newText: string }) {
+    if (!this.dmId || !event.messageId || !event.newText.trim()) return;
+
+    try {
+      await this.dmService.updateMessageText(this.dmId, event.messageId, event.newText.trim());
+    } catch (err) {
+      console.error('Fehler beim Aktualisieren der Nachricht:', err);
+    }
+  }
+
+
+  async addReaction(event: { messageId: string; icon: string }) {
+    if (!event?.messageId || !this.currentUser || !this.dmId) return;
+
+    try {
+      await this.dmService.addReactionToMessage(this.dmId, event.messageId, event.icon, this.currentUser.uid);
+      this.activeReactionDialog = { messageId: null, source: null };
+    } catch (err) {
+      console.error('Fehler beim Hinzufügen der Reaktion:', err);
+    }
+  }
+
+  async onReactionClick(message: any, type: string) {
+    if (!this.dmId || !this.currentUser || !message?.id) return;
+    try {
+      await this.dmService.reactToMessageToggle(this.dmId, message.id, type, this.currentUser.uid);
+    } catch (err) {
+      console.error('Reaction Fehler:', err);
+    }
+  }
+
+  getReactionHoverText(userIds: string[]): string {
+    if (!userIds || userIds.length === 0) return '';
+
+    const currentUid = this.currentUser?.uid;
+    const otherUser = this.otherUser;
+    const currentUserReacted = userIds.includes(currentUid || '');
+    const otherUserReacted = userIds.includes(otherUser?.uid || '');
+    if (currentUserReacted && !otherUserReacted) {
+      return 'Du hast reagiert';
+    }
+    if (!currentUserReacted && otherUserReacted) {
+      return `${otherUser?.name || 'Unbekannt'} hat reagiert`;
+    }
+    if (currentUserReacted && otherUserReacted) {
+      return `${otherUser?.name || 'Unbekannt'} und Du haben reagiert`;
+    }
+    return '';
+  }
+
+  toggleReactionDialog(messageId: string, source: 'chat' | 'hover') {
+    if (this.activeReactionDialog.messageId === messageId && this.activeReactionDialog.source === source) {
+      this.activeReactionDialog = { messageId: null, source: null };
+    } else {
+      this.activeReactionDialog = { messageId, source };
+    }
+  }
+
+  enableEditMessage(message: any) {
+    this.latestMessages.forEach(m => m.isEditing = false);
+    message.isEditing = true;
+    message.editedText = message.text;
+    this.focusAndAutoGrow(message.id);
+  }
+
+  focusAndAutoGrow(messageId: string) {
+    setTimeout(() => {
+      const ta = document.getElementById(`edit-${messageId}`) as HTMLTextAreaElement | null;
+      if (ta) {
+        this.autoGrow(ta);
+        ta.focus();
+        const len = ta.value.length;
+        ta.setSelectionRange(len, len);
+      }
+    }, 0);
+  }
+
+  cancelEditMessage(message: any) {
+    message.isEditing = false;
+    message.editedText = message.text;
+  }
+
+  saveEditedMessage(message: any) {
+    const newText = message.editedText.trim();
+    if (!newText) return;
+
+    this.updateMessageText({ messageId: message.id, newText });
+    message.text = newText;
+    message.isEditing = false;
+  }
 
   private scrollToBottom() {
     const container = document.getElementById("dm-chat-content");
@@ -171,98 +301,11 @@ export class DirectMessageChatsComponent {
     }
   }
 
-  async sendMessage() {
-    const text = (this.messageText || '').trim();
-    if (!text || !this.dmId || !this.currentUser) return;
-
-    await this.dmService.sendMessage(this.dmId, {
-      senderId: this.currentUser.uid,
-      text
-    });
-
-    this.messageText = '';
-    this.scrollToBottom();
+  autoGrow(el: HTMLTextAreaElement | null) {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
   }
-
-  async updateMessageText(event: { messageId: string; newText: string }) {
-    if (!this.dmId || !event.messageId || !event.newText.trim()) return;
-
-    try {
-      await this.dmService.updateMessageText(this.dmId, event.messageId, event.newText.trim());
-      console.log('Nachricht erfolgreich aktualisiert');
-    } catch (err) {
-      console.error('Fehler beim Aktualisieren der Nachricht:', err);
-    }
-  }
-
-
-  async addReaction(event: { messageId: string; icon: string }) {
-    if (!event?.messageId || !this.currentUser || !this.dmId) return;
-
-    try {
-      await this.dmService.addReactionToMessage(this.dmId, event.messageId, event.icon, this.currentUser.uid);
-      this.activeReactionDialog = { messageId: null, source: null };
-    } catch (err) {
-      console.error('Fehler beim Hinzufügen der Reaktion:', err);
-    }
-  }
-
-  async onReactionClick(message: any, type: string) {
-    if (!this.dmId || !this.currentUser || !message?.id) return;
-    try {
-      await this.dmService.reactToMessageToggle(this.dmId, message.id, type, this.currentUser.uid);
-    } catch (err) {
-      console.error('Reaction Fehler:', err);
-    }
-  }
-
-  getReactionHoverText(userIds: string[]): string {
-    if (!userIds || userIds.length === 0) return '';
-
-    const currentUid = this.currentUser?.uid;
-    const otherUser = this.otherUser;
-    const currentUserReacted = userIds.includes(currentUid || '');
-    const otherUserReacted = userIds.includes(otherUser?.uid || '');
-    if (currentUserReacted && !otherUserReacted) {
-      return 'Du hast reagiert';
-    }
-    if (!currentUserReacted && otherUserReacted) {
-      return `${otherUser?.name || 'Unbekannt'} hat reagiert`;
-    }
-    if (currentUserReacted && otherUserReacted) {
-      return `${otherUser?.name || 'Unbekant'} und Du haben reagiert`;
-    }
-    return '';
-  }
-
-  toggleReactionDialog(messageId: string, source: 'chat' | 'hover') {
-    if (this.activeReactionDialog.messageId === messageId && this.activeReactionDialog.source === source) {
-      this.activeReactionDialog = { messageId: null, source: null };
-    } else {
-      this.activeReactionDialog = { messageId, source };
-    }
-  }
-
-  enableEditMessage(message: any) {
-    this.latestMessages.forEach(m => m.isEditing = false);
-    message.isEditing = true;
-    message.editedText = message.text;
-  }
-
-  cancelEditMessage(message: any) {
-    message.isEditing = false;
-    message.editedText = message.text;
-  }
-
-  saveEditedMessage(message: any) {
-    const newText = message.editedText.trim();
-    if (!newText) return;
-
-    this.updateMessageText({ messageId: message.id, newText });
-    message.text = newText;
-    message.isEditing = false;
-  }
-
 
 
 }

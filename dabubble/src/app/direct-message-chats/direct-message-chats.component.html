@@ -1,7 +1,7 @@
 <div class="dm-chats" *ngIf="otherUser as u">
 
     <div class="header">
-        <div class="user">
+        <div class="user" (click)="openProfile.emit(u.uid)">
             <div class="img-container">
                 <img class="user-img" [src]="'assets/user-icons/' + (u.img || 'default-user') + '.svg'" />
                 <div [class]="'online-signal ' + (u.presence || 'offline')"></div>
@@ -18,8 +18,9 @@
             <ng-container *ngIf="users$ | async as users">
                 <div *ngIf="messages.length === 0; else chatContent" class="empty-conversation">
                     <div class="recipient">
-                        <img class="recipient-img" [src]="'assets/user-icons/' + (u.img || 'default-user') + '.svg'" />
-                        <span class="font-w-700 font-24">
+                        <img class="recipient-img" (click)="openProfile.emit(u.uid)"
+                            [src]="'assets/user-icons/' + (u.img || 'default-user') + '.svg'" />
+                        <span class="font-w-700 font-24" (click)="openProfile.emit(u.uid)">
                             {{ u.name }} <span *ngIf="isSelf()">(Du)</span>
                         </span>
                     </div>
@@ -115,7 +116,8 @@
 
                                     <ng-template #editMode>
                                         <div class="chat-edit-wrapper">
-                                            <textarea class="edit-textarea" [(ngModel)]="m.editedText" rows="2"
+                                            <textarea #editTa id="edit-{{m.id}}" class="edit-textarea"
+                                                (input)="autoGrow(editTa)" [(ngModel)]="m.editedText"
                                                 [placeholder]="m.text"></textarea>
                                             <div class="edit-actions">
                                                 <button class="btn cancel"
