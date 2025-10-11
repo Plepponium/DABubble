@@ -101,14 +101,6 @@ export class DirectMessageChatsComponent {
     );
   }
 
-  // private async fetchCurrentUser(): Promise<User | undefined> {
-  //   return firstValueFrom(this.userService.getCurrentUser());
-  // }
-
-  // private clearMessages() {
-  //   this.messages$ = of([]);
-  // }
-
   private setupMessagesObservable() {
     if (!this.dmId || !this.users$) return;
     const rawMessages$ = this.dmService.getMessages(this.dmId);

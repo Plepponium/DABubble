@@ -10,26 +10,17 @@ import { User } from '../../models/user.class';
   styleUrl: './profile-overlay.component.scss'
 })
 export class ProfileOverlayComponent {
-  animationClass = '';
-
   @Input() user!: User;
   @Output() close = new EventEmitter<void>();
+  @Output() openDmChat = new EventEmitter<User>();
+
+  onMessageClick() {
+    this.openDmChat.emit(this.user);
+    console.log(this.user);
+
+  }
 
   handleClose() {
     this.close.emit();
-  }
-
-  onMouseEnter() {
-    // this.animationClass = 'wiggle';
-    setTimeout(() => {
-      this.animationClass = '';
-    }, 100);
-  }
-
-  onMouseLeave() {
-    // this.animationClass = 'wiggle';
-    setTimeout(() => {
-      this.animationClass = '';
-    }, 100);
   }
 }

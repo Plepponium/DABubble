@@ -107,6 +107,11 @@ export class MainPageComponent {
     this.showUserProfile = true;
   }
 
+  openDmChatFromOverlay(user: User) {
+    this.closeAllOverlays();
+    this.openUserChat(user);
+  }
+
   async openProfileOverlay(userId: string) {
     this.closeAllOverlays();
 

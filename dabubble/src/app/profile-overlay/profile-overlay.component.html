@@ -27,8 +27,7 @@
     </div>
 
     <div class="btn-container">
-        <button class="message-btn" [class.wiggle]="animationClass === 'wiggle'" (mouseenter)="onMouseEnter()"
-            (mouseleave)="onMouseLeave()">
+        <button class="message-btn" (click)="onMessageClick()">
             <img src="assets/icons/mode_comment.svg" alt="">
             <div class="f-nunito">Nachricht</div>
         </button>

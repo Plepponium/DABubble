@@ -29,12 +29,8 @@
             <app-thread id="thread" class="thread" *ngIf="threadOpen && currentChannelId && threadChatId"
                 [chatId]="threadChatId" [channelId]="currentChannelId" [hidden]="!threadOpen"
                 (closeThread)="threadOpen = false"></app-thread>
-
-
             <app-direct-message-chats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
                 (openProfile)="openProfileOverlay($event)"></app-direct-message-chats>
-
-
         </div>
     </div>
 
@@ -48,7 +44,7 @@
         (openEdit)="openEditUser()"></app-user-profile>
     <app-edit-user *ngIf="showEditUser" (close)="closeAllOverlays()"></app-edit-user>
     <app-profile-overlay *ngIf="showProfileOverlay" [user]="selectedProfile"
-        (close)="closeAllOverlays()"></app-profile-overlay>
+        (openDmChat)="openDmChatFromOverlay($event)" (close)="closeAllOverlays()"></app-profile-overlay>
 
     <app-add-channel-overlay *ngIf="showAddChannelDialogue" (close)="closeAddChannel()">
     </app-add-channel-overlay>
