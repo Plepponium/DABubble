@@ -97,20 +97,19 @@ export class ChannelService {
   }
 
   async setAnswerReaction(channelId: string, chatId: string, answerId: string, reactionType: string, userIds: string[]) {
-    console.log('chatId', chatId, 'answerId:', answerId);
-    console.log('Firestore-Pfad:', `channels/${channelId}/chats/${chatId}/answers/${answerId}`);
-    const answerRef = doc(this.firestore, `channels/${channelId}/chats/${chatId}/answers`, answerId);
-    const answerSnapshot = await docData(answerRef, { idField: 'id' }).pipe(take(1)).toPromise();
-    const reactions = (answerSnapshot as any)?.reactions || {};
+  const answerRef = doc(this.firestore, `channels/${channelId}/chats/${chatId}/answers`, answerId);
+  const answerSnapshot = await docData(answerRef, { idField: 'id' }).pipe(take(1)).toPromise();
+  const reactions = (answerSnapshot as any)?.reactions || {};
 
-    if (userIds.length === 0) {
-      delete reactions[reactionType];
-    } else {
-      reactions[reactionType] = userIds;
-    }
-
-    return updateDoc(answerRef, { reactions });
+  if (userIds.length === 0) {
+    delete reactions[reactionType];
+  } else {
+    // Immer als Array speichern!
+    reactions[reactionType] = [...userIds];
   }
+
+  return updateDoc(answerRef, { reactions });
+}
 
   async updateReactionForChat(channelId: string, chatId: string, reactionType: string, userIds: string[]) {
     const reactionDocRef = doc(this.firestore, `channels/${channelId}/chats/${chatId}/reactions`, reactionType);
