@@ -95,24 +95,21 @@ export class ChannelService {
 
     return updateDoc(chatRef, { reactions });
   }
-  // async setReaction(channelId: string, chatId: string, reactionType: string, userIds: string[]) {
-  //   const chatRef = doc(this.firestore, `channels/${channelId}/chats`, chatId);
-  //   // Hole aktuellen Daten einmal
-  //   const chatSnapshot = await docData(chatRef, { idField: 'id' }).pipe(take(1)).toPromise();
-  //   const reactions = (chatSnapshot as any)?.reactions || {};
 
-  //   if (userIds.length === 0) {
-  //     // Reaction löschen aus Map
-  //     delete reactions[reactionType];
-  //   } else {
-  //     // Reaction setzen/überschreiben
-  //     reactions[reactionType] = userIds;
-  //   }
+  async setAnswerReaction(channelId: string, chatId: string, answerId: string, reactionType: string, userIds: string[]) {
+    console.log('chatId', chatId, 'answerId:', answerId);
+    const answerRef = doc(this.firestore, `channels/${channelId}/chats/${chatId}/answers`, answerId);
+    const answerSnapshot = await docData(answerRef, { idField: 'id' }).pipe(take(1)).toPromise();
+    const reactions = (answerSnapshot as any)?.reactions || {};
 
-  //   return updateDoc(chatRef, { reactions });
-  // }
+    if (userIds.length === 0) {
+      delete reactions[reactionType];
+    } else {
+      reactions[reactionType] = userIds;
+    }
 
-
+    return updateDoc(answerRef, { reactions });
+  }
 
   async updateReactionForChat(channelId: string, chatId: string, reactionType: string, userIds: string[]) {
     const reactionDocRef = doc(this.firestore, `channels/${channelId}/chats/${chatId}/reactions`, reactionType);

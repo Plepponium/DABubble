@@ -155,7 +155,7 @@
                         <div class="reactions-display-container">
                             <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueAnswersIndex === i">
                                 <div *ngFor="let icon of reactionIcons" class="reactions-container">
-                                    <button (click)="addReaction(answer.id, icon)" class="add-reaction-btn">
+                                    <button (click)="addReactionToAnswer(answer.id, icon)" class="add-reaction-btn">
                                         <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
                                     </button>
                                 </div>
@@ -166,6 +166,7 @@
                                     alt="">
                             </button>
                         </div>
+                        
                         <!-- <button class="add-reaction-btn">
                             <img class="hover-icon" src="assets/icons/comment.svg" alt="">
                             <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="">

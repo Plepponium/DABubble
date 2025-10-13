@@ -72,9 +72,9 @@ export class ThreadComponent implements OnInit {
     this.chat$ = this.getEnrichedChat();
     this.answers$ = this.getEnrichedAnswers();
     
-    this.answers$.pipe(take(1)).subscribe(answers => {
-      console.log('Thread Answers:', answers);
-    });
+    // this.answers$.pipe(take(1)).subscribe(answers => {
+    //   console.log('Thread Answers:', answers);
+    // });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -434,6 +434,7 @@ export class ThreadComponent implements OnInit {
     }
   }
   openReactionsDialogueAnswers(i: number) {
+    console.log('chatId:', this.chatId, 'i: ', i);
     if (this.activeReactionDialogueAnswersIndex === i) {
       this.activeReactionDialogueAnswersIndex = null;
     } else {
@@ -454,6 +455,7 @@ export class ThreadComponent implements OnInit {
   }
 
   openReactionsDialogueBelowAnswers(i: number) {
+    console.log('chatId:', this.chatId, 'i: ', i);
     if (this.activeReactionDialogueBelowAnswersIndex === i) {
       this.activeReactionDialogueBelowAnswersIndex = null; // schließe, wenn bereits offen
     } else {
@@ -604,18 +606,42 @@ export class ThreadComponent implements OnInit {
   }
 
   async addReaction(chatId: string, reactionType: string) {
-    // const chats = this.chatsSubject.getValue();
-    // const chat = chats[chatIndex];
     const chat = await firstValueFrom(this.chat$);
     if (!chat) return;
 
     this.activeReactionDialogueIndex = null;
     this.activeReactionDialogueBelowIndex = null;
+
     const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
     if (!currentReactionUsers.includes(this.currentUserId)) {
       const updatedUsers = [...currentReactionUsers, this.currentUserId];
       await this.saveOrDeleteReaction(this.channelId, chatId, reactionType, updatedUsers);
       await this.updateReactionForChat(chatId, reactionType, updatedUsers);
+    }
+  }
+
+  async addReactionToAnswer(answerId: string, reactionType: string) {
+    console.log('reactionType', reactionType);
+    const answers = await firstValueFrom(this.answers$);
+    const answer = answers.find(a => a.id === answerId);
+    if (!answer) return;
+    console.log('answerId', answerId);
+    this.activeReactionDialogueAnswersIndex = null;
+    this.activeReactionDialogueBelowAnswersIndex = null;
+
+    const currentReactionUsers = this.extractUserIds(answer.reactions || {}, reactionType);
+    if (!currentReactionUsers.includes(this.currentUserId)) {
+      const updatedUsers = [...currentReactionUsers, this.currentUserId];
+      // 4. Aktualisiere Reaction-Map in Firestore via ChannelService
+      await this.channelService.setAnswerReaction(this.channelId, this.chatId, answerId, reactionType, updatedUsers);
+      // 5. Lokales Update der Antwort im answers$ Observable (zwingend, damit UI synchron bleibt)
+      answer.reactions = { ...answer.reactions, [reactionType]: updatedUsers };
+      answer.reactionArray = this.transformReactionsToArray(answer.reactions, this.participants, this.currentUserId);
+      
+      // await this.saveOrDeleteReaction(this.channelId, answerId, reactionType, updatedUsers);
+      // await this.updateReactionForChat(answerId, reactionType, updatedUsers);
+      // Optional: answers$ triggern, damit Template updated wird
+      this.answers$ = of([...answers]);
     }
   }
 
