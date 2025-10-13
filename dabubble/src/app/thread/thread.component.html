@@ -243,7 +243,7 @@
                                 <div class="reactions-display-container-below">
                                     <div class="add-reaction-dialogue below" *ngIf="activeReactionDialogueBelowAnswersIndex === i">
                                         <div *ngFor="let icon of reactionIcons" class="reactions-container">
-                                            <button (click)="addReaction(answer.id, icon)" class="add-reaction-btn">
+                                            <button (click)="addReactionToAnswer(answer.id, icon)" class="add-reaction-btn">
                                                 <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
                                             </button>
                                         </div>

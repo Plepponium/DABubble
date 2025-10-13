@@ -29,7 +29,7 @@ export class MainPageComponent {
   menuOpen = true;
   menuBtnClose = true;
   showAddChannelDialogue = false;
-  threadOpen = true;
+  threadOpen = false;
   channelOpen = true;
   userChatOpen = false;
   currentChannelId?: string;

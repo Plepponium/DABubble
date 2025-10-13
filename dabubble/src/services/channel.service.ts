@@ -98,6 +98,7 @@ export class ChannelService {
 
   async setAnswerReaction(channelId: string, chatId: string, answerId: string, reactionType: string, userIds: string[]) {
     console.log('chatId', chatId, 'answerId:', answerId);
+    console.log('Firestore-Pfad:', `channels/${channelId}/chats/${chatId}/answers/${answerId}`);
     const answerRef = doc(this.firestore, `channels/${channelId}/chats/${chatId}/answers`, answerId);
     const answerSnapshot = await docData(answerRef, { idField: 'id' }).pipe(take(1)).toPromise();
     const reactions = (answerSnapshot as any)?.reactions || {};

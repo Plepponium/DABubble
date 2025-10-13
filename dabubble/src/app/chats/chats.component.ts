@@ -61,17 +61,11 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.getCurrentUser();
-    this.loadChannel();
-    // this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
-    //   if (user) {
-    //     this.currentUserId = user.uid;
-    //   }
-      // if (!this.channelId) {
-      //   this.loadFirstChannel();
-      // } else {
-      //   this.loadChannelWithId(this.channelId);
-      // }
-    // });
+    if (!this.channelId) {
+      this.loadFirstChannel();
+    } else {
+      this.loadChannelWithId(this.channelId);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -98,21 +92,6 @@ export class ChatsComponent implements OnInit, OnChanges {
         // console.log('getCurrentUser', this.currentUserId);
       }
     });
-  }
-
-  loadChannel() {
-    // if (!this.channelId) {
-    //   console.log(this.channelId);
-    //   this.loadFirstChannel();
-    //   // this.loadFirstChatWithAnswers();
-    // } else {
-    //   this.loadChatById(this.channelId);
-    // }
-    if (!this.channelId) {
-        this.loadFirstChannel();
-      } else {
-        this.loadChannelWithId(this.channelId);
-      }
   }
 
   private loadFirstChannel() {
