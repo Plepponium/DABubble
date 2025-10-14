@@ -34,7 +34,8 @@ export class ThreadComponent implements OnInit {
   channelChats: any[] = [];
   reactionIcons = reactionIcons;
   reactionArray: { type: string, count: number, user: string[] }[] = [];
-  newMessage: string = '';
+  // newMessage: string = '';
+  newAnswer: string = '';
 
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
@@ -62,6 +63,9 @@ export class ThreadComponent implements OnInit {
     // this.answers$.pipe(take(1)).subscribe(answers => {
     //   console.log('Thread Answers:', answers);
     // });
+    this.answers$.pipe(take(1)).subscribe(() => {
+      this.scrollToBottom();
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -72,10 +76,12 @@ export class ThreadComponent implements OnInit {
   }
 
   scrollToBottom() {
-    const chatHistory = document.getElementById('chat-history');
-    if (chatHistory) {
-      chatHistory.scrollTop = chatHistory.scrollHeight;
-    }
+    setTimeout(() => {
+      const threadHistory = document.getElementById('thread-history');
+      if (threadHistory) {
+        threadHistory.scrollTop = threadHistory.scrollHeight;
+      }
+    }, 100); // kleiner Delay, damit DOM aktualisiert ist
   }
 
   getCurrentUser() {
@@ -390,6 +396,24 @@ export class ThreadComponent implements OnInit {
     return usersRaw.flatMap((u: string) =>
       u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
     );
+  }
+
+  async submitAnswer() {
+    const message = this.newAnswer.trim();
+    if (!message) return;
+    if (!this.channelId || !this.chatId || !this.currentUserId) return;
+
+    // Bau das Payload-Objekt
+    const answer = {
+      message,
+      time: Math.floor(Date.now() / 1000), // oder Date.now() für ms
+      user: this.currentUserId
+    };
+    // Store in Firestore
+    await this.channelService.addAnswerToChat(this.channelId, this.chatId, answer);
+
+    this.newAnswer = '';
+    setTimeout(() => this.scrollToBottom());
   }
 
   handleCloseThread() {

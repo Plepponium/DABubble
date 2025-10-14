@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Firestore, collectionData, collection, setDoc, deleteDoc } from '@angular/fire/firestore';
+import { Firestore, collectionData, collection, setDoc, deleteDoc, query, orderBy } from '@angular/fire/firestore';
 import { doc, addDoc, docData, updateDoc } from '@angular/fire/firestore';
 import { map, Observable, take } from 'rxjs';
 import { Channel } from '../models/channel.class';
@@ -65,6 +65,12 @@ export class ChannelService {
   //     reactions: reactionsMap
   //   });
   // }
+
+
+  async addAnswerToChat(channelId: string, chatId: string, answer: any): Promise<any> {
+    const answersCollection = collection(this.firestore, `channels/${channelId}/chats/${chatId}/answers`);
+    return addDoc(answersCollection, answer);
+  }
   
   // async setReaction(channelId: string, chatId: string, reactionType: string, userIds: string[]) {
   //   const chatRef = doc(this.firestore, `channels/${channelId}/chats`, chatId);
@@ -126,9 +132,19 @@ export class ChannelService {
 
 
 
+  // getAnswersForChat(channelId: string, chatId: string): Observable<any[]> {
+  //   const answersCollection = collection(this.firestore, `channels/${channelId}/chats/${chatId}/answers`);
+  //   return collectionData(answersCollection, { idField: 'id' }) as Observable<any[]>;
+  // }
   getAnswersForChat(channelId: string, chatId: string): Observable<any[]> {
-    const answersCollection = collection(this.firestore, `channels/${channelId}/chats/${chatId}/answers`);
-    return collectionData(answersCollection, { idField: 'id' }) as Observable<any[]>;
+    const answersCollection = collection(
+      this.firestore,
+      `channels/${channelId}/chats/${chatId}/answers`
+    );
+
+    const answersQuery = query(answersCollection, orderBy('time', 'asc')); // oder 'desc' für neueste oben
+    console.log('answersQuery', answersQuery);
+    return collectionData(answersQuery, { idField: 'id' }) as Observable<any[]>;
   }
 
   getReactionsForAnswer(channelId: string, chatId: string, answerId: string): Observable<any> {
