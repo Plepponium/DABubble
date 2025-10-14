@@ -189,9 +189,12 @@ export class ThreadComponent implements OnInit {
         )
       )
     );
-    this.answers$.pipe(take(1)).subscribe(answers => {
-      console.log('Chats:', answers);
-    });
+    map((enrichedAnswers: Answer[]) =>
+        enrichedAnswers.sort((a, b) => a.time - b.time)
+    );
+    // this.answers$.pipe(take(1)).subscribe(answers => {
+    //   console.log('Chats:', answers);
+    // });
   }
 
   openReactionsDialogue(chatId: string) {
@@ -233,7 +236,6 @@ export class ThreadComponent implements OnInit {
       this.activeReactionDialogueAnswersIndex = null;
     }
   }
-
 
   transformReactionsToArray(
     reactionsMap: Record<string, string[] | string> | undefined,
