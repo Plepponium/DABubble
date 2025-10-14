@@ -98,7 +98,6 @@ export class ThreadComponent implements OnInit {
       this.channelName$ = of(channel.name);
       this.participants$ = this.userService.getUsersByIds(channel.participants);
       this.subscribeToParticipants();
-      // this.subscribeToChatsAndUsers(channelId, this.participants$);
     });
   }
 
@@ -149,11 +148,7 @@ export class ThreadComponent implements OnInit {
 
       this.channelId = channelId;
       this.channelName$ = of(channel.name);
-      // const channelName = await firstValueFrom(this.channelName$);
-      // console.log('Channel Name:', channelName);
-      // this.participants$ = this.userService.getUsersByIds(channel.participants);
       this.subscribeToParticipants();
-      // this.subscribeToChatsAndUsers(channelId, this.participants$);
     });
   }
 
@@ -165,7 +160,6 @@ export class ThreadComponent implements OnInit {
   }
 
   getAnswersForChat() {
-    // Answers aus der Subcollection
     this.answers$ = this.channelService.getAnswersForChat(this.channelId, this.chatId).pipe(
       switchMap(answers =>
         this.userService.getUsersByIds(answers.map((a: any) => a.user)).pipe(
@@ -192,9 +186,6 @@ export class ThreadComponent implements OnInit {
     map((enrichedAnswers: Answer[]) =>
         enrichedAnswers.sort((a, b) => a.time - b.time)
     );
-    // this.answers$.pipe(take(1)).subscribe(answers => {
-    //   console.log('Chats:', answers);
-    // });
   }
 
   openReactionsDialogue(chatId: string) {
@@ -263,38 +254,6 @@ export class ThreadComponent implements OnInit {
     });
   }
 
-  private buildReactionObject(
-    type: string,
-    usersRaw: string[],
-    participants: User[],
-    currentUserId: string
-  ): {
-    type: string,
-    count: number,
-    userIds: string[],
-    currentUserReacted: boolean,
-    otherUserName?: string,
-    otherUserReacted: boolean
-  } {
-    const userIds = this.parseUserIds(usersRaw);
-    const currentUserReacted = userIds.includes(currentUserId);
-    const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
-    const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
-
-    return {
-      type,
-      count: userIds.length,
-      userIds,
-      currentUserReacted,
-      otherUserName,
-      otherUserReacted
-    };
-  }
-
-  private parseUserIds(users: string[]): string[] {
-    return users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
-  }
-
   private findOtherUserName(userIds: string[], currentUserId: string, participants: User[]): string | undefined {
     const others = userIds.filter(id => id !== currentUserId);
     if (others.length === 0) return undefined;
@@ -331,21 +290,6 @@ export class ThreadComponent implements OnInit {
     }
   }
 
-  // private updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[], chatIndex: number) {
-  //   chat.reactions = { ...chat.reactions };
-  //   if (updatedUsers.length === 0) {
-  //     delete chat.reactions[reactionType];
-  //   } else {
-  //     chat.reactions[reactionType] = updatedUsers;
-  //   }
-  //   chat.reactionArray = this.transformReactionsToArray(chat.reactions, this.participants, this.currentUserId);
-
-  //   // Aktualisiere den BehaviorSubject State mit neuem Chat Objekt
-  //   const chats = this.chatsSubject.getValue();
-  //   const newChats = [...chats];
-  //   newChats[chatIndex] = chat;  // Ersetze den Chat an Index
-  //   this.chatsSubject.next(newChats); 
-  // }
   private updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[]): void {
     chat.reactions = { ...chat.reactions };
     if (updatedUsers.length === 0) {
@@ -392,9 +336,7 @@ export class ThreadComponent implements OnInit {
       // 5. Lokales Update der Antwort im answers$ Observable (zwingend, damit UI synchron bleibt)
       answer.reactions = { ...answer.reactions, [reactionType]: updatedUsers };
       answer.reactionArray = this.transformReactionsToArray(answer.reactions, this.participants, this.currentUserId);
-      
-      // await this.saveOrDeleteReaction(this.channelId, answerId, reactionType, updatedUsers);
-      // await this.updateReactionForChat(answerId, reactionType, updatedUsers);
+
       // Optional: answers$ triggern, damit Template updated wird
       this.answers$ = of([...answers]);
     }
