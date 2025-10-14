@@ -29,65 +29,11 @@ export class ChannelService {
     return collectionData(chatsCollection, { idField: 'id' }) as Observable<any[]>;
   }
 
-  // getReactionsForChat(channelId: string, chatId: string): Observable<Record<string, string[]>> {
-  //   const reactionsCollection = collection(this.firestore, `channels/${channelId}/chats/${chatId}/reactions`);
-  //   return collectionData(reactionsCollection, { idField: 'reactionId' }).pipe(
-  //     take(1),
-  //     map(docs => {
-  //       const reactionsMap: Record<string, string[]> = {};
-  //       docs.forEach(doc => {
-  //         const type = doc['type'];
-  //         const users = Array.isArray(doc['user']) ? doc['user'] : [doc['user']];
-  //         if (type) {
-  //           if (!reactionsMap[type]) {
-  //             reactionsMap[type] = [];
-  //           }
-  //           // type: reactionsMap[type];
-  //           // userId: reactionsMap[type].concat(users);
-  //           reactionsMap[type] = reactionsMap[type].concat(users);
-  //         }
-  //       });
-  //       return reactionsMap;
-  //     })
-  //   );
-  // }
-  getReactionsMapForChat(channelId: string, chatId: string): Observable<Record<string, string[]>> {
-    const chatDoc = doc(this.firestore, `channels/${channelId}/chats/${chatId}`);
-    return docData(chatDoc).pipe(
-      take(1),
-      map((data: any) => data?.reactions || {})
-    );
-  }
-
-  // async updateReactionsMapForChat(channelId: string, chatId: string, reactionsMap: Record<string, string[]>) {
-  //   const chatRef = doc(this.firestore, `channels/${channelId}/chats`, chatId);
-  //   return updateDoc(chatRef, {
-  //     reactions: reactionsMap
-  //   });
-  // }
-
-
   async addAnswerToChat(channelId: string, chatId: string, answer: any): Promise<any> {
     const answersCollection = collection(this.firestore, `channels/${channelId}/chats/${chatId}/answers`);
     return addDoc(answersCollection, answer);
   }
   
-  // async setReaction(channelId: string, chatId: string, reactionType: string, userIds: string[]) {
-  //   const chatRef = doc(this.firestore, `channels/${channelId}/chats`, chatId);
-  //   // Hole die aktuelle Map
-  //   const chatData = await docData(chatRef, { idField: 'id' }) as any;
-  //   const reactions = chatData.reactions || {};
-
-  //   if (userIds.length === 0) {
-  //     // Reaktion entfernen
-  //     delete reactions[reactionType];
-  //   } else {
-  //     // Reaktion setzen
-  //     reactions[reactionType] = userIds;
-  //   }
-
-  //   return updateDoc(chatRef, { reactions });
-  // } 
   async setReaction(channelId: string, chatId: string, reactionType: string, userIds: string[]) {
     const chatRef = doc(this.firestore, `channels/${channelId}/chats`, chatId);
     const chatSnapshot = await docData(chatRef, { idField: 'id' }).pipe(take(1)).toPromise();
@@ -110,7 +56,6 @@ export class ChannelService {
   if (userIds.length === 0) {
     delete reactions[reactionType];
   } else {
-    // Immer als Array speichern!
     reactions[reactionType] = [...userIds];
   }
 
@@ -130,20 +75,9 @@ export class ChannelService {
     return deleteDoc(reactionDocRef);
   }
 
-
-
-  // getAnswersForChat(channelId: string, chatId: string): Observable<any[]> {
-  //   const answersCollection = collection(this.firestore, `channels/${channelId}/chats/${chatId}/answers`);
-  //   return collectionData(answersCollection, { idField: 'id' }) as Observable<any[]>;
-  // }
   getAnswersForChat(channelId: string, chatId: string): Observable<any[]> {
-    const answersCollection = collection(
-      this.firestore,
-      `channels/${channelId}/chats/${chatId}/answers`
-    );
-
-    const answersQuery = query(answersCollection, orderBy('time', 'asc')); // oder 'desc' für neueste oben
-    console.log('answersQuery', answersQuery);
+    const answersCollection = collection(this.firestore, `channels/${channelId}/chats/${chatId}/answers`);
+    const answersQuery = query(answersCollection, orderBy('time', 'asc')); 
     return collectionData(answersQuery, { idField: 'id' }) as Observable<any[]>;
   }
 
