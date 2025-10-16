@@ -20,7 +20,7 @@ import { DmReactionsDialogComponent } from '../dm-reactions-dialog/dm-reactions-
 export class DirectMessageChatsComponent {
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
   @Input() userId!: string;
-  @Output() openProfile = new EventEmitter<string>();
+  @Output() openProfile = new EventEmitter<User>();
 
   private userService = inject(UserService);
   private dmService = inject(DirectMessageService);
@@ -248,6 +248,19 @@ export class DirectMessageChatsComponent {
     message.text = newText;
     message.isEditing = false;
   }
+
+  onUserNameClick(senderId: string) {
+    const sender = this.otherUser?.uid === senderId
+      ? this.otherUser
+      : this.currentUser?.uid === senderId
+        ? this.currentUser
+        : undefined;
+
+    if (sender) {
+      this.openProfile.emit(sender);
+    }
+  }
+
 
   private scrollToBottom() {
     const container = document.getElementById("dm-chat-content");

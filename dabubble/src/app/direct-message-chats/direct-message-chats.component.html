@@ -1,7 +1,7 @@
 <div class="dm-chats" *ngIf="otherUser as u">
 
     <div class="header">
-        <div class="user" (click)="openProfile.emit(u.uid)">
+        <div class="user" (click)="openProfile.emit(u)">
             <div class="img-container">
                 <img class="user-img" [src]="'assets/user-icons/' + (u.img || 'default-user') + '.svg'" />
                 <div [class]="'online-signal ' + (u.presence || 'offline')"></div>
@@ -18,9 +18,9 @@
             <ng-container *ngIf="users$ | async as users">
                 <div *ngIf="messages.length === 0; else chatContent" class="empty-conversation">
                     <div class="recipient">
-                        <img class="recipient-img" (click)="openProfile.emit(u.uid)"
+                        <img class="recipient-img" (click)="openProfile.emit(u)"
                             [src]="'assets/user-icons/' + (u.img || 'default-user') + '.svg'" />
-                        <span class="font-w-700 font-24" (click)="openProfile.emit(u.uid)">
+                        <span class="font-w-700 font-24" (click)="openProfile.emit(u)">
                             {{ u.name }} <span *ngIf="isSelf()">(Du)</span>
                         </span>
                     </div>
@@ -59,7 +59,7 @@
                                         <div class="chat-bubble">
                                             <div class="chat-meta">
                                                 <span class="sender-name font-w-700 font-18"
-                                                    (click)="openProfile.emit(m.senderId)">{{ m.senderName }}
+                                                    (click)="onUserNameClick(m.senderId)">{{ m.senderName }}
                                                 </span>
                                                 <span class="time t-gray font-14">
                                                     {{ m.sentAt?.toDate ? (m.sentAt.toDate() | date:'HH:mm') : '' }} Uhr

@@ -33,7 +33,7 @@
         </div>
 
         <div (click)="closeDialogueShowUser(); closeDialogueAddUser(); closeDialogChannelDescription()"
-            *ngIf="showUserDialogue || showAddDialogue || showChannelDescription" class="dialogue-backdrop">
+            *ngIf="showUserDialogue || showAddDialogue || showChannelDescription" class="dialogue-backdrop-chats">
         </div>
         <div class="overlay-box" [ngClass]="{'overlay-channel-description': showChannelDescription}">
             <app-dialogue-overlay *ngIf="showUserDialogue" [participants]="participants"
@@ -49,20 +49,16 @@
                 [channelId]="channelId">
             </app-channel-description-overlay>
         </div>
-
-        <div (click)="closeDialogueShowProfile()" *ngIf="showProfileDialogue" class="dialogue-backdrop-profile"></div>
-        <app-profile-overlay *ngIf="showProfileDialogue" [user]="selectedProfileUser!"
-            (close)="closeDialogueShowProfile()" class="dialogue-overlay-show-profile">
-        </app-profile-overlay>
     </div>
 
     <div *ngIf="(chats$ | async) as chatList" class="chat-content">
         <div id="chat-history" class="chat-history">
 
-            <div *ngFor="let chat of chatList; let i = index" class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
+            <div *ngFor="let chat of chatList; let i = index" class="chat-day-section"
+                [ngClass]="{'reverse': chat.user === currentUserId}">
                 <!-- <div class="chat-date-section"> -->
                 <div *ngIf="i === 0 || !isSameDate(getChatDate(chat), getChatDate(chatList[i-1]))"
-                                class="chat-date-section">
+                    class="chat-date-section">
                     <!-- <div class="chat-date">{{ chat.time * 1000 | date: 'EEEE, d. MMMM':'':'de' }}</div> -->
                     <div class="chat-date">{{ getDisplayDate(getChatDate(chat)) }}</div>
                 </div>
@@ -112,7 +108,8 @@
 
                     <div class="chat-info-container">
                         <div class="chat-start" [ngClass]="{'reverse': chat.user === currentUserId}">
-                            <div class="font-w-700">{{ chat.userName }}</div>
+                            <div class="font-w-700 user-name" (click)="handleOpenProfile(chat)">{{ chat.userName }}
+                            </div>
                             <div class="font-14 t-gray">{{ chat.time * 1000 | date: 'HH:mm' }} Uhr</div>
                         </div>
                         <div class="chat-message"
@@ -122,10 +119,12 @@
                         <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}">
                             <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0">
 
-                                <div (click)="handleOpenThread(chat.id)" class="answer t-purple">{{ chat.answersCount }} Antworten</div>
-                                <div class="last-answer font-14 t-gray">Letzte Antwort {{ chat.lastAnswerTime ? (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}</div>
+                                <div (click)="handleOpenThread(chat.id)" class="answer t-purple">{{ chat.answersCount }}
+                                    Antworten</div>
+                                <div class="last-answer font-14 t-gray">Letzte Antwort {{ chat.lastAnswerTime ?
+                                    (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}</div>
                             </div>
-                            
+
                             <div class="reactions">
                                 <div class="reaction-btns">
                                     <div (click)="toggleReaction(i, reaction.type)"
@@ -175,14 +174,16 @@
                                 </div>
 
                                 <div class="reactions-display-container-below">
-                                    <div class="add-reaction-dialogue below" *ngIf="activeReactionDialogueBelowIndex === i">
+                                    <div class="add-reaction-dialogue below"
+                                        *ngIf="activeReactionDialogueBelowIndex === i">
                                         <div *ngFor="let icon of reactionIcons" class="reactions-container">
                                             <button (click)="addReaction(i, icon)" class="add-reaction-btn">
                                                 <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
                                             </button>
                                         </div>
                                     </div>
-                                    <app-round-btn (click)="openReactionsDialogueBelow(i)" iconSrc="assets/message-icons/add_reaction.svg"
+                                    <app-round-btn (click)="openReactionsDialogueBelow(i)"
+                                        iconSrc="assets/message-icons/add_reaction.svg"
                                         iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
                                         altText="Reaktion hinzufügen">
                                     </app-round-btn>
@@ -210,7 +211,8 @@
                             altText="Reaktion hinzufügen">
                         </app-round-btn>
                         <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
-                            iconHoverSrc="assets/message-icons/alternate_email-purple.svg" altText="Empfänger hinzufügen">
+                            iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
+                            altText="Empfänger hinzufügen">
                         </app-round-btn>
                     </div>
 

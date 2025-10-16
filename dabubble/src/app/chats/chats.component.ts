@@ -7,14 +7,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { DialogueOverlayComponent } from '../dialogue-overlay/dialogue-overlay.component';
-import { ProfileOverlayComponent } from '../profile-overlay/profile-overlay.component';
 import { ChatAddUserOverlayComponent } from '../chat-add-user-overlay/chat-add-user-overlay.component';
 import { ChannelDescriptionOverlayComponent } from '../channel-description-overlay/channel-description-overlay.component';
 import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.class';
 import { Chat } from '../../models/chat.class';
-import { BehaviorSubject, catchError, combineLatest, forkJoin, map, Observable, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, forkJoin, map, Observable, of, switchMap, take } from 'rxjs';
 import { reactionIcons } from '../reaction-icons';
 // import { ChatWithDetails } from '../../models/chat-with-details.class';
 import localeDe from '@angular/common/locales/de';
@@ -22,7 +21,7 @@ registerLocaleData(localeDe);
 
 @Component({
   selector: 'app-chats',
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, DialogueOverlayComponent, ProfileOverlayComponent, ChatAddUserOverlayComponent, ChannelDescriptionOverlayComponent],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, DialogueOverlayComponent, ChatAddUserOverlayComponent, ChannelDescriptionOverlayComponent],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.scss',
 })
@@ -32,7 +31,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   showUserDialogue = false;
   showAddDialogue = false;
   usersDisplayActive = false;
-  showProfileDialogue = false;
   editCommentDialogueExpanded = false;
   activeReactionDialogueIndex: number | null = null;
   activeReactionDialogueBelowIndex: number | null = null;
@@ -44,7 +42,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   reactionIcons = reactionIcons;
   reactionArray: { type: string, count: number, user: string[] }[] = [];
   newMessage: string = '';
-  selectedProfileUser?: User;
 
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
@@ -56,8 +53,8 @@ export class ChatsComponent implements OnInit, OnChanges {
   userService = inject(UserService);
 
   @Input() channelId?: string;
-  @Output() openThread = new EventEmitter<{channelId: string; chatId: string}>();
-  // @ViewChild('chatHistory') chatHistory!: ElementRef<HTMLDivElement>;
+  @Output() openThread = new EventEmitter<{ channelId: string; chatId: string }>();
+  @Output() openProfile = new EventEmitter<User>();
 
   ngOnInit() {
     this.getCurrentUser();
@@ -125,7 +122,7 @@ export class ChatsComponent implements OnInit, OnChanges {
       this.participants = users;
     });
   }
-  
+
   private subscribeToChatsAndUsers(channelId: string, participants$: Observable<User[]>) {
     combineLatest([
       this.channelService.getChatsForChannel(channelId),
@@ -309,9 +306,9 @@ export class ChatsComponent implements OnInit, OnChanges {
     const chats = this.chatsSubject.getValue();
     const newChats = [...chats];
     newChats[chatIndex] = chat;  // Ersetze den Chat an Index
-    this.chatsSubject.next(newChats); 
+    this.chatsSubject.next(newChats);
   }
-  
+
   async addReaction(chatIndex: number, reactionType: string) {
     const chats = this.chatsSubject.getValue();
     const chat = chats[chatIndex];
@@ -343,7 +340,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     await this.channelService.setReaction(this.channelId!, chat.id, reactionType, updatedUsers);
     this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
   }
- 
+
   private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
     let usersRaw = reactions[reactionType];
     if (!usersRaw) return [];
@@ -407,13 +404,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
   openDialogueShowProfile(user: User) {
-    this.selectedProfileUser = user;
-    this.showProfileDialogue = true;
-  }
-
-  closeDialogueShowProfile() {
-    this.showProfileDialogue = false;
-    this.selectedProfileUser = undefined;
+    this.openProfile.emit(user);
   }
 
   submitChatMessage() {
@@ -445,4 +436,12 @@ export class ChatsComponent implements OnInit, OnChanges {
     if (!this.channelId) return;
     this.openThread.emit({ channelId: this.channelId, chatId });
   }
+
+  handleOpenProfile(chat: Chat) {
+    const user = this.participants.find(u => u.uid === chat.user);
+    if (user) {
+      this.openProfile.emit(user);
+    }
+  }
+
 }

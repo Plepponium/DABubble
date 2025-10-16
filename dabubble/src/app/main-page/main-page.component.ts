@@ -112,16 +112,14 @@ export class MainPageComponent {
     this.openUserChat(user);
   }
 
-  async openProfileOverlay(userId: string) {
+  async openProfileOverlay(user: User) {
     this.closeAllOverlays();
 
     const currentUser = await firstValueFrom(this.userService.getCurrentUser());
-    if (currentUser?.uid === userId) {
+    if (currentUser?.uid === user.uid) {
       this.openUserProfile();
       return;
     }
-
-    const user = await firstValueFrom(this.userService.getSingleUserById(userId));
     if (user) {
       this.selectedProfile = user;
       this.showProfileOverlay = true;
