@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, Input, inject, OnInit, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatIconModule} from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -47,11 +47,12 @@ export class ThreadComponent implements OnInit {
 
   channelService = inject(ChannelService);
   userService = inject(UserService);
-  
+
   @Input() channelId!: string;
   @Input() chatId!: string;
-  // @Input() participants: User[] = [];
   @Output() closeThread = new EventEmitter<void>();
+  @Output() openProfile = new EventEmitter<User>();
+
 
 
   ngOnInit() {
@@ -59,7 +60,7 @@ export class ThreadComponent implements OnInit {
     this.loadChannelWithId(this.channelId);
     this.chat$ = this.getEnrichedChat();
     this.answers$ = this.getEnrichedAnswers();
-    
+
     // this.answers$.pipe(take(1)).subscribe(answers => {
     //   console.log('Thread Answers:', answers);
     // });
@@ -133,16 +134,16 @@ export class ThreadComponent implements OnInit {
       switchMap(answers =>
         answers.length
           ? this.userService.getUsersByIds(answers.map(a => a.user)).pipe(
-              map(users =>
-                answers.map(answer => ({
-                  ...answer,
-                  userName: users.find(u => u.uid === answer.user)?.name,
-                  userImg: users.find(u => u.uid === answer.user)?.img,
-                  // answer.reactions direkt als Map
-                  reactionArray: this.transformReactionsToArray(answer.reactions, users, this.currentUserId)
-                }))
-              )
+            map(users =>
+              answers.map(answer => ({
+                ...answer,
+                userName: users.find(u => u.uid === answer.user)?.name,
+                userImg: users.find(u => u.uid === answer.user)?.img,
+                // answer.reactions direkt als Map
+                reactionArray: this.transformReactionsToArray(answer.reactions, users, this.currentUserId)
+              }))
             )
+          )
           : of([])
       )
     );
@@ -190,7 +191,7 @@ export class ThreadComponent implements OnInit {
       )
     );
     map((enrichedAnswers: Answer[]) =>
-        enrichedAnswers.sort((a, b) => a.time - b.time)
+      enrichedAnswers.sort((a, b) => a.time - b.time)
     );
   }
 
@@ -216,10 +217,10 @@ export class ThreadComponent implements OnInit {
 
   openReactionsDialogueBelow(chatId: string) {
     if (this.activeReactionDialogueBelowIndex === chatId) {
-      this.activeReactionDialogueBelowIndex = null; 
+      this.activeReactionDialogueBelowIndex = null;
     } else {
       this.editCommentDialogueExpanded = false;
-      this.activeReactionDialogueBelowIndex = chatId; 
+      this.activeReactionDialogueBelowIndex = chatId;
       this.activeReactionDialogueIndex = null;
     }
   }
@@ -229,7 +230,7 @@ export class ThreadComponent implements OnInit {
       this.activeReactionDialogueBelowAnswersIndex = null;
     } else {
       this.editCommentDialogueExpanded = false;
-      this.activeReactionDialogueBelowAnswersIndex = i; 
+      this.activeReactionDialogueBelowAnswersIndex = i;
       this.activeReactionDialogueAnswersIndex = null;
     }
   }
@@ -311,7 +312,7 @@ export class ThreadComponent implements OnInit {
 
   async addReaction(chatId: string, reactionType: string) {
     console.log('reactionType', reactionType);
-    
+
     const chat = await firstValueFrom(this.chat$);
     if (!chat) return;
 
@@ -415,6 +416,16 @@ export class ThreadComponent implements OnInit {
     this.newAnswer = '';
     setTimeout(() => this.scrollToBottom());
   }
+
+  onUserNameClick(userId: string) {
+    if (!userId) return;
+    this.userService.getSingleUserById(userId).pipe(take(1)).subscribe(user => {
+      if (user) {
+        this.openProfile.emit(user);
+      }
+    });
+  }
+
 
   handleCloseThread() {
     this.closeThread.emit();

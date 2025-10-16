@@ -1,38 +1,38 @@
 .dialogue-overlay {
-    position: absolute;
-    top: 116px;
-    right: 20px;
-    width: fit-content;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    padding: 30px;
-    background-color: #ffffff;
-    border-top-left-radius: 30px;
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
-    box-shadow: 4px 4px 7px 0px rgba(0, 0, 0, 0.2);
-    box-sizing: border-box;
-    z-index: 6;
+  position: absolute;
+  top: 116px;
+  right: 20px;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 30px;
+  background-color: #ffffff;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  box-shadow: 4px 4px 7px 0px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  z-index: 7;
 }
 
 .btn {
-    width: 222px;
-    display: flex;
-    justify-content: center;
-    padding: 10px 45px;
-    font-size: 24px;
-    font-weight: 600;
-    box-sizing: border-box;
-    border-radius: 30px;
-    cursor: pointer;
+  width: 222px;
+  display: flex;
+  justify-content: center;
+  padding: 10px 45px;
+  font-size: 24px;
+  font-weight: 600;
+  box-sizing: border-box;
+  border-radius: 30px;
+  cursor: pointer;
 }
 
 .logout-btn {
-    &:hover {
-        background-color: #eceefe;
-        color: #535AF1;
-        font-weight: 700;
-    }
+  &:hover {
+    background-color: #eceefe;
+    color: #535af1;
+    font-weight: 700;
+  }
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, ChangeDetectionStrategy, Component, signal, OnInit, Output, EventEmitter, inject } from '@angular/core';
+import { ChangeDetectorRef, ChangeDetectionStrategy, Component, signal, OnInit, Output, EventEmitter, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,10 +24,14 @@ export class MenuComponent implements OnInit {
   readonly panelOpenState = signal(false);
   channelsExpanded = true;
   channels: Channel[] = [];
-  activeChannelId?: string;
+  // activeChannelId?: string;
   usersExpanded = true;
-  activeUserId?: string;
+  // activeUserId?: string;
   // showAddChannelDialogue = false;
+
+  @Input() activeChannelId?: string;
+  @Input() activeUserId?: string;
+
   @Output() openAddChannel = new EventEmitter<void>();
   @Output() openChannel = new EventEmitter<string>();
   @Output() openUserChat = new EventEmitter<User>();
