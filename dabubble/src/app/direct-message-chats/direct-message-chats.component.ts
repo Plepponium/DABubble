@@ -48,10 +48,12 @@ export class DirectMessageChatsComponent {
     dropUp: true,
     maxItems: 10,
     mentionFilter: (search: string, items?: any[]) => {
-
-      return items || [];
+      if (!items) return [];
+      const term = search.toLowerCase();
+      return items.filter(u => u.name.toLowerCase().includes(term));
     }
   };
+
 
 
 
