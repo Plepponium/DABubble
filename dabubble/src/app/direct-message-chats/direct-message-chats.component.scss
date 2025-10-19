@@ -92,7 +92,6 @@
   display: flex;
   flex-direction: column;
   border: 1px solid #adb0d9;
-  cursor: pointer;
 
   &:hover {
     border-color: #797ef3;
@@ -100,10 +99,6 @@
   &:focus-within {
     border-color: #535af1;
   }
-}
-
-.form-field * {
-  cursor: pointer;
 }
 
 .input {
@@ -459,4 +454,17 @@
       }
     }
   }
+}
+
+.mention-list {
+  position: absolute;
+  bottom: 100%; // über dem Trigger
+  margin-bottom: 4px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

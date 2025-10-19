@@ -10,10 +10,12 @@ import { DirectMessageService } from '../../services/direct-messages.service';
 import { reactionIcons } from '../reaction-icons';
 import { ReactionIconsDialogComponent } from '../reaction-icons-dialog/reaction-icons-dialog.component';
 import { DmReactionsDialogComponent } from '../dm-reactions-dialog/dm-reactions-dialog.component';
+import { MentionModule } from 'angular-mentions';
+
 
 @Component({
   selector: 'app-direct-message-chats',
-  imports: [RoundBtnComponent, CommonModule, FormsModule, DmReactionsDialogComponent, ReactionIconsDialogComponent],
+  imports: [CommonModule, MentionModule, FormsModule, DmReactionsDialogComponent, ReactionIconsDialogComponent, RoundBtnComponent],
   templateUrl: './direct-message-chats.component.html',
   styleUrls: ['./direct-message-chats.component.scss']
 })
@@ -30,14 +32,29 @@ export class DirectMessageChatsComponent {
   otherUser?: User;
   messages$?: Observable<any[]>;
   users$?: Observable<Record<string, User>>;
-  messageText = '';
 
+  messageText = '';
   latestMessages: any[] = [];
   reactionIcons: string[] = reactionIcons;
   activeReactionDialog: { messageId: string | null; source: 'chat' | 'hover' | null } = {
     messageId: null,
     source: null
   };
+
+  mentionUsers: any[] = [];
+  mentionConfig = {
+    items: this.mentionUsers,
+    labelKey: 'name',
+    dropUp: true,
+    maxItems: 10,
+    mentionFilter: (search: string, items?: any[]) => {
+
+      return items || [];
+    }
+  };
+
+
+
 
   private authSub?: Subscription;
   private subs = new Subscription();
@@ -89,17 +106,23 @@ export class DirectMessageChatsComponent {
   }
 
   private setupUsersObservable() {
-    if (!this.currentUser) return;
-    this.users$ = this.userService.getUsersByIds([this.currentUser!.uid, this.userId]).pipe(
-      map(users =>
-        users.reduce((map, u) => {
-          map[u.uid] = u;
-          return map;
-        }, {} as Record<string, User>)
-      ),
+    this.users$ = this.userService.getUsers().pipe(
+      map(users => {
+        this.mentionUsers = users.map(u => ({
+          uid: u.uid,
+          name: u.name,
+          img: u.img || 'default-user',
+          presence: u.presence || 'offline'
+        }));
+
+        const userMap: Record<string, User> = {};
+        users.forEach(u => userMap[u.uid] = u);
+        return userMap;
+      }),
       shareReplay(1)
     );
   }
+
 
   private setupMessagesObservable() {
     if (!this.dmId || !this.users$) return;
