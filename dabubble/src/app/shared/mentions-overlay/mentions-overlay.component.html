@@ -1,0 +1,19 @@
+<div class="mentions-overlay" *ngIf="activeTrigger && filteredItems.length > 0">
+    <div class="mention-item" *ngFor="let item of filteredItems; let i = index" [class.active]="i === activeIndex"
+        (click)="select(item)">
+
+        <div *ngIf="activeTrigger === '@'" class="user">
+            <div class="img-container">
+                <img class="user-img" [src]="'assets/user-icons/' + (item.img || 'default-user') + '.svg'" />
+                <div [class]="'online-signal ' + (item.presence || 'offline')"></div>
+            </div>
+            <span class="font-w-400 font-18">
+                {{ item.name }} <span *ngIf="item.uid === currentUser?.uid">(Du)</span>
+            </span>
+        </div>
+
+        <div *ngIf="activeTrigger === '#'" class="channel">
+            <span class="font-w-700 font-18">#{{ item.name }}</span>
+        </div>
+    </div>
+</div>

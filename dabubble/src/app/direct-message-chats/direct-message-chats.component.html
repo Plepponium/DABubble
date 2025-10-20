@@ -152,20 +152,12 @@
         <div class="form-field-wrapper">
             <div class="form-field full-width">
                 <textarea #messageInput class="input font-18" [(ngModel)]="messageText"
-                    [placeholder]="'Nachricht an ' + otherUser.name" [mention]="mentionUsers"
-                    [mentionConfig]="mentionConfig" [mentionListTemplate]="mentionUserTemplate">
+                    [placeholder]="'Nachricht an ' + otherUser.name">
                 </textarea>
 
-                <ng-template #mentionUserTemplate let-item="item">
-                    <div>
-                        <img [src]="'assets/user-icons/' + (item.img || 'default-user') + '.svg'" width="30"
-                            height="30">
-                        <span>{{ item.name }}</span>
-                    </div>
-                </ng-template>
-
-
-
+                <app-mentions-overlay [text]="messageText" [currentUser]="currentUser" [context]="'DM'"
+                    [users]="mentionUsers" (mentionSelected)="insertMention($event)">
+                </app-mentions-overlay>
 
                 <div class="input-icon-bar">
                     <div class="icon-bar t-gray">

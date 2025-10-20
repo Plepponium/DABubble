@@ -10,17 +10,19 @@ import { DirectMessageService } from '../../services/direct-messages.service';
 import { reactionIcons } from '../reaction-icons';
 import { ReactionIconsDialogComponent } from '../reaction-icons-dialog/reaction-icons-dialog.component';
 import { DmReactionsDialogComponent } from '../dm-reactions-dialog/dm-reactions-dialog.component';
-import { MentionModule } from 'angular-mentions';
+import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
+
 
 
 @Component({
   selector: 'app-direct-message-chats',
-  imports: [CommonModule, MentionModule, FormsModule, DmReactionsDialogComponent, ReactionIconsDialogComponent, RoundBtnComponent],
+  imports: [CommonModule, FormsModule, MentionsOverlayComponent, DmReactionsDialogComponent, ReactionIconsDialogComponent, RoundBtnComponent],
   templateUrl: './direct-message-chats.component.html',
   styleUrls: ['./direct-message-chats.component.scss']
 })
 export class DirectMessageChatsComponent {
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
+
   @Input() userId!: string;
   @Output() openProfile = new EventEmitter<User>();
 
@@ -40,21 +42,7 @@ export class DirectMessageChatsComponent {
     messageId: null,
     source: null
   };
-
-  mentionUsers: any[] = [];
-  mentionConfig = {
-    items: this.mentionUsers,
-    labelKey: 'name',
-    dropUp: true,
-    maxItems: 10,
-    mentionFilter: (search: string, items?: any[]) => {
-      if (!items) return [];
-      const term = search.toLowerCase();
-      return items.filter(u => u.name.toLowerCase().includes(term));
-    }
-  };
-
-
+  mentionUsers: Pick<User, 'uid' | 'name' | 'img' | 'presence'>[] = [];
 
 
 
@@ -123,6 +111,18 @@ export class DirectMessageChatsComponent {
       }),
       shareReplay(1)
     );
+  }
+
+  insertMention(event: { name: string, type: 'user' | 'channel' }) {
+    const trigger = event.type === 'user' ? '@' : '#';
+    const words = this.messageText.split(/\s/);
+    for (let i = words.length - 1; i >= 0; i--) {
+      if (words[i].startsWith(trigger)) {
+        words[i] = `${trigger}${event.name}`;
+        break;
+      }
+    }
+    this.messageText = words.join(' ') + ' ';
   }
 
 
