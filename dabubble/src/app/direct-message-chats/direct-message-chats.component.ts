@@ -125,6 +125,19 @@ export class DirectMessageChatsComponent {
     this.messageText = words.join(' ') + ' ';
   }
 
+  insertMentionInEdit(message: any, event: { name: string, type: 'user' | 'channel' }) {
+    const trigger = event.type === 'user' ? '@' : '#';
+    const words = message.editedText.split(/\s/);
+    for (let i = words.length - 1; i >= 0; i--) {
+      if (words[i].startsWith(trigger)) {
+        words[i] = `${trigger}${event.name}`;
+        break;
+      }
+    }
+    message.editedText = words.join(' ') + ' ';
+  }
+
+
 
   private setupMessagesObservable() {
     if (!this.dmId || !this.users$) return;

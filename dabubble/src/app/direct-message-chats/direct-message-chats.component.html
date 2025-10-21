@@ -51,7 +51,8 @@
                                     <div class="line"></div>
                                 </div>
 
-                                <div class="chat-message-row" [class.me]="m.senderId === currentUser?.uid">
+                                <div class="chat-message-row" [class.me]="m.senderId === currentUser?.uid"
+                                    [class.edit-mode]="m.isEditing">
                                     <img class="chat-user-img"
                                         [src]="'assets/user-icons/' + (m.senderImg || 'default-user') + '.svg'" />
 
@@ -119,6 +120,12 @@
                                             <textarea #editTa id="edit-{{m.id}}" class="edit-textarea"
                                                 (input)="autoGrow(editTa)" [(ngModel)]="m.editedText"
                                                 [placeholder]="m.text"></textarea>
+
+                                            <app-mentions-overlay [text]="m.editedText" [currentUser]="currentUser"
+                                                [context]="'DM'" [users]="mentionUsers"
+                                                (mentionSelected)="insertMentionInEdit(m, $event)">
+                                            </app-mentions-overlay>
+
                                             <div class="edit-actions">
                                                 <button class="btn cancel"
                                                     (click)="cancelEditMessage(m)">Abbrechen</button>

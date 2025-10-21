@@ -200,6 +200,13 @@
         }
       }
 
+      &.edit-mode {
+        background-color: #eceefe;
+        .dm-reactions-dialog-hover {
+          display: none !important;
+        }
+      }
+
       &:hover {
         background-color: #eceefe;
 
@@ -374,6 +381,7 @@
     align-items: center;
     justify-content: center;
     gap: 5px;
+    z-index: 5;
 
     .reaction-btn-t-box {
       display: flex;
@@ -397,6 +405,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  position: relative;
 
   &:focus-within {
     border-color: #535af1;
