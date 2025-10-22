@@ -8,12 +8,14 @@
                 <div [class]="'online-signal ' + (item.presence || 'offline')"></div>
             </div>
             <span class="font-w-400 font-18">
-                {{ item.name }} <span *ngIf="item.uid === currentUser?.uid">(Du)</span>
+                {{ item.name }} <span *ngIf="item.uid === currentUserId">(Du)</span>
             </span>
         </div>
 
         <div *ngIf="activeTrigger === '#'" class="channel">
-            <span class="font-w-700 font-18">#{{ item.name }}</span>
+            <img class="hover-icon" src="assets/icons/tag.svg">
+            <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
+            <span class="font-w-400 font-18">{{ item.name }}</span>
         </div>
     </div>
 </div>

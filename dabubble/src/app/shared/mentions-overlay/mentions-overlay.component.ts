@@ -13,12 +13,13 @@ export type MentionContext = 'DM' | 'Channel' | 'Searchbar';
 })
 export class MentionsOverlayComponent {
   @Input() text = '';
-  @Input() currentUser?: User;
+  @Input() currentUserId?: string;
   @Input() context: MentionContext = 'DM';
   @Input() users: Partial<User>[] = [];
-
   @Input() channels: any[] = [];
+
   @Output() mentionSelected = new EventEmitter<{ name: string, type: 'user' | 'channel' }>();
+  @Output() overlayStateChange = new EventEmitter<boolean>();
 
   activeTrigger: '@' | '#' | null = null;
   searchTerm = '';
@@ -35,17 +36,16 @@ export class MentionsOverlayComponent {
     const match = this.text.match(/([@#])([^\s]*)$/);
     if (!match) {
       this.closeOverlay();
+      this.overlayStateChange.emit(false);
       return;
     }
     this.activeTrigger = match[1] as '@' | '#';
     this.searchTerm = match[2].toLowerCase();
 
     if (this.activeTrigger === '@') {
-      const sortedUsers = [...this.users].sort((a, b) => {
-        const nameA = (a.name || '').toLowerCase();
-        const nameB = (b.name || '').toLowerCase();
-        return nameA.localeCompare(nameB);
-      });
+      const sortedUsers = [...this.users].sort((a, b) =>
+        (a.name || '').toLowerCase().localeCompare((b.name || '').toLowerCase())
+      );
 
       this.filteredItems = sortedUsers
         .filter(u => u.name?.toLowerCase().includes(this.searchTerm))
@@ -57,8 +57,15 @@ export class MentionsOverlayComponent {
         .slice(0, 10);
     }
 
-    if (this.filteredItems.length === 0) this.closeOverlay();
+    if (this.filteredItems.length === 0) {
+      this.closeOverlay();
+      this.overlayStateChange.emit(false);
+      return;
+    }
+
+    this.overlayStateChange.emit(true);
   }
+
 
 
   private closeOverlay() {

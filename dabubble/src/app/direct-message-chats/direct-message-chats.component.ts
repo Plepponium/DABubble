@@ -34,17 +34,15 @@ export class DirectMessageChatsComponent {
   otherUser?: User;
   messages$?: Observable<any[]>;
   users$?: Observable<Record<string, User>>;
-
   messageText = '';
   latestMessages: any[] = [];
   reactionIcons: string[] = reactionIcons;
+  overlayActive = false;
+  mentionUsers: Pick<User, 'uid' | 'name' | 'img' | 'presence'>[] = [];
   activeReactionDialog: { messageId: string | null; source: 'chat' | 'hover' | null } = {
     messageId: null,
     source: null
   };
-  mentionUsers: Pick<User, 'uid' | 'name' | 'img' | 'presence'>[] = [];
-
-
 
   private authSub?: Subscription;
   private subs = new Subscription();
@@ -62,8 +60,11 @@ export class DirectMessageChatsComponent {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.ensureInitialized();
+    if (changes['userId'] && !changes['userId'].firstChange) {
+      this.ensureInitialized();
+    }
   }
+
 
   ngOnDestroy(): void {
     this.authSub?.unsubscribe();
@@ -181,6 +182,15 @@ export class DirectMessageChatsComponent {
       setTimeout(() => this.scrollToBottom(), 0);
       this.firstLoad = false;
     }
+  }
+
+  onEnterPress(e: KeyboardEvent) {
+    if (this.overlayActive) {
+      e.preventDefault();
+      return;
+    }
+    this.sendMessage();
+    e.preventDefault();
   }
 
   async sendMessage() {

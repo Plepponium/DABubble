@@ -25,6 +25,14 @@
   &.active,
   &:hover {
     background: #eceefe;
+
+    .hover-icon {
+      display: none;
+    }
+
+    .hover-icon-purple {
+      display: block;
+    }
   }
 }
 
@@ -51,4 +59,14 @@
   right: 0;
   top: unset;
   left: unset;
+}
+
+.channel {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.hover-icon-purple {
+  display: none;
 }

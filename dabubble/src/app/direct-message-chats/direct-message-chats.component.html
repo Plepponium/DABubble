@@ -121,8 +121,9 @@
                                                 (input)="autoGrow(editTa)" [(ngModel)]="m.editedText"
                                                 [placeholder]="m.text"></textarea>
 
-                                            <app-mentions-overlay [text]="m.editedText" [currentUser]="currentUser"
-                                                [context]="'DM'" [users]="mentionUsers"
+                                            <app-mentions-overlay [text]="m.editedText"
+                                                [currentUserId]="currentUser?.uid" [context]="'DM'"
+                                                [users]="mentionUsers"
                                                 (mentionSelected)="insertMentionInEdit(m, $event)">
                                             </app-mentions-overlay>
 
@@ -156,32 +157,37 @@
             </ng-container>
         </ng-container>
 
-        <div class="form-field-wrapper">
-            <div class="form-field full-width">
-                <textarea #messageInput class="input font-18" [(ngModel)]="messageText"
-                    [placeholder]="'Nachricht an ' + otherUser.name">
+
+        <form (ngSubmit)="sendMessage()">
+            <div class="form-field-wrapper">
+                <div class="form-field full-width">
+                    <textarea #messageInput class="input font-18" name="message" type="text" [(ngModel)]="messageText"
+                        [placeholder]="'Nachricht an ' + otherUser.name" (keydown.enter)="onEnterPress($any($event))">
                 </textarea>
 
-                <app-mentions-overlay [text]="messageText" [currentUser]="currentUser" [context]="'DM'"
-                    [users]="mentionUsers" (mentionSelected)="insertMention($event)">
-                </app-mentions-overlay>
+                    <app-mentions-overlay [text]="messageText" [currentUserId]="currentUser?.uid" [context]="'DM'"
+                        [users]="mentionUsers" (mentionSelected)="insertMention($event)"
+                        (overlayStateChange)="overlayActive = $event">
+                    </app-mentions-overlay>
 
-                <div class="input-icon-bar">
-                    <div class="icon-bar t-gray">
-                        <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
-                            iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
-                            altText="Reaktion hinzufügen"></app-round-btn>
-                        <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
-                            iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
-                            altText="Mail hinzufügen"></app-round-btn>
+                    <div class="input-icon-bar">
+                        <div class="icon-bar t-gray">
+                            <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
+                                iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
+                                altText="Reaktion hinzufügen"></app-round-btn>
+                            <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
+                                iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
+                                altText="Mail hinzufügen"></app-round-btn>
+                        </div>
+
+                        <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
+                            iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden" type="submit">
+                        </app-round-btn>
                     </div>
-
-                    <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
-                        iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden"
-                        (click)="sendMessage()"></app-round-btn>
                 </div>
             </div>
-        </div>
+        </form>
+
     </div>
 </div>
 

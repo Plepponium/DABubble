@@ -200,10 +200,19 @@
             <div class="form-field full-width">
                 <ng-container *ngIf="channelName$ | async as channelName">
                     <textarea id="chat-message" class="input" name="message" [(ngModel)]="newMessage"
-                        (keydown.enter)="submitChatMessage(); $event.preventDefault();" type="text"
+                        (keydown.enter)="onEnterPress($any($event))" type="text"
                         [placeholder]="'Nachricht an #' + channelName"></textarea>
                 </ng-container>
-                <!-- <label for="chat-message" class="floating-label t-gray">Nachricht an #Entwicklerteam</label> -->
+
+
+
+                <app-mentions-overlay [text]="newMessage" [currentUserId]="currentUserId" [context]="'Channel'"
+                    [users]="(participants$ | async) || [] " [channels]="filteredChannels"
+                    (mentionSelected)="insertMention($event)" (overlayStateChange)="overlayActive = $event">
+                </app-mentions-overlay>
+
+
+
                 <div class="input-icon-bar">
                     <div class="icon-bar t-gray">
                         <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"

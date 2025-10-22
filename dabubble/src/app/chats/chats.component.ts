@@ -17,11 +17,12 @@ import { BehaviorSubject, combineLatest, forkJoin, map, Observable, of, switchMa
 import { reactionIcons } from '../reaction-icons';
 // import { ChatWithDetails } from '../../models/chat-with-details.class';
 import localeDe from '@angular/common/locales/de';
+import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
 registerLocaleData(localeDe);
 
 @Component({
   selector: 'app-chats',
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, DialogueOverlayComponent, ChatAddUserOverlayComponent, ChannelDescriptionOverlayComponent],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MentionsOverlayComponent, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, DialogueOverlayComponent, ChatAddUserOverlayComponent, ChannelDescriptionOverlayComponent],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.scss',
 })
@@ -34,8 +35,11 @@ export class ChatsComponent implements OnInit, OnChanges {
   editCommentDialogueExpanded = false;
   activeReactionDialogueIndex: number | null = null;
   activeReactionDialogueBelowIndex: number | null = null;
+  overlayActive = false;
 
   currentUserId: string = '';
+  channels: any[] = [];
+  filteredChannels: any[] = []
   participantIds: string[] = [];
   participants: User[] = [];
   channelChats: any[] = [];
@@ -58,6 +62,9 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.getCurrentUser();
+    this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
+      this.channels = channels;
+    });
     if (!this.channelId) {
       this.loadFirstChannel();
     } else {
@@ -83,13 +90,20 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   getCurrentUser() {
     this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
-      // console.log(user);
       if (user) {
         this.currentUserId = user.uid;
-        // console.log('getCurrentUser', this.currentUserId);
+
+        // Channels laden und nur die filtern, bei denen der User Teilnehmer ist
+        this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
+          this.channels = channels;
+          this.filteredChannels = channels.filter(c =>
+            c.participants.includes(this.currentUserId)
+          );
+        });
       }
     });
   }
+
 
   private loadFirstChannel() {
     this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
@@ -407,23 +421,31 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.openProfile.emit(user);
   }
 
+  onEnterPress(e: KeyboardEvent) {
+    if (this.overlayActive) {
+      e.preventDefault();
+      return;
+    }
+
+    this.submitChatMessage();
+    e.preventDefault();
+  }
+
   submitChatMessage() {
-    if (!this.newMessage.trim()) return;      // Leere Eingabe unterdrücken
+    if (!this.newMessage.trim()) return;
     if (!this.channelId || !this.currentUserId) return;
 
     const messagePayload = {
       message: this.newMessage.trim(),
-      time: Math.floor(Date.now() / 1000),    // UNIX-Timestamp in Sekunden
+      time: Math.floor(Date.now() / 1000),
       user: this.currentUserId
     };
-    // console.log(messagePayload);
     this.channelService.addChatToChannel(this.channelId, messagePayload)
       .then(() => {
         this.newMessage = '';
         setTimeout(() => this.scrollToBottom());
       })
       .catch(err => {
-        // Optionale Fehlerbehandlung
         console.error('Fehler beim Senden:', err);
       });
   }
@@ -442,6 +464,18 @@ export class ChatsComponent implements OnInit, OnChanges {
     if (user) {
       this.openProfile.emit(user);
     }
+  }
+
+  insertMention(event: { name: string, type: 'user' | 'channel' }) {
+    const trigger = event.type === 'user' ? '@' : '#';
+    const words = this.newMessage.split(/\s/);
+    for (let i = words.length - 1; i >= 0; i--) {
+      if (words[i].startsWith(trigger)) {
+        words[i] = `${trigger}${event.name}`;
+        break;
+      }
+    }
+    this.newMessage = words.join(' ') + ' ';
   }
 
 }
