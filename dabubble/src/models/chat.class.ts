@@ -1,12 +1,7 @@
 import { Answer } from "./answer.class";
-// export interface Chat {
-//     id: string;
-//     message: string;
-//     time: number;
-//     user: string;
-//     reactions?: Record<string, string[] | string>;
-// }
 export interface Chat {
+  editedText: string;
+  isEditing: boolean;
   id: string;
   message: string;
   time: number;

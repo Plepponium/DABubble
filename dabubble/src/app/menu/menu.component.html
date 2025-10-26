@@ -35,23 +35,6 @@
 
 
             <div class="channel-section" *ngIf="channelsExpanded">
-                <!-- <div class="channel-list">
-                    <div class="channel">
-                        <div class="channel-icon-container">
-                            <img class="hover-icon" src="assets/icons/tag.svg" alt="">
-                            <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
-                        </div>
-                        <div>Entwickler-Team</div>
-                    </div>
-
-                    <div class="channel active">
-                        <div class="channel-icon-container">
-                            <img class="hover-icon" src="assets/icons/tag.svg" alt="">
-                            <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
-                        </div>
-                        <div>Office-Team</div>
-                    </div>
-                </div> -->
                 <div class="channel-list">
                     <div (click)="handleOpenChannel(channel)" class="channel" *ngFor="let channel of channels"
                         [class.active]="channel.id === activeChannelId">
@@ -64,23 +47,13 @@
                 </div>
 
                 <div class="sub-section" (click)="handleOpenAddChannel($event)">
-                    <!-- <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon"> -->
                     <img class="hover-icon" src="assets/icons/add_circle.svg" alt="">
                     <img class="hover-icon-purple" src="assets/icons/add_circle-purple.svg" alt="">
-                    <!-- </button> -->
+
                     Channel hinzufügen
                 </div>
             </div>
         </div>
-
-        <!-- <div (click)="closeAddChannel()" *ngIf="showAddChannelDialogue" class="dialogue-backdrop"></div> -->
-        <!-- <app-logout-overlay
-            *ngIf="showLogoutDialogue"
-            (close)="closeDialogueLogout()" 
-            (openUser)="openDialogueUser()"
-            (logout)="logout()">
-        </app-logout-overlay> -->
-
         <div class="menu-section">
             <div class="list-header-container">
                 <div (click)="toggleUsers()" class="list-header font-20">
@@ -95,7 +68,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="user-list" *ngIf="usersExpanded">
                 <div (click)="handleOpenUserChat(user)" class="user"
                     *ngFor="let user of sortedUsers$ | async; trackBy: trackByUserId"

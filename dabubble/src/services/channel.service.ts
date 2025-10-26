@@ -33,7 +33,7 @@ export class ChannelService {
     const answersCollection = collection(this.firestore, `channels/${channelId}/chats/${chatId}/answers`);
     return addDoc(answersCollection, answer);
   }
-  
+
   async setReaction(channelId: string, chatId: string, reactionType: string, userIds: string[]) {
     const chatRef = doc(this.firestore, `channels/${channelId}/chats`, chatId);
     const chatSnapshot = await docData(chatRef, { idField: 'id' }).pipe(take(1)).toPromise();
@@ -49,18 +49,18 @@ export class ChannelService {
   }
 
   async setAnswerReaction(channelId: string, chatId: string, answerId: string, reactionType: string, userIds: string[]) {
-  const answerRef = doc(this.firestore, `channels/${channelId}/chats/${chatId}/answers`, answerId);
-  const answerSnapshot = await docData(answerRef, { idField: 'id' }).pipe(take(1)).toPromise();
-  const reactions = (answerSnapshot as any)?.reactions || {};
+    const answerRef = doc(this.firestore, `channels/${channelId}/chats/${chatId}/answers`, answerId);
+    const answerSnapshot = await docData(answerRef, { idField: 'id' }).pipe(take(1)).toPromise();
+    const reactions = (answerSnapshot as any)?.reactions || {};
 
-  if (userIds.length === 0) {
-    delete reactions[reactionType];
-  } else {
-    reactions[reactionType] = [...userIds];
+    if (userIds.length === 0) {
+      delete reactions[reactionType];
+    } else {
+      reactions[reactionType] = [...userIds];
+    }
+
+    return updateDoc(answerRef, { reactions });
   }
-
-  return updateDoc(answerRef, { reactions });
-}
 
   async updateReactionForChat(channelId: string, chatId: string, reactionType: string, userIds: string[]) {
     const reactionDocRef = doc(this.firestore, `channels/${channelId}/chats/${chatId}/reactions`, reactionType);
@@ -77,7 +77,7 @@ export class ChannelService {
 
   getAnswersForChat(channelId: string, chatId: string): Observable<any[]> {
     const answersCollection = collection(this.firestore, `channels/${channelId}/chats/${chatId}/answers`);
-    const answersQuery = query(answersCollection, orderBy('time', 'asc')); 
+    const answersQuery = query(answersCollection, orderBy('time', 'asc'));
     return collectionData(answersQuery, { idField: 'id' }) as Observable<any[]>;
   }
 
@@ -95,4 +95,22 @@ export class ChannelService {
     const ref = doc(this.firestore, 'channels', id);
     return updateDoc(ref, data);
   }
+
+
+
+
+  async updateChatMessage(channelId: string, chatId: string, newText: string) {
+    try {
+      const chatRef = doc(this.firestore, `channels/${channelId}/chats/${chatId}`);
+      await updateDoc(chatRef, { message: newText });
+    } catch (err) {
+      console.error('Fehler beim Aktualisieren der Chatnachricht:', err);
+      throw err;
+    }
+  }
+
+
+
+
+
 }

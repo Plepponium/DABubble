@@ -49,7 +49,6 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
-  // chats$: Observable<ChatWithDetails[]> = of([]);
   private chatsSubject = new BehaviorSubject<Chat[]>([]);
   public chats$ = this.chatsSubject.asObservable();
 
@@ -478,4 +477,68 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.newMessage = words.join(' ') + ' ';
   }
 
+  insertMentionInEdit(chat: any, event: { name: string; type: 'user' | 'channel' }) {
+    if (!chat || !event) return;
+    const trigger = event.type === 'user' ? '@' : '#';
+    const words = chat.editedText.split(/\s/);
+    for (let i = words.length - 1; i >= 0; i--) {
+      if (words[i].startsWith(trigger)) {
+        words[i] = `${trigger}${event.name}`;
+        break;
+      }
+    }
+    chat.editedText = words.join(' ') + ' ';
+  }
+
+  enableEditChat(chat: any) {
+    this.editCommentDialogueExpanded = false;
+    this.chatsSubject.getValue().forEach(c => c.isEditing = false);
+    chat.isEditing = true;
+    chat.editedText = chat.message;
+    this.focusAndAutoGrow(chat.id);
+  }
+
+  cancelEditChat(chat: any) {
+    chat.isEditing = false;
+    chat.editedText = chat.message;
+  }
+
+  async saveEditedChat(chat: any) {
+    const newText = chat.editedText.trim();
+    if (!newText || newText === chat.message) {
+      chat.isEditing = false;
+      return;
+    }
+
+    this.updateChatMessage({ messageId: chat.id, newText });
+    chat.isEditing = false;
+  }
+
+  async updateChatMessage(event: { messageId: string; newText: string }) {
+    if (!this.channelId || !event.messageId || !event.newText.trim()) return;
+
+    try {
+      await this.channelService.updateChatMessage(this.channelId, event.messageId, event.newText.trim());
+    } catch (err) {
+      console.error('Fehler beim Aktualisieren der Nachricht:', err);
+    }
+  }
+
+  focusAndAutoGrow(messageId: string) {
+    setTimeout(() => {
+      const ta = document.getElementById(`edit-${messageId}`) as HTMLTextAreaElement | null;
+      if (ta) {
+        this.autoGrow(ta);
+        ta.focus();
+        const len = ta.value.length;
+        ta.setSelectionRange(len, len);
+      }
+    }, 0);
+  }
+
+  autoGrow(el: HTMLTextAreaElement | null) {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }
 }

@@ -31,6 +31,14 @@
   transition: transform 0.3s ease;
   transform: translateX(0);
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+
+  app-menu {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .sidenav.closed {
