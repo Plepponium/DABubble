@@ -1,33 +1,29 @@
 <div class="dialogue-overlay">
     <div class="header-container">
-        <div class="dialogue-overlay-header">
-            <div>Leute hinzufügen</div>
-            <app-round-btn (click)="handleClose()" iconSrc="assets/icons/close.svg"
-                iconHoverSrc="assets/icons/close-purple.svg"
-                altText="Schließen">
-            </app-round-btn>
+
+        <div class="header-channel-container">
+            <div class="dialogue-overlay-header">
+                <div>Leute hinzufügen</div>
+                <app-round-btn (click)="handleClose()" iconSrc="assets/icons/close.svg"
+                    iconHoverSrc="assets/icons/close-purple.svg" altText="Schließen">
+                </app-round-btn>
+            </div>
+            <div class="channel-container">
+                <img src="assets/icons/tag-light-purple.svg">
+                <div>{{channelName}}</div>
+            </div>
         </div>
 
-        <div class="channel-container">
-            <img src="assets/icons/tag-light-purple.svg" alt="">
-            <div>Entwicklerteam</div>
+
+        <div class="name-container">
+            <input class="user-name" type="text" placeholder="Name eingeben" [(ngModel)]="searchText" />
+            <app-mentions-overlay [context]="'AddUser'" [users]="allUsers" [text]="searchText"
+                (mentionSelected)="selectUser($event)"></app-mentions-overlay>
+
+        </div>
+        <div class="btn-container">
+            <button class="add-btn">
+                <div class="f-nunito">Hinzufügen</div>
+            </button>
         </div>
     </div>
-    
-
-    
-
-    <div class="name-container">
-        <!-- <div class="user-name"> -->
-            <input class="user-name" type="text" placeholder="Name eingeben">
-        <!-- </div> -->
-    </div>
-
-    <div class="btn-container">
-        <button class="add-btn" [class.wiggle]="animationClass === 'wiggle'" 
-  (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
-            <div class="f-nunito">Hinzufügen</div>        
-        </button>
-    </div>
-    
-</div>

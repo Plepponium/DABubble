@@ -1,8 +1,9 @@
-<div class="mentions-overlay" *ngIf="activeTrigger && filteredItems.length > 0">
-    <div class="mention-item" *ngFor="let item of filteredItems; let i = index" [class.active]="i === activeIndex"
-        (click)="select(item)">
+<div class="mentions-overlay" [class.add-user]="context === 'AddUser'"
+    *ngIf="filteredItems.length > 0 && (activeTrigger || context === 'AddUser')">
+    <div class="mention-item" *ngFor="let item of filteredItems; let i = index" #mentionItem
+        [class.active]="i === activeIndex" (click)="select(item)">
 
-        <div *ngIf="activeTrigger === '@'" class="user">
+        <div *ngIf="activeTrigger === '@' || context === 'AddUser'" class="user">
             <div class="img-container">
                 <img class="user-img" [src]="'assets/user-icons/' + (item.img || 'default-user') + '.svg'" />
                 <div [class]="'online-signal ' + (item.presence || 'offline')"></div>

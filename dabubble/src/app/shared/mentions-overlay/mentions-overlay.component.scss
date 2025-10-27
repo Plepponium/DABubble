@@ -8,9 +8,24 @@
   background: white;
   border: 1px solid #adb0d9;
   border-radius: 20px 20px 20px 0;
-
   padding: 20px;
   z-index: 1000;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  max-height: 400px;
+
+  &::-webkit-scrollbar {
+    width: 0px;
+  }
+
+  &.add-user {
+    left: 15px;
+    top: -19px;
+    bottom: unset;
+    border-radius: 0px 20px 20px 20px;
+    max-height: 171px;
+    box-sizing: content-box;
+  }
 }
 
 .mention-item {

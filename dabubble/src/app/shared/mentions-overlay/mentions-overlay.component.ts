@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostListener, Input, Output, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { User } from '../../../models/user.class';
 
-export type MentionContext = 'DM' | 'Channel' | 'Searchbar';
+export type MentionContext = 'DM' | 'Channel' | 'Searchbar' | 'AddUser';
 
 @Component({
   selector: 'app-mentions-overlay',
@@ -12,6 +12,8 @@ export type MentionContext = 'DM' | 'Channel' | 'Searchbar';
   styleUrls: ['./mentions-overlay.component.scss']
 })
 export class MentionsOverlayComponent {
+
+  @ViewChildren('mentionItem') mentionItems!: QueryList<ElementRef>;
   @Input() text = '';
   @Input() currentUserId?: string;
   @Input() context: MentionContext = 'DM';
@@ -28,8 +30,32 @@ export class MentionsOverlayComponent {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['text']) {
-      this.detectTrigger();
+      if (this.context === 'AddUser') {
+        this.filterUsersDirectly();
+      } else {
+        this.detectTrigger();
+      }
     }
+  }
+
+  private filterUsersDirectly() {
+    const term = this.text.trim().toLowerCase();
+
+    if (!term) {
+      this.filteredItems = [];
+      this.overlayStateChange.emit(false);
+      return;
+    }
+
+    const sortedUsers = [...this.users].sort((a, b) =>
+      (a.name || '').toLowerCase().localeCompare((b.name || '').toLowerCase())
+    );
+
+    this.filteredItems = sortedUsers
+      .filter(u => u.name?.toLowerCase().includes(term))
+      .slice(0, 10);
+
+    this.overlayStateChange.emit(this.filteredItems.length > 0);
   }
 
   private detectTrigger() {
@@ -90,9 +116,11 @@ export class MentionsOverlayComponent {
 
     if (e.key === 'ArrowDown') {
       this.activeIndex = (this.activeIndex + 1) % this.filteredItems.length;
+      this.scrollToActive();
       e.preventDefault();
     } else if (e.key === 'ArrowUp') {
       this.activeIndex = (this.activeIndex - 1 + this.filteredItems.length) % this.filteredItems.length;
+      this.scrollToActive();
       e.preventDefault();
     } else if (e.key === 'Enter') {
       this.select(this.filteredItems[this.activeIndex]);
@@ -100,6 +128,14 @@ export class MentionsOverlayComponent {
     } else if (e.key === 'Escape') {
       this.closeOverlay();
       e.preventDefault();
+    }
+  }
+
+  private scrollToActive() {
+    const items = this.mentionItems.toArray();
+    const el = items[this.activeIndex]?.nativeElement as HTMLElement;
+    if (el) {
+      el.scrollIntoView({ block: 'center' });
     }
   }
 }
