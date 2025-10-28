@@ -96,9 +96,6 @@ export class ChannelService {
     return updateDoc(ref, data);
   }
 
-
-
-
   async updateChatMessage(channelId: string, chatId: string, newText: string) {
     try {
       const chatRef = doc(this.firestore, `channels/${channelId}/chats/${chatId}`);
@@ -108,9 +105,6 @@ export class ChannelService {
       throw err;
     }
   }
-
-
-
 
 
 }
