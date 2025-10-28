@@ -16,13 +16,25 @@
 
 
         <div class="name-container">
-            <input class="user-name" type="text" placeholder="Name eingeben" [(ngModel)]="searchText" />
-            <app-mentions-overlay [context]="'AddUser'" [users]="allUsers" [text]="searchText"
-                (mentionSelected)="selectUser($event)"></app-mentions-overlay>
+            <div class="input-with-chips" [class.has-user]="selectedUser">
 
+                <div class="chip" *ngIf="selectedUser">
+                    <img [src]="'assets/user-icons/' + (selectedUser.img || 'default-user') + '.svg'" />
+                    <span>{{ selectedUser.name }}</span>
+                    <button class="remove-btn" (click)="removeUser()">×</button>
+                </div>
+
+                <input *ngIf="!selectedUser" class="user-name" type="text" placeholder="Name eingeben"
+                    [(ngModel)]="searchText" />
+
+                <app-mentions-overlay *ngIf="!selectedUser" [context]="'AddUser'" [users]="allUsers" [text]="searchText"
+                    (mentionSelected)="selectUser($event)">
+                </app-mentions-overlay>
+            </div>
         </div>
+
         <div class="btn-container">
-            <button class="add-btn">
+            <button class="add-btn" [disabled]="!selectedUser">
                 <div class="f-nunito">Hinzufügen</div>
             </button>
         </div>

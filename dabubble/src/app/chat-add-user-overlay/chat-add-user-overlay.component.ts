@@ -41,8 +41,14 @@ export class ChatAddUserOverlayComponent {
 
   selectUser(event: { name: string }) {
     this.selectedUser = this.allUsers.find(u => u.name === event.name) || null;
-    this.searchText = event.name;
+    this.searchText = '';
   }
+
+  removeUser() {
+    this.selectedUser = null;
+    this.searchText = '';
+  }
+
 
   handleClose() {
     this.close.emit();
