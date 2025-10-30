@@ -42,7 +42,8 @@
             </app-dialogue-overlay>
 
             <app-chat-add-user-overlay *ngIf="showAddDialogue" (close)="closeDialogueAddUser()"
-                class="dialogue-overlay-add-user" [channelName]="(channelName$ | async)">
+                class="dialogue-overlay-add-user" [channelName]="(channelName$ | async)" [channelId]="channelId"
+                [currentUserId]="currentUserId" [participants]="participants">
             </app-chat-add-user-overlay>
 
             <app-channel-description-overlay *ngIf="showChannelDescription" (close)="closeDialogChannelDescription()"

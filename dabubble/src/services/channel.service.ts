@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Firestore, collectionData, collection, setDoc, deleteDoc, query, orderBy } from '@angular/fire/firestore';
+import { Firestore, collectionData, collection, setDoc, deleteDoc, query, orderBy, arrayUnion } from '@angular/fire/firestore';
 import { doc, addDoc, docData, updateDoc } from '@angular/fire/firestore';
 import { map, Observable, take } from 'rxjs';
 import { Channel } from '../models/channel.class';
@@ -105,6 +105,17 @@ export class ChannelService {
       throw err;
     }
   }
+
+  async addParticipants(channelId: string, userIds: string[]) {
+    const ref = doc(this.firestore, 'channels', channelId);
+
+    return updateDoc(ref, {
+      participants: arrayUnion(...userIds)
+    });
+  }
+
+
+
 
 
 }
