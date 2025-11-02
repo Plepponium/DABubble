@@ -1,4 +1,7 @@
 export interface Answer {
+  showEditMenu: any;
+  isEditing: any;
+  editedText: any;
   id: string;
   message: string;
   time: number;

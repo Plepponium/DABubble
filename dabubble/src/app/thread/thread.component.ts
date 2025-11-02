@@ -14,15 +14,19 @@ import { Chat } from '../../models/chat.class';
 import { ChatWithDetails } from '../../models/chat-with-details.class';
 import { Answer } from '../../models/answer.class';
 import { reactionIcons } from '../reaction-icons';
+import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
 
 @Component({
   selector: 'app-thread',
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, MentionsOverlayComponent],
   templateUrl: './thread.component.html',
   styleUrl: './thread.component.scss'
 })
 export class ThreadComponent implements OnInit {
-  editCommentDialogueExpanded = false;
+
+  overlayActive: boolean = false;
+  filteredChannels: any[] = [];
+  editAnswerEditIndex: number | null = null;
   activeReactionDialogueIndex: string | null = null;
   activeReactionDialogueBelowIndex: string | null = null;
   activeReactionDialogueAnswersIndex: number | null = null;
@@ -87,13 +91,17 @@ export class ThreadComponent implements OnInit {
 
   getCurrentUser() {
     this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
-      // console.log(user);
       if (user) {
         this.currentUserId = user.uid;
-        // console.log('getCurrentUser', this.currentUserId);
+        this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
+          this.filteredChannels = channels.filter(c =>
+            Array.isArray(c.participants) && c.participants.includes(this.currentUserId)
+          );
+        });
       }
     });
   }
+
 
   private loadChannelWithId(channelId: string) {
     // console.log('loadChannelWithId channelId', channelId);
@@ -199,7 +207,7 @@ export class ThreadComponent implements OnInit {
     if (this.activeReactionDialogueIndex === chatId) {
       this.activeReactionDialogueIndex = null;
     } else {
-      this.editCommentDialogueExpanded = false;
+      this.editAnswerEditIndex = null;
       this.activeReactionDialogueIndex = chatId;
       this.activeReactionDialogueBelowIndex = null;
     }
@@ -209,7 +217,7 @@ export class ThreadComponent implements OnInit {
     if (this.activeReactionDialogueAnswersIndex === i) {
       this.activeReactionDialogueAnswersIndex = null;
     } else {
-      this.editCommentDialogueExpanded = false;
+      this.editAnswerEditIndex = null;
       this.activeReactionDialogueAnswersIndex = i;
       this.activeReactionDialogueBelowAnswersIndex = null;
     }
@@ -219,7 +227,7 @@ export class ThreadComponent implements OnInit {
     if (this.activeReactionDialogueBelowIndex === chatId) {
       this.activeReactionDialogueBelowIndex = null;
     } else {
-      this.editCommentDialogueExpanded = false;
+      this.editAnswerEditIndex = null;
       this.activeReactionDialogueBelowIndex = chatId;
       this.activeReactionDialogueIndex = null;
     }
@@ -229,7 +237,7 @@ export class ThreadComponent implements OnInit {
     if (this.activeReactionDialogueBelowAnswersIndex === i) {
       this.activeReactionDialogueBelowAnswersIndex = null;
     } else {
-      this.editCommentDialogueExpanded = false;
+      this.editAnswerEditIndex = null;
       this.activeReactionDialogueBelowAnswersIndex = i;
       this.activeReactionDialogueAnswersIndex = null;
     }
@@ -431,7 +439,80 @@ export class ThreadComponent implements OnInit {
     this.closeThread.emit();
   }
 
-  openEditCommentDialogue() {
-    this.editCommentDialogueExpanded = !this.editCommentDialogueExpanded;
+  insertMention(event: { name: string, type: 'user' | 'channel' }) {
+    const trigger = event.type === 'user' ? '@' : '#';
+    const words = this.newAnswer.split(/\s/);
+    for (let i = words.length - 1; i >= 0; i--) {
+      if (words[i].startsWith(trigger)) {
+        words[i] = `${trigger}${event.name}`;
+        break;
+      }
+    }
+    this.newAnswer = words.join(' ') + ' ';
   }
+
+  onEnterPress(e: KeyboardEvent) {
+    if (this.overlayActive) {
+      e.preventDefault();
+      return;
+    }
+
+    this.submitAnswer();
+    e.preventDefault();
+  }
+
+  toggleEditMenu(answer: Answer) {
+    answer.showEditMenu = !answer.showEditMenu;
+  }
+
+  enableEditAnswer(answer: Answer) {
+    answer.showEditMenu = false;
+    answer.isEditing = true;
+    answer.editedText = answer.message;
+  }
+
+  cancelEditAnswer(answer: Answer) {
+    answer.isEditing = false;
+    answer.editedText = answer.message;
+  }
+
+  insertMentionInEdit(answer: any, event: { name: string; type: 'user' | 'channel' }) {
+    if (!answer || !event) return;
+    const trigger = event.type === 'user' ? '@' : '#';
+    answer.editedText = answer.editedText ?? '';
+    const words = answer.editedText.split(/\s/);
+    for (let i = words.length - 1; i >= 0; i--) {
+      if (words[i].startsWith(trigger)) {
+        words[i] = `${trigger}${event.name}`;
+        break;
+      }
+    }
+    answer.editedText = words.join(' ') + ' ';
+  }
+
+
+  async saveEditedAnswer(answer: Answer) {
+    const newText = answer.editedText?.trim();
+    if (!newText || newText === answer.message) {
+      answer.isEditing = false;
+      return;
+    }
+    await this.channelService.updateAnswerMessage(
+      this.channelId,
+      this.chatId,
+      answer.id,
+      newText
+    );
+    answer.message = newText;
+    answer.isEditing = false;
+  }
+
+
+  autoGrow(el: HTMLTextAreaElement | null) {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }
+
+
 }

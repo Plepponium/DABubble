@@ -106,6 +106,17 @@ export class ChannelService {
     }
   }
 
+  async updateAnswerMessage(channelId: string, chatId: string, answerId: string, newText: string) {
+    try {
+      const answerRef = doc(this.firestore, `channels/${channelId}/chats/${chatId}/answers/${answerId}`);
+      await updateDoc(answerRef, { message: newText });
+    } catch (err) {
+      console.error('Fehler beim Aktualisieren der Antwort:', err);
+      throw err;
+    }
+  }
+
+
   async addParticipants(channelId: string, userIds: string[]) {
     const ref = doc(this.firestore, 'channels', channelId);
 
