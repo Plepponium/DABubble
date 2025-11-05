@@ -341,7 +341,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   async toggleReaction(chatIndex: number, reactionType: string) {
     const chat = await this.getChatByIndex(chatIndex);
     if (!chat) return;
-    console.log(chatIndex, reactionType);
+    // console.log(chatIndex, reactionType);
     const currentUsers = this.extractUserIds(chat.reactions || {}, reactionType);
     let updatedUsers: string[];
     if (currentUsers.includes(this.currentUserId)) {
@@ -449,11 +449,7 @@ export class ChatsComponent implements OnInit, OnChanges {
       });
   }
 
-  // handleOpenThread(chatId: string) {
-  //   this.openThread.emit({ chatId }); // im ngFor: (click)="handleOpenThread(chat.id)"
-  // }
   handleOpenThread(chatId: string) {
-    // console.log('channelId', this.channelId);
     if (!this.channelId) return;
     this.openThread.emit({ channelId: this.channelId, chatId });
   }

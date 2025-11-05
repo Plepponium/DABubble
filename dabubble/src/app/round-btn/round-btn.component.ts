@@ -10,4 +10,6 @@ export class RoundBtnComponent {
   @Input() iconSrc = '';          // normal Icon
   @Input() iconHoverSrc = '';     // Hover Icon
   @Input() altText = '';   
+  
+  @Input() type: 'button' | 'submit' | 'reset' = 'button';
 }
