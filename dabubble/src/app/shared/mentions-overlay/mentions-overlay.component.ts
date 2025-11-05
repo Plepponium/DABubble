@@ -19,6 +19,7 @@ export class MentionsOverlayComponent {
   @Input() context: MentionContext = 'DM';
   @Input() users: Partial<User>[] = [];
   @Input() channels: any[] = [];
+  @Input() cursorPos!: number;
 
   @Output() mentionSelected = new EventEmitter<{ name: string, type: 'user' | 'channel' }>();
   @Output() overlayStateChange = new EventEmitter<boolean>();
@@ -59,7 +60,14 @@ export class MentionsOverlayComponent {
   }
 
   private detectTrigger() {
-    const match = this.text.match(/([@#])([^\s]*)$/);
+    if (!this.text || this.cursorPos === undefined || this.cursorPos === null) {
+      this.closeOverlay();
+      this.overlayStateChange.emit(false);
+      return;
+    }
+    // const match = this.text.match(/([@#])([^\s]*)$/);
+    const subText = this.text.slice(0, this.cursorPos);
+    const match = subText.match(/([@#])([^\s]*)$/);
     if (!match) {
       this.closeOverlay();
       this.overlayStateChange.emit(false);

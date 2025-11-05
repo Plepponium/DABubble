@@ -36,6 +36,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   activeReactionDialogueIndex: number | null = null;
   activeReactionDialogueBelowIndex: number | null = null;
   overlayActive = false;
+  insertedAtPending = false;
 
   currentUserId: string = '';
   channels: any[] = [];
@@ -46,6 +47,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   reactionIcons = reactionIcons;
   reactionArray: { type: string, count: number, user: string[] }[] = [];
   newMessage: string = '';
+  cursorPos: number = 0;
 
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
@@ -461,16 +463,90 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
+  // insertMention(event: { name: string, type: 'user' | 'channel' }) {
+  //   const trigger = event.type === 'user' ? '@' : '#';
+  //   const words = this.newMessage.split(/\s/);
+  //   for (let i = words.length - 1; i >= 0; i--) {
+  //     if (words[i].startsWith(trigger)) {
+  //       words[i] = `${trigger}${event.name}`;
+  //       break;
+  //     }
+  //   }
+  //   this.newMessage = words.join(' ') + ' ';
+  //   this.insertedAtPending = false;
+  // }
+
+  onTextInput() {
+    const textarea = this.getTextarea();
+    // this.cursorPos = textarea ? textarea.selectionStart : 0;
+    if (textarea) {
+      this.cursorPos = textarea.selectionStart;
+    }
+  }
+
   insertMention(event: { name: string, type: 'user' | 'channel' }) {
     const trigger = event.type === 'user' ? '@' : '#';
-    const words = this.newMessage.split(/\s/);
-    for (let i = words.length - 1; i >= 0; i--) {
-      if (words[i].startsWith(trigger)) {
-        words[i] = `${trigger}${event.name}`;
-        break;
-      }
+    const textarea = this.getTextarea();
+    if (!textarea) return;
+
+    // Aktuelle Cursorposition
+    const cursorPos = textarea.selectionStart;
+    let value = this.newMessage;
+
+    // 1. Leerzeichen vor dem trigger am Cursor prüfen und ggf. einfügen
+    const { textWithSpace, updatedCursor } = this.ensureSpaceBeforeTrigger(value, cursorPos, trigger);
+
+    // 2. Mention-Text an Cursor-Position ersetzen
+    const { newText, caretPos } = this.replaceMentionAtCursor(textWithSpace, updatedCursor, trigger, event.name);
+
+    // 3. Wert updaten und Cursor setzen
+    this.newMessage = newText;
+    this.focusAndSetCursor(textarea, caretPos);
+
+    this.insertedAtPending = false;
+    this.overlayActive = false;
+  }
+
+  getTextarea(): HTMLTextAreaElement | null {
+    return document.getElementById('chat-message') as HTMLTextAreaElement | null;
+  }
+
+  ensureSpaceBeforeTrigger(text: string, cursorPos: number, trigger: string): { textWithSpace: string, updatedCursor: number } {
+    const beforeCursor = text.slice(0, cursorPos);
+    const atPos = beforeCursor.lastIndexOf(trigger);
+
+    if (atPos >= 0 && atPos < beforeCursor.length && (atPos === 0 || text[atPos - 1] !== ' ')) {
+    // if (atPos > 0 && text[atPos - 1] !== ' ') {
+      // Leerzeichen vor @ einfügen
+      const textWithSpace = text.slice(0, atPos) + ' ' + text.slice(atPos);
+      return { textWithSpace, updatedCursor: cursorPos + 1 };
     }
-    this.newMessage = words.join(' ') + ' ';
+    return { textWithSpace: text, updatedCursor: cursorPos };
+  }
+
+  replaceMentionAtCursor(text: string, cursorPos: number, trigger: string, mention: string): { newText: string, caretPos: number } {
+    // Finde das Wort mit @ am Cursor (wie bisher, auf Wörter splitten)
+    const beforeCursor = text.slice(0, cursorPos);
+    const afterCursor = text.slice(cursorPos);
+    // const match = beforeCursor.match(new RegExp(`\\${trigger}[^\\s]*$`));
+    const regex = new RegExp(`\\${trigger}[^\\s]*$`);
+    const match = beforeCursor.match(regex);
+    if (!match) return { newText: text, caretPos: cursorPos };
+
+    const mentionStart = beforeCursor.lastIndexOf(match[0]);
+    const beforeMention = beforeCursor.slice(0, mentionStart);
+    const inserted = `${trigger}${mention} `; // Leerzeichen nach dem Mention
+
+    const newText = beforeMention + inserted + afterCursor;
+    const caretPos = beforeMention.length + inserted.length;
+    return { newText, caretPos };
+  }
+
+  focusAndSetCursor(textarea: HTMLTextAreaElement, caretPos: number) {
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(caretPos, caretPos);
+    });
   }
 
   insertMentionInEdit(chat: any, event: { name: string; type: 'user' | 'channel' }) {
@@ -484,6 +560,59 @@ export class ChatsComponent implements OnInit, OnChanges {
       }
     }
     chat.editedText = words.join(' ') + ' ';
+  }
+
+  // addRecipientMention() {
+  //   if (this.insertedAtPending) return;
+
+  //   if (!this.newMessage.endsWith(' ') && this.newMessage.length > 0) {
+  //     this.newMessage += ' ';
+  //   }
+  //   this.newMessage += '@';
+  //   this.insertedAtPending = true;
+
+  //   setTimeout(() => {
+  //     const ta = document.getElementById('chat-message') as HTMLTextAreaElement | null;
+  //     if (ta) {
+  //       ta.focus();
+  //       const len = ta.value.length;
+  //       ta.setSelectionRange(len, len);
+  //     }
+  //   });
+  // }
+  addRecipientMention() {
+    if (this.insertedAtPending) return;
+
+    // Insert ' @' vor Cursor oder am Ende, wenn CursorPos nicht gesetzt
+    const textarea = this.getTextarea();
+    if (!textarea) return;
+    
+    const cursorStart = textarea.selectionStart;
+    const before = this.newMessage.slice(0, cursorStart);
+    const after = this.newMessage.slice(cursorStart);
+
+    // Falls nötig vor @ Leerzeichen ergänzen
+    let insertText = '@';
+    if (before.length > 0 && before[before.length -1] !== ' ') {
+      insertText = ' @';
+    }
+
+    this.newMessage = before + insertText + after;
+
+    // Neue Cursorposition hinter das eingefügte @ setzen
+    const newCursorPos = cursorStart + insertText.length;
+
+    this.cursorPos = newCursorPos;
+
+    setTimeout(() => {
+      // Aktualisiere sichtbar das Textarea + Cursorposition
+      textarea.focus();
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+
+      this.onTextInput();
+    });
+
+    this.insertedAtPending = true;
   }
 
   enableEditChat(chat: any) {
