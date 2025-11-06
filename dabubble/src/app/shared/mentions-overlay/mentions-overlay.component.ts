@@ -60,14 +60,7 @@ export class MentionsOverlayComponent {
   }
 
   private detectTrigger() {
-    if (!this.text || this.cursorPos === undefined || this.cursorPos === null) {
-      this.closeOverlay();
-      this.overlayStateChange.emit(false);
-      return;
-    }
-    // const match = this.text.match(/([@#])([^\s]*)$/);
-    const subText = this.text.slice(0, this.cursorPos);
-    const match = subText.match(/([@#])([^\s]*)$/);
+    const match = this.text.match(/([@#])([^\s]*)$/);
     if (!match) {
       this.closeOverlay();
       this.overlayStateChange.emit(false);
