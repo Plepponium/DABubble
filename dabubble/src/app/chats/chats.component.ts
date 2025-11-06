@@ -504,7 +504,9 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.focusAndSetCursor(textarea, caretPos);
 
     this.insertedAtPending = false;
+    console.log('overlayActive insertMention vorher:', this.overlayActive);
     this.overlayActive = false;
+    console.log('overlayActive insertMention jetzt:', this.overlayActive);
   }
 
   getTextarea(): HTMLTextAreaElement | null {
@@ -562,24 +564,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     chat.editedText = words.join(' ') + ' ';
   }
 
-  // addRecipientMention() {
-  //   if (this.insertedAtPending) return;
-
-  //   if (!this.newMessage.endsWith(' ') && this.newMessage.length > 0) {
-  //     this.newMessage += ' ';
-  //   }
-  //   this.newMessage += '@';
-  //   this.insertedAtPending = true;
-
-  //   setTimeout(() => {
-  //     const ta = document.getElementById('chat-message') as HTMLTextAreaElement | null;
-  //     if (ta) {
-  //       ta.focus();
-  //       const len = ta.value.length;
-  //       ta.setSelectionRange(len, len);
-  //     }
-  //   });
-  // }
   addRecipientMention() {
     if (this.insertedAtPending) return;
 

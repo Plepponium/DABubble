@@ -60,7 +60,10 @@ export class MentionsOverlayComponent {
   }
 
   private detectTrigger() {
+    console.log('detectTrigger', { text: this.text, cursorPos: this.cursorPos });
+
     if (!this.text || this.cursorPos === undefined || this.cursorPos === null) {
+      console.log('detectTrigger no text', { text: this.text, cursorPos: this.cursorPos });
       this.closeOverlay();
       this.overlayStateChange.emit(false);
       return;
@@ -97,7 +100,12 @@ export class MentionsOverlayComponent {
       return;
     }
 
+    // this.activeTrigger === null;
+    // this.filteredItems.length === 0;
     this.overlayStateChange.emit(true);
+    console.log('emit overlayStateChange', this.overlayStateChange);
+    console.log('emit overlayStateChange', this.filteredItems.length > 0);
+    // this.overlayStateChange.emit(this.filteredItems.length > 0);
   }
 
 

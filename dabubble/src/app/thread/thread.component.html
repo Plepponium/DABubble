@@ -287,8 +287,9 @@
 
         <form class="form" (ngSubmit)="submitAnswer()" #answerForm="ngForm">
             <div class="form-field full-width">
-                <textarea id="message" class="input" name="answer" [(ngModel)]="newAnswer"
-                    (keydown.enter)="onEnterPress($any($event))" [placeholder]="'Antworten...'"></textarea>
+                <textarea id="answer-message" class="input" name="answer" [(ngModel)]="newAnswer"
+                    (keydown.enter)="onEnterPress($any($event))" [placeholder]="'Antworten...'" 
+                    (input)="onTextInput()"></textarea>
 
                 <app-mentions-overlay [text]="newAnswer" [currentUserId]="currentUserId" [context]="'Channel'"
                     [users]="(participants$ | async) || []" [channels]="filteredChannels"

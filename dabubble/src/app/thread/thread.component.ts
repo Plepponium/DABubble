@@ -31,6 +31,7 @@ export class ThreadComponent implements OnInit {
   activeReactionDialogueBelowIndex: string | null = null;
   activeReactionDialogueAnswersIndex: number | null = null;
   activeReactionDialogueBelowAnswersIndex: number | null = null;
+  insertedAtPending = false;
 
   currentUserId: string = '';
   participantIds: string[] = [];
@@ -40,6 +41,7 @@ export class ThreadComponent implements OnInit {
   reactionArray: { type: string, count: number, user: string[] }[] = [];
   // newMessage: string = '';
   newAnswer: string = '';
+  cursorPos: number = 0;
 
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
@@ -101,7 +103,6 @@ export class ThreadComponent implements OnInit {
       }
     });
   }
-
 
   private loadChannelWithId(channelId: string) {
     // console.log('loadChannelWithId channelId', channelId);
@@ -406,6 +407,10 @@ export class ThreadComponent implements OnInit {
       u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
     );
   }
+  
+  handleCloseThread() {
+    this.closeThread.emit();
+  }
 
   async submitAnswer() {
     const message = this.newAnswer.trim();
@@ -424,6 +429,16 @@ export class ThreadComponent implements OnInit {
     this.newAnswer = '';
     setTimeout(() => this.scrollToBottom());
   }
+  
+  onEnterPress(e: KeyboardEvent) {
+    if (this.overlayActive) {
+      e.preventDefault();
+      return;
+    }
+
+    this.submitAnswer();
+    e.preventDefault();
+  }
 
   onUserNameClick(userId: string) {
     if (!userId) return;
@@ -435,31 +450,90 @@ export class ThreadComponent implements OnInit {
   }
 
 
-  handleCloseThread() {
-    this.closeThread.emit();
+  // insertMention(event: { name: string, type: 'user' | 'channel' }) {
+  //   const trigger = event.type === 'user' ? '@' : '#';
+  //   const words = this.newAnswer.split(/\s/);
+  //   for (let i = words.length - 1; i >= 0; i--) {
+  //     if (words[i].startsWith(trigger)) {
+  //       words[i] = `${trigger}${event.name}`;
+  //       break;
+  //     }
+  //   }
+  //   this.newAnswer = words.join(' ') + ' ';
+  // }
+  onTextInput() {
+    const textarea = this.getTextarea();
+    // this.cursorPos = textarea ? textarea.selectionStart : 0;
+    if (textarea) {
+      this.cursorPos = textarea.selectionStart;
+    }
   }
 
   insertMention(event: { name: string, type: 'user' | 'channel' }) {
     const trigger = event.type === 'user' ? '@' : '#';
-    const words = this.newAnswer.split(/\s/);
-    for (let i = words.length - 1; i >= 0; i--) {
-      if (words[i].startsWith(trigger)) {
-        words[i] = `${trigger}${event.name}`;
-        break;
-      }
-    }
-    this.newAnswer = words.join(' ') + ' ';
+    const textarea = this.getTextarea();
+    if (!textarea) return;
+
+    // Aktuelle Cursorposition
+    const cursorPos = textarea.selectionStart;
+    let value = this.newAnswer;
+
+    // 1. Leerzeichen vor dem trigger am Cursor prüfen und ggf. einfügen
+    const { textWithSpace, updatedCursor } = this.ensureSpaceBeforeTrigger(value, cursorPos, trigger);
+
+    // 2. Mention-Text an Cursor-Position ersetzen
+    const { newText, caretPos } = this.replaceMentionAtCursor(textWithSpace, updatedCursor, trigger, event.name);
+
+    // 3. Wert updaten und Cursor setzen
+    this.newAnswer = newText;
+    this.focusAndSetCursor(textarea, caretPos);
+
+    this.insertedAtPending = false;
+    this.overlayActive = false;
   }
 
-  onEnterPress(e: KeyboardEvent) {
-    if (this.overlayActive) {
-      e.preventDefault();
-      return;
-    }
-
-    this.submitAnswer();
-    e.preventDefault();
+  getTextarea(): HTMLTextAreaElement | null {
+    return document.getElementById('answer-message') as HTMLTextAreaElement | null;
   }
+
+  ensureSpaceBeforeTrigger(text: string, cursorPos: number, trigger: string): { textWithSpace: string, updatedCursor: number } {
+    const beforeCursor = text.slice(0, cursorPos);
+    const atPos = beforeCursor.lastIndexOf(trigger);
+
+    if (atPos >= 0 && atPos < beforeCursor.length && (atPos === 0 || text[atPos - 1] !== ' ')) {
+    // if (atPos > 0 && text[atPos - 1] !== ' ') {
+      // Leerzeichen vor @ einfügen
+      const textWithSpace = text.slice(0, atPos) + ' ' + text.slice(atPos);
+      return { textWithSpace, updatedCursor: cursorPos + 1 };
+    }
+    return { textWithSpace: text, updatedCursor: cursorPos };
+  }
+
+  replaceMentionAtCursor(text: string, cursorPos: number, trigger: string, mention: string): { newText: string, caretPos: number } {
+    // Finde das Wort mit @ am Cursor (wie bisher, auf Wörter splitten)
+    const beforeCursor = text.slice(0, cursorPos);
+    const afterCursor = text.slice(cursorPos);
+    // const match = beforeCursor.match(new RegExp(`\\${trigger}[^\\s]*$`));
+    const regex = new RegExp(`\\${trigger}[^\\s]*$`);
+    const match = beforeCursor.match(regex);
+    if (!match) return { newText: text, caretPos: cursorPos };
+
+    const mentionStart = beforeCursor.lastIndexOf(match[0]);
+    const beforeMention = beforeCursor.slice(0, mentionStart);
+    const inserted = `${trigger}${mention} `; // Leerzeichen nach dem Mention
+
+    const newText = beforeMention + inserted + afterCursor;
+    const caretPos = beforeMention.length + inserted.length;
+    return { newText, caretPos };
+  }
+
+  focusAndSetCursor(textarea: HTMLTextAreaElement, caretPos: number) {
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(caretPos, caretPos);
+    });
+  }
+  
 
   toggleEditMenu(answer: Answer) {
     answer.showEditMenu = !answer.showEditMenu;
@@ -488,6 +562,53 @@ export class ThreadComponent implements OnInit {
       }
     }
     answer.editedText = words.join(' ') + ' ';
+  }
+  // insertMentionInEdit(chat: any, event: { name: string; type: 'user' | 'channel' }) {
+  //   if (!chat || !event) return;
+  //   const trigger = event.type === 'user' ? '@' : '#';
+  //   const words = chat.editedText.split(/\s/);
+  //   for (let i = words.length - 1; i >= 0; i--) {
+  //     if (words[i].startsWith(trigger)) {
+  //       words[i] = `${trigger}${event.name}`;
+  //       break;
+  //     }
+  //   }
+  //   chat.editedText = words.join(' ') + ' ';
+  // }
+
+  addRecipientMention() {
+    if (this.insertedAtPending) return;
+
+    // Insert ' @' vor Cursor oder am Ende, wenn CursorPos nicht gesetzt
+    const textarea = this.getTextarea();
+    if (!textarea) return;
+    
+    const cursorStart = textarea.selectionStart;
+    const before = this.newAnswer.slice(0, cursorStart);
+    const after = this.newAnswer.slice(cursorStart);
+
+    // Falls nötig vor @ Leerzeichen ergänzen
+    let insertText = '@';
+    if (before.length > 0 && before[before.length -1] !== ' ') {
+      insertText = ' @';
+    }
+
+    this.newAnswer = before + insertText + after;
+
+    // Neue Cursorposition hinter das eingefügte @ setzen
+    const newCursorPos = cursorStart + insertText.length;
+
+    this.cursorPos = newCursorPos;
+
+    setTimeout(() => {
+      // Aktualisiere sichtbar das Textarea + Cursorposition
+      textarea.focus();
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+
+      this.onTextInput();
+    });
+
+    this.insertedAtPending = true;
   }
 
 
