@@ -503,9 +503,9 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.focusAndSetCursor(textarea, caretPos);
 
     this.insertedAtPending = false;
-    console.log('overlayActive insertMention vorher:', this.overlayActive);
-    this.overlayActive = false;
-    console.log('overlayActive insertMention jetzt:', this.overlayActive);
+    // console.log('overlayActive insertMention vorher:', this.overlayActive);
+    // this.overlayActive = false;
+    // console.log('overlayActive insertMention jetzt:', this.overlayActive);
   }
 
   getTextarea(): HTMLTextAreaElement | null {

@@ -100,8 +100,6 @@ export class MentionsOverlayComponent {
       return;
     }
 
-    // this.activeTrigger === null;
-    // this.filteredItems.length === 0;
     this.overlayStateChange.emit(true);
     console.log('emit overlayStateChange', this.overlayStateChange);
     console.log('emit overlayStateChange', this.filteredItems.length > 0);
