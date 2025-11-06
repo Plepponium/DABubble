@@ -489,7 +489,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     const textarea = this.getTextarea();
     if (!textarea) return;
 
-    // Aktuelle Cursorposition
     const cursorPos = textarea.selectionStart;
     let value = this.newMessage;
 
