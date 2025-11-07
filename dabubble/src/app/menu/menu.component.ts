@@ -32,6 +32,7 @@ export class MenuComponent implements OnInit {
   @Input() activeChannelId?: string;
   @Input() activeUserId?: string;
 
+  @Output() openNewMessage = new EventEmitter<string>();
   @Output() openAddChannel = new EventEmitter<void>();
   @Output() openChannel = new EventEmitter<string>();
   @Output() openUserChat = new EventEmitter<User>();
@@ -70,6 +71,10 @@ export class MenuComponent implements OnInit {
   // trackByChannelId(index: number, channel: Channel): string {
   //   return channel.id;
   // }
+
+  handleOpenNewMessage() {
+    this.openNewMessage.emit()
+  }
 
   handleOpenAddChannel(event: Event) {
     event.stopPropagation(); // Verhindert, dass das click-Event der list-header-container ausgelöst wird

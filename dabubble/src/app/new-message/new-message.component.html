@@ -1,0 +1,56 @@
+<div class="message">
+    <div class="header">
+        <div class="header-inner-container">
+            <div class="channel-name-container">
+                <div id="channel-name" class="font-24 font-w-700">Neue Nachricht</div>
+            </div>
+
+            <div>
+                <input type="text" placeholder="An: #channel, @jemand oder E-Mail Adresse">
+
+                <app-mentions-overlay [text]="newMessage" [cursorPos]="cursorPos" [currentUserId]="currentUserId" [context]="'Channel'"
+                    [users]="(participants$ | async) || [] " [channels]="filteredChannels"
+                    (mentionSelected)="insertMention($event)" (overlayStateChange)="overlayActive = $event">
+                </app-mentions-overlay>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="message-content">
+        
+        <form class="form" (ngSubmit)="submitChatMessage()" #newMessageForm="ngForm">
+            <div class="form-field full-width">
+                <ng-container *ngIf="channelName$ | async as channelName">
+                    <textarea id="new-message" class="input" name="message" [(ngModel)]="newMessage"
+                        (keydown.enter)="onEnterPress($any($event))" type="text"
+                        placeholder="Starte eine neue Nachricht"
+                        (input)="onTextInput()"></textarea>
+                </ng-container>
+                
+                <app-mentions-overlay [text]="newMessage" [cursorPos]="cursorPos" [currentUserId]="currentUserId" [context]="'Channel'"
+                    [users]="(participants$ | async) || [] " [channels]="filteredChannels"
+                    (mentionSelected)="insertMention($event)" (overlayStateChange)="overlayActive = $event">
+                </app-mentions-overlay>
+
+                <div class="input-icon-bar">
+                    <div class="icon-bar t-gray">
+                        <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
+                            iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
+                            altText="Reaktion hinzufügen" [type]="'button'">
+                        </app-round-btn>
+                        <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
+                            iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
+                            altText="Empfänger hinzufügen" [type]="'button'" (click)="addRecipientMention()">
+                        </app-round-btn>
+                    </div>
+
+                    <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
+                        iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden" type="submit">
+                    </app-round-btn>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>

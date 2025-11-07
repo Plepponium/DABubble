@@ -5,9 +5,9 @@
             <span class="font-24 font-w-700 f-nunito">Devspace</span>
         </div>
 
-        <span class="example-spacer"></span>
+        <!-- <span class="example-spacer"></span> -->
 
-        <app-round-btn iconSrc="assets/icons/edit_square.svg" iconHoverSrc="assets/icons/edit_square-purple.svg"
+        <app-round-btn (click)="handleOpenNewMessage()" iconSrc="assets/icons/edit_square.svg" iconHoverSrc="assets/icons/edit_square-purple.svg"
             altText="Bearbeiten">
         </app-round-btn>
     </mat-toolbar>

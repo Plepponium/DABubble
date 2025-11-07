@@ -18,10 +18,11 @@ import { LogoutOverlayComponent } from '../logout-overlay/logout-overlay.compone
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { firstValueFrom, Subscription } from 'rxjs';
+import { NewMessageComponent } from '../new-message/new-message.component';
 
 @Component({
   selector: 'app-main-page',
-  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, DirectMessageChatsComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent, UserProfileComponent, EditUserComponent, ProfileOverlayComponent, LogoutOverlayComponent],
+  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, DirectMessageChatsComponent, NewMessageComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent, UserProfileComponent, EditUserComponent, ProfileOverlayComponent, LogoutOverlayComponent],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss',
 })
@@ -32,6 +33,7 @@ export class MainPageComponent {
   threadOpen = false;
   channelOpen = true;
   userChatOpen = false;
+  newMessageOpen = false;
   currentChannelId?: string;
   activeUserId?: string;
   threadChatId?: string;
@@ -67,6 +69,15 @@ export class MainPageComponent {
     this.menuOpen = !this.menuOpen;
   }
 
+  openNewMessage() {
+    this.newMessageOpen = true;
+    this.channelOpen = false;
+    this.threadOpen = false;
+    this.currentChannelId = undefined;
+    this.userChatOpen = false;
+    this.activeUserId = undefined;
+  }
+
   openAddChannel() {
     this.showAddChannelDialogue = true;
   }
@@ -81,6 +92,7 @@ export class MainPageComponent {
     this.activeUserId = undefined;
     this.threadOpen = true;
     this.channelOpen = true;
+    this.newMessageOpen = false;
   }
 
   openUserChat(user: User) {
@@ -89,6 +101,7 @@ export class MainPageComponent {
     this.currentChannelId = undefined;
     this.channelOpen = false;
     this.threadOpen = false;
+    this.newMessageOpen = false;
   }
 
   openThread(event: { channelId: string; chatId: string }) {

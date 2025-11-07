@@ -20,12 +20,12 @@
 
     <div class="container">
         <div #drawer class="sidenav" [class.closed]="!menuOpen" mode="side">
-            <app-menu (openAddChannel)="openAddChannel()" (openChannel)="openChannel($event)"
+            <app-menu (openNewMessage)="openNewMessage()" (openAddChannel)="openAddChannel()" (openChannel)="openChannel($event)"
                 (openUserChat)="openUserChat($event)" [activeChannelId]="currentChannelId"
                 [activeUserId]="activeUserId">
             </app-menu>
-
         </div>
+
         <div class="content" [class.fullwidth]="!menuOpen" [class.dm-open]="isDmOpen">
             <app-chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId"
                 (openThread)="openThread($event)" (openProfile)="openProfileOverlay($event)"></app-chats>
@@ -34,6 +34,7 @@
                 (closeThread)="threadOpen = false" (openProfile)="openProfileOverlay($event)"></app-thread>
             <app-direct-message-chats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
                 (openProfile)="openProfileOverlay($event)"></app-direct-message-chats>
+            <app-new-message class="new-message" *ngIf="newMessageOpen"></app-new-message>
         </div>
     </div>
 

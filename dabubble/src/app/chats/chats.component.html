@@ -216,7 +216,7 @@
         </div>
 
         <form class="form" (ngSubmit)="submitChatMessage()" #chatForm="ngForm">
-            <div class="form-field full-width">
+            <div class="form-field">
                 <ng-container *ngIf="channelName$ | async as channelName">
                     <textarea id="chat-message" class="input" name="message" [(ngModel)]="newMessage"
                         (keydown.enter)="onEnterPress($any($event))" type="text"
