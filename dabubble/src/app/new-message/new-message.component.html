@@ -5,8 +5,8 @@
                 <div id="channel-name" class="font-24 font-w-700">Neue Nachricht</div>
             </div>
 
-            <div>
-                <input type="text" placeholder="An: #channel, @jemand oder E-Mail Adresse">
+            <div class="input-field">
+                <input class="input" type="text" placeholder="An: #channel, @jemand oder E-Mail Adresse">
 
                 <app-mentions-overlay [text]="newMessage" [cursorPos]="cursorPos" [currentUserId]="currentUserId" [context]="'Channel'"
                     [users]="(participants$ | async) || [] " [channels]="filteredChannels"
@@ -20,7 +20,7 @@
     <div class="message-content">
         
         <form class="form" (ngSubmit)="submitChatMessage()" #newMessageForm="ngForm">
-            <div class="form-field full-width">
+            <div class="form-field">
                 <ng-container *ngIf="channelName$ | async as channelName">
                     <textarea id="new-message" class="input" name="message" [(ngModel)]="newMessage"
                         (keydown.enter)="onEnterPress($any($event))" type="text"
