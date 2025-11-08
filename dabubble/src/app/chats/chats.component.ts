@@ -491,20 +491,14 @@ export class ChatsComponent implements OnInit, OnChanges {
 
     setTimeout(() => {
       textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
-      this.onTextInput();
+      this.updateCaretPosition();
       textarea.focus();
     });
     this.overlayActive = false;
   }
 
 
-  onTextInput(e?: Event) {
-    const textarea = this.messageInput?.nativeElement;
-    if (!textarea) return;
-    this.mentionCaretIndex = textarea.selectionStart;
-  }
-
-  onCaretUpdate(e: KeyboardEvent) {
+  updateCaretPosition() {
     const textarea = this.messageInput?.nativeElement;
     if (!textarea) return;
     this.mentionCaretIndex = textarea.selectionStart;
