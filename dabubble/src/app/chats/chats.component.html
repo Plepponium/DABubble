@@ -218,15 +218,17 @@
         <form class="form" (ngSubmit)="submitChatMessage()" #chatForm="ngForm">
             <div class="form-field">
                 <ng-container *ngIf="channelName$ | async as channelName">
-                    <textarea id="chat-message" class="input" name="message" [(ngModel)]="newMessage"
+                    <textarea #messageInput id="chat-message" class="input" name="message" [(ngModel)]="newMessage"
                         (keydown.enter)="onEnterPress($any($event))" type="text"
                         [placeholder]="'Nachricht an #' + channelName"
-                        (input)="onTextInput()"></textarea>
+                        (input)="onTextInput($event); autoGrow(messageInput)"
+                        (keyup)="onCaretUpdate($event)"></textarea>
                 </ng-container>
 
-                <app-mentions-overlay [text]="newMessage" [cursorPos]="cursorPos" [currentUserId]="currentUserId" [context]="'Channel'"
-                    [users]="(participants$ | async) || [] " [channels]="filteredChannels"
-                    (mentionSelected)="insertMention($event)" (overlayStateChange)="overlayActive = $event">
+                <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPos"
+                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
+                    [channels]="filteredChannels" (mentionSelected)="insertMention($event)"
+                    (overlayStateChange)="overlayActive = $event">
                 </app-mentions-overlay>
 
                 <div class="input-icon-bar">
@@ -237,7 +239,7 @@
                         </app-round-btn>
                         <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
                             iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
-                            altText="Empfänger hinzufügen" [type]="'button'" (click)="addRecipientMention()">
+                            altText="Empfänger hinzufügen" [type]="'button'" (click)="insertAtCursor('@')">
                         </app-round-btn>
                     </div>
 

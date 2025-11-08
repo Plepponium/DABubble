@@ -15,6 +15,7 @@ export class MentionsOverlayComponent {
 
   @ViewChildren('mentionItem') mentionItems!: QueryList<ElementRef>;
   @Input() text = '';
+  @Input() caretIndex?: number | null;
   @Input() currentUserId?: string;
   @Input() context: MentionContext = 'DM';
   @Input() users: Partial<User>[] = [];
@@ -30,7 +31,7 @@ export class MentionsOverlayComponent {
   activeIndex = 0;
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['text']) {
+    if (changes['text'] || changes['caretIndex']) {
       if (this.context === 'AddUser') {
         this.filterUsersDirectly();
       } else {
@@ -60,7 +61,10 @@ export class MentionsOverlayComponent {
   }
 
   private detectTrigger() {
-    const match = this.text.match(/([@#])([^\s]*)$/);
+    const textToCheck = (typeof this.caretIndex === 'number')
+      ? this.text.slice(0, this.caretIndex)
+      : this.text;
+    const match = textToCheck.match(/([@#])([^\s]*)$/);
     if (!match) {
       this.closeOverlay();
       this.overlayStateChange.emit(false);
@@ -68,28 +72,23 @@ export class MentionsOverlayComponent {
     }
     this.activeTrigger = match[1] as '@' | '#';
     this.searchTerm = match[2].toLowerCase();
-
     if (this.activeTrigger === '@') {
       const sortedUsers = [...this.users].sort((a, b) =>
         (a.name || '').toLowerCase().localeCompare((b.name || '').toLowerCase())
       );
-
       this.filteredItems = sortedUsers
         .filter(u => u.name?.toLowerCase().includes(this.searchTerm))
         .slice(0, 10);
-
     } else if (this.activeTrigger === '#') {
       this.filteredItems = this.channels
         .filter(c => c.name.toLowerCase().includes(this.searchTerm))
         .slice(0, 10);
     }
-
     if (this.filteredItems.length === 0) {
       this.closeOverlay();
       this.overlayStateChange.emit(false);
       return;
     }
-
     this.overlayStateChange.emit(true);
   }
 

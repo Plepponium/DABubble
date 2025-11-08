@@ -27,6 +27,8 @@ registerLocaleData(localeDe);
   styleUrl: './chats.component.scss',
 })
 export class ChatsComponent implements OnInit, OnChanges {
+  @ViewChild('messageInput', { static: false }) messageInput!: ElementRef<HTMLTextAreaElement>;
+
   value = 'Clear me';
   showChannelDescription = false;
   showUserDialogue = false;
@@ -47,6 +49,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   reactionIcons = reactionIcons;
   reactionArray: { type: string, count: number, user: string[] }[] = [];
   newMessage: string = '';
+  mentionCaretIndex: number | null = null;
   cursorPos: number = 0;
 
   channelName$: Observable<string> = of('');
@@ -60,6 +63,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   @Input() channelId?: string;
   @Output() openThread = new EventEmitter<{ channelId: string; chatId: string }>();
   @Output() openProfile = new EventEmitter<User>();
+
 
   ngOnInit() {
     this.getCurrentUser();
@@ -82,6 +86,20 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
+  insertAtCursor(character: string = '@') {
+    const textarea = this.messageInput.nativeElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = this.newMessage.slice(0, start);
+    const after = this.newMessage.slice(end);
+    this.newMessage = before + character + after;
+    this.mentionCaretIndex = start + character.length;
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
+      textarea.focus();
+    }); 0
+  }
+
   scrollToBottom() {
     const chatHistory = document.getElementById('chat-history');
     if (chatHistory) {
@@ -93,8 +111,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
       if (user) {
         this.currentUserId = user.uid;
-
-        // Channels laden und nur die filtern, bei denen der User Teilnehmer ist
         this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
           this.channels = channels;
           this.filteredChannels = channels.filter(c =>
@@ -463,91 +479,39 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  // insertMention(event: { name: string, type: 'user' | 'channel' }) {
-  //   const trigger = event.type === 'user' ? '@' : '#';
-  //   const words = this.newMessage.split(/\s/);
-  //   for (let i = words.length - 1; i >= 0; i--) {
-  //     if (words[i].startsWith(trigger)) {
-  //       words[i] = `${trigger}${event.name}`;
-  //       break;
-  //     }
-  //   }
-  //   this.newMessage = words.join(' ') + ' ';
-  //   this.insertedAtPending = false;
-  // }
+  insertMention(event: { name: string; type: 'user' | 'channel' }) {
+    const trigger = event.type === 'user' ? '@' : '#';
+    const pos = this.mentionCaretIndex ?? this.newMessage.length;
+    const before = this.newMessage.slice(0, pos);
+    const after = this.newMessage.slice(pos);
+    const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
+    this.newMessage = replaced + ' ' + after;
+    const textarea = this.messageInput.nativeElement;
+    this.mentionCaretIndex = replaced.length + 1;
 
-  onTextInput() {
-    const textarea = this.getTextarea();
-    // this.cursorPos = textarea ? textarea.selectionStart : 0;
-    if (textarea) {
-      this.cursorPos = textarea.selectionStart;
-    }
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
+      this.onTextInput();
+      textarea.focus();
+    });
+    this.overlayActive = false;
   }
 
-  insertMention(event: { name: string, type: 'user' | 'channel' }) {
-    const trigger = event.type === 'user' ? '@' : '#';
-    const textarea = this.getTextarea();
+
+  onTextInput(e?: Event) {
+    const textarea = this.messageInput?.nativeElement;
     if (!textarea) return;
+    this.mentionCaretIndex = textarea.selectionStart;
+  }
 
-    const cursorPos = textarea.selectionStart;
-    let value = this.newMessage;
-
-    // 1. Leerzeichen vor dem trigger am Cursor prüfen und ggf. einfügen
-    const { textWithSpace, updatedCursor } = this.ensureSpaceBeforeTrigger(value, cursorPos, trigger);
-
-    // 2. Mention-Text an Cursor-Position ersetzen
-    const { newText, caretPos } = this.replaceMentionAtCursor(textWithSpace, updatedCursor, trigger, event.name);
-
-    // 3. Wert updaten und Cursor setzen
-    this.newMessage = newText;
-    this.focusAndSetCursor(textarea, caretPos);
-
-    this.insertedAtPending = false;
-    // console.log('overlayActive insertMention vorher:', this.overlayActive);
-    // this.overlayActive = false;
-    // console.log('overlayActive insertMention jetzt:', this.overlayActive);
+  onCaretUpdate(e: KeyboardEvent) {
+    const textarea = this.messageInput?.nativeElement;
+    if (!textarea) return;
+    this.mentionCaretIndex = textarea.selectionStart;
   }
 
   getTextarea(): HTMLTextAreaElement | null {
     return document.getElementById('chat-message') as HTMLTextAreaElement | null;
-  }
-
-  ensureSpaceBeforeTrigger(text: string, cursorPos: number, trigger: string): { textWithSpace: string, updatedCursor: number } {
-    const beforeCursor = text.slice(0, cursorPos);
-    const atPos = beforeCursor.lastIndexOf(trigger);
-
-    if (atPos >= 0 && atPos < beforeCursor.length && (atPos === 0 || text[atPos - 1] !== ' ')) {
-    // if (atPos > 0 && text[atPos - 1] !== ' ') {
-      // Leerzeichen vor @ einfügen
-      const textWithSpace = text.slice(0, atPos) + ' ' + text.slice(atPos);
-      return { textWithSpace, updatedCursor: cursorPos + 1 };
-    }
-    return { textWithSpace: text, updatedCursor: cursorPos };
-  }
-
-  replaceMentionAtCursor(text: string, cursorPos: number, trigger: string, mention: string): { newText: string, caretPos: number } {
-    // Finde das Wort mit @ am Cursor (wie bisher, auf Wörter splitten)
-    const beforeCursor = text.slice(0, cursorPos);
-    const afterCursor = text.slice(cursorPos);
-    // const match = beforeCursor.match(new RegExp(`\\${trigger}[^\\s]*$`));
-    const regex = new RegExp(`\\${trigger}[^\\s]*$`);
-    const match = beforeCursor.match(regex);
-    if (!match) return { newText: text, caretPos: cursorPos };
-
-    const mentionStart = beforeCursor.lastIndexOf(match[0]);
-    const beforeMention = beforeCursor.slice(0, mentionStart);
-    const inserted = `${trigger}${mention} `; // Leerzeichen nach dem Mention
-
-    const newText = beforeMention + inserted + afterCursor;
-    const caretPos = beforeMention.length + inserted.length;
-    return { newText, caretPos };
-  }
-
-  focusAndSetCursor(textarea: HTMLTextAreaElement, caretPos: number) {
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(caretPos, caretPos);
-    });
   }
 
   insertMentionInEdit(chat: any, event: { name: string; type: 'user' | 'channel' }) {
@@ -561,41 +525,6 @@ export class ChatsComponent implements OnInit, OnChanges {
       }
     }
     chat.editedText = words.join(' ') + ' ';
-  }
-
-  addRecipientMention() {
-    if (this.insertedAtPending) return;
-
-    // Insert ' @' vor Cursor oder am Ende, wenn CursorPos nicht gesetzt
-    const textarea = this.getTextarea();
-    if (!textarea) return;
-    
-    const cursorStart = textarea.selectionStart;
-    const before = this.newMessage.slice(0, cursorStart);
-    const after = this.newMessage.slice(cursorStart);
-
-    // Falls nötig vor @ Leerzeichen ergänzen
-    let insertText = '@';
-    if (before.length > 0 && before[before.length -1] !== ' ') {
-      insertText = ' @';
-    }
-
-    this.newMessage = before + insertText + after;
-
-    // Neue Cursorposition hinter das eingefügte @ setzen
-    const newCursorPos = cursorStart + insertText.length;
-
-    this.cursorPos = newCursorPos;
-
-    setTimeout(() => {
-      // Aktualisiere sichtbar das Textarea + Cursorposition
-      textarea.focus();
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
-
-      this.onTextInput();
-    });
-
-    this.insertedAtPending = true;
   }
 
   enableEditChat(chat: any) {
