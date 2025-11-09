@@ -6,7 +6,11 @@
   border-radius: 30px;
   padding: 32px 30px;
   gap: 25px;
-  overflow: hidden;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 0px;
+  }
 }
 
 mat-toolbar {
@@ -26,7 +30,6 @@ mat-toolbar {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .menu-section {
@@ -36,7 +39,6 @@ mat-toolbar {
 
   .user-list {
     flex: 1;
-    overflow-y: auto;
   }
 }
 
