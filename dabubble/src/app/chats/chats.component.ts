@@ -504,22 +504,35 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.mentionCaretIndex = textarea.selectionStart;
   }
 
+  updateEditCaret(chat: any, textarea: HTMLTextAreaElement) {
+    chat._caretIndex = textarea.selectionStart;
+  }
+
+
   getTextarea(): HTMLTextAreaElement | null {
     return document.getElementById('chat-message') as HTMLTextAreaElement | null;
   }
 
-  insertMentionInEdit(chat: any, event: { name: string; type: 'user' | 'channel' }) {
-    if (!chat || !event) return;
+  insertMentionInEdit(
+    chat: any,
+    event: { name: string; type: 'user' | 'channel' }
+  ) {
     const trigger = event.type === 'user' ? '@' : '#';
-    const words = chat.editedText.split(/\s/);
-    for (let i = words.length - 1; i >= 0; i--) {
-      if (words[i].startsWith(trigger)) {
-        words[i] = `${trigger}${event.name}`;
-        break;
+    const pos = chat._caretIndex ?? chat.editedText.length;
+    const before = chat.editedText.slice(0, pos);
+    const after = chat.editedText.slice(pos);
+    const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
+    chat.editedText = replaced + ' ' + after;
+    chat._caretIndex = replaced.length + 1;
+    setTimeout(() => {
+      const textarea = document.getElementById(`edit-${chat.id}`) as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.selectionStart = textarea.selectionEnd = chat._caretIndex;
+        textarea.focus();
       }
-    }
-    chat.editedText = words.join(' ') + ' ';
+    });
   }
+
 
   enableEditChat(chat: any) {
     this.editCommentDialogueExpanded = false;

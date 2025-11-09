@@ -196,12 +196,14 @@
 
                     <ng-template #editMode>
                         <div class="chat-edit-wrapper">
-                            <textarea #editTa id="edit-{{chat.id}}" class="edit-textarea" (input)="autoGrow(editTa)"
-                                [(ngModel)]="chat.editedText" [placeholder]="chat.message"></textarea>
+                            <textarea #editTa id="edit-{{chat.id}}" class="edit-textarea"
+                                (input)="updateEditCaret(chat, editTa); autoGrow(editTa)"
+                                (keyup)="updateEditCaret(chat, editTa)" [(ngModel)]="chat.editedText"
+                                [placeholder]="chat.message"></textarea>
 
-                            <app-mentions-overlay [text]="chat.editedText" [currentUserId]="currentUserId"
-                                [context]="'Channel'" [users]="participants" [channels]="filteredChannels"
-                                (mentionSelected)="insertMentionInEdit(chat, $event)">
+                            <app-mentions-overlay [text]="chat.editedText" [caretIndex]="chat._caretIndex"
+                                [currentUserId]="currentUserId" [context]="'Channel'" [users]="participants"
+                                [channels]="filteredChannels" (mentionSelected)="insertMentionInEdit(chat, $event)">
                             </app-mentions-overlay>
 
                             <div class="edit-actions">

@@ -112,22 +112,32 @@ export class MentionsOverlayComponent {
 
   @HostListener('document:keydown', ['$event'])
   onKeyDown(e: KeyboardEvent) {
+
+    // Overlay geschlossen → Browser soll normal arbeiten
     if (!this.filteredItems.length) return;
 
+    // Wenn Overlay offen → Standard und Scroll unterbinden
     if (e.key === 'ArrowDown') {
       this.activeIndex = (this.activeIndex + 1) % this.filteredItems.length;
       this.scrollToActive();
       e.preventDefault();
-    } else if (e.key === 'ArrowUp') {
+      e.stopPropagation();
+    }
+    else if (e.key === 'ArrowUp') {
       this.activeIndex = (this.activeIndex - 1 + this.filteredItems.length) % this.filteredItems.length;
       this.scrollToActive();
       e.preventDefault();
-    } else if (e.key === 'Enter') {
+      e.stopPropagation();
+    }
+    else if (e.key === 'Enter') {
       this.select(this.filteredItems[this.activeIndex]);
       e.preventDefault();
-    } else if (e.key === 'Escape') {
+      e.stopPropagation();
+    }
+    else if (e.key === 'Escape') {
       this.closeOverlay();
       e.preventDefault();
+      e.stopPropagation();
     }
   }
 
@@ -135,7 +145,7 @@ export class MentionsOverlayComponent {
     const items = this.mentionItems.toArray();
     const el = items[this.activeIndex]?.nativeElement as HTMLElement;
     if (el) {
-      el.scrollIntoView({ block: 'center' });
+      el.scrollIntoView({ block: 'nearest' });
     }
   }
 }

@@ -1,5 +1,6 @@
 import { Answer } from "./answer.class";
 export interface Chat {
+  _caretIndex: number | null | undefined;
   editedText: string;
   isEditing: boolean;
   id: string;
