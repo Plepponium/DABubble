@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Auth, authState, signOut } from '@angular/fire/auth';
 import { Firestore, collectionData, collection, serverTimestamp } from '@angular/fire/firestore';
 import { doc, docData, updateDoc } from '@angular/fire/firestore';
-import { Observable, switchMap, of, shareReplay, map, forkJoin, take } from 'rxjs';
+import { Observable, switchMap, of, shareReplay, map, forkJoin, take, combineLatest } from 'rxjs';
 import { User } from '../models/user.class';
 
 @Injectable({ providedIn: 'root' })
@@ -36,22 +36,19 @@ export class UserService {
   }
 
   getUsersByIds(uids: string[]): Observable<User[]> {
-    if (uids.length === 0) {
-      return of([]);
-    }
+    if (uids.length === 0) return of([]);
     const observables = uids.map(uid => {
       const userDocRef = doc(this.firestore, `users/${uid}`);
       return docData(userDocRef, { idField: 'uid' }).pipe(
-        take(1), // wichtig für forkJoin
         map(data => {
-          if (!data) throw new Error(`getUsersByIds Kein Nutzer gefunden mit uid ${uid}`);
+          if (!data) throw new Error(`Kein Nutzer gefunden mit uid ${uid}`);
           return new User(data);
         })
       );
     });
-
-    return forkJoin(observables);
+    return combineLatest(observables);
   }
+
 
   async logout(): Promise<void> {
     const user = this.auth.currentUser;

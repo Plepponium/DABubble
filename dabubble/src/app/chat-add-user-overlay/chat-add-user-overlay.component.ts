@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Output, EventEmitter, Input, inject, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { User } from '../../models/user.class';
 import { UserService } from '../../services/user.service';
@@ -14,12 +14,13 @@ import { ChannelService } from '../../services/channel.service';
   styleUrl: './chat-add-user-overlay.component.scss'
 })
 export class ChatAddUserOverlayComponent {
+
+  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   @Input() channelName: string | null = '';
   @Input() channelId?: string;
   @Input() currentUserId!: string;
   @Input() participants: Partial<User>[] = [];
   @Output() close = new EventEmitter<void>();
-
 
   searchText = '';
   allUsers: Partial<User>[] = [];
@@ -31,6 +32,12 @@ export class ChatAddUserOverlayComponent {
 
   ngOnInit() {
     this.loadAllUsers();
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.searchInput?.nativeElement?.focus();
+    });
   }
 
   loadAllUsers() {
@@ -62,13 +69,11 @@ export class ChatAddUserOverlayComponent {
       this.participants.push(this.selectedUser);
       this.selectedUser = null;
       this.searchText = '';
-      this.close.emit();
+      this.handleClose();
     } catch (err) {
       console.error('Fehler beim Hinzufügen des Users:', err);
     }
   }
-
-
 
   handleClose() {
     this.close.emit();

@@ -405,6 +405,10 @@
   width: 70px;
   height: 70px;
   border-radius: 40px;
+
+  &.grayscale {
+    filter: grayscale(100%);
+  }
 }
 
 .chat-info-container {
@@ -665,6 +669,15 @@
   cursor: pointer;
   &:hover {
     color: #535af1;
+  }
+
+  &.missing {
+    cursor: default;
+    pointer-events: none;
+
+    &:hover {
+      color: inherit;
+    }
   }
 }
 

@@ -17,6 +17,7 @@ export interface Chat {
     otherUserReacted: boolean;
   }>;
   answers?: Answer[];
+  isUserMissing?: boolean;
   answersCount?: number;
   lastAnswerTime?: number | null;
   userName?: string;

@@ -111,7 +111,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
       if (user) {
         this.currentUserId = user.uid;
-        this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
+        this.channelService.getChannels().subscribe(channels => {
           this.channels = channels;
           this.filteredChannels = channels.filter(c =>
             c.participants.includes(this.currentUserId)
@@ -137,16 +137,21 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
   private loadChannelWithId(channelId: string) {
-    this.channelService.getChannelById(channelId).pipe(take(1)).subscribe(channel => {
-      if (!channel) return;
-
-      this.channelId = channelId;
-      this.channelName$ = of(channel.name);
-      this.participants$ = this.userService.getUsersByIds(channel.participants);
-      this.subscribeToParticipants();
-      this.subscribeToChatsAndUsers(channelId, this.participants$);
+    this.channelId = channelId;
+    const channel$ = this.channelService.getChannelById(channelId);
+    this.channelName$ = channel$.pipe(
+      map(channel => channel?.name ?? '')
+    );
+    this.participants$ = channel$.pipe(
+      switchMap(channel => this.userService.getUsersByIds(channel?.participants ?? []))
+    );
+    this.participants$.subscribe(users => {
+      this.participants = users;
     });
+    this.subscribeToChatsAndUsers(channelId, this.participants$);
   }
+
+
 
   subscribeToParticipants() {
     this.participants$.subscribe(users => {
@@ -173,7 +178,6 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   private enrichChat(channelId: string, chat: Chat, users: User[]): Observable<Chat> {
     const normalizedReactions: Record<string, string[]> = {};
-    // Reaktionen normalisieren: Falls Wert einzelner String ist, in Array umwandeln
     Object.entries(chat.reactions || {}).forEach(([key, val]) => {
       if (Array.isArray(val)) {
         normalizedReactions[key] = val;
@@ -190,10 +194,12 @@ export class ChatsComponent implements OnInit, OnChanges {
       answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1))
     }).pipe(
       map(({ reactions, user, answers }) => {
+        const isMissingUser = !user;
         const enriched: Chat = {
           ...chat,
-          userName: user?.name,
-          userImg: user?.img,
+          userName: isMissingUser ? 'Ehemaliger Nutzer' : user.name,
+          userImg: isMissingUser ? 'default-user' : user.img,
+          isUserMissing: isMissingUser,
           answersCount: answers.length,
           lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
           reactions: reactions,

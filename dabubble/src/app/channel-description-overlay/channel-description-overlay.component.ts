@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class ChannelDescriptionOverlayComponent {
   @Input() channelId?: string;
+  @Input() currentUserId?: string;
   @Output() close = new EventEmitter<void>();
 
   channel?: Channel;
@@ -62,9 +63,15 @@ export class ChannelDescriptionOverlayComponent {
     this.isEditingDescription = !this.isEditingDescription;
   }
 
-  leaveChannel() {
-    // participants--
-    // if participants === 0 => deleteChannel()
+  async leaveChannel() {
+    if (!this.channel || !this.currentUserId) return;
+    const updatedParticipants = this.channel.participants?.filter(id => id !== this.currentUserId) || [];
+    try {
+      await this.channelService.updateChannel(this.channel.id, { participants: updatedParticipants });
+      this.handleClose();
+    } catch (error) {
+      console.error('Fehler beim Verlassen des Channels:', error);
+    }
   }
 
 }

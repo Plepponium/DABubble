@@ -10,10 +10,7 @@ import { User } from '../../models/user.class';
   styleUrl: './dialogue-overlay.component.scss'
 })
 export class DialogueOverlayComponent {
-  // @Input() isOpen = false;         
-
   @Input() participants: User[] = [];
-
   @Output() close = new EventEmitter<void>();
   @Output() openProfile = new EventEmitter<User>();
   @Output() openAddUser = new EventEmitter<void>();

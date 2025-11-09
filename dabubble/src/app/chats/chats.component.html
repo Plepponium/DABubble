@@ -36,7 +36,7 @@
             *ngIf="showUserDialogue || showAddDialogue || showChannelDescription" class="dialogue-backdrop-chats">
         </div>
         <div class="overlay-box" [ngClass]="{'overlay-channel-description': showChannelDescription}">
-            <app-dialogue-overlay *ngIf="showUserDialogue" [participants]="participants"
+            <app-dialogue-overlay *ngIf="showUserDialogue" [participants]="(participants$ | async) ?? []"
                 (close)="closeDialogueShowUser()" (openProfile)="openDialogueShowProfile($event)"
                 (openAddUser)="openDialogueAddUser()" class="dialogue-overlay-show-user">
             </app-dialogue-overlay>
@@ -47,7 +47,7 @@
             </app-chat-add-user-overlay>
 
             <app-channel-description-overlay *ngIf="showChannelDescription" (close)="closeDialogChannelDescription()"
-                [channelId]="channelId">
+                [channelId]="channelId" [currentUserId]="currentUserId">
             </app-channel-description-overlay>
         </div>
     </div>
@@ -106,12 +106,13 @@
                     </div>
 
                     <img class="chat-user-img" [src]="'assets/user-icons/' + chat.userImg + '.svg'"
-                        [alt]="chat.userName">
+                        [alt]="chat.userName" [ngClass]="{'grayscale': chat.isUserMissing}">
 
                     <ng-container *ngIf="!chat.isEditing; else editMode">
                         <div class="chat-info-container">
                             <div class="chat-start" [ngClass]="{'reverse': chat.user === currentUserId}">
-                                <div class="font-w-700 user-name" (click)="handleOpenProfile(chat)">{{ chat.userName }}
+                                <div class="font-w-700 user-name" [ngClass]="{'missing': chat.isUserMissing}"
+                                    (click)="handleOpenProfile(chat)">{{ chat.userName }}
                                 </div>
                                 <div class="font-14 t-gray">{{ chat.time * 1000 | date: 'HH:mm' }} Uhr</div>
                             </div>

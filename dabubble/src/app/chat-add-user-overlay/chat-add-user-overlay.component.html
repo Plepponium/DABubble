@@ -24,7 +24,7 @@
                     <button class="remove-btn" (click)="removeUser()">×</button>
                 </div>
 
-                <input *ngIf="!selectedUser" class="user-name" type="text" placeholder="Name eingeben"
+                <input #searchInput *ngIf="!selectedUser" class="user-name" type="text" placeholder="Name eingeben"
                     [(ngModel)]="searchText" />
 
                 <app-mentions-overlay *ngIf="!selectedUser" [context]="'AddUser'" [users]="allUsers" [text]="searchText"
