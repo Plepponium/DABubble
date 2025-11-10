@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostListener, Input, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { User } from '../../../models/user.class';
 
-export type MentionContext = 'DM' | 'Channel' | 'Searchbar' | 'AddUser';
+export type MentionContext = 'DM' | 'Channel' | 'Searchbar' | 'AddUser' | 'NewMessage';
 
 @Component({
   selector: 'app-mentions-overlay',

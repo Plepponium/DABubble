@@ -651,6 +651,11 @@
   justify-content: space-between;
   position: absolute;
   bottom: 14px;
+  pointer-events: none;
+
+  app-round-btn {
+    pointer-events: auto;
+  }
 }
 
 .icon-bar {

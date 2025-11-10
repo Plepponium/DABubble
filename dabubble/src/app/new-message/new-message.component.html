@@ -6,7 +6,7 @@
             </div>
 
             <div class="input-field">
-                <input class="input" type="text" placeholder="An: #channel, @jemand oder E-Mail Adresse">
+                <input id="recipient" class="input" type="text" placeholder="An: #channel, @jemand oder E-Mail Adresse">
 
                 <app-mentions-overlay [text]="newMessage" [cursorPos]="cursorPos" [currentUserId]="currentUserId" [context]="'Channel'"
                     [users]="(participants$ | async) || [] " [channels]="filteredChannels"
@@ -21,16 +21,22 @@
         
         <form class="form" (ngSubmit)="submitChatMessage()" #newMessageForm="ngForm">
             <div class="form-field">
-                <ng-container *ngIf="channelName$ | async as channelName">
-                    <textarea id="new-message" class="input" name="message" [(ngModel)]="newMessage"
+                <ng-container>
+                    <textarea #newMessageInput id="new-message" class="input" name="message" [(ngModel)]="newMessage"
                         (keydown.enter)="onEnterPress($any($event))" type="text"
                         placeholder="Starte eine neue Nachricht"
-                        (input)="onTextInput()"></textarea>
+                        (input)="updateCaretPosition()"
+                        (keyup)="updateCaretPosition()"></textarea>
                 </ng-container>
                 
                 <app-mentions-overlay [text]="newMessage" [cursorPos]="cursorPos" [currentUserId]="currentUserId" [context]="'Channel'"
                     [users]="(participants$ | async) || [] " [channels]="filteredChannels"
                     (mentionSelected)="insertMention($event)" (overlayStateChange)="overlayActive = $event">
+                </app-mentions-overlay>
+                <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPos"
+                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
+                    [channels]="filteredChannels" (mentionSelected)="insertMention($event)"
+                    (overlayStateChange)="overlayActive = $event">
                 </app-mentions-overlay>
 
                 <div class="input-icon-bar">
@@ -41,7 +47,7 @@
                         </app-round-btn>
                         <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
                             iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
-                            altText="Empfänger hinzufügen" [type]="'button'" (click)="addRecipientMention()">
+                            altText="Empfänger hinzufügen" [type]="'button'" (click)="insertAtCursor('@')">
                         </app-round-btn>
                     </div>
 

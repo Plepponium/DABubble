@@ -86,20 +86,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  insertAtCursor(character: string = '@') {
-    const textarea = this.messageInput.nativeElement;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const before = this.newMessage.slice(0, start);
-    const after = this.newMessage.slice(end);
-    this.newMessage = before + character + after;
-    this.mentionCaretIndex = start + character.length;
-    setTimeout(() => {
-      textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
-      textarea.focus();
-    }); 0
-  }
-
   scrollToBottom() {
     const chatHistory = document.getElementById('chat-history');
     if (chatHistory) {
@@ -514,7 +500,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     chat._caretIndex = textarea.selectionStart;
   }
 
-
   getTextarea(): HTMLTextAreaElement | null {
     return document.getElementById('chat-message') as HTMLTextAreaElement | null;
   }
@@ -539,6 +524,19 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
   }
 
+  insertAtCursor(character: string = '@') {
+    const textarea = this.messageInput.nativeElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = this.newMessage.slice(0, start);
+    const after = this.newMessage.slice(end);
+    this.newMessage = before + character + after;
+    this.mentionCaretIndex = start + character.length;
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
+      textarea.focus();
+    }); 0
+  }
 
   enableEditChat(chat: any) {
     this.editCommentDialogueExpanded = false;
