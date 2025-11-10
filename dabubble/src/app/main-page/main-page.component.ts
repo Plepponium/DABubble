@@ -31,9 +31,9 @@ export class MainPageComponent {
   menuBtnClose = true;
   showAddChannelDialogue = false;
   threadOpen = false;
-  channelOpen = true;
+  channelOpen = false;
   userChatOpen = false;
-  newMessageOpen = false;
+  newMessageOpen = true;
   currentChannelId?: string;
   activeUserId?: string;
   threadChatId?: string;
