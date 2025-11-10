@@ -69,20 +69,16 @@
 }
 
 .message-content {
-  height: calc(100% - 130px);
+  height: calc(100% - 158px);
   display: flex;
-  //   flex-direction: column;
-  //   justify-content: end;
   align-items: end;
-//   padding: 20px;
 }
 
 .form {
   width: 100%;
   height: fit-content;
   box-sizing: border-box;
-  padding: 0 35px;
-  padding-top: 35px;
+  padding: 35px;
 }
 
 .form-field {
