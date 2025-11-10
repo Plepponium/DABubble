@@ -43,10 +43,12 @@
                         </button>
                     </div>
                 </div> -->
-                <img class="chat-user-img" [src]="'assets/user-icons/' + chat.userImg + '.svg'" [alt]="chat.userName">
+                <img class="chat-user-img" [src]="'assets/user-icons/' + chat.userImg + '.svg'" [alt]="chat.userName"
+                    [ngClass]="{'grayscale': chat.isUserMissing}">
                 <div class="chat-info-container">
                     <div class="chat-start" [ngClass]="{'reverse': chat.user === currentUserId}">
-                        <div class="font-w-700 user-name" (click)="onUserNameClick(chat.user)">{{ chat.userName }}
+                        <div class="font-w-700 user-name" [ngClass]="{'missing': chat.isUserMissing}"
+                            (click)="onUserNameClick(chat.user)">{{ chat.userName }}
                         </div>
                         <div class="font-14 t-gray">{{ chat.time * 1000 | date: 'HH:mm' }} Uhr</div>
                     </div>
@@ -171,7 +173,7 @@
                     </div>
 
                     <img class="chat-user-img" [src]="'assets/user-icons/' + answer.userImg + '.svg'"
-                        [alt]="answer.userName">
+                        [alt]="answer.userName" [ngClass]="{'grayscale': answer.isUserMissing}">
 
                     <div class="chat-info-container">
 
@@ -179,7 +181,8 @@
 
                         <ng-container *ngIf="!answer.isEditing; else editMode">
                             <div class="chat-start" [ngClass]="{'reverse': answer.user === currentUserId}">
-                                <div class="font-w-700 user-name" (click)="onUserNameClick(answer.user)">
+                                <div class="font-w-700 user-name" [ngClass]="{'missing': answer.isUserMissing}"
+                                    (click)="onUserNameClick(answer.user)">
                                     {{ answer.userName}}</div>
                                 <div class="font-14 t-gray">{{ answer.time * 1000 | date: 'HH:mm' }} Uhr</div>
                             </div>
@@ -264,11 +267,13 @@
                         <ng-template #editMode>
                             <div class="chat-edit-wrapper">
                                 <textarea #editTa id="edit-{{answer.id}}" class="edit-textarea"
-                                    (input)="autoGrow(editTa)" [(ngModel)]="answer.editedText"
+                                    (input)="updateEditCaret(answer, editTa); autoGrow(editTa)"
+                                    (keyup)="updateEditCaret(answer, editTa)" [(ngModel)]="answer.editedText"
                                     [placeholder]="answer.message"></textarea>
 
-                                <app-mentions-overlay [text]="answer.editedText" [currentUserId]="currentUserId"
-                                    [context]="'Channel'" [users]="participants" [channels]="filteredChannels"
+                                <app-mentions-overlay [text]="answer.editedText" [caretIndex]="answer._caretIndex"
+                                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="participants"
+                                    [channels]="filteredChannels"
                                     (mentionSelected)="insertMentionInEdit(answer, $event)">
                                 </app-mentions-overlay>
 
@@ -287,13 +292,14 @@
 
         <form class="form" (ngSubmit)="submitAnswer()" #answerForm="ngForm">
             <div class="form-field full-width">
-                <textarea id="answer-message" class="input" name="answer" [(ngModel)]="newAnswer"
-                    (keydown.enter)="onEnterPress($any($event))" [placeholder]="'Antworten...'" 
-                    (input)="onTextInput()"></textarea>
+                <textarea #answerInput id="answer-message" class="input" name="answer" [(ngModel)]="newAnswer"
+                    (keydown.enter)="onEnterPress($any($event))" type="text" [placeholder]="'Antworten...'"
+                    (input)="updateCaretPosition(); autoGrow(answerInput)"></textarea>
 
-                <app-mentions-overlay [text]="newAnswer" [currentUserId]="currentUserId" [context]="'Channel'"
-                    [users]="(participants$ | async) || []" [channels]="filteredChannels"
-                    (mentionSelected)="insertMention($event)" (overlayStateChange)="overlayActive = $event">
+                <app-mentions-overlay [text]="newAnswer" [caretIndex]="mentionCaretIndex"
+                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || []"
+                    [channels]="filteredChannels" (mentionSelected)="insertMention($event)"
+                    (overlayStateChange)="overlayActive = $event">
                 </app-mentions-overlay>
 
                 <div class="input-icon-bar">
@@ -304,7 +310,7 @@
                         </app-round-btn>
                         <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
                             iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
-                            altText="Empfänger hinzufügen" [type]="'button'">
+                            altText="Empfänger hinzufügen" [type]="'button'" (click)="insertAtCursor('@')">
                         </app-round-btn>
                     </div>
 

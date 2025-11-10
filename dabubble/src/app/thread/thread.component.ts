@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input, inject, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, OnInit, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,6 +24,7 @@ import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-ov
 })
 export class ThreadComponent implements OnInit {
 
+  @ViewChild('answerInput', { static: false }) answerInput!: ElementRef<HTMLTextAreaElement>;
   overlayActive: boolean = false;
   filteredChannels: any[] = [];
   editAnswerEditIndex: number | null = null;
@@ -39,8 +40,8 @@ export class ThreadComponent implements OnInit {
   channelChats: any[] = [];
   reactionIcons = reactionIcons;
   reactionArray: { type: string, count: number, user: string[] }[] = [];
-  // newMessage: string = '';
   newAnswer: string = '';
+  mentionCaretIndex: number | null = null;
   cursorPos: number = 0;
 
   channelName$: Observable<string> = of('');
@@ -120,16 +121,17 @@ export class ThreadComponent implements OnInit {
   getEnrichedChat(): Observable<Chat | undefined> {
     return this.channelService.getChatsForChannel(this.channelId).pipe(
       switchMap(chats =>
-        this.userService.getUsersByIds(chats.map(c => c.user)).pipe(
+        this.participants$.pipe(
           map(users => {
             const chat = chats.find(c => c.id === this.chatId);
             if (!chat) return undefined;
             const user = users.find(u => u.uid === chat.user);
-            // chat.reactions wird erwartet als Map: { reactionType: [userId, ...] } oder { reactionType: userId }
+            const isMissingUser = !user;
             return {
               ...chat,
-              userName: user?.name,
-              userImg: user?.img,
+              userName: isMissingUser ? 'Ehemaliger Nutzer' : user.name,
+              userImg: user?.img ?? 'default-user',
+              isMissingUser,
               reactionArray: this.transformReactionsToArray(chat.reactions, users, this.currentUserId)
             };
           })
@@ -138,25 +140,30 @@ export class ThreadComponent implements OnInit {
     );
   }
 
+
   getEnrichedAnswers(): Observable<Answer[]> {
     return this.channelService.getAnswersForChat(this.channelId, this.chatId).pipe(
       switchMap(answers =>
-        answers.length
-          ? this.userService.getUsersByIds(answers.map(a => a.user)).pipe(
-            map(users =>
-              answers.map(answer => ({
+        this.participants$.pipe(
+          map(users =>
+            answers.map(answer => {
+              const user = users.find(u => u.uid === answer.user);
+              const isMissingUser = !user;
+
+              return {
                 ...answer,
-                userName: users.find(u => u.uid === answer.user)?.name,
-                userImg: users.find(u => u.uid === answer.user)?.img,
-                // answer.reactions direkt als Map
+                userName: isMissingUser ? 'Ehemaliger Nutzer' : user.name,
+                userImg: user?.img ?? 'default-user',
+                isUserMissing: isMissingUser,
                 reactionArray: this.transformReactionsToArray(answer.reactions, users, this.currentUserId)
-              }))
-            )
+              };
+            })
           )
-          : of([])
+        )
       )
     );
   }
+
 
   async loadChatById(channelId: string) {
     this.channelService.getChannelById(channelId).pipe(take(1)).subscribe(async channel => {
@@ -407,7 +414,7 @@ export class ThreadComponent implements OnInit {
       u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
     );
   }
-  
+
   handleCloseThread() {
     this.closeThread.emit();
   }
@@ -429,7 +436,7 @@ export class ThreadComponent implements OnInit {
     this.newAnswer = '';
     setTimeout(() => this.scrollToBottom());
   }
-  
+
   onEnterPress(e: KeyboardEvent) {
     if (this.overlayActive) {
       e.preventDefault();
@@ -449,91 +456,37 @@ export class ThreadComponent implements OnInit {
     });
   }
 
+  insertMention(event: { name: string; type: 'user' | 'channel' }) {
+    const trigger = event.type === 'user' ? '@' : '#';
+    const pos = this.mentionCaretIndex ?? this.newAnswer.length;
+    const before = this.newAnswer.slice(0, pos);
+    const after = this.newAnswer.slice(pos);
+    const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
+    this.newAnswer = replaced + ' ' + after;
+    const textarea = this.answerInput.nativeElement;
+    this.mentionCaretIndex = replaced.length + 1;
 
-  // insertMention(event: { name: string, type: 'user' | 'channel' }) {
-  //   const trigger = event.type === 'user' ? '@' : '#';
-  //   const words = this.newAnswer.split(/\s/);
-  //   for (let i = words.length - 1; i >= 0; i--) {
-  //     if (words[i].startsWith(trigger)) {
-  //       words[i] = `${trigger}${event.name}`;
-  //       break;
-  //     }
-  //   }
-  //   this.newAnswer = words.join(' ') + ' ';
-  // }
-  onTextInput() {
-    const textarea = this.getTextarea();
-    // this.cursorPos = textarea ? textarea.selectionStart : 0;
-    if (textarea) {
-      this.cursorPos = textarea.selectionStart;
-    }
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
+      this.updateCaretPosition();
+      textarea.focus();
+    });
+    this.overlayActive = false;
   }
 
-  insertMention(event: { name: string, type: 'user' | 'channel' }) {
-    const trigger = event.type === 'user' ? '@' : '#';
-    const textarea = this.getTextarea();
+  updateCaretPosition() {
+    const textarea = this.answerInput?.nativeElement;
     if (!textarea) return;
+    this.mentionCaretIndex = textarea.selectionStart;
+  }
 
-    // Aktuelle Cursorposition
-    const cursorPos = textarea.selectionStart;
-    let value = this.newAnswer;
-
-    // 1. Leerzeichen vor dem trigger am Cursor prüfen und ggf. einfügen
-    const { textWithSpace, updatedCursor } = this.ensureSpaceBeforeTrigger(value, cursorPos, trigger);
-
-    // 2. Mention-Text an Cursor-Position ersetzen
-    const { newText, caretPos } = this.replaceMentionAtCursor(textWithSpace, updatedCursor, trigger, event.name);
-
-    // 3. Wert updaten und Cursor setzen
-    this.newAnswer = newText;
-    this.focusAndSetCursor(textarea, caretPos);
-
-    this.insertedAtPending = false;
-    this.overlayActive = false;
+  updateEditCaret(answer: any, textarea: HTMLTextAreaElement) {
+    answer._caretIndex = textarea.selectionStart;
   }
 
   getTextarea(): HTMLTextAreaElement | null {
     return document.getElementById('answer-message') as HTMLTextAreaElement | null;
   }
-
-  ensureSpaceBeforeTrigger(text: string, cursorPos: number, trigger: string): { textWithSpace: string, updatedCursor: number } {
-    const beforeCursor = text.slice(0, cursorPos);
-    const atPos = beforeCursor.lastIndexOf(trigger);
-
-    if (atPos >= 0 && atPos < beforeCursor.length && (atPos === 0 || text[atPos - 1] !== ' ')) {
-    // if (atPos > 0 && text[atPos - 1] !== ' ') {
-      // Leerzeichen vor @ einfügen
-      const textWithSpace = text.slice(0, atPos) + ' ' + text.slice(atPos);
-      return { textWithSpace, updatedCursor: cursorPos + 1 };
-    }
-    return { textWithSpace: text, updatedCursor: cursorPos };
-  }
-
-  replaceMentionAtCursor(text: string, cursorPos: number, trigger: string, mention: string): { newText: string, caretPos: number } {
-    // Finde das Wort mit @ am Cursor (wie bisher, auf Wörter splitten)
-    const beforeCursor = text.slice(0, cursorPos);
-    const afterCursor = text.slice(cursorPos);
-    // const match = beforeCursor.match(new RegExp(`\\${trigger}[^\\s]*$`));
-    const regex = new RegExp(`\\${trigger}[^\\s]*$`);
-    const match = beforeCursor.match(regex);
-    if (!match) return { newText: text, caretPos: cursorPos };
-
-    const mentionStart = beforeCursor.lastIndexOf(match[0]);
-    const beforeMention = beforeCursor.slice(0, mentionStart);
-    const inserted = `${trigger}${mention} `; // Leerzeichen nach dem Mention
-
-    const newText = beforeMention + inserted + afterCursor;
-    const caretPos = beforeMention.length + inserted.length;
-    return { newText, caretPos };
-  }
-
-  focusAndSetCursor(textarea: HTMLTextAreaElement, caretPos: number) {
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(caretPos, caretPos);
-    });
-  }
-  
 
   toggleEditMenu(answer: Answer) {
     answer.showEditMenu = !answer.showEditMenu;
@@ -550,65 +503,39 @@ export class ThreadComponent implements OnInit {
     answer.editedText = answer.message;
   }
 
-  insertMentionInEdit(answer: any, event: { name: string; type: 'user' | 'channel' }) {
-    if (!answer || !event) return;
+  insertMentionInEdit(
+    answer: any,
+    event: { name: string; type: 'user' | 'channel' }
+  ) {
     const trigger = event.type === 'user' ? '@' : '#';
-    answer.editedText = answer.editedText ?? '';
-    const words = answer.editedText.split(/\s/);
-    for (let i = words.length - 1; i >= 0; i--) {
-      if (words[i].startsWith(trigger)) {
-        words[i] = `${trigger}${event.name}`;
-        break;
-      }
-    }
-    answer.editedText = words.join(' ') + ' ';
-  }
-  // insertMentionInEdit(chat: any, event: { name: string; type: 'user' | 'channel' }) {
-  //   if (!chat || !event) return;
-  //   const trigger = event.type === 'user' ? '@' : '#';
-  //   const words = chat.editedText.split(/\s/);
-  //   for (let i = words.length - 1; i >= 0; i--) {
-  //     if (words[i].startsWith(trigger)) {
-  //       words[i] = `${trigger}${event.name}`;
-  //       break;
-  //     }
-  //   }
-  //   chat.editedText = words.join(' ') + ' ';
-  // }
-
-  addRecipientMention() {
-    if (this.insertedAtPending) return;
-
-    // Insert ' @' vor Cursor oder am Ende, wenn CursorPos nicht gesetzt
-    const textarea = this.getTextarea();
-    if (!textarea) return;
-    
-    const cursorStart = textarea.selectionStart;
-    const before = this.newAnswer.slice(0, cursorStart);
-    const after = this.newAnswer.slice(cursorStart);
-
-    // Falls nötig vor @ Leerzeichen ergänzen
-    let insertText = '@';
-    if (before.length > 0 && before[before.length -1] !== ' ') {
-      insertText = ' @';
-    }
-
-    this.newAnswer = before + insertText + after;
-
-    // Neue Cursorposition hinter das eingefügte @ setzen
-    const newCursorPos = cursorStart + insertText.length;
-
-    this.cursorPos = newCursorPos;
-
+    const pos = answer._caretIndex ?? answer.editedText.length;
+    const before = answer.editedText.slice(0, pos);
+    const after = answer.editedText.slice(pos);
+    const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
+    answer.editedText = replaced + ' ' + after;
+    answer._caretIndex = replaced.length + 1;
     setTimeout(() => {
-      // Aktualisiere sichtbar das Textarea + Cursorposition
-      textarea.focus();
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
-
-      this.onTextInput();
+      const textarea = document.getElementById(`edit-${answer.id}`) as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.selectionStart = textarea.selectionEnd = answer._caretIndex;
+        textarea.focus();
+      }
     });
+  }
 
-    this.insertedAtPending = true;
+
+  insertAtCursor(character: string = '@') {
+    const textarea = this.answerInput.nativeElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = this.newAnswer.slice(0, start);
+    const after = this.newAnswer.slice(end);
+    this.newAnswer = before + character + after;
+    this.mentionCaretIndex = start + character.length;
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
+      textarea.focus();
+    }); 0
   }
 
 

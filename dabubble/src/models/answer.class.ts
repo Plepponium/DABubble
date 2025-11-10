@@ -1,4 +1,6 @@
 export interface Answer {
+  isUserMissing: any;
+  _caretIndex: number | null | undefined;
   showEditMenu: any;
   isEditing: any;
   editedText: any;
