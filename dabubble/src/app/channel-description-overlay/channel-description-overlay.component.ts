@@ -65,13 +65,22 @@ export class ChannelDescriptionOverlayComponent {
 
   async leaveChannel() {
     if (!this.channel || !this.currentUserId) return;
+
     const updatedParticipants = this.channel.participants?.filter(id => id !== this.currentUserId) || [];
+
     try {
+      if (updatedParticipants.length === 0) {
+        await this.channelService.deleteChannel(this.channel.id);
+        this.handleClose();
+        return;
+      }
       await this.channelService.updateChannel(this.channel.id, { participants: updatedParticipants });
       this.handleClose();
+
     } catch (error) {
       console.error('Fehler beim Verlassen des Channels:', error);
     }
   }
+
 
 }

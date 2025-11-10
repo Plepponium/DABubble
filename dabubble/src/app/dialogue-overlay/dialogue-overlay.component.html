@@ -13,7 +13,9 @@
                     <img class="user-img" [src]="'assets/user-icons/' + u.img + '.svg'" alt="">
                     <div class="online-signal" [ngClass]="u.presence"></div>
                 </div>
-                <div class="user-name">{{ u.name }}</div>
+                <div class="user-name">
+                    {{ u.name }}<span *ngIf="u.uid === currentUserId"> (Du)</span>
+                </div>
             </div>
         </div>
 

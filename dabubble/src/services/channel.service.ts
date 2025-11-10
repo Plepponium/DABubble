@@ -19,6 +19,11 @@ export class ChannelService {
     return addDoc(channelsCollection, channel);
   }
 
+  async deleteChannel(channelId: string): Promise<void> {
+    const channelRef = doc(this.firestore, `channels/${channelId}`);
+    return deleteDoc(channelRef);
+  }
+
   getChannelById(channelId: string): Observable<Channel> {
     const channelDoc = doc(this.firestore, `channels/${channelId}`);
     return docData(channelDoc, { idField: 'id' }) as Observable<Channel>;
