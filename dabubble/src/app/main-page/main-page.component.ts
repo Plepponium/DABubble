@@ -61,6 +61,10 @@ export class MainPageComponent {
     this.authSub?.unsubscribe();
   }
 
+  get isNmOpen(): boolean {
+    return this.newMessageOpen;
+  }
+
   get isDmOpen(): boolean {
     return this.userChatOpen && !!this.activeUserId;
   }
