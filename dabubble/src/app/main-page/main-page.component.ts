@@ -94,7 +94,7 @@ export class MainPageComponent {
     this.currentChannelId = channelId;
     this.userChatOpen = false;
     this.activeUserId = undefined;
-    this.threadOpen = true;
+    this.threadOpen = false;
     this.channelOpen = true;
     this.newMessageOpen = false;
   }
