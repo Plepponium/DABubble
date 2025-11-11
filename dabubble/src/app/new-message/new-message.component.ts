@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input, inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
@@ -16,6 +16,7 @@ import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-ov
 })
 export class NewMessageComponent {
   @ViewChild('newMessageInput', { static: false }) newMessageInput!: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('recipientInput', { static: false }) recipientInput!: ElementRef<HTMLInputElement>;
   // overlayActive = false;
 
   currentUserId: string = '';
@@ -82,8 +83,6 @@ export class NewMessageComponent {
       console.log('participants', this.participants);
     });
   }
-
- 
   
 
   // insertMention(event: { name: string; type: 'user' | 'channel' }) {
@@ -103,100 +102,64 @@ export class NewMessageComponent {
   //   });
   //   this.overlayActive = false;
   // }
-  // insertMention(event: { name: string; type: 'user' | 'channel' }) {
-  //   const trigger = event.type === 'user' ? '@' : '#';
-  //   const activeElement = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
 
-  //   if (!activeElement) return;
+  insertMention(event: { name: string; type: 'user' | 'channel' }, type: 'recipient' | 'message' = 'message') {
+    const el = this.getInputElement(type);
+    if (!el) return;
 
-  //   let text = '';
-  //   let caretIndex = 0;
-  //   let overlayFlag: 'recipient' | 'message' | null = null;
+    const { text, caretIndex } = this.getCurrentTextAndCaret(type);
+    const { newText, newCaretIndex } = this.insertMentionInText(text, event, caretIndex);
 
-  //   if (activeElement.id === 'recipient') {
-  //     text = this.recipientText;
-  //     caretIndex = this.cursorPosRecipient;
-  //     overlayFlag = 'recipient';
-  //   } else if (activeElement.id === 'new-message') {
-  //     text = this.newMessage;
-  //     caretIndex = this.cursorPosMessage;
-  //     overlayFlag = 'message';
-  //   }
+    this.setText(type, newText);
+    this.mentionCaretIndex = newCaretIndex;
 
-  //   if (!overlayFlag) return;
+    this.focusAndMoveCaret(el, newCaretIndex);
+    this.closeInputOverlay(type);
+  }
 
-  //   // Mention einfügen
-  //   const before = text.slice(0, caretIndex);
-  //   const after = text.slice(caretIndex);
-  //   const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
-  //   const updatedText = replaced + ' ' + after;
+  private getInputElement(type: 'recipient' | 'message'): HTMLInputElement | HTMLTextAreaElement | null {
+    return type === 'recipient'
+      ? document.getElementById('recipient') as HTMLInputElement
+      : this.newMessageInput.nativeElement;
+  }
 
-  //   if (overlayFlag === 'recipient') {
-  //     this.recipientText = updatedText;
-  //     this.cursorPosRecipient = replaced.length + 1;
-  //     this.overlayActiveRecipient = false;
-  //   } else {
-  //     this.newMessage = updatedText;
-  //     this.cursorPosMessage = replaced.length + 1;
-  //     this.overlayActiveMessage = false;
-  //   }
+  /** 2. Liest den aktuellen Text und Caret-Index */
+  private getCurrentTextAndCaret(type: 'recipient' | 'message'): { text: string, caretIndex: number } {
+    const text = type === 'recipient' ? this.recipientText : this.newMessage;
+    const caretIndex = this.mentionCaretIndex ?? text.length;
+    return { text, caretIndex };
+  }
 
-  //   // Caret nach Einfügen neu setzen
-  //   setTimeout(() => {
-  //     activeElement.selectionStart = activeElement.selectionEnd = (overlayFlag === 'recipient')
-  //       ? this.cursorPosRecipient
-  //       : this.cursorPosMessage;
-  //     activeElement.focus();
-  //   });
-  // }
-  // insertMention(event: { name: string; type: 'user' | 'channel' }) {
-  //   const trigger = event.type === 'user' ? '@' : '#';
-  //   const pos = this.mentionCaretIndex ?? this.newMessage.length;
-
-  //   const before = this.newMessage.slice(0, pos);
-  //   const after = this.newMessage.slice(pos);
-  //   const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
-
-  //   this.newMessage = replaced + ' ' + after;
-  //   this.mentionCaretIndex = replaced.length + 1;
-
-  //   // Fokus und Cursor setzen
-  //   const textarea = this.newMessageInput.nativeElement;
-  //   setTimeout(() => {
-  //     textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
-  //     textarea.focus();
-  //   });
-
-  //   this.overlayActiveMessage = false;
-  // }
-  insertMention(event: { name: string; type: 'user' | 'channel' }, type: 'recipient' | 'message') {
-    const trigger = event.type === 'user' ? '@' : '#';
-    const pos = this.mentionCaretIndex ?? (type === 'recipient' ? this.recipientText.length : this.newMessage.length);
-
-    let text = type === 'recipient' ? this.recipientText : this.newMessage;
+  private insertMentionInText(
+    text: string,
+    mention: { name: string; type: 'user' | 'channel' },
+    caretIndex: number | null
+  ): { newText: string, newCaretIndex: number } {
+    const trigger = mention.type === 'user' ? '@' : '#';
+    const pos = caretIndex ?? text.length;
     const before = text.slice(0, pos);
     const after = text.slice(pos);
-    const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
-    text = replaced + ' ' + after;
+    const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${mention.name}`);
+    const newText = replaced + ' ' + after;
+    const newCaretIndex = replaced.length + 1;
+    return { newText, newCaretIndex };
+  }
 
+  private setText(type: 'recipient' | 'message', text: string) {
     if (type === 'recipient') this.recipientText = text;
     else this.newMessage = text;
+  }
 
-    this.mentionCaretIndex = replaced.length + 1;
-
-    // Fokus und Cursor setzen
+  private focusAndMoveCaret(el: HTMLInputElement | HTMLTextAreaElement, caretPos: number) {
     setTimeout(() => {
-      const el = type === 'recipient' ? document.getElementById('recipient') as HTMLInputElement
-                                      : this.newMessageInput.nativeElement;
-      if (el) el.selectionStart = el.selectionEnd = this.mentionCaretIndex!;
-      el?.focus();
+      el.selectionStart = el.selectionEnd = caretPos;
+      el.focus();
     });
+  }
 
-    // Overlay schließen
-    // if (type === 'recipient') this.overlayActiveRecipient = false;
-    // else this.overlayActiveMessage = false;
-    this.overlayActiveRecipient = false;
-    this.overlayActiveMessage = false;
+  private closeInputOverlay(type: 'recipient' | 'message') {
+    if (type === 'recipient') this.overlayActiveRecipient = false;
+    else this.overlayActiveMessage = false;
   }
 
 
@@ -255,6 +218,32 @@ export class NewMessageComponent {
     }); 0
   }
 
+  // @HostListener('document:click', ['$event'])
+  // onDocumentClick(event: MouseEvent) {
+  //   const target = event.target as HTMLElement;
+
+  //   // Recipient Input + Overlay
+  //   const recipientInputEl = this.recipientInput?.nativeElement;
+  //   const recipientOverlayEl = document.querySelector('#recipient + app-mentions-overlay'); // Overlay direkt nach Input
+
+  //   if (this.overlayActiveRecipient && recipientInputEl && recipientOverlayEl) {
+  //     const clickedInsideRecipient = recipientInputEl.contains(target) || recipientOverlayEl.contains(target);
+  //     if (!clickedInsideRecipient) {
+  //       this.overlayActiveRecipient = false;
+  //     }
+  //   }
+
+  //   // Message Textarea + Overlay
+  //   const messageInputEl = this.newMessageInput?.nativeElement;
+  //   const messageOverlayEl = document.querySelector('#new-message + app-mentions-overlay'); // Overlay direkt nach Textarea
+
+  //   if (this.overlayActiveMessage && messageInputEl && messageOverlayEl) {
+  //     const clickedInsideMessage = messageInputEl.contains(target) || messageOverlayEl.contains(target);
+  //     if (!clickedInsideMessage) {
+  //       this.overlayActiveMessage = false;
+  //     }
+  //   }
+  // }
 
   submitChatMessage() {
     if (!this.newMessage.trim()) return;
