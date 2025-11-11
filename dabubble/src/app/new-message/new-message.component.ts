@@ -19,6 +19,7 @@ export class NewMessageComponent {
   overlayActive = false;
 
   currentUserId: string = '';
+  participants: User[] = [];
   filteredChannels: any[] = []
   newMessage: string = '';
   mentionCaretIndex: number | null = null;
@@ -31,7 +32,8 @@ export class NewMessageComponent {
   userService = inject(UserService);
 
   ngOnInit() {
-    this.getCurrentUser();
+    this.getCurrentUserAndChannels();
+    this.participants$ = this.userService.getUsers();
     // this.loadChannelWithId(this.channelId);
     // this.chat$ = this.getEnrichedChat();
     // this.answers$ = this.getEnrichedAnswers();
@@ -44,7 +46,7 @@ export class NewMessageComponent {
     // });
   }
 
-  getCurrentUser() {
+  getCurrentUserAndChannels() {
     this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
       if (user) {
         this.currentUserId = user.uid;
@@ -54,6 +56,12 @@ export class NewMessageComponent {
           );
         });
       }
+    });
+  }
+
+  subscribeToParticipants() {
+    this.participants$.subscribe(users => {
+      this.participants = users;
     });
   }
  

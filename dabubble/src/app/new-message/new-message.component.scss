@@ -44,9 +44,6 @@
 .input-field {
   position: relative;
   width: 100%;
-//   flex-grow: 1;
-//   width: 600px;
-//   height: 25px;
   border: 1px solid #adb0d9;
   border-radius: 30px;
   background-color: #ffffff;
@@ -54,16 +51,10 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  // justify-content: flex-end;
   border: 1px solid #adb0d9;
   &:hover {
     border-color: #797ef3;
   }
-  // &:focus {
-  //     // border-color: #535af1;
-  //     // outline: none;
-
-  // }
   &:focus-within {
     border-color: #535af1;
   }
@@ -80,7 +71,6 @@
   height: fit-content;
   box-sizing: border-box;
   padding: 35px;
-//   padding-top: 35px;
 }
 
 .form-field {
@@ -99,11 +89,6 @@
   &:hover {
     border-color: #797ef3;
   }
-  // &:focus {
-  //     // border-color: #535af1;
-  //     // outline: none;
-
-  // }
   &:focus-within {
     border-color: #535af1;
   }
@@ -119,18 +104,6 @@
   transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-// .input:focus + .floating-label,
-// .input:not(:placeholder-shown) + .floating-label {
-//     top: -8px;
-//     left: 20px;
-//     padding: 0 4px;
-//     font-size: 0.8rem;
-//     color: #535af1;
-//     // .form-field {
-//     //     border-color: #535af1;
-//     //     outline: none;
-//     // }
-// }
 .input:focus + .floating-label,
 .input:not(:placeholder-shown) + .floating-label {
   top: -8px;
@@ -158,12 +131,6 @@
   font-family: Nunito, "Helvetica Neue", sans-serif;
   resize: none;
 }
-
-// .input:focus {
-//     border: none;
-//     outline: none;
-//     box-shadow: none;
-// }
 
 .input-icon-bar {
   width: calc(100% - 40px);
@@ -198,15 +165,6 @@
   &:hover {
     color: #535af1;
   }
-
-//   &.missing {
-//     cursor: default;
-//     pointer-events: none;
-
-//     &:hover {
-//       color: inherit;
-//     }
-//   }
 }
 
 .chat-edit-wrapper {

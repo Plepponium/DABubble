@@ -6,12 +6,12 @@
             </div>
 
             <div class="input-field">
-                <input id="recipient" class="input" type="text" placeholder="An: #channel, @jemand oder E-Mail Adresse">
+                <input #recipientInput id="recipient" class="input" type="text" placeholder="An: #channel, @jemand oder E-Mail Adresse">
 
-                <app-mentions-overlay [text]="newMessage" [cursorPos]="cursorPos" [currentUserId]="currentUserId" [context]="'Channel'"
+                <!-- <app-mentions-overlay [text]="newMessage" [cursorPos]="cursorPos" [currentUserId]="currentUserId" [context]="'Channel'"
                     [users]="(participants$ | async) || [] " [channels]="filteredChannels"
                     (mentionSelected)="insertMention($event)" (overlayStateChange)="overlayActive = $event">
-                </app-mentions-overlay>
+                </app-mentions-overlay> -->
             </div>
         </div>
 
@@ -23,16 +23,10 @@
             <div class="form-field">
                 <ng-container>
                     <textarea #newMessageInput id="new-message" class="input" name="message" [(ngModel)]="newMessage"
-                        (keydown.enter)="onEnterPress($any($event))" type="text"
-                        placeholder="Starte eine neue Nachricht"
-                        (input)="updateCaretPosition()"
-                        (keyup)="updateCaretPosition()"></textarea>
+                        (keydown.enter)="onEnterPress($any($event))" type="text" placeholder="Starte eine neue Nachricht"
+                        (input)="updateCaretPosition()" (keyup)="updateCaretPosition()"></textarea>
                 </ng-container>
-                
-                <!-- <app-mentions-overlay [text]="newMessage" [cursorPos]="cursorPos" [currentUserId]="currentUserId" [context]="'Channel'"
-                    [users]="(participants$ | async) || [] " [channels]="filteredChannels"
-                    (mentionSelected)="insertMention($event)" (overlayStateChange)="overlayActive = $event">
-                </app-mentions-overlay> -->
+
                 <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPos"
                     [currentUserId]="currentUserId" [context]="'AddUser'" [users]="(participants$ | async) || [] "
                     [channels]="filteredChannels" (mentionSelected)="insertMention($event)"

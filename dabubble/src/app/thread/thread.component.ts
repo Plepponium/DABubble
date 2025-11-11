@@ -26,7 +26,6 @@ export class ThreadComponent implements OnInit {
 
   @ViewChild('answerInput', { static: false }) answerInput!: ElementRef<HTMLTextAreaElement>;
   overlayActive: boolean = false;
-  filteredChannels: any[] = [];
   editAnswerEditIndex: number | null = null;
   activeReactionDialogueIndex: string | null = null;
   activeReactionDialogueBelowIndex: string | null = null;
@@ -37,7 +36,8 @@ export class ThreadComponent implements OnInit {
   currentUserId: string = '';
   participantIds: string[] = [];
   participants: User[] = [];
-  channelChats: any[] = [];
+  filteredChannels: any[] = [];
+  // channelChats: any[] = [];
   reactionIcons = reactionIcons;
   reactionArray: { type: string, count: number, user: string[] }[] = [];
   newAnswer: string = '';
@@ -62,7 +62,7 @@ export class ThreadComponent implements OnInit {
 
 
   ngOnInit() {
-    this.getCurrentUser();
+    this.getCurrentUserAndChannels();
     this.loadChannelWithId(this.channelId);
     this.chat$ = this.getEnrichedChat();
     this.answers$ = this.getEnrichedAnswers();
@@ -76,7 +76,7 @@ export class ThreadComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.getCurrentUser();
+    this.getCurrentUserAndChannels();
     this.loadChannelWithId(this.channelId);
     this.chat$ = this.getEnrichedChat();
     this.answers$ = this.getEnrichedAnswers();
@@ -91,7 +91,7 @@ export class ThreadComponent implements OnInit {
     }, 100); // kleiner Delay, damit DOM aktualisiert ist
   }
 
-  getCurrentUser() {
+  getCurrentUserAndChannels() {
     this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
       if (user) {
         this.currentUserId = user.uid;
