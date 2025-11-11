@@ -30,16 +30,7 @@ export class NewMessageComponent {
   channelService = inject(ChannelService);
   userService = inject(UserService);
 
-  onEnterPress(e: KeyboardEvent) {
-    if (this.overlayActive) {
-      e.preventDefault();
-      return;
-    }
-
-    this.submitChatMessage();
-    e.preventDefault();
-  }
-
+ 
   submitChatMessage() {
     if (!this.newMessage.trim()) return;
     // if (!this.channelId || !this.currentUserId) return;
@@ -57,6 +48,16 @@ export class NewMessageComponent {
     //   .catch(err => {
     //     console.error('Fehler beim Senden:', err);
     //   });
+  }
+
+  onEnterPress(e: KeyboardEvent) {
+    if (this.overlayActive) {
+      e.preventDefault();
+      return;
+    }
+
+    this.submitChatMessage();
+    e.preventDefault();
   }
 
   insertMention(event: { name: string; type: 'user' | 'channel' }) {
