@@ -16,14 +16,21 @@ import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-ov
 })
 export class NewMessageComponent {
   @ViewChild('newMessageInput', { static: false }) newMessageInput!: ElementRef<HTMLTextAreaElement>;
-  overlayActive = false;
+  // overlayActive = false;
 
   currentUserId: string = '';
   participants: User[] = [];
-  filteredChannels: any[] = []
+  filteredChannels: any[] = [];
+
   newMessage: string = '';
+  recipientText: string = '';
+
   mentionCaretIndex: number | null = null;
-  cursorPos: number = 0;
+  cursorPosRecipient: number = 0;
+  cursorPosMessage: number = 0;
+  
+  overlayActiveRecipient = false;
+  overlayActiveMessage = false;
 
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
@@ -33,7 +40,14 @@ export class NewMessageComponent {
 
   ngOnInit() {
     this.getCurrentUserAndChannels();
-    this.participants$ = this.userService.getUsers();
+    this.loadAllUsers();
+
+    // console.log('currentUserId', this.currentUserId);
+    
+
+    // this.participants$ = this.userService.getUsers();
+    // this.subscribeToParticipants();
+
     // this.loadChannelWithId(this.channelId);
     // this.chat$ = this.getEnrichedChat();
     // this.answers$ = this.getEnrichedAnswers();
@@ -50,6 +64,7 @@ export class NewMessageComponent {
     this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
       if (user) {
         this.currentUserId = user.uid;
+        // console.log('currentUserId', this.currentUserId);
         this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
           this.filteredChannels = channels.filter(c =>
             Array.isArray(c.participants) && c.participants.includes(this.currentUserId)
@@ -59,72 +74,152 @@ export class NewMessageComponent {
     });
   }
 
-  subscribeToParticipants() {
-    this.participants$.subscribe(users => {
-      this.participants = users;
+  loadAllUsers() {
+    this.userService.getUsers().pipe(take(1)).subscribe(users => {
+      this.participants$ = of(users);   // optional, falls das Overlay ein Observable erwartet
+      this.participants = users;        // falls du sie lokal brauchst
+      console.log('🔹 Alle User geladen:', users.length);
+      console.log('participants', this.participants);
     });
   }
+
  
-  submitChatMessage() {
-    if (!this.newMessage.trim()) return;
-    // if (!this.channelId || !this.currentUserId) return;
+  
 
-    // const messagePayload = {
-    //   message: this.newMessage.trim(),
-    //   time: Math.floor(Date.now() / 1000),
-    //   user: this.currentUserId
-    // };
-    // this.channelService.addChatToChannel(this.channelId, messagePayload)
-    //   .then(() => {
-    //     this.newMessage = '';
-    //     setTimeout(() => this.scrollToBottom());
-    //   })
-    //   .catch(err => {
-    //     console.error('Fehler beim Senden:', err);
-    //   });
-  }
+  // insertMention(event: { name: string; type: 'user' | 'channel' }) {
+  //   const trigger = event.type === 'user' ? '@' : '#';
+  //   const pos = this.mentionCaretIndex ?? this.newMessage.length;
+  //   const before = this.newMessage.slice(0, pos);
+  //   const after = this.newMessage.slice(pos);
+  //   const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
+  //   this.newMessage = replaced + ' ' + after;
+  //   const textarea = this.newMessageInput.nativeElement;
+  //   this.mentionCaretIndex = replaced.length + 1;
 
-  onEnterPress(e: KeyboardEvent) {
-    if (this.overlayActive) {
-      e.preventDefault();
-      return;
-    }
+  //   setTimeout(() => {
+  //     textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
+  //     this.updateCaretPosition();
+  //     textarea.focus();
+  //   });
+  //   this.overlayActive = false;
+  // }
+  // insertMention(event: { name: string; type: 'user' | 'channel' }) {
+  //   const trigger = event.type === 'user' ? '@' : '#';
+  //   const activeElement = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
 
-    this.submitChatMessage();
-    e.preventDefault();
-  }
+  //   if (!activeElement) return;
 
-  insertMention(event: { name: string; type: 'user' | 'channel' }) {
+  //   let text = '';
+  //   let caretIndex = 0;
+  //   let overlayFlag: 'recipient' | 'message' | null = null;
+
+  //   if (activeElement.id === 'recipient') {
+  //     text = this.recipientText;
+  //     caretIndex = this.cursorPosRecipient;
+  //     overlayFlag = 'recipient';
+  //   } else if (activeElement.id === 'new-message') {
+  //     text = this.newMessage;
+  //     caretIndex = this.cursorPosMessage;
+  //     overlayFlag = 'message';
+  //   }
+
+  //   if (!overlayFlag) return;
+
+  //   // Mention einfügen
+  //   const before = text.slice(0, caretIndex);
+  //   const after = text.slice(caretIndex);
+  //   const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
+  //   const updatedText = replaced + ' ' + after;
+
+  //   if (overlayFlag === 'recipient') {
+  //     this.recipientText = updatedText;
+  //     this.cursorPosRecipient = replaced.length + 1;
+  //     this.overlayActiveRecipient = false;
+  //   } else {
+  //     this.newMessage = updatedText;
+  //     this.cursorPosMessage = replaced.length + 1;
+  //     this.overlayActiveMessage = false;
+  //   }
+
+  //   // Caret nach Einfügen neu setzen
+  //   setTimeout(() => {
+  //     activeElement.selectionStart = activeElement.selectionEnd = (overlayFlag === 'recipient')
+  //       ? this.cursorPosRecipient
+  //       : this.cursorPosMessage;
+  //     activeElement.focus();
+  //   });
+  // }
+  // insertMention(event: { name: string; type: 'user' | 'channel' }) {
+  //   const trigger = event.type === 'user' ? '@' : '#';
+  //   const pos = this.mentionCaretIndex ?? this.newMessage.length;
+
+  //   const before = this.newMessage.slice(0, pos);
+  //   const after = this.newMessage.slice(pos);
+  //   const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
+
+  //   this.newMessage = replaced + ' ' + after;
+  //   this.mentionCaretIndex = replaced.length + 1;
+
+  //   // Fokus und Cursor setzen
+  //   const textarea = this.newMessageInput.nativeElement;
+  //   setTimeout(() => {
+  //     textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
+  //     textarea.focus();
+  //   });
+
+  //   this.overlayActiveMessage = false;
+  // }
+  insertMention(event: { name: string; type: 'user' | 'channel' }, type: 'recipient' | 'message') {
     const trigger = event.type === 'user' ? '@' : '#';
-    const pos = this.mentionCaretIndex ?? this.newMessage.length;
-    const before = this.newMessage.slice(0, pos);
-    const after = this.newMessage.slice(pos);
+    const pos = this.mentionCaretIndex ?? (type === 'recipient' ? this.recipientText.length : this.newMessage.length);
+
+    let text = type === 'recipient' ? this.recipientText : this.newMessage;
+    const before = text.slice(0, pos);
+    const after = text.slice(pos);
     const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
-    this.newMessage = replaced + ' ' + after;
-    const textarea = this.newMessageInput.nativeElement;
+    text = replaced + ' ' + after;
+
+    if (type === 'recipient') this.recipientText = text;
+    else this.newMessage = text;
+
     this.mentionCaretIndex = replaced.length + 1;
 
+    // Fokus und Cursor setzen
     setTimeout(() => {
-      textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
-      this.updateCaretPosition();
-      textarea.focus();
+      const el = type === 'recipient' ? document.getElementById('recipient') as HTMLInputElement
+                                      : this.newMessageInput.nativeElement;
+      if (el) el.selectionStart = el.selectionEnd = this.mentionCaretIndex!;
+      el?.focus();
     });
-    this.overlayActive = false;
+
+    // Overlay schließen
+    // if (type === 'recipient') this.overlayActiveRecipient = false;
+    // else this.overlayActiveMessage = false;
+    this.overlayActiveRecipient = false;
+    this.overlayActiveMessage = false;
   }
 
-  updateCaretPosition() {
-    const textarea = this.newMessageInput?.nativeElement;
-    if (!textarea) return;
-    this.mentionCaretIndex = textarea.selectionStart;
+
+  // updateCaretPosition() {
+  //   const textarea = this.newMessageInput?.nativeElement;
+  //   if (!textarea) return;
+  //   this.mentionCaretIndex = textarea.selectionStart;
+  // }
+  updateCaretPosition(event: any, type: 'recipient' | 'message') {
+    const target = event.target as HTMLInputElement | HTMLTextAreaElement;
+    const caretPos = target.selectionStart || 0;
+
+    if (type === 'recipient') {
+      this.cursorPosRecipient = caretPos;
+    } else {
+      this.cursorPosMessage = caretPos;
+    }
+    this.mentionCaretIndex = caretPos;
   }
 
   updateEditCaret(chat: any, textarea: HTMLTextAreaElement) {
     chat._caretIndex = textarea.selectionStart;
   }
-
-  // getTextarea(): HTMLTextAreaElement | null {
-  //   return document.getElementById('chat-message') as HTMLTextAreaElement | null;
-  // }
 
   insertMentionInEdit(
     chat: any,
@@ -158,6 +253,39 @@ export class NewMessageComponent {
       textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
       textarea.focus();
     }); 0
+  }
+
+
+  submitChatMessage() {
+    if (!this.newMessage.trim()) return;
+    // if (!this.channelId || !this.currentUserId) return;
+
+    // const messagePayload = {
+    //   message: this.newMessage.trim(),
+    //   time: Math.floor(Date.now() / 1000),
+    //   user: this.currentUserId
+    // };
+    // this.channelService.addChatToChannel(this.channelId, messagePayload)
+    //   .then(() => {
+        console.log('Message submitted:', this.newMessage);
+        this.recipientText = '';
+        this.newMessage = '';
+    //     setTimeout(() => this.scrollToBottom());
+    //   })
+    //   .catch(err => {
+    //     console.error('Fehler beim Senden:', err);
+    //   });
+  }
+
+  onEnterPress(e: KeyboardEvent) {
+    if (this.overlayActiveRecipient || this.overlayActiveMessage) {
+    // if (this.overlayActive) {
+      e.preventDefault();
+      return;
+    }
+
+    this.submitChatMessage();
+    e.preventDefault();
   }
 
   autoGrow(el: HTMLTextAreaElement | null) {

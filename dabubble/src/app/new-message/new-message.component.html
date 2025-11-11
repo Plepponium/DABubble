@@ -6,12 +6,19 @@
             </div>
 
             <div class="input-field">
-                <input #recipientInput id="recipient" class="input" type="text" placeholder="An: #channel, @jemand oder E-Mail Adresse">
+                <input #recipientInput id="recipient" class="input" [(ngModel)]="recipientText" type="text" 
+                    placeholder="An: #channel, @jemand oder E-Mail Adresse" 
+                    (input)="updateCaretPosition($event, 'recipient')" (keyup)="updateCaretPosition($event, 'recipient')">
 
-                <!-- <app-mentions-overlay [text]="newMessage" [cursorPos]="cursorPos" [currentUserId]="currentUserId" [context]="'Channel'"
+                <!-- <app-mentions-overlay [text]="recipientText" [cursorPos]="cursorPos" [currentUserId]="currentUserId" [context]="'Channel'"
                     [users]="(participants$ | async) || [] " [channels]="filteredChannels"
                     (mentionSelected)="insertMention($event)" (overlayStateChange)="overlayActive = $event">
                 </app-mentions-overlay> -->
+                <app-mentions-overlay [text]="recipientText" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosRecipient"
+                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
+                    [channels]="filteredChannels" (mentionSelected)="insertMention($event, 'recipient')"
+                    (overlayStateChange)="overlayActiveRecipient  = $event">
+                </app-mentions-overlay>
             </div>
         </div>
 
@@ -21,16 +28,16 @@
         
         <form class="form" (ngSubmit)="submitChatMessage()" #newMessageForm="ngForm">
             <div class="form-field">
-                <ng-container>
+                <!-- <ng-container> -->
                     <textarea #newMessageInput id="new-message" class="input" name="message" [(ngModel)]="newMessage"
                         (keydown.enter)="onEnterPress($any($event))" type="text" placeholder="Starte eine neue Nachricht"
-                        (input)="updateCaretPosition()" (keyup)="updateCaretPosition()"></textarea>
-                </ng-container>
+                        (input)="updateCaretPosition($event, 'message')" (keyup)="updateCaretPosition($event, 'message')"></textarea>
+                <!-- </ng-container> -->
 
-                <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPos"
-                    [currentUserId]="currentUserId" [context]="'AddUser'" [users]="(participants$ | async) || [] "
-                    [channels]="filteredChannels" (mentionSelected)="insertMention($event)"
-                    (overlayStateChange)="overlayActive = $event">
+                <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosMessage"
+                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
+                    [channels]="filteredChannels" (mentionSelected)="insertMention($event, 'message')"
+                    (overlayStateChange)="overlayActiveMessage  = $event">
                 </app-mentions-overlay>
 
                 <div class="input-icon-bar">
