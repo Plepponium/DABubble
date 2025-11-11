@@ -29,10 +29,10 @@
                         (keyup)="updateCaretPosition()"></textarea>
                 </ng-container>
                 
-                <app-mentions-overlay [text]="newMessage" [cursorPos]="cursorPos" [currentUserId]="currentUserId" [context]="'Channel'"
+                <!-- <app-mentions-overlay [text]="newMessage" [cursorPos]="cursorPos" [currentUserId]="currentUserId" [context]="'Channel'"
                     [users]="(participants$ | async) || [] " [channels]="filteredChannels"
                     (mentionSelected)="insertMention($event)" (overlayStateChange)="overlayActive = $event">
-                </app-mentions-overlay>
+                </app-mentions-overlay> -->
                 <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPos"
                     [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
                     [channels]="filteredChannels" (mentionSelected)="insertMention($event)"

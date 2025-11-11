@@ -523,7 +523,6 @@ export class ThreadComponent implements OnInit {
     });
   }
 
-
   insertAtCursor(character: string = '@') {
     const textarea = this.answerInput.nativeElement;
     const start = textarea.selectionStart;
@@ -537,7 +536,6 @@ export class ThreadComponent implements OnInit {
       textarea.focus();
     }); 0
   }
-
 
   async saveEditedAnswer(answer: Answer) {
     const newText = answer.editedText?.trim();
@@ -555,12 +553,9 @@ export class ThreadComponent implements OnInit {
     answer.isEditing = false;
   }
 
-
   autoGrow(el: HTMLTextAreaElement | null) {
     if (!el) return;
     el.style.height = 'auto';
     el.style.height = `${el.scrollHeight}px`;
   }
-
-
 }
