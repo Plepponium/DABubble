@@ -93,14 +93,46 @@
 .chat-day-section {
   display: flex;
   flex-direction: column;
-  // justify-content: end;
+  justify-content: end;
+  gap: 16px;
+  margin-top: 1px;
 }
 
-// .chat-section {
-//     display: flex;
-//     gap: 20px;
-//     padding: 10px 45px;
-// }
+.chat-date-section {
+  width: 100%;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.5;
+}
+
+.chat-date-section::before,
+.chat-date-section::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #adb0d9;
+  margin: 0 0px;
+}
+
+.chat-date-section::before {
+  margin-left: 35px;
+}
+
+.chat-date-section::after {
+  margin-right: 35px;
+}
+
+.chat-date {
+  width: fit-content;
+  display: flex;
+  justify-content: center;
+  margin: 25px 0;
+  border: 1px solid #adb0d9;
+  border-radius: 20px;
+  padding: 5px 15px;
+}
 
 .chat-section {
   display: flex;
