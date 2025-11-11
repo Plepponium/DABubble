@@ -61,7 +61,6 @@ export class ThreadComponent implements OnInit {
   @Output() openProfile = new EventEmitter<User>();
 
 
-
   ngOnInit() {
     this.getCurrentUser();
     this.loadChannelWithId(this.channelId);
@@ -140,7 +139,6 @@ export class ThreadComponent implements OnInit {
     );
   }
 
-
   getEnrichedAnswers(): Observable<Answer[]> {
     return this.channelService.getAnswersForChat(this.channelId, this.chatId).pipe(
       switchMap(answers =>
@@ -163,7 +161,6 @@ export class ThreadComponent implements OnInit {
       )
     );
   }
-
 
   async loadChatById(channelId: string) {
     this.channelService.getChannelById(channelId).pipe(take(1)).subscribe(async channel => {
@@ -295,7 +292,6 @@ export class ThreadComponent implements OnInit {
     await this.channelService.setReaction(channelId, chatId, reactionType, updatedUsers);
   }
 
-
   private async updateReactionForChat(chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
     // Hole den aktuellen Chat direkt über das Observable (du hast nur einen Chat im Thread)
     const chat = await firstValueFrom(this.chat$);
@@ -424,13 +420,11 @@ export class ThreadComponent implements OnInit {
     if (!message) return;
     if (!this.channelId || !this.chatId || !this.currentUserId) return;
 
-    // Bau das Payload-Objekt
     const answer = {
       message,
       time: Math.floor(Date.now() / 1000), // oder Date.now() für ms
       user: this.currentUserId
     };
-    // Store in Firestore
     await this.channelService.addAnswerToChat(this.channelId, this.chatId, answer);
 
     this.newAnswer = '';
@@ -482,10 +476,6 @@ export class ThreadComponent implements OnInit {
 
   updateEditCaret(answer: any, textarea: HTMLTextAreaElement) {
     answer._caretIndex = textarea.selectionStart;
-  }
-
-  getTextarea(): HTMLTextAreaElement | null {
-    return document.getElementById('answer-message') as HTMLTextAreaElement | null;
   }
 
   toggleEditMenu(answer: Answer) {
