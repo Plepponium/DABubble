@@ -2,7 +2,7 @@ import { Component, Output, EventEmitter, Input, inject, ViewChild, ElementRef }
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
-import { Observable, of } from 'rxjs';
+import { Observable, of, take } from 'rxjs';
 import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.class';
@@ -30,6 +30,32 @@ export class NewMessageComponent {
   channelService = inject(ChannelService);
   userService = inject(UserService);
 
+  ngOnInit() {
+    this.getCurrentUser();
+    // this.loadChannelWithId(this.channelId);
+    // this.chat$ = this.getEnrichedChat();
+    // this.answers$ = this.getEnrichedAnswers();
+
+    // // this.answers$.pipe(take(1)).subscribe(answers => {
+    // //   console.log('Thread Answers:', answers);
+    // // });
+    // this.answers$.pipe(take(1)).subscribe(() => {
+    //   this.scrollToBottom();
+    // });
+  }
+
+  getCurrentUser() {
+    this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
+      if (user) {
+        this.currentUserId = user.uid;
+        this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
+          this.filteredChannels = channels.filter(c =>
+            Array.isArray(c.participants) && c.participants.includes(this.currentUserId)
+          );
+        });
+      }
+    });
+  }
  
   submitChatMessage() {
     if (!this.newMessage.trim()) return;
@@ -88,9 +114,9 @@ export class NewMessageComponent {
     chat._caretIndex = textarea.selectionStart;
   }
 
-  getTextarea(): HTMLTextAreaElement | null {
-    return document.getElementById('chat-message') as HTMLTextAreaElement | null;
-  }
+  // getTextarea(): HTMLTextAreaElement | null {
+  //   return document.getElementById('chat-message') as HTMLTextAreaElement | null;
+  // }
 
   insertMentionInEdit(
     chat: any,
