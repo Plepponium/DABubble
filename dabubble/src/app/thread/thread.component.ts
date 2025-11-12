@@ -561,23 +561,20 @@ export class ThreadComponent implements OnInit {
   }
 
   getDisplayDate(date: Date | undefined): string {
-    if (!date) return '';
-
     const today = new Date();
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
 
-    if (this.isSameDate(date, today)) {
-      return 'Heute';
-    } else if (this.isSameDate(date, yesterday)) {
-      return 'Gestern';
+    if (this.isSameDate(date, today)) return 'Heute';
+    if (this.isSameDate(date, yesterday)) return 'Gestern';
+    return date!.toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  shouldShowDateForAnswer(answers: any[], i: number, chat: any): boolean {
+    if (i === 0) {
+      return !this.isSameDate(this.getChatDate(chat), this.getChatDate(answers[i]));
     } else {
-      // normales Datum: Montag, 20. September
-      return new Intl.DateTimeFormat('de-DE', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long'
-      }).format(date);
+      return !this.isSameDate(this.getChatDate(answers[i]), this.getChatDate(answers[i - 1]));
     }
   }
 

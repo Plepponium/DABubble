@@ -143,8 +143,7 @@
         <div *ngIf="answers$ | async as answers" id="thread-history" class="chat-history">
             <div *ngFor="let answer of answers; let i = index" class="chat-day-section"
                 [ngClass]="{'reverse': answer.user === currentUserId}">
-                <div *ngIf="i === 0 || !isSameDate(getChatDate(answer), getChatDate(answers[i-1]))"
-                    class="chat-date-section">
+                <div *ngIf="shouldShowDateForAnswer(answers, i, chat)" class="chat-date-section">
                     <div class="chat-date">{{ getDisplayDate(getChatDate(answer)) }}</div>
                 </div>
 
