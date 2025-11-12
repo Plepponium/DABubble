@@ -63,6 +63,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   @Input() channelId?: string;
   @Output() openThread = new EventEmitter<{ channelId: string; chatId: string }>();
   @Output() openProfile = new EventEmitter<User>();
+  @Output() channelDeleted = new EventEmitter<void>();
 
 
   ngOnInit() {
@@ -588,5 +589,10 @@ export class ChatsComponent implements OnInit, OnChanges {
     if (!el) return;
     el.style.height = 'auto';
     el.style.height = `${el.scrollHeight}px`;
+  }
+
+  handleChannelDeleted() {
+    this.channelDeleted.emit();
+    this.closeDialogChannelDescription();
   }
 }

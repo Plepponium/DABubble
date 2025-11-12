@@ -20,15 +20,16 @@
 
     <div class="container">
         <div #drawer class="sidenav" [class.closed]="!menuOpen" mode="side">
-            <app-menu (openNewMessage)="openNewMessage()" (openAddChannel)="openAddChannel()" (openChannel)="openChannel($event)"
-                (openUserChat)="openUserChat($event)" [activeChannelId]="currentChannelId"
-                [activeUserId]="activeUserId">
+            <app-menu (openNewMessage)="openNewMessage()" (openAddChannel)="openAddChannel()"
+                (openChannel)="openChannel($event)" (openUserChat)="openUserChat($event)"
+                [activeChannelId]="currentChannelId" [activeUserId]="activeUserId">
             </app-menu>
         </div>
 
         <div class="content" [class.fullwidth]="!menuOpen" [class.dm-open]="isDmOpen" [class.nm-open]="isNmOpen">
             <app-chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId"
-                (openThread)="openThread($event)" (openProfile)="openProfileOverlay($event)"></app-chats>
+                (openThread)="openThread($event)" (openProfile)="openProfileOverlay($event)"
+                (channelDeleted)="onChannelDeleted()"></app-chats>
             <app-thread id="thread" class="thread" *ngIf="threadOpen && currentChannelId && threadChatId"
                 [chatId]="threadChatId" [channelId]="currentChannelId" [hidden]="!threadOpen"
                 (closeThread)="threadOpen = false" (openProfile)="openProfileOverlay($event)"></app-thread>

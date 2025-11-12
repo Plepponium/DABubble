@@ -162,6 +162,14 @@ export class MainPageComponent {
     return this.showUserProfile || this.showEditUser || this.showProfileOverlay || this.showLogoutOverlay || this.showAddChannelDialogue;
   }
 
+  onChannelDeleted() {
+    this.channelOpen = false;
+    this.newMessageOpen = true;
+    this.currentChannelId = undefined;
+  }
+
+
+
   logout() {
     this.authSub?.unsubscribe();
     this.userService.logout().then(() => {

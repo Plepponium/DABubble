@@ -15,6 +15,8 @@ export class ChannelDescriptionOverlayComponent {
   @Input() channelId?: string;
   @Input() currentUserId?: string;
   @Output() close = new EventEmitter<void>();
+  @Output() channelDeleted = new EventEmitter<void>();
+
 
   channel?: Channel;
   channelService = inject(ChannelService);
@@ -29,8 +31,8 @@ export class ChannelDescriptionOverlayComponent {
     if (this.channelId) {
       this.channelService.getChannelById(this.channelId).subscribe(channel => {
         this.channel = channel;
-        this.editedName = channel.name;
-        this.editedDescription = channel.description || '';
+        this.editedName = channel?.name ?? '';
+        this.editedDescription = channel?.description ?? '';
       });
     }
   }
@@ -71,6 +73,7 @@ export class ChannelDescriptionOverlayComponent {
     try {
       if (updatedParticipants.length === 0) {
         await this.channelService.deleteChannel(this.channel.id);
+        this.channelDeleted.emit();
         this.handleClose();
         return;
       }
