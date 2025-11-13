@@ -18,7 +18,7 @@
     <div *ngIf="(chat$ | async) as chat" class="chat-content">
         <div class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
             <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}">
-                <!-- <div class="chat-dialogue" [ngClass]="{'reverse': chat.user === currentUserId}">
+                <div class="chat-dialogue" [ngClass]="{'reverse': chat.user === currentUserId}">
                     <div class="reactions-display-container">
                         <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === chat.id">
                             <div *ngFor="let icon of reactionIcons" class="reactions-container">
@@ -33,7 +33,7 @@
                         </button>
                     </div>
 
-                    <div class="edit-comment-container">
+                    <!-- <div class="edit-comment-container">
                         <div class="edit-comment-dialogue" *ngIf="editCommentDialogueExpanded">
                             <div class="edit-comment" (click)="editChat(chat)">Nachricht bearbeiten</div>
                         </div>
@@ -41,8 +41,8 @@
                             <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="">
                             <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg" alt="">
                         </button>
-                    </div>
-                </div> -->
+                    </div> -->
+                </div>
                 <img class="chat-user-img" [src]="'assets/user-icons/' + chat.userImg + '.svg'" [alt]="chat.userName"
                     [ngClass]="{'grayscale': chat.isUserMissing}">
                 <div class="chat-info-container">
