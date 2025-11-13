@@ -56,7 +56,6 @@ export class DirectMessageService {
         });
     }
 
-
     async addReactionToMessage(dmId: string, messageId: string, type: string, userId: string) {
         const msgRef = doc(this.firestore, `dmChats/${dmId}/messages/${messageId}`);
         return updateDoc(msgRef as any, { [`reactions.${type}`]: arrayUnion(userId) });

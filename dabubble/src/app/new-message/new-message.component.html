@@ -26,7 +26,7 @@
 
     <div class="message-content">
         
-        <form class="form" (ngSubmit)="submitChatMessage()" #newMessageForm="ngForm">
+        <form class="form" (ngSubmit)="submitMessage()" #newMessageForm="ngForm">
             <div class="form-field">
                 <!-- <ng-container> -->
                     <textarea #newMessageInput id="new-message" class="input" name="message" [(ngModel)]="newMessage"

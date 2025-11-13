@@ -121,7 +121,6 @@ export class ChannelService {
     }
   }
 
-
   async addParticipants(channelId: string, userIds: string[]) {
     const ref = doc(this.firestore, 'channels', channelId);
 
@@ -129,9 +128,4 @@ export class ChannelService {
       participants: arrayUnion(...userIds)
     });
   }
-
-
-
-
-
 }

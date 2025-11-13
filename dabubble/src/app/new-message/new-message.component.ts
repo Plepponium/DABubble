@@ -5,6 +5,7 @@ import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { Observable, of, take } from 'rxjs';
 import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
+import { DirectMessageService } from '../../services/direct-messages.service';
 import { User } from '../../models/user.class';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
 
@@ -38,6 +39,7 @@ export class NewMessageComponent {
 
   channelService = inject(ChannelService);
   userService = inject(UserService);
+  dmService  = inject(DirectMessageService);
 
   ngOnInit() {
     this.getCurrentUserAndChannels();
@@ -218,52 +220,117 @@ export class NewMessageComponent {
     }); 0
   }
 
-  // @HostListener('document:click', ['$event'])
-  // onDocumentClick(event: MouseEvent) {
-  //   const target = event.target as HTMLElement;
+  // submitMessage() {
+  //   if (!this.newMessage.trim() || !this.recipientText.trim()) return;
+  //   // if (!this.channelId || !this.currentUserId) return;
 
-  //   // Recipient Input + Overlay
-  //   const recipientInputEl = this.recipientInput?.nativeElement;
-  //   const recipientOverlayEl = document.querySelector('#recipient + app-mentions-overlay'); // Overlay direkt nach Input
+  //   const messagePayload = {
+  //     message: this.newMessage.trim(),
+  //     time: Math.floor(Date.now() / 1000),
+  //     user: this.currentUserId
+  //   };
 
-  //   if (this.overlayActiveRecipient && recipientInputEl && recipientOverlayEl) {
-  //     const clickedInsideRecipient = recipientInputEl.contains(target) || recipientOverlayEl.contains(target);
-  //     if (!clickedInsideRecipient) {
-  //       this.overlayActiveRecipient = false;
-  //     }
-  //   }
+  //   // this.channelService.addChatToChannel(this.channelId, messagePayload)
+  //   //   .then(() => {
+  //       console.log('Message submitted:', this.newMessage);
+  //       this.recipientText = '';
+  //       this.newMessage = '';
 
-  //   // Message Textarea + Overlay
-  //   const messageInputEl = this.newMessageInput?.nativeElement;
-  //   const messageOverlayEl = document.querySelector('#new-message + app-mentions-overlay'); // Overlay direkt nach Textarea
+  //       // link zu channel oder dm 
 
-  //   if (this.overlayActiveMessage && messageInputEl && messageOverlayEl) {
-  //     const clickedInsideMessage = messageInputEl.contains(target) || messageOverlayEl.contains(target);
-  //     if (!clickedInsideMessage) {
-  //       this.overlayActiveMessage = false;
-  //     }
-  //   }
+  //   //     setTimeout(() => this.scrollToBottom());
+  //   //   })
+  //   //   .catch(err => {
+  //   //     console.error('Fehler beim Senden:', err);
+  //   //   });
   // }
+  async submitMessage() {
+    if (!this.validateInputs()) return;
 
-  submitChatMessage() {
-    if (!this.newMessage.trim()) return;
-    // if (!this.channelId || !this.currentUserId) return;
+    const { userMentions, channelMentions } = this.parseRecipients(this.recipientText);
+    const messagePayload = this.buildMessagePayload(this.newMessage);
 
-    // const messagePayload = {
-    //   message: this.newMessage.trim(),
-    //   time: Math.floor(Date.now() / 1000),
-    //   user: this.currentUserId
-    // };
-    // this.channelService.addChatToChannel(this.channelId, messagePayload)
-    //   .then(() => {
-        console.log('Message submitted:', this.newMessage);
-        this.recipientText = '';
-        this.newMessage = '';
-    //     setTimeout(() => this.scrollToBottom());
-    //   })
-    //   .catch(err => {
-    //     console.error('Fehler beim Senden:', err);
-    //   });
+    await Promise.all([
+      this.sendToChannels(channelMentions, messagePayload),
+      this.sendToUsers(userMentions, messagePayload)
+    ]);
+
+    this.resetInputs();
+  }
+
+  private validateInputs(): boolean {
+    const trimmedMessage = this.newMessage.trim();
+    const trimmedRecipients = this.recipientText.trim();
+
+    if (!trimmedMessage || !trimmedRecipients) {
+      console.warn('⚠️ Nachricht oder Empfänger fehlt.');
+      return false;
+    }
+    return true;
+  }
+
+  private parseRecipients(text: string): { userMentions: string[], channelMentions: string[] } {
+    const userMentions = text.match(/@\s*[\p{L}\p{M}\s]+/gu)?.map(t => t.replace(/^@\s*/, '').trim()) || [];
+    const channelMentions = text.match(/#\s*[\w-]+/g)?.map(t => t.replace(/^#\s*/, '').trim()) || [];
+    return { userMentions, channelMentions };
+  }
+
+  private buildMessagePayload(message: string) {
+    return {
+      message: message.trim(),
+      time: Math.floor(Date.now() / 1000),
+      user: this.currentUserId
+    };
+  }
+
+  private async sendToChannels(channelMentions: string[], payload: any) {
+    if (channelMentions.length === 0) return;
+
+    const sendPromises = channelMentions.map(async name => {
+      const channel = this.filteredChannels.find(c => c.name === name);
+      if (!channel) {
+        console.warn(`⚠️ Channel "${name}" nicht gefunden.`);
+        return;
+      }
+
+      await this.channelService.addChatToChannel(channel.id, payload);
+      console.log(`📨 Nachricht an #${name} gesendet.`);
+    });
+
+    await Promise.all(sendPromises);
+  }
+
+  private async sendToUsers(userMentions: string[], payload: any) {
+    if (userMentions.length === 0) return;
+
+    const sendPromises = userMentions.map(async fullName => {
+      const targetUser = this.participants.find(u => u.name.trim().toLowerCase() === fullName.toLowerCase());
+      if (!targetUser) {
+        console.warn(`⚠️ Benutzer "${fullName}" nicht gefunden.`);
+        return;
+      }
+
+      try {
+        // 🔸 DM-Chat holen oder erstellen
+        const dmId = await this.dmService.getOrCreateDmId(this.currentUserId, targetUser.uid);
+        await this.dmService.sendMessage(dmId, {
+          senderId: this.currentUserId,
+          text: payload.message
+        });
+
+        console.log(`💬 Nachricht an @${fullName} über DM gesendet.`);
+      } catch (err) {
+        console.error(`❌ Fehler beim Senden an @${fullName}:`, err);
+      }
+    });
+
+    await Promise.all(sendPromises);
+  }
+
+  private resetInputs() {
+    this.recipientText = '';
+    this.newMessage = '';
+    console.log('✅ Nachricht erfolgreich gesendet.');
   }
 
   onEnterPress(e: KeyboardEvent) {
@@ -273,7 +340,7 @@ export class NewMessageComponent {
       return;
     }
 
-    this.submitChatMessage();
+    this.submitMessage();
     e.preventDefault();
   }
 
