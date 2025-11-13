@@ -1,4 +1,5 @@
 .menu {
+  height: calc(100% - 40px);
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -6,11 +7,7 @@
   border-radius: 30px;
   padding: 32px 30px;
   gap: 25px;
-  overflow-y: auto;
-
-  &::-webkit-scrollbar {
-    width: 0px;
-  }
+  
 }
 
 mat-toolbar {
@@ -30,6 +27,11 @@ mat-toolbar {
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 0px;
+  }
 }
 
 .menu-section {

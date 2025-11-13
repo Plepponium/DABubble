@@ -220,30 +220,6 @@ export class NewMessageComponent {
     }); 0
   }
 
-  // submitMessage() {
-  //   if (!this.newMessage.trim() || !this.recipientText.trim()) return;
-  //   // if (!this.channelId || !this.currentUserId) return;
-
-  //   const messagePayload = {
-  //     message: this.newMessage.trim(),
-  //     time: Math.floor(Date.now() / 1000),
-  //     user: this.currentUserId
-  //   };
-
-  //   // this.channelService.addChatToChannel(this.channelId, messagePayload)
-  //   //   .then(() => {
-  //       console.log('Message submitted:', this.newMessage);
-  //       this.recipientText = '';
-  //       this.newMessage = '';
-
-  //       // link zu channel oder dm 
-
-  //   //     setTimeout(() => this.scrollToBottom());
-  //   //   })
-  //   //   .catch(err => {
-  //   //     console.error('Fehler beim Senden:', err);
-  //   //   });
-  // }
   async submitMessage() {
     if (!this.validateInputs()) return;
 
@@ -311,7 +287,6 @@ export class NewMessageComponent {
       }
 
       try {
-        // 🔸 DM-Chat holen oder erstellen
         const dmId = await this.dmService.getOrCreateDmId(this.currentUserId, targetUser.uid);
         await this.dmService.sendMessage(dmId, {
           senderId: this.currentUserId,
