@@ -35,7 +35,7 @@
 
                     <div class="edit-comment-container">
                         <div class="edit-comment-dialogue" *ngIf="editCommentDialogueExpanded">
-                            <div class="edit-comment">Nachricht bearbeiten</div>
+                            <div class="edit-comment" (click)="editChat(chat)">Nachricht bearbeiten</div>
                         </div>
                         <button (click)="openEditCommentDialogue()" class="add-reaction-btn reverse">
                             <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="">
