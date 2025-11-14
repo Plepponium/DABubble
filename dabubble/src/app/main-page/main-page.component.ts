@@ -100,6 +100,7 @@ export class MainPageComponent {
   }
 
   openUserChat(user: User) {
+    console.log('main-page openUserChat', user);
     this.activeUserId = user.uid;
     this.userChatOpen = true;
     this.currentChannelId = undefined;

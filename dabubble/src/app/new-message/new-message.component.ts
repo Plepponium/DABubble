@@ -8,6 +8,7 @@ import { UserService } from '../../services/user.service';
 import { DirectMessageService } from '../../services/direct-messages.service';
 import { User } from '../../models/user.class';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
+import { Channel } from '../../models/channel.class';
 
 @Component({
   selector: 'app-new-message',
@@ -39,6 +40,9 @@ export class NewMessageComponent {
   channelService = inject(ChannelService);
   userService = inject(UserService);
   dmService  = inject(DirectMessageService);
+
+  @Output() openChannel = new EventEmitter<string>();
+  @Output() openUserChat = new EventEmitter<User>();
 
   ngOnInit() {
     this.getCurrentUserAndChannels();
@@ -141,10 +145,7 @@ export class NewMessageComponent {
     chat._caretIndex = textarea.selectionStart;
   }
 
-  insertMentionInEdit(
-    chat: any,
-    event: { name: string; type: 'user' | 'channel' }
-  ) {
+  insertMentionInEdit(chat: any, event: { name: string; type: 'user' | 'channel' }) {
     const trigger = event.type === 'user' ? '@' : '#';
     const pos = chat._caretIndex ?? chat.editedText.length;
     const before = chat.editedText.slice(0, pos);
@@ -186,7 +187,10 @@ export class NewMessageComponent {
       this.sendToUsers(userMentions, messagePayload)
     ]);
 
-    this.resetInputs();
+    this.goToMessage();
+    setTimeout(() => {
+      this.resetInputs();
+    });
   }
 
   private validateInputs(): boolean {
@@ -225,7 +229,7 @@ export class NewMessageComponent {
       }
 
       await this.channelService.addChatToChannel(channel.id, payload);
-      console.log(`📨 Nachricht an #${name} gesendet.`);
+      // console.log(`📨 Nachricht an #${name} gesendet.`);
     });
 
     await Promise.all(sendPromises);
@@ -248,7 +252,7 @@ export class NewMessageComponent {
           text: payload.message
         });
 
-        console.log(`💬 Nachricht an @${fullName} über DM gesendet.`);
+        // console.log(`💬 Nachricht an @${fullName} über DM gesendet.`);
       } catch (err) {
         console.error(`❌ Fehler beim Senden an @${fullName}:`, err);
       }
@@ -260,7 +264,91 @@ export class NewMessageComponent {
   private resetInputs() {
     this.recipientText = '';
     this.newMessage = '';
-    console.log('✅ Nachricht erfolgreich gesendet.');
+    // console.log('✅ Nachricht erfolgreich gesendet.');
+  }
+
+  goToMessage() {
+    const recipient = this.getFirstRecipient();
+    if (!recipient) return;
+
+    const name = this.extractMentionName(recipient);
+
+    if (this.isUserMention(recipient)) {
+      this.openUserByName(name);
+      return;
+    }
+
+    if (this.isChannelMention(recipient)) {
+      this.openChannelByName(name);
+      return;
+    }
+
+    console.warn(`⚠️ Empfänger nicht erkannt: ${recipient}`);
+  }
+
+  private getFirstRecipient(): string | null {
+    // Full user mention: @Firstname Lastname (Mehrwort!)
+    const userMatch = this.recipientText.match(/^@\s*[\p{L}\p{M}\s]+/u);
+    if (userMatch) return userMatch[0].trim();
+
+    // Channel: #channel
+    const channelMatch = this.recipientText.match(/^#\s*[\w-]+/);
+    if (channelMatch) return channelMatch[0].trim();
+
+    return null;
+  }
+
+  private extractMentionName(mention: string): string {
+    return mention.substring(1).trim(); 
+  }
+
+  private isUserMention(text: string): boolean {
+    return text.startsWith('@');
+  }
+
+  private openUserByName(name: string) {
+    const user = this.findUserByName(name);
+    if (!user) {
+      console.warn(`⚠️ User "${name}" nicht gefunden.`);
+      return;
+    }
+
+    this.handleOpenUserChat(user);
+  }
+
+  private findUserByName(fullName: string): User | undefined {
+    return this.participants.find(
+      u => u.name.trim().toLowerCase() === fullName.toLowerCase()
+    );
+  }
+
+  handleOpenUserChat(user: User) {
+    this.openUserChat.emit(user);
+  }
+
+  private isChannelMention(text: string): boolean {
+    return text.startsWith('#');
+  }
+
+  private openChannelByName(name: string) {
+    const channel = this.findChannelByName(name);
+
+    if (!channel) {
+      console.warn(`⚠️ Channel "${name}" nicht gefunden.`);
+      return;
+    }
+
+    this.handleOpenChannel(channel);
+  }
+
+  private findChannelByName(name: string): Channel | undefined {
+    return this.filteredChannels.find(
+      c => c.name.trim().toLowerCase() === name.toLowerCase()
+    );
+  }
+
+  handleOpenChannel(channel: Channel) {
+    this.openChannel.emit(channel.id);
   }
 
   onEnterPress(e: KeyboardEvent) {
