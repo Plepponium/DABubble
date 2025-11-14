@@ -18,7 +18,6 @@ import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-ov
 export class NewMessageComponent {
   @ViewChild('newMessageInput', { static: false }) newMessageInput!: ElementRef<HTMLTextAreaElement>;
   @ViewChild('recipientInput', { static: false }) recipientInput!: ElementRef<HTMLInputElement>;
-  // overlayActive = false;
 
   currentUserId: string = '';
   participants: User[] = [];
@@ -44,30 +43,12 @@ export class NewMessageComponent {
   ngOnInit() {
     this.getCurrentUserAndChannels();
     this.loadAllUsers();
-
-    // console.log('currentUserId', this.currentUserId);
-    
-
-    // this.participants$ = this.userService.getUsers();
-    // this.subscribeToParticipants();
-
-    // this.loadChannelWithId(this.channelId);
-    // this.chat$ = this.getEnrichedChat();
-    // this.answers$ = this.getEnrichedAnswers();
-
-    // // this.answers$.pipe(take(1)).subscribe(answers => {
-    // //   console.log('Thread Answers:', answers);
-    // // });
-    // this.answers$.pipe(take(1)).subscribe(() => {
-    //   this.scrollToBottom();
-    // });
   }
 
   getCurrentUserAndChannels() {
     this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
       if (user) {
         this.currentUserId = user.uid;
-        // console.log('currentUserId', this.currentUserId);
         this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
           this.filteredChannels = channels.filter(c =>
             Array.isArray(c.participants) && c.participants.includes(this.currentUserId)
@@ -79,31 +60,12 @@ export class NewMessageComponent {
 
   loadAllUsers() {
     this.userService.getUsers().pipe(take(1)).subscribe(users => {
-      this.participants$ = of(users);   // optional, falls das Overlay ein Observable erwartet
-      this.participants = users;        // falls du sie lokal brauchst
-      console.log('🔹 Alle User geladen:', users.length);
-      console.log('participants', this.participants);
+      this.participants$ = of(users); 
+      this.participants = users;
+      // console.log('🔹 Alle User geladen:', users.length);
+      // console.log('participants', this.participants);
     });
   }
-  
-
-  // insertMention(event: { name: string; type: 'user' | 'channel' }) {
-  //   const trigger = event.type === 'user' ? '@' : '#';
-  //   const pos = this.mentionCaretIndex ?? this.newMessage.length;
-  //   const before = this.newMessage.slice(0, pos);
-  //   const after = this.newMessage.slice(pos);
-  //   const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
-  //   this.newMessage = replaced + ' ' + after;
-  //   const textarea = this.newMessageInput.nativeElement;
-  //   this.mentionCaretIndex = replaced.length + 1;
-
-  //   setTimeout(() => {
-  //     textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
-  //     this.updateCaretPosition();
-  //     textarea.focus();
-  //   });
-  //   this.overlayActive = false;
-  // }
 
   insertMention(event: { name: string; type: 'user' | 'channel' }, type: 'recipient' | 'message' = 'message') {
     const el = this.getInputElement(type);
@@ -125,7 +87,6 @@ export class NewMessageComponent {
       : this.newMessageInput.nativeElement;
   }
 
-  /** 2. Liest den aktuellen Text und Caret-Index */
   private getCurrentTextAndCaret(type: 'recipient' | 'message'): { text: string, caretIndex: number } {
     const text = type === 'recipient' ? this.recipientText : this.newMessage;
     const caretIndex = this.mentionCaretIndex ?? text.length;
@@ -164,12 +125,6 @@ export class NewMessageComponent {
     else this.overlayActiveMessage = false;
   }
 
-
-  // updateCaretPosition() {
-  //   const textarea = this.newMessageInput?.nativeElement;
-  //   if (!textarea) return;
-  //   this.mentionCaretIndex = textarea.selectionStart;
-  // }
   updateCaretPosition(event: any, type: 'recipient' | 'message') {
     const target = event.target as HTMLInputElement | HTMLTextAreaElement;
     const caretPos = target.selectionStart || 0;
@@ -310,7 +265,6 @@ export class NewMessageComponent {
 
   onEnterPress(e: KeyboardEvent) {
     if (this.overlayActiveRecipient || this.overlayActiveMessage) {
-    // if (this.overlayActive) {
       e.preventDefault();
       return;
     }
