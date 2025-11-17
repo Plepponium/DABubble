@@ -1,7 +1,5 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MentionContext } from '../mentions-overlay/mentions-overlay.component';
-import { User } from '../../../models/user.class';
 
 @Component({
   selector: 'app-smiley-overlay',
@@ -10,26 +8,10 @@ import { User } from '../../../models/user.class';
   styleUrl: './smiley-overlay.component.scss'
 })
 export class SmileyOverlayComponent {
-  // @ViewChildren('mentionSmiley') mentionItems!: QueryList<ElementRef>;
-  // @Input() text = '';
-  // @Input() caretIndex?: number | null;
-  // @Input() context: MentionContext = 'DM';
-  // // @Input() users: Partial<User>[] = [];
-  // // @Input() channels: any[] = [];
-  // @Input() cursorPos!: number;
-
-  // @Output() smileySelected = new EventEmitter<{ name: string }>();
-  // @Output() overlayStateChange = new EventEmitter<boolean>();
-
-  @Input() emojis: string[] = [];       // z.B. ['check', 'glasses', ...]
+  @Input() emojis: string[] = [];   
   @Input() active = false;              // Wird vom Parent gesteuert
   @Output() selected = new EventEmitter<string>();
   @Output() activeChange = new EventEmitter<boolean>();
-
-  // activeSmiley: true;
-  // // searchTerm = '';
-  // filteredItems: any[] = [];
-  // activeIndex = 0;
 
   filteredItems: string[] = [];
   activeIndex = 0;
