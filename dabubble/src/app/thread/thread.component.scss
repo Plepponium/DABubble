@@ -183,16 +183,17 @@
 
 .chat-dialogue.reverse {
   right: unset;
-  left: 45px;
+  left: 60px;
+
+  &.top {
+    left: 20px;
+  }
 
   .add-reaction-btn.reverse {
     display: flex;
   }
   .add-reaction-dialogue {
-    // position: absolute;
-    // top: 20px;
     left: 28px;
-    // background-color: #ffffff;
     border-top-left-radius: unset;
     border-top-right-radius: 30px;
     border-bottom-left-radius: 30px;

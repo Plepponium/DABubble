@@ -28,10 +28,7 @@ import { NewMessageComponent } from '../new-message/new-message.component';
 })
 export class MainPageComponent {
 
-  @ViewChild(ThreadComponent, { static: false })
-  threadComponent!: ThreadComponent;
-
-
+  @ViewChild('chats') chatsComponent!: ChatsComponent;
   menuOpen = true;
   menuBtnClose = true;
   showAddChannelDialogue = false;
@@ -117,10 +114,6 @@ export class MainPageComponent {
     this.threadChatId = event.chatId;
     this.currentChannelId = event.channelId;
     this.threadOpen = true;
-
-    setTimeout(() => {
-      this.threadComponent?.focusAnswerInput();
-    });
   }
 
   openLogoutOverlay() {
@@ -174,6 +167,10 @@ export class MainPageComponent {
     this.channelOpen = false;
     this.newMessageOpen = true;
     this.currentChannelId = undefined;
+  }
+
+  onAnswerAdded(event: { chatId: string; answerTime: number }) {
+    this.chatsComponent.handleAnswerAdded(event);
   }
 
   logout() {

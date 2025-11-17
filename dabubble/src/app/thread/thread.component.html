@@ -18,7 +18,7 @@
     <div *ngIf="(chat$ | async) as chat" class="chat-content">
         <div class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
             <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}">
-                <div class="chat-dialogue" [ngClass]="{'reverse': chat.user === currentUserId}">
+                <div class="chat-dialogue top" [ngClass]="{'reverse': chat.user === currentUserId}">
                     <div class="reactions-display-container">
                         <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === chat.id">
                             <div *ngFor="let icon of reactionIcons" class="reactions-container">

@@ -59,6 +59,8 @@ export class ThreadComponent implements OnInit {
   @Input() chatId!: string;
   @Output() closeThread = new EventEmitter<void>();
   @Output() openProfile = new EventEmitter<User>();
+  @Output() answerAdded = new EventEmitter<{ chatId: string, answerTime: number }>();
+
 
 
   ngOnInit() {
@@ -66,20 +68,25 @@ export class ThreadComponent implements OnInit {
     this.loadChannelWithId(this.channelId);
     this.chat$ = this.getEnrichedChat();
     this.answers$ = this.getEnrichedAnswers();
-
-    // this.answers$.pipe(take(1)).subscribe(answers => {
-    //   console.log('Thread Answers:', answers);
-    // });
     this.answers$.pipe(take(1)).subscribe(() => {
       this.scrollToBottom();
+      this.focusAnswerInput()
     });
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.getCurrentUserAndChannels();
-    this.loadChannelWithId(this.channelId);
-    this.chat$ = this.getEnrichedChat();
-    this.answers$ = this.getEnrichedAnswers();
+    if (changes['chatId'] && !changes['chatId'].firstChange) {
+      this.chat$ = this.getEnrichedChat();
+      this.answers$ = this.getEnrichedAnswers();
+      this.answers$.pipe(take(1)).subscribe(() => {
+        this.scrollToBottom();
+        this.focusAnswerInput();
+      });
+    }
+    if (changes['channelId'] && !changes['channelId'].firstChange) {
+      this.getCurrentUserAndChannels();
+      this.loadChannelWithId(this.channelId);
+    }
   }
 
   focusAnswerInput() {
@@ -87,8 +94,6 @@ export class ThreadComponent implements OnInit {
       this.answerInput?.nativeElement?.focus();
     }, 0);
   }
-
-
 
   scrollToBottom() {
     setTimeout(() => {
@@ -427,14 +432,13 @@ export class ThreadComponent implements OnInit {
     const message = this.newAnswer.trim();
     if (!message) return;
     if (!this.channelId || !this.chatId || !this.currentUserId) return;
-
     const answer = {
       message,
-      time: Math.floor(Date.now() / 1000), // oder Date.now() für ms
+      time: Math.floor(Date.now() / 1000),
       user: this.currentUserId
     };
     await this.channelService.addAnswerToChat(this.channelId, this.chatId, answer);
-
+    this.answerAdded.emit({ chatId: this.chatId!, answerTime: answer.time });
     this.newAnswer = '';
     setTimeout(() => this.scrollToBottom());
   }

@@ -479,6 +479,22 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
+  handleAnswerAdded(event: { chatId: string; answerTime: number }) {
+    this.chatsSubject.next(
+      this.chatsSubject.getValue().map(chat =>
+        chat.id === event.chatId
+          ? {
+            ...chat,
+            answersCount: (chat.answersCount || 0) + 1,
+            lastAnswerTime: event.answerTime
+          }
+          : chat
+      )
+    );
+  }
+
+
+
   insertMention(event: { name: string; type: 'user' | 'channel' }) {
     const trigger = event.type === 'user' ? '@' : '#';
     const pos = this.mentionCaretIndex ?? this.newMessage.length;
