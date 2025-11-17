@@ -1,0 +1,87 @@
+.smiley-overlay {
+  position: absolute;
+  bottom: 95%;
+  left: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: white;
+  border: 1px solid #adb0d9;
+  border-radius: 20px 20px 20px 0;
+  padding: 20px;
+  z-index: 1000;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  max-height: 400px;
+
+  &::-webkit-scrollbar {
+    width: 0px;
+  }
+
+  &.add-smiley {
+    left: 15px;
+    top: -19px;
+    bottom: unset;
+    border-radius: 0px 20px 20px 20px;
+    max-height: 171px;
+    box-sizing: content-box;
+  }
+}
+
+.mention-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-radius: 35px;
+  padding: 4px 20px;
+  cursor: pointer;
+  transition: background 75ms;
+
+  &.active,
+  &:hover {
+    background: #eceefe;
+
+    .hover-icon {
+      display: none;
+    }
+
+    .hover-icon-purple {
+      display: block;
+    }
+  }
+}
+
+.smiley {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+// .img-container {
+//   width: 50px;
+//   height: 50px;
+//   position: relative;
+// }
+
+// .user-img {
+//   width: 100%;
+//   height: 100%;
+//   border-radius: 50%;
+// }
+
+// .online-signal {
+//   bottom: 0;
+//   right: 0;
+//   top: unset;
+//   left: unset;
+// }
+
+// .channel {
+//   display: flex;
+//   gap: 15px;
+//   align-items: center;
+// }
+
+.hover-icon-purple {
+  display: none;
+}

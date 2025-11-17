@@ -9,10 +9,12 @@ import { DirectMessageService } from '../../services/direct-messages.service';
 import { User } from '../../models/user.class';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
 import { Channel } from '../../models/channel.class';
+import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.component";
+import { reactionIcons } from '../reaction-icons';
 
 @Component({
   selector: 'app-new-message',
-  imports: [CommonModule, FormsModule, RoundBtnComponent, MentionsOverlayComponent],
+  imports: [CommonModule, FormsModule, RoundBtnComponent, MentionsOverlayComponent, SmileyOverlayComponent],
   templateUrl: './new-message.component.html',
   styleUrl: './new-message.component.scss'
 })
@@ -40,6 +42,9 @@ export class NewMessageComponent {
   channelService = inject(ChannelService);
   userService = inject(UserService);
   dmService  = inject(DirectMessageService);
+
+  activeSmiley = false;
+  allSmileys = reactionIcons; 
 
   @Output() openChannel = new EventEmitter<string>();
   @Output() openUserChat = new EventEmitter<User>();
@@ -69,6 +74,36 @@ export class NewMessageComponent {
       // console.log('🔹 Alle User geladen:', users.length);
       // console.log('participants', this.participants);
     });
+  }
+
+  openSmileyOverlay() {
+    this.activeSmiley = !this.activeSmiley;
+  }
+
+  onSmileySelected(smiley: string) {
+    this.insertSmileyAtCursor(smiley);
+  }
+
+  insertSmileyAtCursor(smiley: string) {
+    const textarea = this.newMessageInput.nativeElement;
+
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? 0;
+
+    const before = this.newMessage.slice(0, start);
+    const after = this.newMessage.slice(end);
+
+    // Format frei – hier z.B. :thumb: oder 👍 möglich
+    this.newMessage = before + `:${smiley}:` + after;
+
+    const caret = start + smiley.length + 2;
+
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = caret;
+      textarea.focus();
+    });
+
+    this.activeSmiley = false;
   }
 
   insertMention(event: { name: string; type: 'user' | 'channel' }, type: 'recipient' | 'message' = 'message') {

@@ -10,10 +10,6 @@
                     placeholder="An: #channel, @jemand oder E-Mail Adresse" 
                     (input)="updateCaretPosition($event, 'recipient')" (keyup)="updateCaretPosition($event, 'recipient')">
 
-                <!-- <app-mentions-overlay [text]="recipientText" [cursorPos]="cursorPos" [currentUserId]="currentUserId" [context]="'Channel'"
-                    [users]="(participants$ | async) || [] " [channels]="filteredChannels"
-                    (mentionSelected)="insertMention($event)" (overlayStateChange)="overlayActive = $event">
-                </app-mentions-overlay> -->
                 <app-mentions-overlay [text]="recipientText" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosRecipient"
                     [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
                     [channels]="filteredChannels" (mentionSelected)="insertMention($event, 'recipient')"
@@ -28,12 +24,14 @@
         
         <form class="form" (ngSubmit)="submitMessage()" #newMessageForm="ngForm">
             <div class="form-field">
-                <!-- <ng-container> -->
-                    <textarea #newMessageInput id="new-message" class="input" name="message" [(ngModel)]="newMessage"
-                        (keydown.enter)="onEnterPress($any($event))" type="text" placeholder="Starte eine neue Nachricht"
-                        (input)="updateCaretPosition($event, 'message')" (keyup)="updateCaretPosition($event, 'message')"></textarea>
-                <!-- </ng-container> -->
+                <textarea #newMessageInput id="new-message" class="input" name="message" [(ngModel)]="newMessage"
+                    (keydown.enter)="onEnterPress($any($event))" type="text" placeholder="Starte eine neue Nachricht"
+                    (input)="updateCaretPosition($event, 'message')" (keyup)="updateCaretPosition($event, 'message')"></textarea>
 
+                <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
+                    (selected)="onSmileySelected($event)"
+                    (activeChange)="activeSmiley = $event">
+                </app-smiley-overlay>
                 <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosMessage"
                     [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
                     [channels]="filteredChannels" (mentionSelected)="insertMention($event, 'message')"
@@ -44,7 +42,7 @@
                     <div class="icon-bar t-gray">
                         <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
                             iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
-                            altText="Reaktion hinzufügen" [type]="'button'">
+                            altText="Reaktion hinzufügen" [type]="'button'" (click)="openSmileyOverlay()">
                         </app-round-btn>
                         <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
                             iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
