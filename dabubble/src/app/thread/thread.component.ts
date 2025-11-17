@@ -82,6 +82,14 @@ export class ThreadComponent implements OnInit {
     this.answers$ = this.getEnrichedAnswers();
   }
 
+  focusAnswerInput() {
+    setTimeout(() => {
+      this.answerInput?.nativeElement?.focus();
+    }, 0);
+  }
+
+
+
   scrollToBottom() {
     setTimeout(() => {
       const threadHistory = document.getElementById('thread-history');
@@ -125,12 +133,12 @@ export class ThreadComponent implements OnInit {
             const chat = chats.find(c => c.id === this.chatId);
             if (!chat) return undefined;
             const user = users.find(u => u.uid === chat.user);
-            const isMissingUser = !user;
+            const isUserMissing = !user;
             return {
               ...chat,
-              userName: isMissingUser ? 'Ehemaliger Nutzer' : user.name,
+              userName: isUserMissing ? 'Ehemaliger Nutzer' : user.name,
               userImg: user?.img ?? 'default-user',
-              isMissingUser,
+              isUserMissing,
               reactionArray: this.transformReactionsToArray(chat.reactions, users, this.currentUserId)
             };
           })
@@ -146,13 +154,13 @@ export class ThreadComponent implements OnInit {
           map(users =>
             answers.map(answer => {
               const user = users.find(u => u.uid === answer.user);
-              const isMissingUser = !user;
+              const isUserMissing = !user;
 
               return {
                 ...answer,
-                userName: isMissingUser ? 'Ehemaliger Nutzer' : user.name,
+                userName: isUserMissing ? 'Ehemaliger Nutzer' : user.name,
                 userImg: user?.img ?? 'default-user',
-                isUserMissing: isMissingUser,
+                isUserMissing,
                 reactionArray: this.transformReactionsToArray(answer.reactions, users, this.currentUserId)
               };
             })

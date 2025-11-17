@@ -390,7 +390,14 @@ export class ChatsComponent implements OnInit, OnChanges {
     })
   }
 
-  openAddComment() { }
+  openAddComment(chat: Chat) {
+    if (!this.channelId) return;
+
+    this.openThread.emit({
+      channelId: this.channelId,
+      chatId: chat.id
+    });
+  }
 
   openEditCommentDialogue() {
     this.activeReactionDialogueIndex = null;

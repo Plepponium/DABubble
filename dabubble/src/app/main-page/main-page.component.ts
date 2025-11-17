@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
 import { MenuComponent } from '../menu/menu.component';
@@ -27,6 +27,11 @@ import { NewMessageComponent } from '../new-message/new-message.component';
   styleUrl: './main-page.component.scss',
 })
 export class MainPageComponent {
+
+  @ViewChild(ThreadComponent, { static: false })
+  threadComponent!: ThreadComponent;
+
+
   menuOpen = true;
   menuBtnClose = true;
   showAddChannelDialogue = false;
@@ -112,6 +117,10 @@ export class MainPageComponent {
     this.threadChatId = event.chatId;
     this.currentChannelId = event.channelId;
     this.threadOpen = true;
+
+    setTimeout(() => {
+      this.threadComponent?.focusAnswerInput();
+    });
   }
 
   openLogoutOverlay() {
@@ -143,7 +152,6 @@ export class MainPageComponent {
     }
   }
 
-
   openEditUser() {
     this.closeAllOverlays();
     this.showEditUser = true;
@@ -167,8 +175,6 @@ export class MainPageComponent {
     this.newMessageOpen = true;
     this.currentChannelId = undefined;
   }
-
-
 
   logout() {
     this.authSub?.unsubscribe();
