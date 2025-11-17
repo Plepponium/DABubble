@@ -50,7 +50,8 @@
   gap: 20px;
   padding: 25px 20px;
   flex-grow: 1;
-  transition: margin-left 0.3s ease;
+  transition: margin-left 0.3s ease, margin-right 0.3s ease;
+
   margin-left: 386px;
 }
 
@@ -58,7 +59,12 @@
   margin-left: 0;
 }
 
-.content.dm-open, .content.nm-open {
+.content.thread-open {
+  margin-right: 505px;
+}
+
+.content.dm-open,
+.content.nm-open {
   display: block;
   width: 100%;
 }
@@ -139,4 +145,20 @@
   justify-content: center;
   align-items: center;
   z-index: 7;
+}
+
+.thread {
+  position: fixed;
+  top: 120px;
+  right: 20px;
+  transition: transform 0.3s ease;
+  transform: translateX(505px);
+}
+
+.thread.open {
+  transform: translateX(0);
+}
+
+.thread.closed {
+  transform: translateX(505px);
 }

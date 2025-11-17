@@ -26,14 +26,22 @@
             </app-menu>
         </div>
 
-        <div class="content" [class.fullwidth]="!menuOpen" [class.dm-open]="isDmOpen" [class.nm-open]="isNmOpen">
+        <div class="content" [class.fullwidth]="!menuOpen" [class.dm-open]="isDmOpen" [class.nm-open]="isNmOpen"
+            [class.thread-open]="threadOpen">
+
+
             <app-chats #chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId"
                 (openThread)="openThread($event)" (openProfile)="openProfileOverlay($event)"
                 (channelDeleted)="onChannelDeleted()"></app-chats>
-            <app-thread id="thread" class="thread" *ngIf="threadOpen && currentChannelId && threadChatId"
-                [chatId]="threadChatId" [channelId]="currentChannelId" [hidden]="!threadOpen"
+
+
+            <app-thread id="thread" class="thread" *ngIf="threadChatId && currentChannelId" [chatId]="threadChatId"
+                [channelId]="currentChannelId" [class.open]="threadOpen" [class.closed]="!threadOpen"
                 (closeThread)="threadOpen = false" (openProfile)="openProfileOverlay($event)"
                 (answerAdded)="onAnswerAdded($event)"></app-thread>
+
+
+
             <app-direct-message-chats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
                 (openProfile)="openProfileOverlay($event)"></app-direct-message-chats>
             <app-new-message class="new-message" *ngIf="newMessageOpen" (openChannel)="openChannel($event)"
