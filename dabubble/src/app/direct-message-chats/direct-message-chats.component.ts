@@ -11,12 +11,13 @@ import { reactionIcons } from '../reaction-icons';
 import { ReactionIconsDialogComponent } from '../reaction-icons-dialog/reaction-icons-dialog.component';
 import { DmReactionsDialogComponent } from '../dm-reactions-dialog/dm-reactions-dialog.component';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
-
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.component";
 
 
 @Component({
   selector: 'app-direct-message-chats',
-  imports: [CommonModule, FormsModule, MentionsOverlayComponent, DmReactionsDialogComponent, ReactionIconsDialogComponent, RoundBtnComponent],
+  imports: [CommonModule, FormsModule, MentionsOverlayComponent, DmReactionsDialogComponent, ReactionIconsDialogComponent, RoundBtnComponent, SmileyOverlayComponent],
   templateUrl: './direct-message-chats.component.html',
   styleUrls: ['./direct-message-chats.component.scss']
 })
@@ -44,6 +45,9 @@ export class DirectMessageChatsComponent {
     source: null
   };
 
+  activeSmiley = false;
+  allSmileys = reactionIcons; 
+
   private authSub?: Subscription;
   private subs = new Subscription();
 
@@ -51,6 +55,8 @@ export class DirectMessageChatsComponent {
 
   private firstLoad = true;
   private lastMessageCount = 0;
+
+  constructor(private sanitizer: DomSanitizer) {}
 
   ngOnInit(): void {
     this.authSub = this.userService.getCurrentUser().subscribe(user => {
@@ -114,6 +120,33 @@ export class DirectMessageChatsComponent {
     );
   }
 
+  openSmileyOverlay() {
+    this.activeSmiley = !this.activeSmiley;
+  }
+
+  onSmileySelected(smiley: string) {
+    const textarea = this.messageInput.nativeElement;
+
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? 0;
+
+    const before = this.messageText.slice(0, start);
+    const after = this.messageText.slice(end);
+
+    // Format frei – hier z.B. :thumb: oder 👍 möglich
+    this.messageText = before + `:${smiley}:` + after;
+    
+    const caret = start + smiley.length + 2;
+    // const caret = start + img.length;
+
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = caret;
+      textarea.focus();
+    });
+
+    this.activeSmiley = false;
+  }
+
   insertMention(event: { name: string, type: 'user' | 'channel' }) {
     const trigger = event.type === 'user' ? '@' : '#';
     const words = this.messageText.split(/\s/);
@@ -138,7 +171,19 @@ export class DirectMessageChatsComponent {
     message.editedText = words.join(' ') + ' ';
   }
 
-
+  // insertAtCursor(character: string = '@') {
+  //   const textarea = this.messageInput.nativeElement;
+  //   const start = textarea.selectionStart;
+  //   const end = textarea.selectionEnd;
+  //   const before = this.newMessage.slice(0, start);
+  //   const after = this.newMessage.slice(end);
+  //   this.newMessage = before + character + after;
+  //   this.mentionCaretIndex = start + character.length;
+  //   setTimeout(() => {
+  //     textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
+  //     textarea.focus();
+  //   }); 0
+  // }
 
   private setupMessagesObservable() {
     if (!this.dmId || !this.users$) return;
@@ -360,5 +405,15 @@ export class DirectMessageChatsComponent {
     el.style.height = `${el.scrollHeight}px`;
   }
 
+  renderMessage(text: string): SafeHtml {
+    if (!text) return '';
 
+    const replaced = text.replace(/:([a-zA-Z0-9_+-]+):/g, (match, name) => {
+      return `<img src="assets/reaction-icons/${name}.svg"
+                  alt="${name}"
+                  class="inline-smiley">`;
+    });
+
+    return this.sanitizer.bypassSecurityTrustHtml(replaced);
+  }
 }

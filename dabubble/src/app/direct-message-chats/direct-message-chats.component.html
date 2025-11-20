@@ -67,7 +67,9 @@
                                                 </span>
                                             </div>
 
-                                            <div class="chat-text font-18">{{ m.text }}</div>
+                                            <div class="chat-text font-18" [innerHTML]="renderMessage(m.text)">
+                                                <!-- {{ m.text }} -->
+                                            </div>
 
 
 
@@ -165,16 +167,20 @@
                         [placeholder]="'Nachricht an ' + otherUser.name" (keydown.enter)="onEnterPress($any($event))">
                 </textarea>
 
-                    <app-mentions-overlay [text]="messageText" [currentUserId]="currentUser?.uid" [context]="'DM'"
-                        [users]="mentionUsers" (mentionSelected)="insertMention($event)"
-                        (overlayStateChange)="overlayActive = $event">
-                    </app-mentions-overlay>
+                <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
+                    (selected)="onSmileySelected($event)"
+                    (activeChange)="activeSmiley = $event">
+                </app-smiley-overlay>
+                <app-mentions-overlay [text]="messageText" [currentUserId]="currentUser?.uid" [context]="'DM'"
+                    [users]="mentionUsers" (mentionSelected)="insertMention($event)"
+                    (overlayStateChange)="overlayActive = $event">
+                </app-mentions-overlay>
 
                     <div class="input-icon-bar">
                         <div class="icon-bar t-gray">
                             <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
                                 iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
-                                altText="Reaktion hinzufügen"></app-round-btn>
+                                altText="Reaktion hinzufügen" (click)="openSmileyOverlay()"></app-round-btn>
                             <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
                                 iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
                                 altText="Mail hinzufügen"></app-round-btn>
