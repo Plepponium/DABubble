@@ -59,6 +59,11 @@
     <app-profile-overlay *ngIf="showProfileOverlay" [user]="selectedProfile"
         (openDmChat)="openDmChatFromOverlay($event)" (close)="closeAllOverlays()"></app-profile-overlay>
 
-    <app-add-channel-overlay *ngIf="showAddChannelDialogue" (close)="closeAddChannel()"></app-add-channel-overlay>
+    <app-add-channel-overlay *ngIf="showAddChannelDialogue" (close)="closeAddChannel()"
+        (createdChannel)="openChannelMemberOverlay($event)"></app-add-channel-overlay>
+
+    <app-add-channel-members-overlay *ngIf="showMemberOverlay && currentUser" [channel]="createdChannel"
+        [currentUser]="currentUser" (close)="closeMemberOverlay()">
+    </app-add-channel-members-overlay>
 
 </div>

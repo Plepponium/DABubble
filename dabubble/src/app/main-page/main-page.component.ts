@@ -19,33 +19,39 @@ import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { NewMessageComponent } from '../new-message/new-message.component';
+import { AddChannelMembersOverlayComponent } from '../add-channel-members-overlay/add-channel-members-overlay.component';
 
 @Component({
   selector: 'app-main-page',
-  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, DirectMessageChatsComponent, NewMessageComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent, UserProfileComponent, EditUserComponent, ProfileOverlayComponent, LogoutOverlayComponent],
+  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, DirectMessageChatsComponent, NewMessageComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent, AddChannelMembersOverlayComponent, UserProfileComponent, EditUserComponent, ProfileOverlayComponent, LogoutOverlayComponent],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss',
 })
 export class MainPageComponent {
 
   @ViewChild('chats') chatsComponent!: ChatsComponent;
+
   menuOpen = true;
   menuBtnClose = true;
-  showAddChannelDialogue = false;
   threadOpen = false;
   channelOpen = false;
   userChatOpen = false;
   newMessageOpen = true;
-  currentChannelId?: string;
-  activeUserId?: string;
-  threadChatId?: string;
 
   showLogoutOverlay = false;
   showUserProfile = false;
   showEditUser = false;
   showProfileOverlay = false;
+  showAddChannelDialogue = false;
+  showMemberOverlay = false;
+
+  currentUser?: User;
+  currentChannelId?: string;
+  activeUserId?: string;
+  threadChatId?: string;
 
   selectedProfile: any = null;
+  createdChannel: any = null;
 
   private userService = inject(UserService);
   private router = inject(Router);
@@ -55,7 +61,9 @@ export class MainPageComponent {
     this.authSub = this.userService.getCurrentUser().subscribe(user => {
       if (!user) {
         this.router.navigate(['/']);
+        return;
       }
+      this.currentUser = user;
     });
   }
 
@@ -92,6 +100,17 @@ export class MainPageComponent {
     this.showAddChannelDialogue = false;
   }
 
+  openChannelMemberOverlay(channelData: any) {
+    this.createdChannel = channelData;
+    this.closeAllOverlays();
+    this.showMemberOverlay = true;
+  }
+
+  closeMemberOverlay() {
+    this.showMemberOverlay = false;
+    this.createdChannel = null;
+  }
+
   openChannel(channelId: string) {
     this.currentChannelId = channelId;
     this.userChatOpen = false;
@@ -111,9 +130,10 @@ export class MainPageComponent {
   }
 
   openThread(event: { channelId: string; chatId: string }) {
+    this.threadOpen = true;
     this.threadChatId = event.chatId;
     this.currentChannelId = event.channelId;
-    this.threadOpen = true;
+
   }
 
   openLogoutOverlay() {
@@ -131,18 +151,14 @@ export class MainPageComponent {
     this.openUserChat(user);
   }
 
-  async openProfileOverlay(user: User) {
+  openProfileOverlay(user: User) {
     this.closeAllOverlays();
-
-    const currentUser = await firstValueFrom(this.userService.getCurrentUser());
-    if (currentUser?.uid === user.uid) {
-      this.openUserProfile();
+    if (this.currentUser?.uid === user.uid) {
+      this.showUserProfile = true;
       return;
     }
-    if (user) {
-      this.selectedProfile = user;
-      this.showProfileOverlay = true;
-    }
+    this.selectedProfile = user;
+    this.showProfileOverlay = true;
   }
 
   openEditUser() {
@@ -160,7 +176,7 @@ export class MainPageComponent {
   }
 
   anyOverlayOpen() {
-    return this.showUserProfile || this.showEditUser || this.showProfileOverlay || this.showLogoutOverlay || this.showAddChannelDialogue;
+    return this.showUserProfile || this.showEditUser || this.showProfileOverlay || this.showLogoutOverlay || this.showAddChannelDialogue || this.showMemberOverlay;
   }
 
   onChannelDeleted() {

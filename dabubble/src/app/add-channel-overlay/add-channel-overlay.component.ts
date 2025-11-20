@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Output, EventEmitter, inject, OnInit } from '@angular/core';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { ChannelService } from '../../services/channel.service';
 import { FormsModule } from '@angular/forms';
@@ -11,22 +11,21 @@ import { User } from '../../models/user.class';
   templateUrl: './add-channel-overlay.component.html',
   styleUrl: './add-channel-overlay.component.scss'
 })
-export class AddChannelOverlayComponent {
-  // @Input() isOpen = false;              // wird von außen gesetzt
+export class AddChannelOverlayComponent implements OnInit {
+
   @Output() close = new EventEmitter<void>();
+  @Output() createdChannel = new EventEmitter<any>();
 
   channelName: string = '';
   description: string = '';
   currentUser?: User;
 
-  userService = inject(UserService)
+  private userService = inject(UserService);
+  private channelService = inject(ChannelService);
 
-
-  constructor(private channelService: ChannelService) {
+  ngOnInit() {
     this.userService.getCurrentUser().subscribe(user => {
-      if (user) {
-        this.currentUser = user;
-      }
+      if (user) this.currentUser = user;
     });
   }
 
@@ -36,7 +35,6 @@ export class AddChannelOverlayComponent {
 
   handleAddChannel() {
     if (!this.currentUser) return;
-
     const newChannel = {
       name: this.channelName,
       description: this.description,
@@ -45,10 +43,10 @@ export class AddChannelOverlayComponent {
       participants: [this.currentUser.uid],
       createdAt: new Date()
     };
-
-    this.channelService.addChannel(newChannel).then(() => {
+    this.channelService.addChannel(newChannel).then(channelRef => {
+      const channelWithId = { id: channelRef.id, ...newChannel };
+      this.createdChannel.emit(channelWithId);
       this.handleClose();
     });
   }
-
 }

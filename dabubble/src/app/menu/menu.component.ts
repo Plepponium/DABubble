@@ -77,8 +77,7 @@ export class MenuComponent implements OnInit {
   }
 
   handleOpenAddChannel(event: Event) {
-    event.stopPropagation(); // Verhindert, dass das click-Event der list-header-container ausgelöst wird
-    // this.showAddChannelDialogue = true;
+    event.stopPropagation();
     this.openAddChannel.emit();
   }
 

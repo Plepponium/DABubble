@@ -1,0 +1,52 @@
+<div class="dialogue-overlay">
+    <div class="dialogue-overlay-header">
+        <div>Leute hinzufügen</div>
+        <app-round-btn (click)="handleClose()" iconSrc="assets/icons/close.svg"
+            iconHoverSrc="assets/icons/close-purple.svg" altText="Schließen">
+        </app-round-btn>
+    </div>
+
+    <div class="checklist">
+        <label class="check-item">
+            <input type="radio" name="memberMode" [value]="'all'" [(ngModel)]="selectedMode" />
+            <img class="check-icon" [src]="selectedMode === 'all' 
+                    ? 'assets/icons/radio_button_checked.svg' 
+                    : 'assets/icons/radio_button_unchecked.svg'" />
+            <div class="text font-18">
+                Alle Mitglieder von <span class="t-purple"> {{ firstUserChannel?.name }} </span> hinzufügen
+            </div>
+        </label>
+
+        <label class="check-item">
+            <input type="radio" name="memberMode" [value]="'custom'" [(ngModel)]="selectedMode" />
+            <img class="check-icon" [src]="selectedMode === 'custom' 
+                    ? 'assets/icons/radio_button_checked.svg' 
+                    : 'assets/icons/radio_button_unchecked.svg'" />
+            <div class="text font-18">Bestimmte Leute hinzufügen</div>
+        </label>
+    </div>
+
+    <div *ngIf="selectedMode === 'custom'" class="name-container">
+        <div class="input-with-chips" [class.has-user]="selectedUser">
+
+            <div class="chip" *ngIf="selectedUser">
+                <img [src]="'assets/user-icons/' + (selectedUser.img || 'default-user') + '.svg'" />
+                <span>{{ selectedUser.name }}</span>
+                <button class="remove-btn" (click)="removeUser()">×</button>
+            </div>
+
+            <input #searchInput *ngIf="!selectedUser" class="user-name" type="text" placeholder="Name eingeben"
+                [(ngModel)]="searchText" />
+
+            <app-mentions-overlay *ngIf="!selectedUser" [context]="'AddUser'" [users]="allUsers" [text]="searchText"
+                (mentionSelected)="selectUser($event)">
+            </app-mentions-overlay>
+        </div>
+    </div>
+
+    <div class="btn-container">
+        <button class="add-btn" [disabled]="isCreateDisabled()" (click)="handleCreate()">
+            <span>Erstellen</span>
+        </button>
+    </div>
+</div>
