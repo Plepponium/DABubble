@@ -1,16 +1,3 @@
-<!-- <div class="smiley-overlay add-smiley" 
-    *ngIf="activeSmiley">
-    <div class="mention-item" *ngFor="let item of filteredItems; let i = index" #mentionSmiley
-        [class.active]="i === activeIndex" (click)="select(item)">
-
-        <div *ngIf="activeSmiley" class="smiley">
-            <span class="font-w-400 font-18">
-                {{ item.name }} 
-            </span>
-        </div>
-    </div>
-</div> -->
-
 <div class="smiley-overlay" *ngIf="active">
   <div class="mention-item" *ngFor="let item of filteredItems; let i = index"
     [class.active]="i === activeIndex" (click)="select(item)">

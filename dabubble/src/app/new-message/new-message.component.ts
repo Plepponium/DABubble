@@ -81,10 +81,6 @@ export class NewMessageComponent {
   }
 
   onSmileySelected(smiley: string) {
-    this.insertSmileyAtCursor(smiley);
-  }
-
-  insertSmileyAtCursor(smiley: string) {
     const textarea = this.newMessageInput.nativeElement;
 
     const start = textarea.selectionStart ?? 0;
@@ -94,12 +90,10 @@ export class NewMessageComponent {
     const after = this.newMessage.slice(end);
 
     // Format frei – hier z.B. :thumb: oder 👍 möglich
-    // this.newMessage = before + `:${smiley}:` + after;
-    const img = `<img src="assets/reaction-icons/${smiley}.svg" alt="${smiley}" class="inline-smiley">`;
-    this.newMessage = before + img + after;
+    this.newMessage = before + `:${smiley}:` + after;
     
-    // const caret = start + smiley.length + 2;
-    const caret = start + img.length;
+    const caret = start + smiley.length + 2;
+    // const caret = start + img.length;
 
     setTimeout(() => {
       textarea.selectionStart = textarea.selectionEnd = caret;

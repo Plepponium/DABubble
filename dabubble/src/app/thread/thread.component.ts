@@ -15,10 +15,12 @@ import { ChatWithDetails } from '../../models/chat-with-details.class';
 import { Answer } from '../../models/answer.class';
 import { reactionIcons } from '../reaction-icons';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
+import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.component";
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-thread',
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, MentionsOverlayComponent],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, MentionsOverlayComponent, SmileyOverlayComponent],
   templateUrl: './thread.component.html',
   styleUrl: './thread.component.scss'
 })
@@ -55,13 +57,16 @@ export class ThreadComponent implements OnInit {
   channelService = inject(ChannelService);
   userService = inject(UserService);
 
+  activeSmiley = false;
+  allSmileys = reactionIcons; 
+
   @Input() channelId!: string;
   @Input() chatId!: string;
   @Output() closeThread = new EventEmitter<void>();
   @Output() openProfile = new EventEmitter<User>();
   @Output() answerAdded = new EventEmitter<{ chatId: string, answerTime: number }>();
 
-
+  constructor(private sanitizer: DomSanitizer) {}
 
   ngOnInit() {
     this.getCurrentUserAndChannels();
@@ -462,6 +467,33 @@ export class ThreadComponent implements OnInit {
     });
   }
 
+  openSmileyOverlay() {
+    this.activeSmiley = !this.activeSmiley;
+  }
+
+  onSmileySelected(smiley: string) {
+    const textarea = this.answerInput.nativeElement;
+
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? 0;
+
+    const before = this.newAnswer.slice(0, start);
+    const after = this.newAnswer.slice(end);
+
+    // Format frei – hier z.B. :thumb: oder 👍 möglich
+    this.newAnswer = before + `:${smiley}:` + after;
+    
+    const caret = start + smiley.length + 2;
+    // const caret = start + img.length;
+
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = caret;
+      textarea.focus();
+    });
+
+    this.activeSmiley = false;
+  }
+
   insertMention(event: { name: string; type: 'user' | 'channel' }) {
     const trigger = event.type === 'user' ? '@' : '#';
     const pos = this.mentionCaretIndex ?? this.newAnswer.length;
@@ -483,7 +515,7 @@ export class ThreadComponent implements OnInit {
   updateCaretPosition() {
     const textarea = this.answerInput?.nativeElement;
     if (!textarea) return;
-    this.mentionCaretIndex = textarea.selectionStart;
+    this.mentionCaretIndex = textarea.selectionStart ?? 0;
   }
 
   updateEditCaret(answer: any, textarea: HTMLTextAreaElement) {
@@ -590,4 +622,15 @@ export class ThreadComponent implements OnInit {
     }
   }
 
+  renderMessage(text: string): SafeHtml {
+    if (!text) return '';
+
+    const replaced = text.replace(/:([a-zA-Z0-9_+-]+):/g, (match, name) => {
+      return `<img src="assets/reaction-icons/${name}.svg"
+                  alt="${name}"
+                  class="inline-smiley">`;
+    });
+
+    return this.sanitizer.bypassSecurityTrustHtml(replaced);
+  }
 }

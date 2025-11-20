@@ -29,18 +29,14 @@
         <div class="content" [class.fullwidth]="!menuOpen" [class.dm-open]="isDmOpen" [class.nm-open]="isNmOpen"
             [class.thread-open]="threadOpen">
 
-
             <app-chats #chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId"
                 (openThread)="openThread($event)" (openProfile)="openProfileOverlay($event)"
                 (channelDeleted)="onChannelDeleted()"></app-chats>
-
 
             <app-thread id="thread" class="thread" *ngIf="threadChatId && currentChannelId" [chatId]="threadChatId"
                 [channelId]="currentChannelId" [class.open]="threadOpen" [class.closed]="!threadOpen"
                 (closeThread)="threadOpen = false" (openProfile)="openProfileOverlay($event)"
                 (answerAdded)="onAnswerAdded($event)"></app-thread>
-
-
 
             <app-direct-message-chats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
                 (openProfile)="openProfileOverlay($event)"></app-direct-message-chats>
@@ -53,15 +49,16 @@
     <div (click)="closeAllOverlays()" *ngIf="anyOverlayOpen()" class="dialogue-backdrop"></div>
 
     <app-logout-overlay *ngIf="showLogoutOverlay" (close)="closeAllOverlays()" (openUser)="openUserProfile()"
-        (logout)="logout()">
-    </app-logout-overlay>
+        (logout)="logout()"></app-logout-overlay>
+
     <app-user-profile *ngIf="showUserProfile" (close)="closeAllOverlays()"
         (openEdit)="openEditUser()"></app-user-profile>
+
     <app-edit-user *ngIf="showEditUser" (close)="closeAllOverlays()"></app-edit-user>
+
     <app-profile-overlay *ngIf="showProfileOverlay" [user]="selectedProfile"
         (openDmChat)="openDmChatFromOverlay($event)" (close)="closeAllOverlays()"></app-profile-overlay>
 
-    <app-add-channel-overlay *ngIf="showAddChannelDialogue" (close)="closeAddChannel()">
-    </app-add-channel-overlay>
+    <app-add-channel-overlay *ngIf="showAddChannelDialogue" (close)="closeAddChannel()"></app-add-channel-overlay>
 
 </div>

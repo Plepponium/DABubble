@@ -18,11 +18,13 @@ import { reactionIcons } from '../reaction-icons';
 // import { ChatWithDetails } from '../../models/chat-with-details.class';
 import localeDe from '@angular/common/locales/de';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.component";
 registerLocaleData(localeDe);
 
 @Component({
   selector: 'app-chats',
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MentionsOverlayComponent, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, DialogueOverlayComponent, ChatAddUserOverlayComponent, ChannelDescriptionOverlayComponent],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MentionsOverlayComponent, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, DialogueOverlayComponent, ChatAddUserOverlayComponent, ChannelDescriptionOverlayComponent, SmileyOverlayComponent],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.scss',
 })
@@ -60,11 +62,15 @@ export class ChatsComponent implements OnInit, OnChanges {
   channelService = inject(ChannelService);
   userService = inject(UserService);
 
+  activeSmiley = false;
+  allSmileys = reactionIcons; 
+
   @Input() channelId?: string;
   @Output() openThread = new EventEmitter<{ channelId: string; chatId: string }>();
   @Output() openProfile = new EventEmitter<User>();
   @Output() channelDeleted = new EventEmitter<void>();
 
+  constructor(private sanitizer: DomSanitizer) {}
 
   ngOnInit() {
     this.getCurrentUser();
@@ -137,8 +143,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
     this.subscribeToChatsAndUsers(channelId, this.participants$);
   }
-
-
 
   subscribeToParticipants() {
     this.participants$.subscribe(users => {
@@ -493,7 +497,32 @@ export class ChatsComponent implements OnInit, OnChanges {
     );
   }
 
+  openSmileyOverlay() {
+    this.activeSmiley = !this.activeSmiley;
+  }
 
+  onSmileySelected(smiley: string) {
+    const textarea = this.messageInput.nativeElement;
+
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? 0;
+
+    const before = this.newMessage.slice(0, start);
+    const after = this.newMessage.slice(end);
+
+    // Format frei – hier z.B. :thumb: oder 👍 möglich
+    this.newMessage = before + `:${smiley}:` + after;
+    
+    const caret = start + smiley.length + 2;
+    // const caret = start + img.length;
+
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = caret;
+      textarea.focus();
+    });
+
+    this.activeSmiley = false;
+  }
 
   insertMention(event: { name: string; type: 'user' | 'channel' }) {
     const trigger = event.type === 'user' ? '@' : '#';
@@ -612,6 +641,18 @@ export class ChatsComponent implements OnInit, OnChanges {
     if (!el) return;
     el.style.height = 'auto';
     el.style.height = `${el.scrollHeight}px`;
+  }
+
+  renderMessage(text: string): SafeHtml {
+    if (!text) return '';
+
+    const replaced = text.replace(/:([a-zA-Z0-9_+-]+):/g, (match, name) => {
+      return `<img src="assets/reaction-icons/${name}.svg"
+                  alt="${name}"
+                  class="inline-smiley">`;
+    });
+
+    return this.sanitizer.bypassSecurityTrustHtml(replaced);
   }
 
   handleChannelDeleted() {

@@ -118,8 +118,9 @@
                                 <div class="font-14 t-gray">{{ chat.time * 1000 | date: 'HH:mm' }} Uhr</div>
                             </div>
                             <div class="chat-message"
-                                [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 'right': chat.user === currentUserId}">
-                                {{ chat.message }}
+                                [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 
+                                'right': chat.user === currentUserId}" [innerHTML]="renderMessage(chat.message)">
+                                <!-- {{ chat.message }} -->
                             </div>
                             <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}">
                                 <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0">
@@ -229,6 +230,10 @@
                         (keyup)="updateCaretPosition()"></textarea>
                 </ng-container>
 
+                <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
+                    (selected)="onSmileySelected($event)"
+                    (activeChange)="activeSmiley = $event">
+                </app-smiley-overlay>
                 <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPos"
                     [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
                     [channels]="filteredChannels" (mentionSelected)="insertMention($event)"
@@ -239,7 +244,7 @@
                     <div class="icon-bar t-gray">
                         <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
                             iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
-                            altText="Reaktion hinzufügen" [type]="'button'">
+                            altText="Reaktion hinzufügen" [type]="'button'" (click)="openSmileyOverlay()">
                         </app-round-btn>
                         <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
                             iconHoverSrc="assets/message-icons/alternate_email-purple.svg"

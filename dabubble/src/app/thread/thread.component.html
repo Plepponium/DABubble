@@ -192,8 +192,10 @@
                                 <div class="font-14 t-gray">{{ answer.time * 1000 | date: 'HH:mm' }} Uhr</div>
                             </div>
                             <div class="chat-message"
-                                [ngClass]="{'left bg-light-purple': answer.user !== currentUserId, 'right': answer.user === currentUserId}">
-                                {{ answer.message }}</div>
+                                [ngClass]="{'left bg-light-purple': answer.user !== currentUserId, 'right': answer.user === currentUserId}"
+                                [innerHTML]="renderMessage(answer.message)">
+                                <!-- {{ answer.message }} -->
+                            </div>
                             <div class="chat-answered" [ngClass]="{'right': answer.user === currentUserId}">
 
                                 <div class="reactions">
@@ -299,8 +301,13 @@
             <div class="form-field full-width">
                 <textarea #answerInput id="answer-message" class="input" name="answer" [(ngModel)]="newAnswer"
                     (keydown.enter)="onEnterPress($any($event))" type="text" [placeholder]="'Antworten...'"
-                    (input)="updateCaretPosition(); autoGrow(answerInput)"></textarea>
+                    (input)="updateCaretPosition(); autoGrow(answerInput)"
+                    (keyup)="updateCaretPosition()"></textarea>
 
+                <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
+                    (selected)="onSmileySelected($event)"
+                    (activeChange)="activeSmiley = $event">
+                </app-smiley-overlay>
                 <app-mentions-overlay [text]="newAnswer" [caretIndex]="mentionCaretIndex"
                     [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || []"
                     [channels]="filteredChannels" (mentionSelected)="insertMention($event)"
@@ -311,7 +318,7 @@
                     <div class="icon-bar t-gray">
                         <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
                             iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
-                            altText="Reaktion hinzufügen" [type]="'button'">
+                            altText="Reaktion hinzufügen" [type]="'button'" (click)="openSmileyOverlay()">
                         </app-round-btn>
                         <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
                             iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
