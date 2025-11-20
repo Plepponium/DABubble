@@ -3,19 +3,20 @@
         <div class="dialogue-overlay-header">
             <div>Channel erstellen</div>
             <app-round-btn (click)="handleClose()" iconSrc="assets/icons/close.svg"
-                iconHoverSrc="assets/icons/close-purple.svg"
-                altText="Schließen">
+                iconHoverSrc="assets/icons/close-purple.svg" altText="Schließen">
             </app-round-btn>
         </div>
     </div>
 
-    <div>Channels dienen deinem Team zur Kommunikation. Am besten sollten sie themenbezogen sein #marketing zum Beispiel.</div>
+    <div>Channels dienen deinem Team zur Kommunikation. Am besten sollten sie themenbezogen sein #marketing zum
+        Beispiel.</div>
 
     <div class="input-container name">
         <label for="channel-name">Channel-Name</label>
         <div class="input-wrapper">
             <img class="input-icon" src="assets/icons/tag-grey.svg" alt="Channel Icon">
-            <input id="channel-name" class="channel-name" [(ngModel)]="channelName" type="text" placeholder="z. B. Kooperationsprojekte" />
+            <input id="channel-name" class="channel-name" [(ngModel)]="channelName" type="text"
+                placeholder="z. B. Kooperationsprojekte" />
         </div>
     </div>
 
@@ -24,14 +25,15 @@
             Beschreibung <span class="optional">(optional)</span>
         </label>
         <div>
-            <input id="channel-description" class="channel-description" [(ngModel)]="description" type="text" placeholder="Dein Text hier" />
+            <input id="channel-description" class="channel-description" [(ngModel)]="description" type="text"
+                placeholder="Dein Text hier" />
         </div>
     </div>
-        
+
     <div class="btn-container">
-        <button (click)="handleAddChannel()" class="add-btn">
-            <div class="f-nunito">Erstellen</div>        
+        <button (click)="handleAddChannel()" class="add-btn" [disabled]="!channelName.trim()">
+            <div class="f-nunito">Erstellen</div>
         </button>
     </div>
-    
+
 </div>

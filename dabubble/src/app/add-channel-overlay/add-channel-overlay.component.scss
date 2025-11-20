@@ -100,14 +100,9 @@ input {
   &:hover {
     background-color: #797ef3;
   }
+
+  &:disabled {
+    background-color: #686868;
+    cursor: not-allowed;
+  }
 }
-
-// .wiggle {
-//   animation: wiggle 0.2s ease forwards;
-// }
-
-// @keyframes wiggle {
-//     0%   { transform: translateY(0); }
-//     50%  { transform: translateY(1px); }
-//     100% { transform: translateY(0); }
-// }
