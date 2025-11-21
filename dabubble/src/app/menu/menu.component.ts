@@ -58,11 +58,33 @@ export class MenuComponent implements OnInit {
   constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
+    this.getChannels();
+  }
+
+  private getChannels() {
     this.channelService.getChannels().subscribe(data => {
-      this.channels = data;
+      this.channels = [...data];
+      this.sortChannels();
       this.cdr.markForCheck();
     });
   }
+
+  private sortChannels() {
+    this.channels.sort((a, b) => {
+      const aDate = a.createdAt ? this.toDate(a.createdAt) : null;
+      const bDate = b.createdAt ? this.toDate(b.createdAt) : null;
+      if (!aDate && !bDate) return 0;
+      if (!aDate) return -1;
+      if (!bDate) return 1;
+      return aDate.getTime() - bDate.getTime();
+    });
+  }
+
+  private toDate(value: any): Date {
+    if (value?.seconds) return new Date(value.seconds * 1000 + value.nanoseconds / 1e6);
+    return new Date(value);
+  }
+
 
   toggleChannels() {
     this.channelsExpanded = !this.channelsExpanded;
