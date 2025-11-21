@@ -14,7 +14,6 @@ import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-ov
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.component";
 
-
 @Component({
   selector: 'app-direct-message-chats',
   imports: [CommonModule, FormsModule, MentionsOverlayComponent, DmReactionsDialogComponent, ReactionIconsDialogComponent, RoundBtnComponent, SmileyOverlayComponent],
@@ -72,7 +71,6 @@ export class DirectMessageChatsComponent {
     }
   }
 
-
   ngOnDestroy(): void {
     this.authSub?.unsubscribe();
     this.subs.unsubscribe();
@@ -84,7 +82,6 @@ export class DirectMessageChatsComponent {
     this.initializedForUserId = this.userId;
     void this.initializeChat();
   }
-
 
   private async initializeChat() {
     if (!this.currentUser) return;
@@ -134,11 +131,9 @@ export class DirectMessageChatsComponent {
     const before = this.messageText.slice(0, start);
     const after = this.messageText.slice(end);
 
-    // Format frei – hier z.B. :thumb: oder 👍 möglich
     this.messageText = before + `:${smiley}:` + after;
     
     const caret = start + smiley.length + 2;
-    // const caret = start + img.length;
 
     setTimeout(() => {
       textarea.selectionStart = textarea.selectionEnd = caret;
@@ -148,17 +143,6 @@ export class DirectMessageChatsComponent {
     this.activeSmiley = false;
   }
 
-  // insertMention(event: { name: string, type: 'user' | 'channel' }) {
-  //   const trigger = event.type === 'user' ? '@' : '#';
-  //   const words = this.messageText.split(/\s/);
-  //   for (let i = words.length - 1; i >= 0; i--) {
-  //     if (words[i].startsWith(trigger)) {
-  //       words[i] = `${trigger}${event.name}`;
-  //       break;
-  //     }
-  //   }
-  //   this.messageText = words.join(' ') + ' ';
-  // }
   insertMention(event: { name: string; type: 'user' | 'channel' }) {
     const trigger = event.type === 'user' ? '@' : '#';
     const pos = this.mentionCaretIndex ?? this.messageText.length;
@@ -187,17 +171,6 @@ export class DirectMessageChatsComponent {
     chat._caretIndex = textarea.selectionStart;
   }
 
-  // insertMentionInEdit(message: any, event: { name: string, type: 'user' | 'channel' }) {
-  //   const trigger = event.type === 'user' ? '@' : '#';
-  //   const words = message.editedText.split(/\s/);
-  //   for (let i = words.length - 1; i >= 0; i--) {
-  //     if (words[i].startsWith(trigger)) {
-  //       words[i] = `${trigger}${event.name}`;
-  //       break;
-  //     }
-  //   }
-  //   message.editedText = words.join(' ') + ' ';
-  // }
   insertMentionInEdit(
     message: any,
     event: { name: string; type: 'user' | 'channel' }
@@ -218,19 +191,19 @@ export class DirectMessageChatsComponent {
     });
   }
 
-  // insertAtCursor(character: string = '@') {
-  //   const textarea = this.messageInput.nativeElement;
-  //   const start = textarea.selectionStart;
-  //   const end = textarea.selectionEnd;
-  //   const before = this.messageText.slice(0, start);
-  //   const after = this.messageText.slice(end);
-  //   this.messageText = before + character + after;
-  //   this.mentionCaretIndex = start + character.length;
-  //   setTimeout(() => {
-  //     textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
-  //     textarea.focus();
-  //   }); 0
-  // }
+  insertAtCursor(character: string = '@') {
+    const textarea = this.messageInput.nativeElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = this.messageText.slice(0, start);
+    const after = this.messageText.slice(end);
+    this.messageText = before + character + after;
+    this.mentionCaretIndex = start + character.length;
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
+      textarea.focus();
+    }); 0
+  }
 
   private setupMessagesObservable() {
     if (!this.dmId || !this.users$) return;
@@ -245,7 +218,6 @@ export class DirectMessageChatsComponent {
     const s = this.userService.getSingleUserById(this.userId).subscribe(u => this.otherUser = u);
     this.subs.add(s);
   }
-
 
   private enrichMessages(messages: any[], users: Record<string, User>): any[] {
     return messages.map(m => ({
@@ -307,7 +279,6 @@ export class DirectMessageChatsComponent {
       console.error('Fehler beim Aktualisieren der Nachricht:', err);
     }
   }
-
 
   async addReaction(event: { messageId: string; icon: string }) {
     if (!event?.messageId || !this.currentUser || !this.dmId) return;
@@ -400,7 +371,6 @@ export class DirectMessageChatsComponent {
       this.openProfile.emit(sender);
     }
   }
-
 
   private scrollToBottom() {
     const container = document.getElementById("dm-chat-content");
