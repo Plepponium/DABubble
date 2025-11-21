@@ -40,9 +40,9 @@ body {
 .inline-smiley {
   // width: 20px;
   // height: 20px;
-  vertical-align: middle; 
+  vertical-align: middle;
   position: relative;
-  top: -2px;  
+  top: -2px;
 }
 
 .font-32 {
@@ -115,4 +115,26 @@ body {
 
 .t-green {
   color: #92c83e;
+}
+
+.snow-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+  background-color: rgba($color: #000000, $alpha: .05);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
 }
