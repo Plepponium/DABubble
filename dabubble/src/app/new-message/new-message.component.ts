@@ -177,12 +177,6 @@ export class NewMessageComponent {
     chat._caretIndex = textarea.selectionStart;
   }
 
-  updateCaretIndexManually() {
-    const el = this.newMessageInput?.nativeElement;
-    if (!el) return;
-    this.mentionCaretIndex = el.selectionStart ?? this.newMessage.length;
-  }
-
   insertMentionInEdit(chat: any, event: { name: string; type: 'user' | 'channel' }) {
     const trigger = event.type === 'user' ? '@' : '#';
     const pos = chat._caretIndex ?? chat.editedText.length;
@@ -387,18 +381,6 @@ export class NewMessageComponent {
 
   handleOpenChannel(channel: Channel) {
     this.openChannel.emit(channel.id);
-  }
-
-  onRecipientFocus() {
-    // this.overlayActiveRecipient = true;
-    this.overlayActiveMessage = false; 
-    this.updateCaretIndexManually();
-  }
-
-  onMessageFocus() {
-    this.overlayActiveRecipient = false; 
-    // this.overlayActiveMessage = true;
-    this.updateCaretIndexManually();
   }
 
   onEnterPress(e: KeyboardEvent) {
