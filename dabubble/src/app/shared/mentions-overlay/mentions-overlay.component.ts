@@ -34,6 +34,8 @@ export class MentionsOverlayComponent {
     if (changes['text'] || changes['caretIndex']) {
       if (this.context === 'AddUser') {
         this.filterUsersDirectly();
+      } else if (this.context === 'AddRecipient') {
+        this.filterRecipientUsers();
       } else {
         this.detectTrigger();
       }
@@ -42,13 +44,11 @@ export class MentionsOverlayComponent {
 
   private filterUsersDirectly() {
     const term = this.text.trim().toLowerCase();
-
     if (!term) {
       this.filteredItems = [];
       this.overlayStateChange.emit(false);
       return;
     }
-
     const sortedUsers = [...this.users].sort((a, b) =>
       (a.name || '').toLowerCase().localeCompare((b.name || '').toLowerCase())
     );
@@ -58,6 +58,48 @@ export class MentionsOverlayComponent {
       .slice(0, 10);
 
     this.overlayStateChange.emit(this.filteredItems.length > 0);
+  }
+
+  private filterRecipientUsers() {
+    const term = this.text.trim().toLowerCase();
+    const triggerMatch = (typeof this.caretIndex === 'number')
+      ? this.text.slice(0, this.caretIndex).match(/([@#])([^\s]*)$/)
+      : null;
+    if (triggerMatch) {
+      this.activeTrigger = triggerMatch[1] as '@' | '#';
+      this.searchTerm = triggerMatch[2].toLowerCase();
+      this.detectTrigger();
+      return;
+    }
+    if (term.length < 1) {
+      this.filteredItems = [];
+      this.activeTrigger = null;
+      this.overlayStateChange.emit(false);
+      return;
+    }
+    const sortedUsers = [...this.users].sort((a, b) =>
+      (a.email || '').toLowerCase().localeCompare((b.email || '').toLowerCase())
+    );
+    this.filteredItems = sortedUsers
+      .filter(u => (u.email || '').toLowerCase().includes(term))
+      .slice(0, 10);
+    this.activeTrigger = null;
+    this.overlayStateChange.emit(this.filteredItems.length > 0);
+  }
+
+  select(item: any) {
+    if (!item) return;
+    let valueToInsert = item.name;
+    let type: 'user' | 'channel' = this.activeTrigger === '@' ? 'user' : 'channel';
+    if (this.context === 'AddRecipient' && !this.activeTrigger) {
+      valueToInsert = item.email;
+      type = 'user';
+    }
+    this.mentionSelected.emit({
+      name: valueToInsert,
+      type: type
+    });
+    this.closeOverlay();
   }
 
   private detectTrigger() {
@@ -92,31 +134,15 @@ export class MentionsOverlayComponent {
     this.overlayStateChange.emit(true);
   }
 
-
-
   private closeOverlay() {
     this.activeTrigger = null;
     this.filteredItems = [];
     this.activeIndex = 0;
   }
 
-  select(item: any) {
-    if (!item) return;
-    this.mentionSelected.emit({
-      name: item.name,
-      type: this.activeTrigger === '@' ? 'user' : 'channel'
-    });
-    this.closeOverlay();
-  }
-
-
   @HostListener('document:keydown', ['$event'])
   onKeyDown(e: KeyboardEvent) {
-
-    // Overlay geschlossen → Browser soll normal arbeiten
     if (!this.filteredItems.length) return;
-
-    // Wenn Overlay offen → Standard und Scroll unterbinden
     if (e.key === 'ArrowDown') {
       this.activeIndex = (this.activeIndex + 1) % this.filteredItems.length;
       this.scrollToActive();

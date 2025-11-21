@@ -1,5 +1,6 @@
-<div class="mentions-overlay" [class.add-user]="context === 'AddUser'" [class.add-recipient]="context === 'AddRecipient'"
-    *ngIf="filteredItems.length > 0 && (activeTrigger || context === 'AddUser')">
+<div class="mentions-overlay" [class.add-user]="context === 'AddUser'"
+    [class.add-recipient]="context === 'AddRecipient'"
+    *ngIf="filteredItems.length > 0 && (activeTrigger || context === 'AddUser' || context === 'AddRecipient')">
     <div class="mention-item" *ngFor="let item of filteredItems; let i = index" #mentionItem
         [class.active]="i === activeIndex" (click)="select(item)">
 
@@ -11,6 +12,10 @@
             <span class="font-w-400 font-18">
                 {{ item.name }} <span *ngIf="item.uid === currentUserId">(Du)</span>
             </span>
+        </div>
+
+        <div *ngIf="context === 'AddRecipient' && !activeTrigger" class="user-email">
+            <span class="font-w-400 font-18">{{ item.email }}</span>
         </div>
 
         <div *ngIf="activeTrigger === '#'" class="channel">

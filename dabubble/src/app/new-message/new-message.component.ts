@@ -32,7 +32,7 @@ export class NewMessageComponent {
   mentionCaretIndex: number | null = null;
   cursorPosRecipient: number = 0;
   cursorPosMessage: number = 0;
-  
+
   overlayActiveRecipient = false;
   overlayActiveMessage = false;
 
@@ -41,10 +41,10 @@ export class NewMessageComponent {
 
   channelService = inject(ChannelService);
   userService = inject(UserService);
-  dmService  = inject(DirectMessageService);
+  dmService = inject(DirectMessageService);
 
   activeSmiley = false;
-  allSmileys = reactionIcons; 
+  allSmileys = reactionIcons;
 
   @Output() openChannel = new EventEmitter<string>();
   @Output() openUserChat = new EventEmitter<User>();
@@ -69,7 +69,7 @@ export class NewMessageComponent {
 
   loadAllUsers() {
     this.userService.getUsers().pipe(take(1)).subscribe(users => {
-      this.participants$ = of(users); 
+      this.participants$ = of(users);
       this.participants = users;
       // console.log('🔹 Alle User geladen:', users.length);
       // console.log('participants', this.participants);
@@ -91,7 +91,7 @@ export class NewMessageComponent {
 
     // Format frei – hier z.B. :thumb: oder 👍 möglich
     this.newMessage = before + `:${smiley}:` + after;
-    
+
     const caret = start + smiley.length + 2;
     // const caret = start + img.length;
 
@@ -331,7 +331,7 @@ export class NewMessageComponent {
   }
 
   private extractMentionName(mention: string): string {
-    return mention.substring(1).trim(); 
+    return mention.substring(1).trim();
   }
 
   private isUserMention(text: string): boolean {
