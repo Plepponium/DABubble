@@ -36,6 +36,7 @@ export class DirectMessageChatsComponent {
   messages$?: Observable<any[]>;
   users$?: Observable<Record<string, User>>;
   messageText = '';
+  mentionCaretIndex: number | null = null;
   latestMessages: any[] = [];
   reactionIcons: string[] = reactionIcons;
   overlayActive = false;
@@ -147,37 +148,83 @@ export class DirectMessageChatsComponent {
     this.activeSmiley = false;
   }
 
-  insertMention(event: { name: string, type: 'user' | 'channel' }) {
+  // insertMention(event: { name: string, type: 'user' | 'channel' }) {
+  //   const trigger = event.type === 'user' ? '@' : '#';
+  //   const words = this.messageText.split(/\s/);
+  //   for (let i = words.length - 1; i >= 0; i--) {
+  //     if (words[i].startsWith(trigger)) {
+  //       words[i] = `${trigger}${event.name}`;
+  //       break;
+  //     }
+  //   }
+  //   this.messageText = words.join(' ') + ' ';
+  // }
+  insertMention(event: { name: string; type: 'user' | 'channel' }) {
     const trigger = event.type === 'user' ? '@' : '#';
-    const words = this.messageText.split(/\s/);
-    for (let i = words.length - 1; i >= 0; i--) {
-      if (words[i].startsWith(trigger)) {
-        words[i] = `${trigger}${event.name}`;
-        break;
-      }
-    }
-    this.messageText = words.join(' ') + ' ';
+    const pos = this.mentionCaretIndex ?? this.messageText.length;
+    const before = this.messageText.slice(0, pos);
+    const after = this.messageText.slice(pos);
+    const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
+    this.messageText = replaced + ' ' + after;
+    const textarea = this.messageInput.nativeElement;
+    this.mentionCaretIndex = replaced.length + 1;
+
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
+      this.updateCaretPosition();
+      textarea.focus();
+    });
+    this.overlayActive = false;
   }
 
-  insertMentionInEdit(message: any, event: { name: string, type: 'user' | 'channel' }) {
+  updateCaretPosition() {
+    const textarea = this.messageInput?.nativeElement;
+    if (!textarea) return;
+    this.mentionCaretIndex = textarea.selectionStart;
+  }
+
+  updateEditCaret(chat: any, textarea: HTMLTextAreaElement) {
+    chat._caretIndex = textarea.selectionStart;
+  }
+
+  // insertMentionInEdit(message: any, event: { name: string, type: 'user' | 'channel' }) {
+  //   const trigger = event.type === 'user' ? '@' : '#';
+  //   const words = message.editedText.split(/\s/);
+  //   for (let i = words.length - 1; i >= 0; i--) {
+  //     if (words[i].startsWith(trigger)) {
+  //       words[i] = `${trigger}${event.name}`;
+  //       break;
+  //     }
+  //   }
+  //   message.editedText = words.join(' ') + ' ';
+  // }
+  insertMentionInEdit(
+    message: any,
+    event: { name: string; type: 'user' | 'channel' }
+  ) {
     const trigger = event.type === 'user' ? '@' : '#';
-    const words = message.editedText.split(/\s/);
-    for (let i = words.length - 1; i >= 0; i--) {
-      if (words[i].startsWith(trigger)) {
-        words[i] = `${trigger}${event.name}`;
-        break;
+    const pos = message._caretIndex ?? message.editedText.length;
+    const before = message.editedText.slice(0, pos);
+    const after = message.editedText.slice(pos);
+    const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
+    message.editedText = replaced + ' ' + after;
+    message._caretIndex = replaced.length + 1;
+    setTimeout(() => {
+      const textarea = document.getElementById(`edit-${message.id}`) as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.selectionStart = textarea.selectionEnd = message._caretIndex;
+        textarea.focus();
       }
-    }
-    message.editedText = words.join(' ') + ' ';
+    });
   }
 
   // insertAtCursor(character: string = '@') {
   //   const textarea = this.messageInput.nativeElement;
   //   const start = textarea.selectionStart;
   //   const end = textarea.selectionEnd;
-  //   const before = this.newMessage.slice(0, start);
-  //   const after = this.newMessage.slice(end);
-  //   this.newMessage = before + character + after;
+  //   const before = this.messageText.slice(0, start);
+  //   const after = this.messageText.slice(end);
+  //   this.messageText = before + character + after;
   //   this.mentionCaretIndex = start + character.length;
   //   setTimeout(() => {
   //     textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;

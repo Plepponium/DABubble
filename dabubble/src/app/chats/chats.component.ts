@@ -114,7 +114,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
   }
 
-
   private loadFirstChannel() {
     this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
       if (channels.length > 0) {
@@ -542,7 +541,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.overlayActive = false;
   }
 
-
   updateCaretPosition() {
     const textarea = this.messageInput?.nativeElement;
     if (!textarea) return;
@@ -553,9 +551,9 @@ export class ChatsComponent implements OnInit, OnChanges {
     chat._caretIndex = textarea.selectionStart;
   }
 
-  getTextarea(): HTMLTextAreaElement | null {
-    return document.getElementById('chat-message') as HTMLTextAreaElement | null;
-  }
+  // getTextarea(): HTMLTextAreaElement | null {
+  //   return document.getElementById('chat-message') as HTMLTextAreaElement | null;
+  // }
 
   insertMentionInEdit(
     chat: any,
