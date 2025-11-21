@@ -10,8 +10,7 @@
                     placeholder="An: #channel, @jemand oder E-Mail Adresse" (focus)="onRecipientFocus()"
                     (input)="updateCaretPosition($event, 'recipient')" (keyup)="updateCaretPosition($event, 'recipient')">
 
-                <app-mentions-overlay *ngIf="overlayActiveRecipient && !overlayActiveMessage"
-                    [text]="recipientText" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosRecipient"
+                <app-mentions-overlay [text]="recipientText" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosRecipient"
                     [currentUserId]="currentUserId" [context]="'AddRecipient'" [users]="(participants$ | async) || [] "
                     [channels]="filteredChannels" (mentionSelected)="insertMention($event, 'recipient')"
                     (overlayStateChange)="overlayActiveRecipient = $event">
@@ -34,8 +33,7 @@
                     (selected)="onSmileySelected($event)"
                     (activeChange)="activeSmiley = $event">
                 </app-smiley-overlay>
-                <app-mentions-overlay *ngIf="overlayActiveMessage && !overlayActiveRecipient"
-                    [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosMessage"
+                <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosMessage"
                     [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
                     [channels]="filteredChannels" (mentionSelected)="insertMention($event, 'message')"
                     (overlayStateChange)="overlayActiveMessage = $event">
