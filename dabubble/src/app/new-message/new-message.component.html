@@ -7,13 +7,14 @@
 
             <div class="input-field">
                 <input #recipientInput id="recipient" class="input" [(ngModel)]="recipientText" type="text" 
-                    placeholder="An: #channel, @jemand oder E-Mail Adresse" 
+                    placeholder="An: #channel, @jemand oder E-Mail Adresse" (focus)="onRecipientFocus()"
                     (input)="updateCaretPosition($event, 'recipient')" (keyup)="updateCaretPosition($event, 'recipient')">
 
-                <app-mentions-overlay [text]="recipientText" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosRecipient"
-                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
+                <app-mentions-overlay *ngIf="overlayActiveRecipient && !overlayActiveMessage"
+                    [text]="recipientText" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosRecipient"
+                    [currentUserId]="currentUserId" [context]="'AddRecipient'" [users]="(participants$ | async) || [] "
                     [channels]="filteredChannels" (mentionSelected)="insertMention($event, 'recipient')"
-                    (overlayStateChange)="overlayActiveRecipient  = $event">
+                    (overlayStateChange)="overlayActiveRecipient = $event">
                 </app-mentions-overlay>
             </div>
         </div>
@@ -25,17 +26,19 @@
         <form class="form" (ngSubmit)="submitMessage()" #newMessageForm="ngForm">
             <div class="form-field">
                 <textarea #newMessageInput id="new-message" class="input" name="message" [(ngModel)]="newMessage"
-                    (keydown.enter)="onEnterPress($any($event))" type="text" placeholder="Starte eine neue Nachricht"
-                    (input)="updateCaretPosition($event, 'message')" (keyup)="updateCaretPosition($event, 'message')"></textarea>
+                    type="text" placeholder="Starte eine neue Nachricht" (focus)="onMessageFocus()" 
+                    (input)="updateCaretPosition($event, 'message')" (keyup)="updateCaretPosition($event, 'message')"
+                    (keydown.enter)="onEnterPress($any($event))" ></textarea>
 
                 <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
                     (selected)="onSmileySelected($event)"
                     (activeChange)="activeSmiley = $event">
                 </app-smiley-overlay>
-                <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosMessage"
+                <app-mentions-overlay *ngIf="overlayActiveMessage && !overlayActiveRecipient"
+                    [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosMessage"
                     [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
                     [channels]="filteredChannels" (mentionSelected)="insertMention($event, 'message')"
-                    (overlayStateChange)="overlayActiveMessage  = $event">
+                    (overlayStateChange)="overlayActiveMessage = $event">
                 </app-mentions-overlay>
 
                 <div class="input-icon-bar">

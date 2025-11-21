@@ -383,6 +383,16 @@ export class NewMessageComponent {
     this.openChannel.emit(channel.id);
   }
 
+  onRecipientFocus() {
+    this.overlayActiveRecipient = true;
+    this.overlayActiveMessage = false;   // unteres Overlay schließen
+  }
+
+  onMessageFocus() {
+    this.overlayActiveRecipient = false; // oberes Overlay schließen
+    this.overlayActiveMessage = true;
+  }
+
   onEnterPress(e: KeyboardEvent) {
     if (this.overlayActiveRecipient || this.overlayActiveMessage) {
       e.preventDefault();

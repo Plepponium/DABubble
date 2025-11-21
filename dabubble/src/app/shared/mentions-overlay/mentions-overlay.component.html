@@ -1,4 +1,4 @@
-<div class="mentions-overlay" [class.add-user]="context === 'AddUser'"
+<div class="mentions-overlay" [class.add-user]="context === 'AddUser'" [class.add-recipient]="context === 'AddRecipient'"
     *ngIf="filteredItems.length > 0 && (activeTrigger || context === 'AddUser')">
     <div class="mention-item" *ngFor="let item of filteredItems; let i = index" #mentionItem
         [class.active]="i === activeIndex" (click)="select(item)">

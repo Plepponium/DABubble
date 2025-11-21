@@ -30,6 +30,11 @@
                 <app-mentions-overlay *ngIf="!selectedUser" [context]="'AddUser'" [users]="allUsers" [text]="searchText"
                     (mentionSelected)="selectUser($event)">
                 </app-mentions-overlay>
+                <!-- <app-mentions-overlay [text]="searchText" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosMessage"
+                    [currentUserId]="currentUserId" [context]="'AddUser'" [users]="allUsers"
+                    [channels]="filteredChannels" (mentionSelected)="insertMention($event, 'message')"
+                    (overlayStateChange)="overlayActiveMessage  = $event">
+                </app-mentions-overlay> -->
             </div>
         </div>
 
