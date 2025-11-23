@@ -20,7 +20,6 @@ export class MentionsOverlayComponent {
   @Input() context: MentionContext = 'DM';
   @Input() users: Partial<User>[] = [];
   @Input() channels: any[] = [];
-  @Input() cursorPos!: number;
 
   @Output() mentionSelected = new EventEmitter<{ name: string, type: 'user' | 'channel' | 'email' }>();
   @Output() overlayStateChange = new EventEmitter<boolean>();

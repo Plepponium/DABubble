@@ -34,9 +34,8 @@
                     (selected)="onSmileySelected($event, newMessageInput)" (activeChange)="activeSmiley = $event">
                 </app-smiley-overlay>
                 <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex"
-                    [cursorPos]="cursorPosMessage" [currentUserId]="currentUserId" [context]="'Channel'"
-                    [users]="(participants$ | async) || [] " [channels]="filteredChannels"
-                    (mentionSelected)="insertMention($event, newMessageInput)"
+                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
+                    [channels]="filteredChannels" (mentionSelected)="insertMention($event, newMessageInput)"
                     (overlayStateChange)="overlayActiveMessage = $event">
                 </app-mentions-overlay>
 
