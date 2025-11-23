@@ -117,8 +117,7 @@
                                 </div>
                                 <div class="font-14 t-gray">{{ chat.time * 1000 | date: 'HH:mm' }} Uhr</div>
                             </div>
-                            <div class="chat-message"
-                                [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 
+                            <div class="chat-message" [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 
                                 'right': chat.user === currentUserId}" [innerHTML]="renderMessage(chat.message)">
                                 <!-- {{ chat.message }} -->
                             </div>
@@ -226,36 +225,40 @@
                     <textarea #messageInput id="chat-message" class="input" name="message" [(ngModel)]="newMessage"
                         (keydown.enter)="onEnterPress($any($event))" type="text"
                         [placeholder]="'Nachricht an #' + channelName"
-                        (input)="updateCaretPosition(); autoGrow(messageInput)"
-                        (keyup)="updateCaretPosition()"></textarea>
-                </ng-container>
+                        (input)="updateCaretPosition(messageInput); autoGrow(messageInput)"
+                        (keyup)="updateCaretPosition(messageInput)"></textarea>
 
-                <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
-                    (selected)="onSmileySelected($event)"
-                    (activeChange)="activeSmiley = $event">
-                </app-smiley-overlay>
-                <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPos"
-                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
-                    [channels]="filteredChannels" (mentionSelected)="insertMention($event)"
-                    (overlayStateChange)="overlayActive = $event">
-                </app-mentions-overlay>
 
-                <div class="input-icon-bar">
-                    <div class="icon-bar t-gray">
-                        <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
-                            iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
-                            altText="Reaktion hinzufügen" [type]="'button'" (click)="openSmileyOverlay()">
-                        </app-round-btn>
-                        <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
-                            iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
-                            altText="Empfänger hinzufügen" [type]="'button'" (click)="insertAtCursor('@')">
+                    <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
+                        (selected)="onSmileySelected($event, messageInput)" (activeChange)="activeSmiley = $event">
+                    </app-smiley-overlay>
+                    <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPos"
+                        [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
+                        [channels]="filteredChannels" (mentionSelected)="insertMention($event, messageInput)"
+                        (overlayStateChange)="overlayActive = $event">
+                    </app-mentions-overlay>
+
+
+
+                    <div class="input-icon-bar">
+                        <div class="icon-bar t-gray">
+                            <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
+                                iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
+                                altText="Reaktion hinzufügen" [type]="'button'" (click)="openSmileyOverlay()">
+                            </app-round-btn>
+                            <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
+                                iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
+                                altText="Empfänger hinzufügen" [type]="'button'"
+                                (click)="insertAtCursor('@', messageInput)">
+                            </app-round-btn>
+                        </div>
+
+                        <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
+                            iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden" type="submit">
                         </app-round-btn>
                     </div>
+                </ng-container>
 
-                    <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
-                        iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden" type="submit">
-                    </app-round-btn>
-                </div>
             </div>
         </form>
 

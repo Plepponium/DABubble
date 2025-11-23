@@ -29,8 +29,6 @@ registerLocaleData(localeDe);
   styleUrl: './chats.component.scss',
 })
 export class ChatsComponent implements OnInit, OnChanges {
-  @ViewChild('messageInput', { static: false }) messageInput!: ElementRef<HTMLTextAreaElement>;
-
   value = 'Clear me';
   showChannelDescription = false;
   showUserDialogue = false;
@@ -63,14 +61,14 @@ export class ChatsComponent implements OnInit, OnChanges {
   userService = inject(UserService);
 
   activeSmiley = false;
-  allSmileys = reactionIcons; 
+  allSmileys = reactionIcons;
 
   @Input() channelId?: string;
   @Output() openThread = new EventEmitter<{ channelId: string; chatId: string }>();
   @Output() openProfile = new EventEmitter<User>();
   @Output() channelDeleted = new EventEmitter<void>();
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
     this.getCurrentUser();
@@ -500,60 +498,50 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.activeSmiley = !this.activeSmiley;
   }
 
-  onSmileySelected(smiley: string) {
-    const textarea = this.messageInput.nativeElement;
-
-    const start = textarea.selectionStart ?? 0;
-    const end = textarea.selectionEnd ?? 0;
-
+  onSmileySelected(smiley: string, el: HTMLTextAreaElement) {
+    const start = el.selectionStart ?? 0;
+    const end = el.selectionEnd ?? 0;
     const before = this.newMessage.slice(0, start);
     const after = this.newMessage.slice(end);
-
-    // Format frei – hier z.B. :thumb: oder 👍 möglich
     this.newMessage = before + `:${smiley}:` + after;
-    
     const caret = start + smiley.length + 2;
-    // const caret = start + img.length;
-
     setTimeout(() => {
-      textarea.selectionStart = textarea.selectionEnd = caret;
-      textarea.focus();
+      el.selectionStart = el.selectionEnd = caret;
+      el.focus();
     });
-
     this.activeSmiley = false;
   }
 
-  insertMention(event: { name: string; type: 'user' | 'channel' }) {
+
+  insertMention(
+    event: { name: string; type: 'user' | 'channel' },
+    el: HTMLTextAreaElement
+  ) {
     const trigger = event.type === 'user' ? '@' : '#';
     const pos = this.mentionCaretIndex ?? this.newMessage.length;
     const before = this.newMessage.slice(0, pos);
     const after = this.newMessage.slice(pos);
     const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
     this.newMessage = replaced + ' ' + after;
-    const textarea = this.messageInput.nativeElement;
     this.mentionCaretIndex = replaced.length + 1;
-
     setTimeout(() => {
-      textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
-      this.updateCaretPosition();
-      textarea.focus();
+      el.selectionStart = el.selectionEnd = this.mentionCaretIndex!;
+      this.updateCaretPosition(el);
+      el.focus();
     });
     this.overlayActive = false;
   }
 
-  updateCaretPosition() {
-    const textarea = this.messageInput?.nativeElement;
-    if (!textarea) return;
-    this.mentionCaretIndex = textarea.selectionStart;
+
+  updateCaretPosition(el: HTMLTextAreaElement | HTMLInputElement) {
+    if (!el) return;
+    this.mentionCaretIndex = el.selectionStart || 0;
   }
+
 
   updateEditCaret(chat: any, textarea: HTMLTextAreaElement) {
     chat._caretIndex = textarea.selectionStart;
   }
-
-  // getTextarea(): HTMLTextAreaElement | null {
-  //   return document.getElementById('chat-message') as HTMLTextAreaElement | null;
-  // }
 
   insertMentionInEdit(
     chat: any,
@@ -575,18 +563,17 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
   }
 
-  insertAtCursor(character: string = '@') {
-    const textarea = this.messageInput.nativeElement;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
+  insertAtCursor(character: string = '@', el: HTMLTextAreaElement) {
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
     const before = this.newMessage.slice(0, start);
     const after = this.newMessage.slice(end);
     this.newMessage = before + character + after;
     this.mentionCaretIndex = start + character.length;
     setTimeout(() => {
-      textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
-      textarea.focus();
-    }); 0
+      el.selectionStart = el.selectionEnd = this.mentionCaretIndex!;
+      el.focus();
+    });
   }
 
   enableEditChat(chat: any) {
