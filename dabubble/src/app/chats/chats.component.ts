@@ -50,7 +50,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   reactionArray: { type: string, count: number, user: string[] }[] = [];
   newMessage: string = '';
   mentionCaretIndex: number | null = null;
-  cursorPos: number = 0;
 
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
@@ -444,7 +443,6 @@ export class ChatsComponent implements OnInit, OnChanges {
       e.preventDefault();
       return;
     }
-
     this.submitChatMessage();
     e.preventDefault();
   }
@@ -514,7 +512,7 @@ export class ChatsComponent implements OnInit, OnChanges {
 
 
   insertMention(
-    event: { name: string; type: 'user' | 'channel' },
+    event: { name: string; type: 'user' | 'channel' | 'email' },
     el: HTMLTextAreaElement
   ) {
     const trigger = event.type === 'user' ? '@' : '#';
@@ -545,7 +543,7 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   insertMentionInEdit(
     chat: any,
-    event: { name: string; type: 'user' | 'channel' }
+    event: { name: string; type: 'user' | 'channel' | 'email' }
   ) {
     const trigger = event.type === 'user' ? '@' : '#';
     const pos = chat._caretIndex ?? chat.editedText.length;

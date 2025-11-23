@@ -58,7 +58,7 @@ export class ThreadComponent implements OnInit {
   userService = inject(UserService);
 
   activeSmiley = false;
-  allSmileys = reactionIcons; 
+  allSmileys = reactionIcons;
 
   @Input() channelId!: string;
   @Input() chatId!: string;
@@ -66,7 +66,7 @@ export class ThreadComponent implements OnInit {
   @Output() openProfile = new EventEmitter<User>();
   @Output() answerAdded = new EventEmitter<{ chatId: string, answerTime: number }>();
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
     this.getCurrentUserAndChannels();
@@ -482,7 +482,7 @@ export class ThreadComponent implements OnInit {
 
     // Format frei – hier z.B. :thumb: oder 👍 möglich
     this.newAnswer = before + `:${smiley}:` + after;
-    
+
     const caret = start + smiley.length + 2;
     // const caret = start + img.length;
 
@@ -494,7 +494,7 @@ export class ThreadComponent implements OnInit {
     this.activeSmiley = false;
   }
 
-  insertMention(event: { name: string; type: 'user' | 'channel' }) {
+  insertMention(event: { name: string; type: 'user' | 'channel' | 'email' }) {
     const trigger = event.type === 'user' ? '@' : '#';
     const pos = this.mentionCaretIndex ?? this.newAnswer.length;
     const before = this.newAnswer.slice(0, pos);
@@ -539,7 +539,7 @@ export class ThreadComponent implements OnInit {
 
   insertMentionInEdit(
     answer: any,
-    event: { name: string; type: 'user' | 'channel' }
+    event: { name: string; type: 'user' | 'channel' | 'email' }
   ) {
     const trigger = event.type === 'user' ? '@' : '#';
     const pos = answer._caretIndex ?? answer.editedText.length;

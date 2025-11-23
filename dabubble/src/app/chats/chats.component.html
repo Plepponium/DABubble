@@ -232,7 +232,7 @@
                     <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
                         (selected)="onSmileySelected($event, messageInput)" (activeChange)="activeSmiley = $event">
                     </app-smiley-overlay>
-                    <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPos"
+                    <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex"
                         [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
                         [channels]="filteredChannels" (mentionSelected)="insertMention($event, messageInput)"
                         (overlayStateChange)="overlayActive = $event">

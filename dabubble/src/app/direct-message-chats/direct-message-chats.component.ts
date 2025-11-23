@@ -46,7 +46,7 @@ export class DirectMessageChatsComponent {
   };
 
   activeSmiley = false;
-  allSmileys = reactionIcons; 
+  allSmileys = reactionIcons;
 
   private authSub?: Subscription;
   private subs = new Subscription();
@@ -56,7 +56,7 @@ export class DirectMessageChatsComponent {
   private firstLoad = true;
   private lastMessageCount = 0;
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(private sanitizer: DomSanitizer) { }
 
   ngOnInit(): void {
     this.authSub = this.userService.getCurrentUser().subscribe(user => {
@@ -132,7 +132,7 @@ export class DirectMessageChatsComponent {
     const after = this.messageText.slice(end);
 
     this.messageText = before + `:${smiley}:` + after;
-    
+
     const caret = start + smiley.length + 2;
 
     setTimeout(() => {
@@ -143,7 +143,7 @@ export class DirectMessageChatsComponent {
     this.activeSmiley = false;
   }
 
-  insertMention(event: { name: string; type: 'user' | 'channel' }) {
+  insertMention(event: { name: string; type: 'user' | 'channel' | 'email' }) {
     const trigger = event.type === 'user' ? '@' : '#';
     const pos = this.mentionCaretIndex ?? this.messageText.length;
     const before = this.messageText.slice(0, pos);
@@ -173,7 +173,7 @@ export class DirectMessageChatsComponent {
 
   insertMentionInEdit(
     message: any,
-    event: { name: string; type: 'user' | 'channel' }
+    event: { name: string; type: 'user' | 'channel' | 'email' }
   ) {
     const trigger = event.type === 'user' ? '@' : '#';
     const pos = message._caretIndex ?? message.editedText.length;

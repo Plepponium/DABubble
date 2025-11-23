@@ -22,7 +22,7 @@ export class MentionsOverlayComponent {
   @Input() channels: any[] = [];
   @Input() cursorPos!: number;
 
-  @Output() mentionSelected = new EventEmitter<{ name: string, type: 'user' | 'channel' }>();
+  @Output() mentionSelected = new EventEmitter<{ name: string, type: 'user' | 'channel' | 'email' }>();
   @Output() overlayStateChange = new EventEmitter<boolean>();
 
   activeTrigger: '@' | '#' | null = null;
@@ -61,39 +61,46 @@ export class MentionsOverlayComponent {
   }
 
   private filterRecipientUsers() {
-    const term = this.text.trim().toLowerCase();
-    const triggerMatch = (typeof this.caretIndex === 'number')
-      ? this.text.slice(0, this.caretIndex).match(/([@#])([^\s]*)$/)
-      : null;
+    const textBeforeCaret =
+      typeof this.caretIndex === 'number'
+        ? this.text.slice(0, this.caretIndex)
+        : this.text;
+    const lastTokenMatch = textBeforeCaret.match(/([^\s]+)$/);
+    const lastToken = lastTokenMatch ? lastTokenMatch[1] : "";
+    const triggerMatch = textBeforeCaret.match(/([@#])([^\s]*)$/);
     if (triggerMatch) {
       this.activeTrigger = triggerMatch[1] as '@' | '#';
       this.searchTerm = triggerMatch[2].toLowerCase();
       this.detectTrigger();
       return;
     }
-    if (term.length < 1) {
+    if (lastToken.includes("@") && textBeforeCaret.endsWith(" ")) {
       this.filteredItems = [];
-      this.activeTrigger = null;
       this.overlayStateChange.emit(false);
       return;
     }
-    const sortedUsers = [...this.users].sort((a, b) =>
-      (a.email || '').toLowerCase().localeCompare((b.email || '').toLowerCase())
-    );
-    this.filteredItems = sortedUsers
-      .filter(u => (u.email || '').toLowerCase().includes(term))
+    const clean = lastToken.toLowerCase();
+    if (clean.length < 1) {
+      this.filteredItems = [];
+      this.overlayStateChange.emit(false);
+      return;
+    }
+    this.filteredItems = [...this.users]
+      .filter(u => u.email?.toLowerCase().includes(clean))
       .slice(0, 10);
     this.activeTrigger = null;
     this.overlayStateChange.emit(this.filteredItems.length > 0);
   }
 
+
+
   select(item: any) {
     if (!item) return;
     let valueToInsert = item.name;
-    let type: 'user' | 'channel' = this.activeTrigger === '@' ? 'user' : 'channel';
+    let type: 'email' | 'user' | 'channel' = this.activeTrigger === '@' ? 'user' : 'channel';
     if (this.context === 'AddRecipient' && !this.activeTrigger) {
       valueToInsert = item.email;
-      type = 'user';
+      type = 'email';
     }
     this.mentionSelected.emit({
       name: valueToInsert,

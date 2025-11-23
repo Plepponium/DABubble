@@ -6,14 +6,15 @@
             </div>
 
             <div class="input-field">
-                <input #recipientInput id="recipient" class="input" [(ngModel)]="recipientText" type="text" 
-                    placeholder="An: #channel, @jemand oder E-Mail Adresse" 
-                    (input)="updateCaretPosition($event, 'recipient')" (keyup)="updateCaretPosition($event, 'recipient')">
+                <input #recipientInput id="recipient" class="input" [(ngModel)]="recipientText" type="text"
+                    placeholder="An: #channel, @jemand oder E-Mail Adresse"
+                    (input)="updateRecipientCaret(recipientInput)" (keyup)="updateRecipientCaret(recipientInput)">
 
-                <app-mentions-overlay [text]="recipientText" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosRecipient"
+                <app-mentions-overlay [text]="recipientText" [caretIndex]="recipientCaretIndex"
                     [currentUserId]="currentUserId" [context]="'AddRecipient'" [users]="(participants$ | async) || [] "
-                    [channels]="filteredChannels" (mentionSelected)="insertMention($event, 'recipient')"
-                    (overlayStateChange)="overlayActiveRecipient  = $event">
+                    [channels]="filteredChannels"
+                    (mentionSelected)="insertMentionInRecipientInput($event, recipientInput)"
+                    (overlayStateChange)="overlayActiveRecipient = $event">
                 </app-mentions-overlay>
             </div>
         </div>
@@ -21,21 +22,22 @@
     </div>
 
     <div class="message-content">
-        
+
         <form class="form" (ngSubmit)="submitMessage()" #newMessageForm="ngForm">
             <div class="form-field">
                 <textarea #newMessageInput id="new-message" class="input" name="message" [(ngModel)]="newMessage"
                     (keydown.enter)="onEnterPress($any($event))" type="text" placeholder="Starte eine neue Nachricht"
-                    (input)="updateCaretPosition($event, 'message')" (keyup)="updateCaretPosition($event, 'message')"></textarea>
+                    (input)="updateCaretPosition(newMessageInput)"
+                    (keyup)="updateCaretPosition(newMessageInput)"></textarea>
 
                 <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
-                    (selected)="onSmileySelected($event)"
-                    (activeChange)="activeSmiley = $event">
+                    (selected)="onSmileySelected($event, newMessageInput)" (activeChange)="activeSmiley = $event">
                 </app-smiley-overlay>
-                <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosMessage"
-                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
-                    [channels]="filteredChannels" (mentionSelected)="insertMention($event, 'message')"
-                    (overlayStateChange)="overlayActiveMessage  = $event">
+                <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex"
+                    [cursorPos]="cursorPosMessage" [currentUserId]="currentUserId" [context]="'Channel'"
+                    [users]="(participants$ | async) || [] " [channels]="filteredChannels"
+                    (mentionSelected)="insertMention($event, newMessageInput)"
+                    (overlayStateChange)="overlayActiveMessage = $event">
                 </app-mentions-overlay>
 
                 <div class="input-icon-bar">
@@ -46,7 +48,8 @@
                         </app-round-btn>
                         <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
                             iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
-                            altText="Empfänger hinzufügen" [type]="'button'" (click)="insertAtCursor('@')">
+                            altText="Empfänger hinzufügen" [type]="'button'"
+                            (click)="insertAtCursor('@', newMessageInput)">
                         </app-round-btn>
                     </div>
 
