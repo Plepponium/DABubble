@@ -3,7 +3,10 @@
     [class.active]="i === activeIndex" (click)="select(item)">
 
     <div class="smiley">
-      <span>{{ item }}</span>
+      <!-- <span>{{ item }}</span> -->
+      <img [src]="'assets/reaction-icons/' + item + '.svg'"
+        [alt]="item"
+        class="inline-smiley">
     </div>
 
   </div>
