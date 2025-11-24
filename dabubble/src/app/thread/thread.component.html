@@ -45,7 +45,7 @@
                 </div>
                 <img class="chat-user-img" [src]="'assets/user-icons/' + chat.userImg + '.svg'" [alt]="chat.userName"
                     [ngClass]="{'grayscale': chat.isUserMissing}">
-                <div class="chat-info-container">
+                <div class="chat-info-container" [ngClass]="{'reverse': chat.user === currentUserId}">
                     <div class="chat-start" [ngClass]="{'reverse': chat.user === currentUserId}">
                         <div class="font-w-700 user-name" [ngClass]="{'missing': chat.isUserMissing}"
                             (click)="onUserNameClick(chat.user)">{{ chat.userName }}
@@ -143,13 +143,12 @@
         <div *ngIf="answers$ | async as answers" id="thread-history" class="chat-history">
             <div *ngFor="let answer of answers; let i = index" class="chat-day-section"
                 [ngClass]="{'reverse': answer.user === currentUserId}">
+
                 <div *ngIf="shouldShowDateForAnswer(answers, i, chat)" class="chat-date-section">
                     <div class="chat-date">{{ getDisplayDate(getChatDate(answer)) }}</div>
                 </div>
 
-
-                <div class="chat-section"
-                    [ngClass]="{'reverse': answer.user === currentUserId, 'editing': answer.isEditing}">
+                <div class="chat-section" [ngClass]="{'reverse': answer.user === currentUserId, 'editing': answer.isEditing}">
                     <div class="chat-dialogue" [ngClass]="{'reverse': answer.user === currentUserId}">
                         <div class="reactions-display-container">
                             <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueAnswersIndex === i">
@@ -180,10 +179,7 @@
                     <img class="chat-user-img" [src]="'assets/user-icons/' + answer.userImg + '.svg'"
                         [alt]="answer.userName" [ngClass]="{'grayscale': answer.isUserMissing}">
 
-                    <div class="chat-info-container">
-
-
-
+                    <div class="chat-info-container" [ngClass]="{'reverse': answer.user === currentUserId}">
                         <ng-container *ngIf="!answer.isEditing; else editMode">
                             <div class="chat-start" [ngClass]="{'reverse': answer.user === currentUserId}">
                                 <div class="font-w-700 user-name" [ngClass]="{'missing': answer.isUserMissing}"

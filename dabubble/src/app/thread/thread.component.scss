@@ -322,6 +322,10 @@
   gap: 8px;
 }
 
+.chat-info-container.reverse {
+  align-items: end;
+}
+
 .chat-start {
   display: flex;
   align-items: center;
@@ -337,6 +341,7 @@
   padding: 15px;
   border-bottom-right-radius: 30px;
   border-bottom-left-radius: 30px;
+  width: fit-content;
 }
 
 .chat-message.left {

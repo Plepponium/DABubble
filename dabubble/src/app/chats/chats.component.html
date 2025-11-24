@@ -110,7 +110,7 @@
                         [alt]="chat.userName" [ngClass]="{'grayscale': chat.isUserMissing}">
 
                     <ng-container *ngIf="!chat.isEditing; else editMode">
-                        <div class="chat-info-container">
+                        <div class="chat-info-container" [ngClass]="{'reverse': chat.user === currentUserId}">
                             <div class="chat-start" [ngClass]="{'reverse': chat.user === currentUserId}">
                                 <div class="font-w-700 user-name" [ngClass]="{'missing': chat.isUserMissing}"
                                     (click)="handleOpenProfile(chat)">{{ chat.userName }}
