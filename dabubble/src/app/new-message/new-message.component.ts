@@ -125,11 +125,23 @@ export class NewMessageComponent {
 
     // replace last token only (works for @trigger, #trigger and plain text/email)
     // if there's an @ or # right before caret, regex will replace the partial trigger token
-    const newBefore = before.replace(/([@#]?[^\s]*)$/, insertValue);
+    // const newBefore = before.replace(/([@#]?[^\s]*)$/, insertValue);
 
-    this.recipientText = newBefore + ' ' + after;
-    // caret -> after inserted text + space
-    this.recipientCaretIndex = newBefore.length + 1;
+    // this.recipientText = newBefore + ' ' + after;
+    // // caret -> after inserted text + space
+    // this.recipientCaretIndex = newBefore.length + 1;
+
+    // 🔥 Nur Trigger ersetzen
+    const triggerRegex = /[@#][^\s]*$/;
+    const didReplace = triggerRegex.test(before);
+
+    const replacedBefore = didReplace
+      ? before.replace(triggerRegex, insertValue)
+      : before + (before.endsWith(' ') ? '' : ' ') + insertValue;
+
+    this.recipientText = replacedBefore + ' ' + after;
+
+    this.recipientCaretIndex = replacedBefore.length + 1;
 
     setTimeout(() => {
       el.selectionStart = el.selectionEnd = this.recipientCaretIndex!;
@@ -224,15 +236,13 @@ export class NewMessageComponent {
     emailMentions: string[];
   } {
 
-    // 1. Usernames: @Firstname Lastname (mindestens 2 Wörter)
-    const userRegex = /(?:^|\s)@([A-Za-zÀ-ÖØ-öø-ÿ]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ]+)+)(?=[\s,]|$)/g;
+    const userRegex = /(?:^|\s)@([A-Za-zÀ-ÖØ-öø-ÿ]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ]+)*)?(?=[\s,]|$)/g;
     const users: string[] = [];
     let m1;
     while ((m1 = userRegex.exec(text)) !== null) {
       users.push(m1[1].trim());
     }
 
-    // 2. Channels: #channel
     const channelRegex = /#([A-Za-z0-9_-]+)/g;
     const channels: string[] = [];
     let m2;
@@ -240,7 +250,6 @@ export class NewMessageComponent {
       channels.push(m2[1]);
     }
 
-    // 3. Emails
     const emailRegex = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
     const emails = text.match(emailRegex) || [];
 
