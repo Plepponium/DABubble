@@ -173,12 +173,15 @@ export class NewMessageComponent {
   async submitMessage() {
     if (!this.validateInputs()) return;
 
-    const { userMentions, channelMentions } = this.parseRecipients(this.recipientText);
+    // const { userMentions, channelMentions } = this.parseRecipients(this.recipientText);
+    const { userMentions, channelMentions, emailMentions } =
+      this.parseRecipients(this.recipientText);
     const messagePayload = this.buildMessagePayload(this.newMessage);
 
     await Promise.all([
       this.sendToChannels(channelMentions, messagePayload),
-      this.sendToUsers(userMentions, messagePayload)
+      this.sendToUsers(userMentions, messagePayload),
+      this.sendToEmails(emailMentions, messagePayload)
     ]);
 
     this.goToMessage();
@@ -198,10 +201,54 @@ export class NewMessageComponent {
     return true;
   }
 
-  private parseRecipients(text: string): { userMentions: string[], channelMentions: string[] } {
-    const userMentions = text.match(/@\s*[\p{L}\p{M}\s]+/gu)?.map(t => t.replace(/^@\s*/, '').trim()) || [];
-    const channelMentions = text.match(/#\s*[\w-]+/g)?.map(t => t.replace(/^#\s*/, '').trim()) || [];
-    return { userMentions, channelMentions };
+  // private parseRecipients(text: string): { userMentions: string[], channelMentions: string[] } {
+  //   const userMentions = text.match(/@\s*[\p{L}\p{M}\s]+/gu)?.map(t => t.replace(/^@\s*/, '').trim()) || [];
+  //   const channelMentions = text.match(/#\s*[\w-]+/g)?.map(t => t.replace(/^#\s*/, '').trim()) || [];
+  //   return { userMentions, channelMentions };
+  // }
+  // private parseRecipients(text: string): { userMentions: string[], channelMentions: string[], emailMentions: string[] } {
+  //   const userMentions =
+  //     text.match(/@\s*[\p{L}\p{M}\s]+/gu)?.map(t => t.replace(/^@\s*/, '').trim()) || [];
+
+  //   const channelMentions =
+  //     text.match(/#\s*[\w-]+/g)?.map(t => t.replace(/^#\s*/, '').trim()) || [];
+
+  //   const emailMentions =
+  //     text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}/g) || [];
+
+  //   return { userMentions, channelMentions, emailMentions };
+  // }
+  private parseRecipients(text: string): {
+    userMentions: string[];
+    channelMentions: string[];
+    emailMentions: string[];
+  } {
+
+    // 1. Usernames: @Firstname Lastname (mindestens 2 Wörter)
+    const userRegex = /(?:^|\s)@([A-Za-zÀ-ÖØ-öø-ÿ]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ]+)+)(?=[\s,]|$)/g;
+    const users: string[] = [];
+    let m1;
+    while ((m1 = userRegex.exec(text)) !== null) {
+      users.push(m1[1].trim());
+    }
+
+    // 2. Channels: #channel
+    const channelRegex = /#([A-Za-z0-9_-]+)/g;
+    const channels: string[] = [];
+    let m2;
+    while ((m2 = channelRegex.exec(text)) !== null) {
+      channels.push(m2[1]);
+    }
+
+    // 3. Emails
+    const emailRegex = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
+    const emails = text.match(emailRegex) || [];
+
+    return {
+      userMentions: users,
+      channelMentions: channels,
+      emailMentions: emails
+    };
   }
 
   private buildMessagePayload(message: string) {
@@ -253,6 +300,72 @@ export class NewMessageComponent {
     });
 
     await Promise.all(sendPromises);
+  }
+  // private matchUsersByName(userMentions: string[]): any[] {
+  //   return userMentions
+  //     .map(name => this.participants.find(
+  //       u => u.name.trim().toLowerCase() === name.toLowerCase()
+  //     ))
+  //     .filter(u => {
+  //       if (!u) console.warn(`⚠️ Benutzer nicht gefunden (Name):`);
+  //       return !!u;
+  //     });
+  // }
+  // private matchUsersByEmail(emailMentions: string[]): any[] {
+  //   return emailMentions
+  //     .map(email => this.participants.find(
+  //       u => u.email?.trim().toLowerCase() === email.toLowerCase()
+  //     ))
+  //     .filter(u => {
+  //       if (!u) console.warn(`⚠️ Benutzer nicht gefunden (Email):`);
+  //       return !!u;
+  //     });
+  // }
+  // private async sendToUsers(users: any[], payload: any) {
+  //   if (!users || users.length === 0) return;
+
+  //   const promises = users.map(async user => {
+  //     try {
+  //       const dmId = await this.dmService.getOrCreateDmId(this.currentUserId, user.uid);
+  //       await this.dmService.sendMessage(dmId, {
+  //         senderId: this.currentUserId,
+  //         text: payload.message
+  //       });
+
+  //     } catch (err) {
+  //       console.error(`❌ Fehler beim Senden an ${user.name || user.email}:`, err);
+  //     }
+  //   });
+
+  //   await Promise.all(promises);
+  // }
+
+  private async sendToEmails(emailMentions: string[], payload: any) {
+    if (emailMentions.length === 0) return;
+
+    const promises = emailMentions.map(async email => {
+      const targetUser = this.participants.find(
+        u => u.email?.trim().toLowerCase() === email.toLowerCase()
+      );
+
+      if (!targetUser) {
+        console.warn(`⚠️ Kein Benutzer mit E-Mail "${email}" gefunden.`);
+        return;
+      }
+
+      try {
+        const dmId = await this.dmService.getOrCreateDmId(this.currentUserId, targetUser.uid);
+        await this.dmService.sendMessage(dmId, {
+          senderId: this.currentUserId,
+          text: payload.message
+        });
+
+      } catch (err) {
+        console.error(`❌ Fehler beim Senden an E-Mail "${email}":`, err);
+      }
+    });
+
+    await Promise.all(promises);
   }
 
   private resetInputs() {
