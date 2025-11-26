@@ -98,7 +98,11 @@ export class NewMessageComponent {
     const pos = this.mentionCaretIndex ?? this.newMessage.length;
     const before = this.newMessage.slice(0, pos);
     const after = this.newMessage.slice(pos);
-    const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
+
+    // const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
+    const triggerRegex = /(@[A-Za-zÀ-ÖØ-öø-ÿ0-9_-]*|#[A-Za-z0-9_-]*|[A-Za-z0-9._%+-]+)$/;
+    const replaced = before.replace(triggerRegex, `${trigger}${event.name}`);
+
     this.newMessage = replaced + ' ' + after;
     this.mentionCaretIndex = replaced.length + 1;
     setTimeout(() => {
@@ -132,12 +136,9 @@ export class NewMessageComponent {
     // this.recipientCaretIndex = newBefore.length + 1;
 
     // 🔥 Nur Trigger ersetzen
-    const triggerRegex = /[@#][^\s]*$/;
-    const didReplace = triggerRegex.test(before);
-
-    const replacedBefore = didReplace
-      ? before.replace(triggerRegex, insertValue)
-      : before + (before.endsWith(' ') ? '' : ' ') + insertValue;
+    // const triggerRegex = /(@[A-Za-zÀ-ÖØ-öø-ÿ0-9_-]*|#[A-Za-z0-9_-]*|[A-Za-z0-9._%+-]*)$/;
+    const triggerRegex = /(?:@[A-Za-zÀ-ÖØ-öø-ÿ0-9_-]*|#[A-Za-z0-9_-]*|[A-Za-z0-9._%+-]+)$/;
+    const replacedBefore = before.replace(triggerRegex, insertValue);
 
     this.recipientText = replacedBefore + ' ' + after;
 
@@ -152,10 +153,6 @@ export class NewMessageComponent {
     this.overlayActiveRecipient = false;
   }
 
-
-
-
-
   updateCaretPosition(el: HTMLTextAreaElement | HTMLInputElement) {
     if (!el) return;
     this.mentionCaretIndex = el.selectionStart || 0;
@@ -165,9 +162,6 @@ export class NewMessageComponent {
     if (!el) return;
     this.recipientCaretIndex = el.selectionStart || 0;
   }
-
-
-
 
   insertAtCursor(character: string = '@', el: HTMLTextAreaElement) {
     const start = el.selectionStart;
@@ -236,7 +230,7 @@ export class NewMessageComponent {
     emailMentions: string[];
   } {
 
-    const userRegex = /(?:^|\s)@([A-Za-zÀ-ÖØ-öø-ÿ]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ]+)*)?(?=[\s,]|$)/g;
+    const userRegex = /(?:^|\s)@([A-Za-zÀ-ÖØ-öø-ÿ]+(?:-[A-Za-zÀ-ÖØ-öø-ÿ]+)*(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ]+(?:-[A-Za-zÀ-ÖØ-öø-ÿ]+)*)*)(?=\s+@|\s+(?!@)[A-Za-z0-9._%+-]+@|[\s,]|$)/g;
     const users: string[] = [];
     let m1;
     while ((m1 = userRegex.exec(text)) !== null) {
@@ -386,7 +380,7 @@ export class NewMessageComponent {
   goToMessage() {
     const recipient = this.getFirstRecipient();
     if (!recipient) return;
-
+    console.log('recipient', recipient);
     const name = this.extractMentionName(recipient);
 
     if (this.isUserMention(recipient)) {
@@ -399,17 +393,44 @@ export class NewMessageComponent {
       return;
     }
 
+    if (this.isEmailMention(recipient)) {
+      console.log('isEmailMention true name', name);
+      this.openUserByEmail(name);
+      return;
+    }
+
     console.warn(`⚠️ Empfänger nicht erkannt: ${recipient}`);
   }
 
   private getFirstRecipient(): string | null {
+    const text = this.recipientText.trim();
+
+    const userRegex = /^(?:^|\s)@([A-Za-zÀ-ÖØ-öø-ÿ]+(?:-[A-Za-zÀ-ÖØ-öø-ÿ]+)*(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ]+(?:-[A-Za-zÀ-ÖØ-öø-ÿ]+)*)*)(?=\s+@|\s+(?!@)[A-Za-z0-9._%+-]+@|[\s,]|$)/;
+    const userMatch = text.match(userRegex);
+    if (userMatch) {
+      return '@' + userMatch[1];
+    }
+
     // Full user mention: @Firstname Lastname (Mehrwort!)
-    const userMatch = this.recipientText.match(/^@\s*[\p{L}\p{M}\s]+/u);
-    if (userMatch) return userMatch[0].trim();
+    // const userMatch = this.recipientText.match(/^@\s*[\p{L}\p{M}\s]+/u);
+    // if (userMatch) return userMatch[0].trim();
 
     // Channel: #channel
-    const channelMatch = this.recipientText.match(/^#\s*[\w-]+/);
-    if (channelMatch) return channelMatch[0].trim();
+    // const channelMatch = this.recipientText.match(/^#\s*[\w-]+/);
+    // if (channelMatch) return channelMatch[0].trim();
+
+    const channelRegex = /^#([A-Za-z0-9_-]+)/;
+    const channelMatch = text.match(channelRegex);
+    if (channelMatch) {
+      return '#' + channelMatch[1];
+    }
+
+    // 3. Email
+    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
+    const emailMatch = text.match(emailRegex);
+    if (emailMatch) {
+      return emailMatch[0];
+    }
 
     return null;
   }
@@ -434,8 +455,17 @@ export class NewMessageComponent {
 
   private findUserByName(fullName: string): User | undefined {
     return this.participants.find(
-      u => u.name.trim().toLowerCase() === fullName.toLowerCase()
+      // u => u.name.trim().toLowerCase() === fullName.toLowerCase()
+      u => this.normalizeName(u.name) === this.normalizeName(fullName)
     );
+  }
+
+  private normalizeName(name: string) {
+    return name
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/-+/g, '-')   
+      .toLowerCase();
   }
 
   handleOpenUserChat(user: User) {
@@ -465,6 +495,25 @@ export class NewMessageComponent {
 
   handleOpenChannel(channel: Channel) {
     this.openChannel.emit(channel.id);
+  }
+
+  private isEmailMention(text: string): boolean {
+    console.log('isEmailMention');
+    return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(text.trim());
+  }
+
+  private openUserByEmail(email: string) {
+    const user = this.findUserByEmail(email);
+    if (user) {
+      console.log('openUserByEmail user', user);
+      this.handleOpenUserChat(user);
+    }
+  }
+
+  private findUserByEmail(email: string) {
+    return this.participants.find(
+      u => u.email?.trim().toLowerCase() === email.toLowerCase()
+    );
   }
 
   onEnterPress(e: KeyboardEvent) {
