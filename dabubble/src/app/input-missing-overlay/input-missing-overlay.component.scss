@@ -1,0 +1,19 @@
+.overlay-container {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.message-container {
+    padding: 20px;
+    border-radius: 30px;
+    background-color: #444df2;
+    color: white;
+}

@@ -46,6 +46,10 @@ export class NewMessageComponent {
 
   @Output() openChannel = new EventEmitter<string>();
   @Output() openUserChat = new EventEmitter<User>();
+  @Output() inputMissing = new EventEmitter<{ 
+    recipientMissing: boolean; 
+    textMissing: boolean;
+  }>();
 
   ngOnInit() {
     this.getCurrentUserAndChannels();
@@ -200,8 +204,13 @@ export class NewMessageComponent {
     const trimmedMessage = this.newMessage.trim();
     const trimmedRecipients = this.recipientText.trim();
 
-    if (!trimmedMessage || !trimmedRecipients) {
-      console.warn('⚠️ Nachricht oder Empfänger fehlt.');
+    const recipientMissing = !trimmedRecipients;
+    const textMissing = !trimmedMessage;
+
+    if (recipientMissing || textMissing) {
+    // if (!trimmedMessage || !trimmedRecipients) {
+      // console.warn('⚠️ Nachricht oder Empfänger fehlt.');
+      this.inputMissing.emit({ recipientMissing, textMissing });
       return false;
     }
     return true;

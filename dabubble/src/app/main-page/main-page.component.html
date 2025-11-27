@@ -41,7 +41,7 @@
             <app-direct-message-chats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
                 (openProfile)="openProfileOverlay($event)"></app-direct-message-chats>
             <app-new-message class="new-message" *ngIf="newMessageOpen" (openChannel)="openChannel($event)"
-                (openUserChat)="openUserChat($event)"></app-new-message>
+                (openUserChat)="openUserChat($event)" (inputMissing)="openInputMissingOverlay($event)"></app-new-message>
         </div>
     </div>
 
@@ -65,5 +65,7 @@
     <app-add-channel-members-overlay *ngIf="showMemberOverlay && currentUser" [channel]="createdChannel"
         [currentUser]="currentUser" (close)="closeMemberOverlay()">
     </app-add-channel-members-overlay>
+
+    <app-input-missing-overlay *ngIf="inputMissing" [missingInfo]="missingInfo!" (close)="closeInputMissingOverlay()"></app-input-missing-overlay>
 
 </div>

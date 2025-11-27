@@ -20,15 +20,15 @@ import { Router } from '@angular/router';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { NewMessageComponent } from '../new-message/new-message.component';
 import { AddChannelMembersOverlayComponent } from '../add-channel-members-overlay/add-channel-members-overlay.component';
+import { InputMissingOverlayComponent } from "../input-missing-overlay/input-missing-overlay.component";
 
 @Component({
   selector: 'app-main-page',
-  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, DirectMessageChatsComponent, NewMessageComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent, AddChannelMembersOverlayComponent, UserProfileComponent, EditUserComponent, ProfileOverlayComponent, LogoutOverlayComponent],
+  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, DirectMessageChatsComponent, NewMessageComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent, AddChannelMembersOverlayComponent, UserProfileComponent, EditUserComponent, ProfileOverlayComponent, LogoutOverlayComponent, InputMissingOverlayComponent],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss',
 })
 export class MainPageComponent {
-
   @ViewChild('chats') chatsComponent!: ChatsComponent;
 
   menuOpen = true;
@@ -44,6 +44,8 @@ export class MainPageComponent {
   showProfileOverlay = false;
   showAddChannelDialogue = false;
   showMemberOverlay = false;
+  inputMissing = false;
+  missingInfo: {recipientMissing: boolean; textMissing: boolean;} | null = null;
 
   currentUser?: User;
   currentChannelId?: string;
@@ -166,6 +168,16 @@ export class MainPageComponent {
     this.showEditUser = true;
   }
 
+  openInputMissingOverlay(info: { recipientMissing: boolean; textMissing: boolean }) {
+    this.missingInfo = info;
+    this.inputMissing = true;
+  }
+
+  closeInputMissingOverlay() {
+    this.inputMissing = false;
+    this.missingInfo = null;
+  }
+
   closeAllOverlays() {
     this.showUserProfile = false;
     this.showEditUser = false;
@@ -195,6 +207,4 @@ export class MainPageComponent {
       this.router.navigate(['/']);
     });
   }
-
-
 }
