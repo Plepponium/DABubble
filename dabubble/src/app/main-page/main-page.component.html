@@ -1,6 +1,6 @@
 <div class="main-page">
-    <app-header class="header" (openLogoutOverlay)="openLogoutOverlay()"
-        (openUserProfile)="openUserProfile()"></app-header>
+    <app-header class="header" (openLogoutOverlay)="openLogoutOverlay()" (openUserProfile)="openUserProfile()"
+        [currentUser]="currentUser" [users]="allUsers" [channels]="allChannels"></app-header>
 
     <button class="toggle-menu-btn" type="button" (click)="toggleMenu()">
         <div class="toggle-btn-container">
@@ -41,7 +41,8 @@
             <app-direct-message-chats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
                 (openProfile)="openProfileOverlay($event)"></app-direct-message-chats>
             <app-new-message class="new-message" *ngIf="newMessageOpen" (openChannel)="openChannel($event)"
-                (openUserChat)="openUserChat($event)" (inputMissing)="openInputMissingOverlay($event)"></app-new-message>
+                (openUserChat)="openUserChat($event)"
+                (inputMissing)="openInputMissingOverlay($event)"></app-new-message>
         </div>
     </div>
 
@@ -66,6 +67,7 @@
         [currentUser]="currentUser" (close)="closeMemberOverlay()">
     </app-add-channel-members-overlay>
 
-    <app-input-missing-overlay *ngIf="inputMissing" [missingInfo]="missingInfo!" (close)="closeInputMissingOverlay()"></app-input-missing-overlay>
+    <app-input-missing-overlay *ngIf="inputMissing" [missingInfo]="missingInfo!"
+        (close)="closeInputMissingOverlay()"></app-input-missing-overlay>
 
 </div>

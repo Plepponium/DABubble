@@ -19,12 +19,16 @@
   }
 }
 
-.searchbar-container {
+.searchbar-wrapper {
   position: relative;
+  display: flex;
   width: 100%;
-  box-sizing: border-box;
   margin-left: 406px;
   margin-right: 526px;
+}
+
+.searchbar-container {
+  width: 100%;
 }
 
 .searchbar {

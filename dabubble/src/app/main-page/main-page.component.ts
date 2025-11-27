@@ -21,6 +21,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 import { NewMessageComponent } from '../new-message/new-message.component';
 import { AddChannelMembersOverlayComponent } from '../add-channel-members-overlay/add-channel-members-overlay.component';
 import { InputMissingOverlayComponent } from "../input-missing-overlay/input-missing-overlay.component";
+import { ChannelService } from '../../services/channel.service';
 
 @Component({
   selector: 'app-main-page',
@@ -45,7 +46,10 @@ export class MainPageComponent {
   showAddChannelDialogue = false;
   showMemberOverlay = false;
   inputMissing = false;
-  missingInfo: {recipientMissing: boolean; textMissing: boolean;} | null = null;
+  missingInfo: { recipientMissing: boolean; textMissing: boolean; } | null = null;
+
+  allUsers: any[] = [];
+  allChannels: any[] = [];
 
   currentUser?: User;
   currentChannelId?: string;
@@ -56,6 +60,7 @@ export class MainPageComponent {
   createdChannel: any = null;
 
   private userService = inject(UserService);
+  private channelService = inject(ChannelService);
   private router = inject(Router);
   private authSub?: Subscription;
 
@@ -66,6 +71,8 @@ export class MainPageComponent {
         return;
       }
       this.currentUser = user;
+      this.userService.getUsers().subscribe(u => this.allUsers = u);
+      this.channelService.getChannels().subscribe(c => this.allChannels = c);
     });
   }
 
