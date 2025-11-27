@@ -380,7 +380,6 @@ export class NewMessageComponent {
   goToMessage() {
     const recipient = this.getFirstRecipient();
     if (!recipient) return;
-    console.log('recipient', recipient);
     const name = this.extractMentionName(recipient);
 
     if (this.isUserMention(recipient)) {
@@ -394,8 +393,7 @@ export class NewMessageComponent {
     }
 
     if (this.isEmailMention(recipient)) {
-      console.log('isEmailMention true name', name);
-      this.openUserByEmail(name);
+      this.openUserByEmail(recipient);
       return;
     }
 
@@ -498,14 +496,12 @@ export class NewMessageComponent {
   }
 
   private isEmailMention(text: string): boolean {
-    console.log('isEmailMention');
     return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(text.trim());
   }
 
   private openUserByEmail(email: string) {
     const user = this.findUserByEmail(email);
     if (user) {
-      console.log('openUserByEmail user', user);
       this.handleOpenUserChat(user);
     }
   }
