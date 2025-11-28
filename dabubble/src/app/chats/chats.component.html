@@ -68,18 +68,18 @@
                     [class.edit-mode]="chat.isEditing">
                     <div class="chat-dialogue" [ngClass]="{'reverse': chat.user === currentUserId}">
                         <button (click)="addReaction(i, 'check')" class="add-reaction-btn">
-                            <img class="" src="assets/reaction-icons/check.svg" alt="">
+                            <img  class="smiley-img" src="assets/reaction-icons/check.svg" alt="">
                         </button>
 
                         <button (click)="addReaction(i, 'thumb')" class="add-reaction-btn">
-                            <img class="" src="assets/reaction-icons/thumb.svg" alt="">
+                            <img  class="smiley-img" src="assets/reaction-icons/thumb.svg" alt="">
                         </button>
 
                         <div class="reactions-display-container">
                             <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === i">
                                 <div *ngFor="let icon of reactionIcons" class="reactions-container">
                                     <button (click)="addReaction(i, icon)" class="add-reaction-btn">
-                                        <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                        <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
                                     </button>
                                 </div>
                             </div>
@@ -181,7 +181,7 @@
                                             *ngIf="activeReactionDialogueBelowIndex === i">
                                             <div *ngFor="let icon of reactionIcons" class="reactions-container">
                                                 <button (click)="addReaction(i, icon)" class="add-reaction-btn">
-                                                    <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                                    <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
                                                 </button>
                                             </div>
                                         </div>

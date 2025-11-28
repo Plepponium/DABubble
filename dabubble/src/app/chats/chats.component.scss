@@ -343,6 +343,11 @@
 //     cursor: pointer;
 // }
 
+.smiley-img {
+  width: 24px;
+  height: 24px;
+}
+
 .reactions-display-container,
 .reactions-display-container-below {
   position: relative;
@@ -350,6 +355,9 @@
 
 .add-reaction-dialogue {
   width: fit-content;
+  max-width: 200px;
+  // width: 100%;
+  overflow-x: auto;
   position: absolute;
   top: 20px;
   // left: 28px;
@@ -359,6 +367,7 @@
   // border-top-right-radius: 30px;
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
+  box-sizing: border-box;
   padding: 10px 20px;
   box-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.2);
   font-size: 20px;
@@ -456,7 +465,10 @@
 .chat-answered {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
+  flex-wrap: wrap;
+  // gap: 20px;
+  column-gap: 20px; /* Abstand zwischen Elementen in derselben Zeile */
+  row-gap: 6px;
 }
 
 .chat-answered.right {
@@ -484,12 +496,14 @@
 .reactions {
   display: flex;
   align-items: center;
+  // flex-wrap: wrap;
   gap: 8px;
 }
 
 .reaction-btns {
   display: flex;
   align-items: center;
+  // flex-wrap: wrap;
   gap: 10px;
 }
 
