@@ -23,7 +23,7 @@
                         <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === chat.id">
                             <div *ngFor="let icon of reactionIcons" class="reactions-container">
                                 <button (click)="addReaction(chat.id, icon)" class="add-reaction-btn">
-                                    <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                    <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
                                 </button>
                             </div>
                         </div>
@@ -114,7 +114,7 @@
                                     *ngIf="activeReactionDialogueBelowIndex === chat.id">
                                     <div *ngFor="let icon of reactionIcons" class="reactions-container">
                                         <button (click)="addReaction(chat.id, icon)" class="add-reaction-btn">
-                                            <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                            <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
                                         </button>
                                     </div>
                                 </div>
@@ -154,7 +154,7 @@
                             <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueAnswersIndex === i">
                                 <div *ngFor="let icon of reactionIcons" class="reactions-container">
                                     <button (click)="addReactionToAnswer(answer.id, icon)" class="add-reaction-btn">
-                                        <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                        <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
                                     </button>
                                 </div>
                             </div>
@@ -248,7 +248,7 @@
                                             <div *ngFor="let icon of reactionIcons" class="reactions-container">
                                                 <button (click)="addReactionToAnswer(answer.id, icon)"
                                                     class="add-reaction-btn">
-                                                    <img [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                                    <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
                                                 </button>
                                             </div>
                                         </div>

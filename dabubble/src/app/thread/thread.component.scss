@@ -240,6 +240,11 @@
 //     box-sizing: border-box;
 // }
 
+.smiley-img {
+  width: 24px;
+  height: 24px;
+}
+
 .reactions-display-container,
 .reactions-display-container-below {
   position: relative;
@@ -247,6 +252,8 @@
 
 .add-reaction-dialogue {
   width: fit-content;
+  max-width: 200px;
+  overflow-x: auto;
   position: absolute;
   top: 20px;
   // left: 28px;
