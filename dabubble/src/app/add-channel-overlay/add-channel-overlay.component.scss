@@ -42,6 +42,18 @@ label {
 .input-wrapper {
   position: relative;
   width: 100%;
+  padding-bottom: 25px;
+  display: flex;
+  align-items: center;
+
+  .error-msg {
+    position: absolute;
+    bottom: 0;
+    left: 50px;
+    font-size: 14px;
+    color: #ff4d4d;
+    pointer-events: none;
+  }
 }
 
 input {
@@ -51,6 +63,11 @@ input {
   box-sizing: border-box;
   border-radius: 30px;
   border: 1px solid #adb0d9;
+
+  &.error-border {
+    border-color: #ff4d4d !important;
+  }
+
   &:hover {
     border-color: #797ef3;
   }
@@ -60,20 +77,14 @@ input {
   }
 }
 
-/* Input-Styling wie bisher */
 .channel-name {
   width: 100%;
-  padding: 18px 20px 18px 50px; /* Mehr Padding links, damit Text nicht über Icon läuft */
-  //   transition: border-color 0.3s ease;
+  padding: 18px 20px 18px 50px;
 }
 
 .input-icon {
   position: absolute;
-  top: 50%;
   left: 20px;
-  transform: translateY(-50%);
-  //   width: 23px;
-  //   height: 23px;
   pointer-events: none;
 }
 
