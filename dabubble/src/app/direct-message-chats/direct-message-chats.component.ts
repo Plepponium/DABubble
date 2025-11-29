@@ -301,23 +301,33 @@ export class DirectMessageChatsComponent {
   }
 
   getReactionHoverText(userIds: string[]): string {
-    if (!userIds || userIds.length === 0) return '';
+    if (!userIds?.length) return '';
+    const reacted = this.getReactionState(userIds);
+    if (this.isChatWithSelf()) return reacted.current ? 'Du hast reagiert' : '';
 
-    const currentUid = this.currentUser?.uid;
-    const otherUser = this.otherUser;
-    const currentUserReacted = userIds.includes(currentUid || '');
-    const otherUserReacted = userIds.includes(otherUser?.uid || '');
-    if (currentUserReacted && !otherUserReacted) {
-      return 'Du hast reagiert';
-    }
-    if (!currentUserReacted && otherUserReacted) {
-      return `${otherUser?.name || 'Unbekannt'} hat reagiert`;
-    }
-    if (currentUserReacted && otherUserReacted) {
-      return `${otherUser?.name || 'Unbekannt'} und Du haben reagiert`;
-    }
+    return this.buildReactionText(reacted.current, reacted.other);
+  }
+
+  private getReactionState(userIds: string[]) {
+    const current = userIds.includes(this.currentUser?.uid || '');
+    const other = userIds.includes(this.otherUser?.uid || '');
+    return { current, other };
+  }
+
+  private isChatWithSelf(): boolean {
+    return this.currentUser?.uid === this.otherUser?.uid;
+  }
+
+  private buildReactionText(current: boolean, other: boolean): string {
+    const name = this.otherUser?.name || 'Unbekannt';
+
+    if (current && !other) return 'Du hast reagiert';
+    if (!current && other) return `${name} hat reagiert`;
+    if (current && other) return `${name} und Du haben reagiert`;
+
     return '';
   }
+
 
   toggleReactionDialog(messageId: string, source: 'chat' | 'hover') {
     if (this.activeReactionDialog.messageId === messageId && this.activeReactionDialog.source === source) {
