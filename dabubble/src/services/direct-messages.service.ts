@@ -77,4 +77,12 @@ export class DirectMessageService {
         const updated = has ? current.filter((u: string) => u !== userId) : [...current, userId];
         return updateDoc(msgRef as any, { [`reactions.${type}`]: updated });
     }
+
+    async getDmIdsForUser(uid: string): Promise<string[]> {
+        const dmCol = collection(this.firestore, 'dmChats');
+        const q = query(dmCol as any, where('participants', 'array-contains', uid));
+        const snap = await getDocs(q);
+        return snap.docs.map(d => d.id);
+    }
+
 }

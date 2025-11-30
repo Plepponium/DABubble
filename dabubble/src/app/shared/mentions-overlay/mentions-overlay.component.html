@@ -1,27 +1,46 @@
 <div class="mentions-overlay" [class.add-user]="context === 'AddUser'"
     [class.add-recipient]="context === 'AddRecipient'" [class.searchbar]="context === 'Searchbar'"
-    *ngIf="filteredItems.length > 0 && (activeTrigger || context === 'AddUser' || context === 'AddRecipient')">
-    <div class="mention-item" *ngFor="let item of filteredItems; let i = index" #mentionItem
-        [class.active]="i === activeIndex" (click)="select(item)">
+    *ngIf="filteredItems.length > 0">
 
-        <div *ngIf="activeTrigger === '@' || context === 'AddUser'" class="user">
-            <div class="img-container">
-                <img class="user-img" [src]="'assets/user-icons/' + (item.img || 'default-user') + '.svg'" />
-                <div [class]="'online-signal ' + (item.presence || 'offline')"></div>
+
+    <ng-container *ngIf="activeTrigger || context === 'AddUser' || context === 'AddRecipient'">
+        <div class="mention-item" #mentionItem *ngFor="let item of filteredItems; let i = index"
+            [class.active]="i === activeIndex" (click)="select(item)">
+            <div *ngIf="activeTrigger === '@' || context === 'AddUser'" class="user">
+                <div class="img-container">
+                    <img class="user-img" [src]="'assets/user-icons/' + (item.img || 'default-user') + '.svg'" />
+                    <div [class]="'online-signal ' + (item.presence || 'offline')"></div>
+                </div>
+                <span class="font-w-400 font-18">
+                    {{ item.name }} <span *ngIf="item.uid === currentUserId">(Du)</span>
+                </span>
             </div>
-            <span class="font-w-400 font-18">
-                {{ item.name }} <span *ngIf="item.uid === currentUserId">(Du)</span>
-            </span>
-        </div>
 
-        <div *ngIf="context === 'AddRecipient' && !activeTrigger" class="user-email">
-            <span class="font-w-400 font-18">{{ item.email }}</span>
-        </div>
+            <div *ngIf="context === 'AddRecipient' && !activeTrigger" class="user-email">
+                <span class="font-w-400 font-18">{{ item.email }}</span>
+            </div>
 
-        <div *ngIf="activeTrigger === '#'" class="channel">
-            <img class="hover-icon" src="assets/icons/tag.svg">
-            <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
-            <span class="font-w-400 font-18">{{ item.name }}</span>
+            <div *ngIf="activeTrigger === '#'" class="channel">
+                <img class="hover-icon" src="assets/icons/tag.svg">
+                <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
+                <span class="font-w-400 font-18">{{ item.name }}</span>
+            </div>
         </div>
-    </div>
+    </ng-container>
+
+
+    <ng-container *ngIf="context === 'Searchbar' && !activeTrigger">
+        <div class="mention-item search-result" *ngFor="let item of filteredItems; let i = index" #mentionItem
+            [class.active]="i === activeIndex" (click)="select(item)">
+            <div *ngIf="item.type === 'channel-message'" class="info" [title]="item.message">
+                <div class="font-w-600 snippet">{{ item.message }}</div>
+                <div class="t-gray flag">{{ item.channelName }}</div>
+            </div>
+            <div *ngIf="item.type === 'dm-message'" class="info" [title]="item.text">
+                <span class="font-w-600 snippet">{{ item.text }}</span>
+                <div class="t-gray flag">DM</div>
+
+            </div>
+        </div>
+    </ng-container>
 </div>

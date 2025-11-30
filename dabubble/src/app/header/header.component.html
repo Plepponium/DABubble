@@ -13,7 +13,7 @@
             </button>
         </div>
         <app-mentions-overlay [text]="searchText" [caretIndex]="caretIndex" [currentUserId]="currentUser?.uid"
-            [context]="'Searchbar'" [users]="users" [channels]="relevantChannels"
+            [context]="'Searchbar'" [users]="users" [channels]="relevantChannels" [messages]="messages"
             (mentionSelected)="onMentionPicked($event, searchInput)" (overlayStateChange)="overlayActive = $event">
         </app-mentions-overlay>
     </div>

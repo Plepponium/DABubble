@@ -20,6 +20,8 @@ export class MentionsOverlayComponent {
   @Input() context: MentionContext = 'DM';
   @Input() users: Partial<User>[] = [];
   @Input() channels: any[] = [];
+  @Input() messages: any[] = [];
+
 
   @Output() mentionSelected = new EventEmitter<{ name: string, type: 'user' | 'channel' | 'email' }>();
   @Output() overlayStateChange = new EventEmitter<boolean>();
@@ -31,15 +33,26 @@ export class MentionsOverlayComponent {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['text'] || changes['caretIndex']) {
+
       if (this.context === 'AddUser') {
         this.filterUsersDirectly();
-      } else if (this.context === 'AddRecipient') {
-        this.filterRecipientUsers();
-      } else {
-        this.detectTrigger();
+        return;
       }
+
+      if (this.context === 'AddRecipient') {
+        this.filterRecipientUsers();
+        return;
+      }
+
+      if (this.context === 'Searchbar') {
+        this.filterSearchbar();
+        return;
+      }
+
+      this.detectTrigger();
     }
   }
+
 
   private filterUsersDirectly() {
     const term = this.text.trim().toLowerCase();
@@ -93,20 +106,39 @@ export class MentionsOverlayComponent {
 
 
 
-  select(item: any) {
-    if (!item) return;
-    let valueToInsert = item.name;
-    let type: 'email' | 'user' | 'channel' = this.activeTrigger === '@' ? 'user' : 'channel';
-    if (this.context === 'AddRecipient' && !this.activeTrigger) {
-      valueToInsert = item.email;
-      type = 'email';
+
+  private filterSearchbar() {
+    const textToCheck = typeof this.caretIndex === 'number'
+      ? this.text.slice(0, this.caretIndex)
+      : this.text;
+    const match = textToCheck.match(/([@#])([^\s]*)$/);
+    if (match) {
+      this.detectTrigger();
+      return;
     }
-    this.mentionSelected.emit({
-      name: valueToInsert,
-      type: type
-    });
-    this.closeOverlay();
+    this.activeTrigger = null;
+    const term = this.text.trim().toLowerCase();
+    if (!term || term.length < 1) {
+      this.filteredItems = [];
+      this.closeOverlay();
+      this.overlayStateChange.emit(false);
+      return;
+    }
+    this.filteredItems = this.messages
+      .filter(m =>
+        (m.type === 'channel-message' && m.message?.toLowerCase().includes(term)) ||
+        (m.type === 'dm-message' && m.text?.toLowerCase().includes(term))
+      )
+      .slice(0, 20);
+    this.overlayStateChange.emit(this.filteredItems.length > 0);
+    if (!this.filteredItems.length) {
+      this.closeOverlay();
+      this.overlayStateChange.emit(false);
+    }
   }
+
+
+
 
   private detectTrigger() {
     const textToCheck = (typeof this.caretIndex === 'number')
@@ -138,6 +170,21 @@ export class MentionsOverlayComponent {
       return;
     }
     this.overlayStateChange.emit(true);
+  }
+
+  select(item: any) {
+    if (!item) return;
+    let valueToInsert = item.name;
+    let type: 'email' | 'user' | 'channel' = this.activeTrigger === '@' ? 'user' : 'channel';
+    if (this.context === 'AddRecipient' && !this.activeTrigger) {
+      valueToInsert = item.email;
+      type = 'email';
+    }
+    this.mentionSelected.emit({
+      name: valueToInsert,
+      type: type
+    });
+    this.closeOverlay();
   }
 
   private closeOverlay() {

@@ -1,13 +1,15 @@
-import { Component, ElementRef, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, inject, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { User } from '../../models/user.class';
 import { UserService } from '../../services/user.service';
-import { Observable } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
+import { ChannelService } from '../../services/channel.service';
+import { DirectMessageService } from '../../services/direct-messages.service';
 
 @Component({
   selector: 'app-header',
@@ -27,8 +29,50 @@ export class HeaderComponent {
   caretIndex: number | null = null;
   overlayActive = false;
 
+  messages: any[] = [];
+
   userService = inject(UserService)
+  channelService = inject(ChannelService)
+  dmService = inject(DirectMessageService)
   router = inject(Router);
+
+  ngOnChanges(changes: SimpleChanges) {
+    if ((changes['currentUser'] || changes['channels']) && this.currentUser) {
+      this.loadMessages();
+    }
+  }
+
+  private async loadMessages() {
+    console.log('Relevant channels:', this.relevantChannels);
+
+    this.messages = [];
+
+    for (const ch of this.relevantChannels) {
+      console.log('Fetching chats for channel', ch.id);
+      const chats = await firstValueFrom(this.channelService.getChatsForChannel(ch.id));
+      console.log('Chats fetched:', chats);
+      const mapped = chats.map(c => ({
+        type: 'channel-message',
+        channelId: ch.id,
+        channelName: ch.name,
+        ...c
+      }));
+      this.messages.push(...mapped);
+    }
+
+    const dmIds = await this.dmService.getDmIdsForUser(this.currentUser!.uid);
+    for (const dmId of dmIds) {
+      const dmMsgs = await firstValueFrom(this.dmService.getMessages(dmId));
+      const mapped = dmMsgs.map(m => ({
+        type: 'dm-message',
+        dmId,
+        ...m
+      }));
+      this.messages.push(...mapped);
+    }
+    console.log('HeaderComponent messages loaded:', this.messages);
+  }
+
 
   get relevantChannels() {
     if (!this.currentUser) return [];

@@ -46,6 +46,7 @@
 .mention-item {
   display: flex;
   align-items: center;
+  width: 550px;
   gap: 15px;
   border-radius: 35px;
   padding: 4px 20px;
@@ -63,6 +64,25 @@
     .hover-icon-purple {
       display: block;
     }
+  }
+}
+
+.info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+
+  .snippet {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .flag {
+    margin-left: 10px;
+    flex-shrink: 0;
   }
 }
 
