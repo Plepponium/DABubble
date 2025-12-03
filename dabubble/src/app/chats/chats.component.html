@@ -160,14 +160,11 @@
                                                             class="font-w-700">
                                                             Du
                                                         </div>
-                                                        <span
-                                                            *ngIf="reaction.count === 1 && reaction.currentUserReacted">hast
+                                                        <span *ngIf="reaction.count === 1 && reaction.currentUserReacted">hast
                                                             reagiert</span>
-                                                        <span
-                                                            *ngIf="reaction.count === 1 && !reaction.currentUserReacted">hat
+                                                        <span *ngIf="reaction.count === 1 && !reaction.currentUserReacted">hat
                                                             reagiert</span>
-                                                        <span
-                                                            *ngIf="reaction.count - (reaction.currentUserReacted ? 1 : 0) >= 2"
+                                                        <span *ngIf="reaction.count - (reaction.currentUserReacted ? 1 : 0) >= 2"
                                                             class="font-w-700">und andere</span>
                                                         <span *ngIf="reaction.count > 1">haben reagiert</span>
                                                     </div>
