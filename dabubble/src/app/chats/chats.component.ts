@@ -50,6 +50,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   reactionArray: { type: string, count: number, user: string[] }[] = [];
   newMessage: string = '';
   mentionCaretIndex: number | null = null;
+  showAllReactions: { [index: number]: boolean } = {};
 
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
