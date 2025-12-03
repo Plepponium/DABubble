@@ -28,6 +28,8 @@ export class HeaderComponent {
   searchText = '';
   caretIndex: number | null = null;
   overlayActive = false;
+  private messagesLoaded = false;
+
 
   messages: any[] = [];
 
@@ -37,10 +39,14 @@ export class HeaderComponent {
   router = inject(Router);
 
   ngOnChanges(changes: SimpleChanges) {
-    if ((changes['currentUser'] || changes['channels']) && this.currentUser) {
+    if (!this.currentUser || this.messagesLoaded) return;
+
+    if (changes['currentUser'] || changes['channels']) {
+      this.messagesLoaded = true;
       this.loadMessages();
     }
   }
+
 
   private async loadMessages() {
     this.messages = [];
