@@ -161,14 +161,14 @@
   transform: translateX(0);
 }
 
-// .thread.width-with-menu {
-//   // width: calc(100vw - 40px);
-//   width: calc(100vw - 426px);
-// }
-
 .thread.fullwidth {
   // width: calc(100vw - 40px);
   width: calc(100vw - 426px);
+}
+
+.thread.fullwidth-without-menu {
+  width: calc(100vw - 40px);
+  // width: calc(100vw - 426px);
 }
 
 .thread.closed {
