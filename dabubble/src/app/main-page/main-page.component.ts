@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, HostListener, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
 import { MenuComponent } from '../menu/menu.component';
@@ -47,6 +47,7 @@ export class MainPageComponent {
   showMemberOverlay = false;
   inputMissing = false;
   missingInfo: { recipientMissing: boolean; textMissing: boolean; } | null = null;
+  isSmallScreen = false;
 
   allUsers: any[] = [];
   allChannels: any[] = [];
@@ -64,7 +65,13 @@ export class MainPageComponent {
   private router = inject(Router);
   private authSub?: Subscription;
 
+  @HostListener('window:resize', [])
+  onResize() {
+    this.isSmallScreen = window.innerWidth < 1512;
+  }
+
   ngOnInit() {
+    this.onResize();
     this.authSub = this.userService.getCurrentUser().subscribe(user => {
       if (!user) {
         this.router.navigate(['/']);
@@ -143,6 +150,18 @@ export class MainPageComponent {
     this.threadChatId = event.chatId;
     this.currentChannelId = event.channelId;
 
+    if (this.isSmallScreen) {
+      this.channelOpen = false;
+    }
+  }
+
+  onThreadClosed() {
+    this.threadOpen = false;
+
+    // Auf kleinen Screens Chats wieder anzeigen
+    if (this.isSmallScreen) {
+      this.channelOpen = true;
+    }
   }
 
   openLogoutOverlay() {

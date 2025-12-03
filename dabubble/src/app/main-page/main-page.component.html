@@ -35,8 +35,8 @@
 
             <app-thread id="thread" class="thread" *ngIf="threadChatId && currentChannelId" [chatId]="threadChatId"
                 [channelId]="currentChannelId" [class.open]="threadOpen" [class.closed]="!threadOpen"
-                (closeThread)="threadOpen = false" (openProfile)="openProfileOverlay($event)"
-                (answerAdded)="onAnswerAdded($event)"></app-thread>
+                (closeThread)="onThreadClosed()" (openProfile)="openProfileOverlay($event)"
+                (answerAdded)="onAnswerAdded($event)" [class.fullwidth]="!channelOpen"></app-thread>
 
             <app-direct-message-chats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
                 (openProfile)="openProfileOverlay($event)"></app-direct-message-chats>
