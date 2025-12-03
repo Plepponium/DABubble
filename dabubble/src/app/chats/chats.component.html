@@ -134,7 +134,7 @@
                                 <div class="reactions">
                                     <div class="reaction-btns">
                                         <div (click)="toggleReaction(i, reaction.type)"
-                                            *ngFor="let reaction of chat.reactionArray" class="reaction-btn"
+                                            *ngFor="let reaction of chat.reactionArray | slice:0:7" class="reaction-btn"
                                             [ngClass]="{'reacted': reaction.currentUserReacted}">
                                             <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
                                                 [alt]="reaction.type">
@@ -173,6 +173,10 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                        
+                                        <div *ngIf="chat.reactionArray!.length > 7" class="reaction-btn more-reactions">
+                                            ...
                                         </div>
                                     </div>
 
