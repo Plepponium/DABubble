@@ -20,6 +20,7 @@ import { DirectMessageService } from '../../services/direct-messages.service';
 export class HeaderComponent {
   @Output() openLogoutOverlay = new EventEmitter<void>();
   @Output() openUserProfile = new EventEmitter<void>();
+  @Output() messageSelected = new EventEmitter<any>();
 
   @Input() users: any[] = [];
   @Input() channels: any[] = [];
@@ -28,8 +29,6 @@ export class HeaderComponent {
   searchText = '';
   caretIndex: number | null = null;
   overlayActive = false;
-  private messagesLoaded = false;
-
 
   messages: any[] = [];
 
@@ -39,17 +38,19 @@ export class HeaderComponent {
   router = inject(Router);
 
   ngOnChanges(changes: SimpleChanges) {
-    if (!this.currentUser || this.messagesLoaded) return;
-
-    if (changes['currentUser'] || changes['channels']) {
-      this.messagesLoaded = true;
+    if (!this.currentUser || !this.channels?.length || !this.users?.length) return;
+    if (changes['currentUser'] || changes['channels'] || changes['users']) {
       this.loadMessages();
     }
   }
 
-
   private async loadMessages() {
     this.messages = [];
+    await this.loadChannelMessages();
+    await this.loadDmMessages();
+  }
+
+  private async loadChannelMessages() {
     for (const ch of this.relevantChannels) {
       const chats = await firstValueFrom(this.channelService.getChatsForChannel(ch.id));
       const mapped = chats.map(c => {
@@ -59,20 +60,25 @@ export class HeaderComponent {
           channelId: ch.id,
           channelName: ch.name,
           senderName: sender?.name || 'Unbekannt',
+          participants: ch.participants,
           ...c
         };
       });
       this.messages.push(...mapped);
     }
+  }
 
+  private async loadDmMessages() {
     const dmIds = await this.dmService.getDmIdsForUser(this.currentUser!.uid);
     for (const dmId of dmIds) {
+      const dmDoc = await firstValueFrom(this.dmService.getDmDoc(dmId));
       const dmMsgs = await firstValueFrom(this.dmService.getMessages(dmId));
       const mapped = dmMsgs.map(m => {
         const sender = this.users.find(u => u.uid === m.senderId);
         return {
           type: 'dm-message',
           dmId,
+          participants: dmDoc.participants,
           senderName: sender?.name || 'Unbekannt',
           ...m
         };
@@ -80,7 +86,6 @@ export class HeaderComponent {
       this.messages.push(...mapped);
     }
   }
-
 
   get relevantChannels() {
     if (!this.currentUser) return [];
@@ -92,25 +97,24 @@ export class HeaderComponent {
     this.caretIndex = el.selectionStart || 0;
   }
 
-  // --- under construction ---
-  onMentionPicked(event: { name: string; type: 'user' | 'channel' | 'email' }, el: HTMLInputElement) {
-    const pos = this.caretIndex ?? this.searchText.length;
-    const before = this.searchText.slice(0, pos);
-    const after = this.searchText.slice(pos);
+  onNavigateToMessage(item: any) {
+    // optionally enrich item with senderName if not present:
+    if (item.type === 'dm-message') {
+      // senderId might be item.senderId
+      if (!item.senderName && item.senderId) {
+        const u = this.users.find(x => x.uid === item.senderId);
+        if (u) item.senderName = u.name;
+      }
+    } else if (item.type === 'channel-message') {
+      if (!item.senderName && item.user) {
+        const u = this.users.find(x => x.uid === item.user);
+        if (u) item.senderName = u.name;
+      }
+    }
 
-    const insertValue =
-      event.type === 'user' ? `@${event.name}` :
-        event.type === 'channel' ? `#${event.name}` : event.name;
-
-    this.searchText = before + insertValue + ' ' + after;
-    this.caretIndex = before.length + insertValue.length + 1;
-
-    setTimeout(() => {
-      el.focus();
-      el.selectionStart = el.selectionEnd = this.caretIndex;
-    });
+    // forward upstream to main-page
+    this.messageSelected.emit(item);
   }
-  // --- under construction ---
 
   getAvatarImg(user?: User): string {
     return user?.img || 'default-user';

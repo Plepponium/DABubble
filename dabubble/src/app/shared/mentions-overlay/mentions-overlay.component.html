@@ -31,7 +31,7 @@
 
     <ng-container *ngIf="context === 'Searchbar' && !activeTrigger">
         <div class="mention-item search-result" *ngFor="let item of filteredItems; let i = index" #mentionItem
-            [class.active]="i === activeIndex" (click)="select(item)">
+            [class.active]="i === activeIndex" (click)="onItemClick(item)">
             <div *ngIf="item.type === 'channel-message'" class="info" [title]="item.message">
                 <span class="sender font-w-600">{{ item.senderName }}:&nbsp;</span>
                 <div class="snippet">{{ item.message }}</div>

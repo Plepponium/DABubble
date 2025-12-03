@@ -25,6 +25,7 @@ export class MentionsOverlayComponent {
 
   @Output() mentionSelected = new EventEmitter<{ name: string, type: 'user' | 'channel' | 'email' }>();
   @Output() overlayStateChange = new EventEmitter<boolean>();
+  @Output() navigateToMessage = new EventEmitter<any>();
 
   activeTrigger: '@' | '#' | null = null;
   searchTerm = '';
@@ -193,6 +194,16 @@ export class MentionsOverlayComponent {
     this.activeIndex = 0;
   }
 
+  onItemClick(item: any) {
+    if (!item) return;
+    if (this.context === 'Searchbar' && !this.activeTrigger) {
+      this.navigateToMessage.emit(item);
+      this.closeOverlay();
+      return;
+    }
+    this.select(item);
+  }
+
   @HostListener('document:keydown', ['$event'])
   onKeyDown(e: KeyboardEvent) {
     if (!this.filteredItems.length) return;
@@ -209,7 +220,12 @@ export class MentionsOverlayComponent {
       e.stopPropagation();
     }
     else if (e.key === 'Enter') {
-      this.select(this.filteredItems[this.activeIndex]);
+      const item = this.filteredItems[this.activeIndex];
+      if (this.context === 'Searchbar') {
+        this.onItemClick(item);
+      } else {
+        this.select(item);
+      }
       e.preventDefault();
       e.stopPropagation();
     }

@@ -145,6 +145,28 @@ export class MainPageComponent {
     this.newMessageOpen = false;
   }
 
+  openMessageFromHeader(item: any) {
+    if (!item) return;
+    if (item.type === 'channel-message') {
+      this.openChannel(item.channelId);
+      return;
+    }
+    if (item.type === 'dm-message') {
+      const otherUid =
+        item.participants.find((p: string | undefined) => p !== this.currentUser?.uid)
+        || item.participants[0];
+
+      const user = this.allUsers.find(u => u.uid === otherUid);
+      if (user) {
+        this.openUserChat(user);
+      } else {
+        console.warn('Other participant not found locally', otherUid);
+      }
+      return;
+    }
+  }
+
+
   openThread(event: { channelId: string; chatId: string }) {
     this.threadOpen = true;
     this.threadChatId = event.chatId;

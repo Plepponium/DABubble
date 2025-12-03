@@ -1,6 +1,7 @@
 <div class="main-page">
-    <app-header class="header" (openLogoutOverlay)="openLogoutOverlay()" (openUserProfile)="openUserProfile()"
-        [currentUser]="currentUser" [users]="allUsers" [channels]="allChannels"></app-header>
+    <app-header class="header" (messageSelected)="openMessageFromHeader($event)"
+        (openLogoutOverlay)="openLogoutOverlay()" (openUserProfile)="openUserProfile()" [currentUser]="currentUser"
+        [users]="allUsers" [channels]="allChannels"></app-header>
 
     <button class="toggle-menu-btn" type="button" (click)="toggleMenu()">
         <div class="toggle-btn-container">
