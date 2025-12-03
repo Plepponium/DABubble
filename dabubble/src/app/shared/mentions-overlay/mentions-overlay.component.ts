@@ -118,7 +118,7 @@ export class MentionsOverlayComponent {
     }
     this.activeTrigger = null;
     const term = this.text.trim().toLowerCase();
-    if (!term || term.length < 1) {
+    if (!term || term.length < 3) {
       this.filteredItems = [];
       this.closeOverlay();
       this.overlayStateChange.emit(false);
