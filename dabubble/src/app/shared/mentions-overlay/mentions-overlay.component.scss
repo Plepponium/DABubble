@@ -40,13 +40,16 @@
     top: 55px;
     border-radius: 0px 20px 20px 20px;
     height: max-content;
+
+    .mention-item {
+      width: 550px;
+    }
   }
 }
 
 .mention-item {
   display: flex;
   align-items: center;
-  width: 550px;
   gap: 15px;
   border-radius: 35px;
   padding: 4px 20px;
