@@ -33,11 +33,13 @@
         <div class="mention-item search-result" *ngFor="let item of filteredItems; let i = index" #mentionItem
             [class.active]="i === activeIndex" (click)="select(item)">
             <div *ngIf="item.type === 'channel-message'" class="info" [title]="item.message">
-                <div class="font-w-600 snippet">{{ item.message }}</div>
+                <span class="sender font-w-600">{{ item.senderName }}:&nbsp;</span>
+                <div class="snippet">{{ item.message }}</div>
                 <div class="t-gray flag">{{ item.channelName }}</div>
             </div>
             <div *ngIf="item.type === 'dm-message'" class="info" [title]="item.text">
-                <span class="font-w-600 snippet">{{ item.text }}</span>
+                <span class="sender font-w-600">{{ item.senderName }}:&nbsp;</span>
+                <span class="snippet">{{ item.text }}</span>
                 <div class="t-gray flag">DM</div>
 
             </div>

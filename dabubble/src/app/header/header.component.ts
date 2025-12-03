@@ -43,34 +43,36 @@ export class HeaderComponent {
   }
 
   private async loadMessages() {
-    console.log('Relevant channels:', this.relevantChannels);
-
     this.messages = [];
-
     for (const ch of this.relevantChannels) {
-      console.log('Fetching chats for channel', ch.id);
       const chats = await firstValueFrom(this.channelService.getChatsForChannel(ch.id));
-      console.log('Chats fetched:', chats);
-      const mapped = chats.map(c => ({
-        type: 'channel-message',
-        channelId: ch.id,
-        channelName: ch.name,
-        ...c
-      }));
+      const mapped = chats.map(c => {
+        const sender = this.users.find(u => u.uid === c.user);
+        return {
+          type: 'channel-message',
+          channelId: ch.id,
+          channelName: ch.name,
+          senderName: sender?.name || 'Unbekannt',
+          ...c
+        };
+      });
       this.messages.push(...mapped);
     }
 
     const dmIds = await this.dmService.getDmIdsForUser(this.currentUser!.uid);
     for (const dmId of dmIds) {
       const dmMsgs = await firstValueFrom(this.dmService.getMessages(dmId));
-      const mapped = dmMsgs.map(m => ({
-        type: 'dm-message',
-        dmId,
-        ...m
-      }));
+      const mapped = dmMsgs.map(m => {
+        const sender = this.users.find(u => u.uid === m.senderId);
+        return {
+          type: 'dm-message',
+          dmId,
+          senderName: sender?.name || 'Unbekannt',
+          ...m
+        };
+      });
       this.messages.push(...mapped);
     }
-    console.log('HeaderComponent messages loaded:', this.messages);
   }
 
 
