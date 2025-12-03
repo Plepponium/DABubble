@@ -14,6 +14,7 @@ export const reactionIcons: string[] = [
   // 'silence',
   'crying',
   'cap',
+  'alien',
   'sappy',
   'shock',
 ];

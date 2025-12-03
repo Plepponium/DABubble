@@ -374,13 +374,14 @@
 .reactions {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  // flex-wrap: wrap;
   gap: 8px;
 }
 
 .reaction-btns {
   display: flex;
   align-items: center;
+  justify-content: end;
   flex-wrap: wrap;
   gap: 10px;
 }
