@@ -305,7 +305,8 @@ export class ChatsComponent implements OnInit, OnChanges {
         otherUserName,
         otherUserReacted
       };
-    });
+    })
+    .sort((a, b) => a.type.localeCompare(b.type));
   }
 
   private parseUserIds(users: string[]): string[] {

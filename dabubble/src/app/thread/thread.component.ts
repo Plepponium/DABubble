@@ -291,7 +291,8 @@ export class ThreadComponent implements OnInit {
       const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
       const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
       return { type, count: userIds.length, userIds, currentUserReacted, otherUserName, otherUserReacted };
-    });
+    })
+    .sort((a, b) => a.type.localeCompare(b.type));
   }
 
   private findOtherUserName(userIds: string[], currentUserId: string, participants: User[]): string | undefined {
