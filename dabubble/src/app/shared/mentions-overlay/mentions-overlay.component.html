@@ -5,7 +5,8 @@
 
     <ng-container *ngIf="activeTrigger || context === 'AddUser' || context === 'AddRecipient'">
         <div class="mention-item" #mentionItem *ngFor="let item of filteredItems; let i = index"
-            [class.active]="i === activeIndex" (click)="select(item)">
+            [class.active]="i === activeIndex"
+            (click)="context === 'Searchbar' && activeTrigger ? onItemClick(item) : select(item)">
             <div *ngIf="activeTrigger === '@' || context === 'AddUser'" class="user">
                 <div class="img-container">
                     <img class="user-img" [src]="'assets/user-icons/' + (item.img || 'default-user') + '.svg'" />

@@ -145,26 +145,50 @@ export class MainPageComponent {
     this.newMessageOpen = false;
   }
 
-  openMessageFromHeader(item: any) {
+  openChatFromHeader(item: any) {
     if (!item) return;
-    if (item.type === 'channel-message') {
-      this.openChannel(item.channelId);
-      return;
-    }
-    if (item.type === 'dm-message') {
-      const otherUid =
-        item.participants.find((p: string | undefined) => p !== this.currentUser?.uid)
-        || item.participants[0];
-
-      const user = this.allUsers.find(u => u.uid === otherUid);
-      if (user) {
-        this.openUserChat(user);
-      } else {
-        console.warn('Other participant not found locally', otherUid);
-      }
-      return;
-    }
+    if (item.type === 'channel-message') return this.handleChannelMessage(item);
+    if (item.type === 'dm-message') return this.handleDmMessage(item);
+    if (this.isUserMention(item)) return this.handleUserMention(item);
+    if (this.isChannelMention(item)) return this.handleChannelMention(item);
+    console.warn('Unknown item type, cannot open:', item);
   }
+
+  private handleChannelMessage(item: any) {
+    const id = item.channelId;
+    if (!id) {
+      console.warn('ChannelId not found in message:', item);
+      return;
+    }
+    this.openChannel(id);
+  }
+
+  private handleDmMessage(item: any) {
+    const otherUid =
+      item.participants.find((p: string) => p !== this.currentUser?.uid)
+      || item.participants[0];
+    const user = this.allUsers.find(u => u.uid === otherUid);
+    if (user) this.openUserChat(user);
+    else console.warn('DM participant not found:', otherUid);
+  }
+
+  private handleUserMention(item: any) {
+    this.openUserChat(item);
+  }
+
+  private handleChannelMention(item: any) {
+    this.openChannel(item.id);
+  }
+
+  private isUserMention(item: any): boolean {
+    return !!item.uid;
+  }
+
+  private isChannelMention(item: any): boolean {
+    return !!(item.id && item.participants && item.name);
+  }
+
+
 
 
   openThread(event: { channelId: string; chatId: string }) {

@@ -20,7 +20,7 @@ import { DirectMessageService } from '../../services/direct-messages.service';
 export class HeaderComponent {
   @Output() openLogoutOverlay = new EventEmitter<void>();
   @Output() openUserProfile = new EventEmitter<void>();
-  @Output() messageSelected = new EventEmitter<any>();
+  @Output() selectedItem = new EventEmitter<any>();
 
   @Input() users: any[] = [];
   @Input() channels: any[] = [];
@@ -29,6 +29,8 @@ export class HeaderComponent {
   searchText = '';
   caretIndex: number | null = null;
   overlayActive = false;
+  inputFocused = false;
+
 
   messages: any[] = [];
 
@@ -97,24 +99,20 @@ export class HeaderComponent {
     this.caretIndex = el.selectionStart || 0;
   }
 
-  onNavigateToMessage(item: any) {
-    // optionally enrich item with senderName if not present:
-    if (item.type === 'dm-message') {
-      // senderId might be item.senderId
-      if (!item.senderName && item.senderId) {
-        const u = this.users.find(x => x.uid === item.senderId);
-        if (u) item.senderName = u.name;
-      }
-    } else if (item.type === 'channel-message') {
-      if (!item.senderName && item.user) {
-        const u = this.users.find(x => x.uid === item.user);
-        if (u) item.senderName = u.name;
-      }
-    }
-
-    // forward upstream to main-page
-    this.messageSelected.emit(item);
+  onNavigateToChat(item: any) {
+    this.searchText = '';
+    this.selectedItem.emit(item);
   }
+
+  onSearchFocus() {
+    this.inputFocused = true;
+  }
+
+  onSearchBlur() {
+    this.inputFocused = false;
+  }
+
+
 
   getAvatarImg(user?: User): string {
     return user?.img || 'default-user';

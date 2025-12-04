@@ -7,14 +7,16 @@
     <div class="searchbar-wrapper">
         <div class="searchbar-container">
             <input #searchInput class="searchbar t-gray font-24" type="text" placeholder="Devspace durchsuchen"
-                [(ngModel)]="searchText" (input)="updateCaret(searchInput)" (keyup)="updateCaret(searchInput)">
+                [(ngModel)]="searchText" (input)="updateCaret(searchInput)" (keyup)="updateCaret(searchInput)"
+                (focus)="onSearchFocus()" (blur)="onSearchBlur()">
             <button mat-icon-button aria-label="Example icon-button with share icon">
                 <img src="assets/icons/lens.svg" alt="">
             </button>
         </div>
-        <app-mentions-overlay [text]="searchText" [caretIndex]="caretIndex" [currentUserId]="currentUser?.uid"
-            [context]="'Searchbar'" [users]="users" [channels]="relevantChannels" [messages]="messages"
-            (navigateToMessage)="onNavigateToMessage($event)" (overlayStateChange)="overlayActive = $event">
+        <app-mentions-overlay *ngIf="inputFocused" [text]="searchText" [caretIndex]="caretIndex"
+            [currentUserId]="currentUser?.uid" [context]="'Searchbar'" [users]="users" [channels]="relevantChannels"
+            [messages]="messages" (navigateToChat)="onNavigateToChat($event)"
+            (overlayStateChange)="overlayActive = $event">
         </app-mentions-overlay>
     </div>
 

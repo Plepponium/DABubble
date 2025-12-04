@@ -25,7 +25,7 @@ export class MentionsOverlayComponent {
 
   @Output() mentionSelected = new EventEmitter<{ name: string, type: 'user' | 'channel' | 'email' }>();
   @Output() overlayStateChange = new EventEmitter<boolean>();
-  @Output() navigateToMessage = new EventEmitter<any>();
+  @Output() navigateToChat = new EventEmitter<any>();
 
   activeTrigger: '@' | '#' | null = null;
   searchTerm = '';
@@ -174,6 +174,11 @@ export class MentionsOverlayComponent {
   }
 
   select(item: any) {
+    if (this.context === 'Searchbar') {
+      this.navigateToChat.emit(item);
+      this.closeOverlay();
+      return;
+    }
     if (!item) return;
     let valueToInsert = item.name;
     let type: 'email' | 'user' | 'channel' = this.activeTrigger === '@' ? 'user' : 'channel';
@@ -196,13 +201,11 @@ export class MentionsOverlayComponent {
 
   onItemClick(item: any) {
     if (!item) return;
-    if (this.context === 'Searchbar' && !this.activeTrigger) {
-      this.navigateToMessage.emit(item);
-      this.closeOverlay();
-      return;
-    }
-    this.select(item);
+    console.log('Item clicked:', item);
+    this.navigateToChat.emit(item);
+    this.closeOverlay();
   }
+
 
   @HostListener('document:keydown', ['$event'])
   onKeyDown(e: KeyboardEvent) {
