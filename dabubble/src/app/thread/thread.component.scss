@@ -456,6 +456,11 @@
   white-space: nowrap;
 }
 
+.more-reactions {
+  width: fit-content;
+  font-size: 16px;
+}
+
 .hidden-answers-line {
   width: calc(100% - 70px);
   display: flex;

@@ -45,6 +45,8 @@ export class ThreadComponent implements OnInit {
   newAnswer: string = '';
   mentionCaretIndex: number | null = null;
   cursorPos: number = 0;
+  showAllReactionsForChat: { [chatId: string]: boolean } = {};
+  showAllReactionsForAnswer: { [answerId: string]: boolean } = {};
 
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
