@@ -331,6 +331,8 @@
   .reaction-btns {
     display: flex;
     align-items: center;
+    justify-content: end;
+    flex-wrap: wrap;
     gap: 10px;
 
     .reaction-btn {
@@ -398,6 +400,11 @@
       white-space: nowrap;
     }
   }
+}
+
+.more-reactions {
+  width: fit-content !important;
+  font-size: 16px;
 }
 
 .chat-edit-wrapper {
