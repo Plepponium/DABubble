@@ -176,6 +176,9 @@
                                         <div (click)="showAllReactions[i] = true" *ngIf="chat.reactionArray!.length > 7 && !showAllReactions[i]" class="reaction-btn more-reactions">
                                             {{chat.reactionArray!.length-7}} weitere
                                         </div>
+                                        <div (click)="showAllReactions[i] = false" *ngIf="showAllReactions[i]" class="reaction-btn more-reactions">
+                                            Weniger anzeigen
+                                        </div>
                                     </div>
 
                                     <div class="reactions-display-container-below">
