@@ -135,8 +135,8 @@
                                     <div class="reaction-btns">
                                         <div (click)="toggleReaction(i, reaction.type)"
                                             *ngFor="let reaction of (showAllReactions[i] ? chat.reactionArray : (chat.reactionArray | slice:0:7))" 
-                                            class="reaction-btn"
-                                            [ngClass]="{'reacted': reaction.currentUserReacted}">
+                                            class="reaction-btn" [ngClass]="{'reacted': reaction.currentUserReacted}">
+                                            
                                             <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
                                                 [alt]="reaction.type">
                                             <div>{{ reaction.count }}</div>

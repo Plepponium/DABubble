@@ -44,6 +44,7 @@ export class DirectMessageChatsComponent {
     messageId: null,
     source: null
   };
+  showAllReactions: Record<number, boolean> = {};
 
   activeSmiley = false;
   allSmileys = reactionIcons;
@@ -141,6 +142,24 @@ export class DirectMessageChatsComponent {
     });
 
     this.activeSmiley = false;
+  }
+
+  getReactionArray(message: any): { type: string; count: number }[] {
+    if (!message.reactions) return [];
+    return Object.keys(message.reactions)
+      .map(type => ({
+        type,
+        count: message.reactions[type]?.length || 0
+      }))
+      .filter(r => r.count > 0);
+  }
+
+  getVisibleReactions(message: any, index: number): { type: string; count: number }[] {
+    const all = this.getReactionArray(message);
+    if (this.showAllReactions[index]) {
+      return all;
+    }
+    return all.slice(0, 7); // Max 7 Reaktionen
   }
 
   insertMention(event: { name: string; type: 'user' | 'channel' | 'email' }) {
