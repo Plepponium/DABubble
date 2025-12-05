@@ -75,28 +75,26 @@
 
                                             <div class="reactions">
                                                 <div class="reaction-btns">
-                                                    <!-- <ng-container *ngFor="let icon of reactionIcons"> -->
-                                                        <div class="reaction-btn"
-                                                            *ngFor="let reaction of getVisibleReactions(m, i)"
-                                                            (click)="onReactionClick(m, reaction.type)"
-                                                            [class.reacted]="m.reactions[reaction.type]?.includes(currentUser?.uid || '')">
-                                                            <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
-                                                                alt="reaction icon" />
-                                                            <span>{{ reaction.count }}</span>
+                                                    <div class="reaction-btn"
+                                                        *ngFor="let reaction of getVisibleReactions(m, i); trackBy: trackReaction"
+                                                        (click)="onReactionClick(m, reaction.type)"
+                                                        [class.reacted]="m.reactions[reaction.type]?.includes(currentUser?.uid || '')">
+                                                        <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
+                                                            alt="reaction icon" />
+                                                        <span>{{ reaction.count }}</span>
 
-                                                            <div class="r-btn-hover-display">
-                                                                <div class="r-btn-hover-display-content">
-                                                                    <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
-                                                                        alt="reaction.type" />
-                                                                    <div class="reaction-btn-t-box">
-                                                                        <div class="font-w-700">{{
-                                                                            getReactionHoverText(m.reactions[reaction.type]) }}
-                                                                        </div>
+                                                        <div class="r-btn-hover-display">
+                                                            <div class="r-btn-hover-display-content">
+                                                                <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
+                                                                    alt="reaction.type" />
+                                                                <div class="reaction-btn-t-box">
+                                                                    <div class="font-w-700">{{
+                                                                        getReactionHoverText(m.reactions[reaction.type]) }}
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    <!-- </ng-container> -->
+                                                    </div>
 
                                                     <div (click)="showAllReactions[i] = true" *ngIf="getReactionArray(m).length > 7 && !showAllReactions[i]" class="reaction-btn more-reactions">
                                                         {{ getReactionArray(m).length - 7 }} weitere

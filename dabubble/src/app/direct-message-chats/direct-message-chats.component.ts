@@ -151,15 +151,17 @@ export class DirectMessageChatsComponent {
         type,
         count: message.reactions[type]?.length || 0
       }))
-      .filter(r => r.count > 0);
+      .filter(r => r.count > 0)
+      .sort((a, b) => a.type.localeCompare(b.type));
   }
 
   getVisibleReactions(message: any, index: number): { type: string; count: number }[] {
     const all = this.getReactionArray(message);
-    if (this.showAllReactions[index]) {
+    const showAll = this.showAllReactions[index] ?? false;
+    if (showAll) {
       return all;
     }
-    return all.slice(0, 7); // Max 7 Reaktionen
+    return all.slice(0, 7); 
   }
 
   insertMention(event: { name: string; type: 'user' | 'channel' | 'email' }) {
@@ -308,6 +310,10 @@ export class DirectMessageChatsComponent {
     } catch (err) {
       console.error('Fehler beim Hinzufügen der Reaktion:', err);
     }
+  }
+
+  trackReaction(_index: number, reaction: { type: string; count: number }): string {
+    return reaction.type; // Eindeutig pro Reaction-Typ
   }
 
   async onReactionClick(message: any, type: string) {
