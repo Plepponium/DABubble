@@ -46,8 +46,8 @@ export class NewMessageComponent {
 
   @Output() openChannel = new EventEmitter<string>();
   @Output() openUserChat = new EventEmitter<User>();
-  @Output() inputMissing = new EventEmitter<{ 
-    recipientMissing: boolean; 
+  @Output() inputMissing = new EventEmitter<{
+    recipientMissing: boolean;
     textMissing: boolean;
   }>();
 
@@ -208,7 +208,7 @@ export class NewMessageComponent {
     const textMissing = !trimmedMessage;
 
     if (recipientMissing || textMissing) {
-    // if (!trimmedMessage || !trimmedRecipients) {
+      // if (!trimmedMessage || !trimmedRecipients) {
       // console.warn('⚠️ Nachricht oder Empfänger fehlt.');
       this.inputMissing.emit({ recipientMissing, textMissing });
       return false;
@@ -471,7 +471,7 @@ export class NewMessageComponent {
     return name
       .trim()
       .replace(/\s+/g, ' ')
-      .replace(/-+/g, '-')   
+      .replace(/-+/g, '-')
       .toLowerCase();
   }
 

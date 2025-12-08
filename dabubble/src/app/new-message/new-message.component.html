@@ -6,9 +6,12 @@
             </div>
 
             <div class="input-field">
+                <input type="text" style="display:none" autocomplete="on">
                 <input #recipientInput id="recipient" class="input" [(ngModel)]="recipientText" type="text"
-                    placeholder="An: #channel, @jemand oder E-Mail Adresse"
-                    (input)="updateRecipientCaret(recipientInput)" (keyup)="updateRecipientCaret(recipientInput)">
+                    placeholder="An: #channel, @jemand oder E-Mail Adresse" autocomplete="off"
+                    autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false"
+                    inputmode="none" role="presentation" (input)="updateRecipientCaret(recipientInput)"
+                    (keyup)="updateRecipientCaret(recipientInput)">
 
                 <app-mentions-overlay [text]="recipientText" [caretIndex]="recipientCaretIndex"
                     [currentUserId]="currentUserId" [context]="'AddRecipient'" [users]="(participants$ | async) || [] "

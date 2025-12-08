@@ -34,22 +34,18 @@ export class MentionsOverlayComponent {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['text'] || changes['caretIndex']) {
-
       if (this.context === 'AddUser') {
         this.filterUsersDirectly();
         return;
       }
-
       if (this.context === 'AddRecipient') {
         this.filterRecipientUsers();
         return;
       }
-
       if (this.context === 'Searchbar') {
         this.filterSearchbar();
         return;
       }
-
       this.detectTrigger();
     }
   }
@@ -98,8 +94,16 @@ export class MentionsOverlayComponent {
       this.overlayStateChange.emit(false);
       return;
     }
+    const selected = this.getSelectedNames();
     this.filteredItems = [...this.users]
-      .filter(u => u.email?.toLowerCase().includes(clean))
+      .filter(u => {
+        const email = u.email?.toLowerCase();
+        const name = u.name?.toLowerCase();
+        if (!email) return false;
+        if (!email.includes(clean)) return false;
+        if (selected.has(email) || (name && selected.has(name))) return false;
+        return true;
+      })
       .slice(0, 10);
     this.activeTrigger = null;
     this.overlayStateChange.emit(this.filteredItems.length > 0);
@@ -154,23 +158,33 @@ export class MentionsOverlayComponent {
     this.activeTrigger = match[1] as '@' | '#';
     this.searchTerm = match[2].toLowerCase();
     if (this.activeTrigger === '@') {
+      const selected = this.getSelectedNames();
+
       const sortedUsers = [...this.users].sort((a, b) =>
         (a.name || '').toLowerCase().localeCompare((b.name || '').toLowerCase())
       );
+
       this.filteredItems = sortedUsers
-        .filter(u => u.name?.toLowerCase().includes(this.searchTerm))
+        .filter(u => {
+          const name = u.name?.toLowerCase();
+          if (!name) return false;
+          if (selected.has(name)) return false;
+          if (this.searchTerm && !name.includes(this.searchTerm)) return false;
+          return true;
+        })
         .slice(0, 10);
-    } else if (this.activeTrigger === '#') {
+    }
+    else if (this.activeTrigger === '#') {
+      const selected = this.getSelectedNames();
       this.filteredItems = this.channels
-        .filter(c => c.name.toLowerCase().includes(this.searchTerm))
+        .filter(c => {
+          const name = c.name.toLowerCase();
+          if (selected.has(name)) return false;
+          if (this.searchTerm && !name.includes(this.searchTerm)) return false;
+          return true;
+        })
         .slice(0, 10);
     }
-    if (this.filteredItems.length === 0) {
-      this.closeOverlay();
-      this.overlayStateChange.emit(false);
-      return;
-    }
-    this.overlayStateChange.emit(true);
   }
 
   select(item: any) {
@@ -192,6 +206,24 @@ export class MentionsOverlayComponent {
     });
     this.closeOverlay();
   }
+
+  private getSelectedNames(): Set<string> {
+    if (this.context !== 'AddRecipient') return new Set();
+    const result = new Set<string>();
+    const mentionRegex = /[@#]([a-zA-ZÀ-ÿ0-9._-]+(?:\s+[a-zA-ZÀ-ÿ0-9._-]+)*)/g;
+    let match: RegExpExecArray | null;
+    while ((match = mentionRegex.exec(this.text)) !== null) {
+      result.add(match[1].toLowerCase());
+    }
+    this.text
+      .split(/\s+/)
+      .filter(t => t.includes('@') && !t.startsWith('@'))
+      .forEach(email => result.add(email.toLowerCase()));
+    return result;
+  }
+
+
+
 
   private closeOverlay() {
     this.activeTrigger = null;
