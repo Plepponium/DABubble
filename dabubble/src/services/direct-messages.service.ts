@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Firestore, collectionData, collection, doc, docData } from '@angular/fire/firestore';
-import { query, where, getDocs, addDoc, serverTimestamp, orderBy, arrayUnion, updateDoc, arrayRemove, getDoc } from 'firebase/firestore';
+import { query, where, getDocs, addDoc, serverTimestamp, orderBy, arrayUnion, updateDoc, arrayRemove, getDoc, deleteField } from 'firebase/firestore';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -74,8 +74,20 @@ export class DirectMessageService {
         const reactions = data.reactions || {};
         const current: string[] = reactions[type] || [];
         const has = current.includes(userId);
-        const updated = has ? current.filter((u: string) => u !== userId) : [...current, userId];
-        return updateDoc(msgRef as any, { [`reactions.${type}`]: updated });
+        if (has) {
+            const updated = current.filter(u => u !== userId);
+            if (updated.length === 0) {
+                return updateDoc(msgRef, {
+                    [`reactions.${type}`]: deleteField()
+                });
+            }
+            return updateDoc(msgRef, {
+                [`reactions.${type}`]: updated
+            });
+        }
+        return updateDoc(msgRef, {
+            [`reactions.${type}`]: [...current, userId]
+        });
     }
 
     async getDmIdsForUser(uid: string): Promise<string[]> {
