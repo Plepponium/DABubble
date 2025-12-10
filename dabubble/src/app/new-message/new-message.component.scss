@@ -236,3 +236,12 @@
     }
   }
 }
+
+@media(max-width: 880px) {
+  .message {
+  width: 100%;
+  // flex-grow: 1;
+  height: calc(100vh - 120px);
+  border-radius: 0px;
+}
+}
