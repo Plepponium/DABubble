@@ -1,5 +1,7 @@
 .header {
   width: 100%;
+  height: 95px;
+  box-sizing: border-box;
   padding-top: 25px;
   display: flex;
   position: relative;
@@ -144,8 +146,18 @@
   }
 }
 
-@media (max-width: 940px) {
-  .searchBar {
-    margin-left: 260px;
+@media (max-width: 1010px) {
+  .hide-responsive {
+    display: none;
   }
+}
+
+// @media (max-width: 940px) {
+//   .searchBar {
+//     margin-left: 260px;
+//   }
+// }
+
+@media (max-width: 880px) {
+  
 }

@@ -42,6 +42,7 @@
 
             <app-direct-message-chats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
                 (openProfile)="openProfileOverlay($event)"></app-direct-message-chats>
+            
             <app-new-message class="new-message" *ngIf="newMessageOpen" (openChannel)="openChannel($event)"
                 (openUserChat)="openUserChat($event)"
                 (inputMissing)="openInputMissingOverlay($event)"></app-new-message>

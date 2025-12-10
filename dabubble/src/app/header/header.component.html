@@ -4,7 +4,7 @@
         <div class="font-32 font-w-700">DABubble</div>
     </div>
 
-    <div class="searchbar-wrapper">
+    <div class="searchbar-wrapper hide-responsive">
         <div class="searchbar-container">
             <input #searchInput class="searchbar t-gray font-24" type="text" placeholder="Devspace durchsuchen"
                 [(ngModel)]="searchText" (input)="updateCaret(searchInput)" (keyup)="updateCaret(searchInput)"
@@ -21,13 +21,13 @@
     </div>
 
     <div (click)="openDialogueLogout()" class="user" *ngIf="currentUser as user">
-        <div id="user-name" class="user-name font-32 font-w-700">{{ user.name }}</div>
+        <div id="user-name" class="user-name font-32 font-w-700 hide-responsive">{{ user.name }}</div>
         <div class="img-container">
             <img class="user-img" [src]="'assets/user-icons/' + getAvatarImg(user) + '.svg'" alt="Avatar">
             <div [class]="'online-signal-header ' + user.presence"></div>
         </div>
 
-        <div class="icon-container">
+        <div class="icon-container hide-responsive">
             <img class="hover-icon" src="assets/icons/expand_more.svg" alt="">
             <img class="hover-icon-purple" src="assets/icons/expand_more-purple.svg" alt="">
         </div>

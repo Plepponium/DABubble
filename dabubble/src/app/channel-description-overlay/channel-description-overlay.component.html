@@ -16,8 +16,11 @@
                 <span class="font-w-600 t-purple edit hide-responsive" (click)="toggleEditName()">
                     {{ isEditingName ? 'Speichern' : 'Bearbeiten' }}
                 </span>
-                <div class="show-responsive">
+                <div (click)="toggleEditName(); toggleEditDescription()" *ngIf="!isEditingName" class="show-responsive">
                     <img src="assets/icons/edit.svg" alt="bearbeiten">
+                </div>
+                <div (click)="toggleEditName(); toggleEditDescription()" *ngIf="isEditingName" class="show-responsive">
+                    <img src="assets/icons/check_circle.svg" alt="speichern">
                 </div>
             </div>
             <div class="title-content" [class.editing]="isEditingName">
@@ -37,8 +40,11 @@
                 <span class="font-w-600 t-purple edit hide-responsive" (click)="toggleEditDescription()">
                     {{ isEditingDescription ? 'Speichern' : 'Bearbeiten' }}
                 </span>
-                <div class="show-responsive">
+                <div (click)="toggleEditName(); toggleEditDescription()" *ngIf="!isEditingDescription" class="show-responsive">
                     <img src="assets/icons/edit.svg" alt="bearbeiten">
+                </div>
+                <div (click)="toggleEditName(); toggleEditDescription()" *ngIf="isEditingDescription" class="show-responsive">
+                    <img src="assets/icons/check_circle.svg" alt="speichern">
                 </div>
             </div>
             <div class="description" [class.editing]="isEditingDescription">

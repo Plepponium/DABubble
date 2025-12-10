@@ -131,8 +131,6 @@
   background: transparent;
 }
 
-
-
 .dialogue-content {
   width: 335px;
   display: flex;
@@ -230,8 +228,7 @@
     display: none;
   }
 
-  // .dialogue-overlay {
-  //   width: 100% !important;
-  //   // height: 100% !important;
-  // }
+  .dialogue-overlay {
+    width: 350px !important;
+  }
 }
