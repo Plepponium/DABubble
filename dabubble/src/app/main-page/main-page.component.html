@@ -3,7 +3,7 @@
         (openUserProfile)="openUserProfile()" [currentUser]="currentUser" [users]="allUsers"
         [channels]="allChannels"></app-header>
 
-    <button class="toggle-menu-btn" type="button" (click)="toggleMenu()">
+    <button class="toggle-menu-btn hide-responsive" type="button" (click)="toggleMenu()">
         <div class="toggle-btn-container">
             <div *ngIf="menuOpen" class="toggle-btn-content menu-open">
                 <div class="toggle-btn-text font-20 f-nunito">Workspace-Menü schließen</div>

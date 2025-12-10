@@ -244,3 +244,17 @@ mat-toolbar {
   height: 50px;
   border-radius: 30px;
 }
+
+.show-responsive {
+  display: none;
+}
+
+@media(max-width: 880px) {
+  .show-responsive {
+    display: flex;
+  }
+
+  .hide-responsive {
+    display: none;
+  }
+}

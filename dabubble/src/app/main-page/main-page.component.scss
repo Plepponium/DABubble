@@ -10,7 +10,7 @@
 .container {
   display: flex;
   width: 100%;
-  height: 100vh;
+  // height: 100vh;
   background-color: #eceefe;
   display: flex;
   align-items: center;
@@ -173,4 +173,34 @@
 
 .thread.closed {
   transform: translateX(505px);
+}
+
+@media(max-width: 880px) {
+  .hide-responsive {
+    display: none;
+  }
+
+  .container {
+    display: flex;
+    width: 100%;
+    // height: 100vh;
+    background-color: #eceefe;
+    display: flex;
+    align-items: end;
+  }
+
+  .sidenav {
+    position: unset;
+    top: 120px;
+    left: 20px;
+    // width: 366px;
+    width: 100vw;
+    height: calc(100vh - 120px);
+    // height: calc(100vh - 120px - 25px); /* Höhe ggf. anpassen */
+    border-radius: 0px;
+  }
+
+  // .content {
+  //   display: none;
+  // }
 }
