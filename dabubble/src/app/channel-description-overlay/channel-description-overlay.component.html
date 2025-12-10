@@ -13,9 +13,12 @@
         <div class="overlay-title-container container-box" [class.editing]="isEditingName">
             <div class="box-header">
                 <span class="font-18 font-w-700">Channel-Name</span>
-                <span class="font-w-600 t-purple edit" (click)="toggleEditName()">
+                <span class="font-w-600 t-purple edit hide-responsive" (click)="toggleEditName()">
                     {{ isEditingName ? 'Speichern' : 'Bearbeiten' }}
                 </span>
+                <div class="show-responsive">
+                    <img src="assets/icons/edit.svg" alt="bearbeiten">
+                </div>
             </div>
             <div class="title-content" [class.editing]="isEditingName">
                 <img src="assets/icons/tag.svg">
@@ -31,9 +34,12 @@
         <div class="overlay-content-container container-box" [class.editing]="isEditingDescription">
             <div class="box-header">
                 <span class="font-18 font-w-700">Beschreibung</span>
-                <span class="font-w-600 t-purple edit" (click)="toggleEditDescription()">
+                <span class="font-w-600 t-purple edit hide-responsive" (click)="toggleEditDescription()">
                     {{ isEditingDescription ? 'Speichern' : 'Bearbeiten' }}
                 </span>
+                <div class="show-responsive">
+                    <img src="assets/icons/edit.svg" alt="bearbeiten">
+                </div>
             </div>
             <div class="description" [class.editing]="isEditingDescription">
                 <ng-container *ngIf="!isEditingDescription">
@@ -52,9 +58,6 @@
         <div class="container-box show-responsive">
             <div class="box-header">
                 <span class="font-18 font-w-700">Mitglieder</span>
-                 <span class="font-w-600 t-purple edit" (click)="toggleEditDescription()">
-                    {{ isEditingDescription ? 'Speichern' : 'Bearbeiten' }}
-                </span>
             </div>
 
             <div class="dialogue-content">

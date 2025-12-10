@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, inject, Input, Output } from '@angular/core';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { Channel } from '../../models/channel.class';
 import { ChannelService } from '../../services/channel.service';
@@ -16,7 +16,7 @@ export class ChannelDescriptionOverlayComponent {
   @Input() channelId?: string;
   @Input() currentUserId?: string;
   @Input() participants: User[] = [];
-  
+
   @Output() close = new EventEmitter<void>();
   @Output() channelDeleted = new EventEmitter<void>();
 
@@ -28,9 +28,18 @@ export class ChannelDescriptionOverlayComponent {
 
   isEditingName = false;
   isEditingDescription = false;
+  // isScreenUnder1512 = false;
+  isScreenUnder1010 = false;
+  // isScreenUnder1512 = false;
 
   editedName = '';
   editedDescription = '';
+
+  @HostListener('window:resize', [])
+  onResize() {
+    // this.isScreenUnder1512 = window.innerWidth < 1512;
+    this.isScreenUnder1010 = window.innerWidth < 1010;
+  }
 
   ngOnInit() {
     if (this.channelId) {
