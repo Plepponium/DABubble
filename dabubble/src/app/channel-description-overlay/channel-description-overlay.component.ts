@@ -4,6 +4,7 @@ import { Channel } from '../../models/channel.class';
 import { ChannelService } from '../../services/channel.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { User } from '../../models/user.class';
 
 @Component({
   selector: 'app-channel-description-overlay',
@@ -14,9 +15,13 @@ import { FormsModule } from '@angular/forms';
 export class ChannelDescriptionOverlayComponent {
   @Input() channelId?: string;
   @Input() currentUserId?: string;
+  @Input() participants: User[] = [];
+  
   @Output() close = new EventEmitter<void>();
   @Output() channelDeleted = new EventEmitter<void>();
 
+  @Output() openProfile = new EventEmitter<User>();
+  @Output() openAddUser = new EventEmitter<void>();
 
   channel?: Channel;
   channelService = inject(ChannelService);
@@ -85,5 +90,11 @@ export class ChannelDescriptionOverlayComponent {
     }
   }
 
+  handleOpenProfile(user: User) {
+    this.openProfile.emit(user);
+  }
 
+  handleOpenAddUser() {
+    this.openAddUser.emit();
+  }
 }

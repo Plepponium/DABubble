@@ -12,7 +12,7 @@
             </div>
 
             <div class="header-right">
-                <div (click)="openDialogueShowUser()" class="users-display"
+                <div (click)="openDialogueShowUser()" class="users-display hide-responsive"
                     [ngClass]="{'users-display-active': usersDisplayActive}">
                     <div class="user-pics">
                         <div class="img-box" *ngFor="let user of participants$ | async | slice:0:3">
@@ -47,8 +47,11 @@
                 [currentUserId]="currentUserId" [participants]="participants">
             </app-chat-add-user-overlay>
 
-            <app-channel-description-overlay *ngIf="showChannelDescription" (close)="closeDialogChannelDescription()"
-                (channelDeleted)="handleChannelDeleted()" [channelId]="channelId" [currentUserId]="currentUserId">
+            <app-channel-description-overlay *ngIf="showChannelDescription && !showAddDialogue" (close)="closeDialogChannelDescription()" 
+                [participants]="(participants$ | async) ?? []"  
+                [channelId]="channelId" [currentUserId]="currentUserId"
+                (openProfile)="openDialogueShowProfile($event)" (openAddUser)="openDialogueAddUser()"
+                (channelDeleted)="handleChannelDeleted()">
             </app-channel-description-overlay>
         </div>
     </div>

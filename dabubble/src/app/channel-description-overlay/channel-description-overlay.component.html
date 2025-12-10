@@ -9,43 +9,76 @@
         </app-round-btn>
     </div>
 
-    <div class="overlay-title-container container-box" [class.editing]="isEditingName">
-        <div class="box-header">
-            <span class="font-18 font-w-700">Channel-Name</span>
-            <span class="font-w-600 t-purple edit" (click)="toggleEditName()">
-                {{ isEditingName ? 'Speichern' : 'Bearbeiten' }}
-            </span>
-        </div>
-        <div class="title-content" [class.editing]="isEditingName">
-            <img src="assets/icons/tag.svg">
-            <ng-container *ngIf="!isEditingName">
-                <span>{{ channel.name }}</span>
-            </ng-container>
-            <ng-container *ngIf="isEditingName">
-                <input type="text" [(ngModel)]="editedName" [placeholder]="channel.name" />
-            </ng-container>
-        </div>
-    </div>
-
-    <div class="overlay-content-container container-box" [class.editing]="isEditingDescription">
-        <div class="box-header">
-            <span class="font-18 font-w-700">Beschreibung</span>
-            <span class="font-w-600 t-purple edit" (click)="toggleEditDescription()">
-                {{ isEditingDescription ? 'Speichern' : 'Bearbeiten' }}
-            </span>
-        </div>
-        <div class="description" [class.editing]="isEditingDescription">
-            <ng-container *ngIf="!isEditingDescription">
-                {{ channel.description }}
-            </ng-container>
-            <ng-container *ngIf="isEditingDescription">
-                <input type="text" [(ngModel)]="editedDescription" placeholder="Dein Text hier">
-            </ng-container>
+    <div class="scrollable-content">
+        <div class="overlay-title-container container-box" [class.editing]="isEditingName">
+            <div class="box-header">
+                <span class="font-18 font-w-700">Channel-Name</span>
+                <span class="font-w-600 t-purple edit" (click)="toggleEditName()">
+                    {{ isEditingName ? 'Speichern' : 'Bearbeiten' }}
+                </span>
+            </div>
+            <div class="title-content" [class.editing]="isEditingName">
+                <img src="assets/icons/tag.svg">
+                <ng-container *ngIf="!isEditingName">
+                    <span>{{ channel.name }}</span>
+                </ng-container>
+                <ng-container *ngIf="isEditingName">
+                    <input type="text" [(ngModel)]="editedName" [placeholder]="channel.name" />
+                </ng-container>
+            </div>
         </div>
 
-        <div class="line"></div>
-        <span class="font-18 font-w-700">Erstellt von</span>
-        <span class="created-by font-24 t-purple">{{ channel.createdByName }}</span>
+        <div class="overlay-content-container container-box" [class.editing]="isEditingDescription">
+            <div class="box-header">
+                <span class="font-18 font-w-700">Beschreibung</span>
+                <span class="font-w-600 t-purple edit" (click)="toggleEditDescription()">
+                    {{ isEditingDescription ? 'Speichern' : 'Bearbeiten' }}
+                </span>
+            </div>
+            <div class="description" [class.editing]="isEditingDescription">
+                <ng-container *ngIf="!isEditingDescription">
+                    {{ channel.description }}
+                </ng-container>
+                <ng-container *ngIf="isEditingDescription">
+                    <input type="text" [(ngModel)]="editedDescription" placeholder="Dein Text hier">
+                </ng-container>
+            </div>
+
+            <div class="line"></div>
+            <span class="font-18 font-w-700">Erstellt von</span>
+            <span class="created-by font-24 t-purple">{{ channel.createdByName }}</span>
+        </div>
+
+        <div class="container-box show-responsive">
+            <div class="box-header">
+                <span class="font-18 font-w-700">Mitglieder</span>
+                 <span class="font-w-600 t-purple edit" (click)="toggleEditDescription()">
+                    {{ isEditingDescription ? 'Speichern' : 'Bearbeiten' }}
+                </span>
+            </div>
+
+            <div class="dialogue-content">
+                <div class="selected-users">
+                    <div class="user" *ngFor="let u of participants" (click)="handleOpenProfile(u)">
+                        <div class="img-container">
+                            <img class="user-img" [src]="'assets/user-icons/' + u.img + '.svg'" alt="">
+                            <div class="online-signal" [ngClass]="u.presence"></div>
+                        </div>
+                        <div class="user-name">
+                            {{ u.name }}<span *ngIf="u.uid === currentUserId"> (Du)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="add-user" (click)="handleOpenAddUser()">
+                    <div class="add-user-icon-box">
+                        <img class="hover-icon" src="assets/icons/person_add.svg" alt="">
+                        <img class="hover-icon-purple" src="assets/icons/person_add-purple.svg" alt="">
+                    </div>
+                    Mitglieder hinzufügen
+                </div>
+            </div>
+        </div>
     </div>
 
     <button type="button" class="btn-leave font-18 font-w-700" (click)="leaveChannel()">Channel verlassen</button>

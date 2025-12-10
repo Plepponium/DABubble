@@ -188,9 +188,6 @@ export class MainPageComponent {
     return !!(item.id && item.participants && item.name);
   }
 
-
-
-
   openThread(event: { channelId: string; chatId: string }) {
     this.threadOpen = true;
     this.threadChatId = event.chatId;

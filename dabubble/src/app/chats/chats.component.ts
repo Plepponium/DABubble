@@ -512,7 +512,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.activeSmiley = false;
   }
 
-
   insertMention(
     event: { name: string; type: 'user' | 'channel' | 'email' },
     el: HTMLTextAreaElement
@@ -532,12 +531,10 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.overlayActive = false;
   }
 
-
   updateCaretPosition(el: HTMLTextAreaElement | HTMLInputElement) {
     if (!el) return;
     this.mentionCaretIndex = el.selectionStart || 0;
   }
-
 
   updateEditCaret(chat: any, textarea: HTMLTextAreaElement) {
     chat._caretIndex = textarea.selectionStart;

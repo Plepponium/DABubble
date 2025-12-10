@@ -782,3 +782,14 @@
     }
   }
 }
+
+@media(max-width: 1010px) {
+  .hide-responsive {
+    display: none;
+  }
+
+  .show-responsive {
+    display: block;
+    display: flex;
+  }
+}
