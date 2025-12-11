@@ -6,8 +6,6 @@
                 <span class="font-24 font-w-700 f-nunito">Devspace</span>
             </div>
 
-            <!-- <span class="example-spacer"></span> -->
-
             <app-round-btn (click)="handleOpenNewMessage()" iconSrc="assets/icons/edit_square.svg" iconHoverSrc="assets/icons/edit_square-purple.svg"
                 altText="Bearbeiten">
             </app-round-btn>
@@ -23,14 +21,13 @@
                 </button>
             </div>
 
-            <app-mentions-overlay *ngIf="inputFocused" [text]="searchText" [caretIndex]="caretIndex"
+            <app-mentions-overlay *ngIf="inputFocused" class="mentions-overlay" [text]="searchText" [caretIndex]="caretIndex"
                 [currentUserId]="currentUser?.uid" [context]="'Searchbar'" [users]="users" [channels]="relevantChannels"
                 [messages]="messages" (navigateToChat)="onNavigateToChat($event)"
                 (overlayStateChange)="overlayActive = $event">
             </app-mentions-overlay>
         </div>
     </div>
-    
 
     <div class="menu-content">
         <div class="menu-section">

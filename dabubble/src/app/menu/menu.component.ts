@@ -69,18 +69,12 @@ export class MenuComponent implements OnInit {
   // constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
-    this.getChannels();
+    // this.getChannels();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log('🔄 ngOnChanges:', changes);
     if (changes['channels'] || changes['users'] || changes['currentUser']) {
     // if (changes['channels']) {
-      console.log('📦 Daten da:', {
-        users: this.users?.length,
-        channels: this.channels?.length,
-        currentUser: !!this.currentUser
-      });
       this.loadMessages();
       this.sortChannels();
       this.cdr.markForCheck();
@@ -216,17 +210,15 @@ export class MenuComponent implements OnInit {
   }
 
   onSearchFocus() {
-    console.log('🔍 FOCUS - inputFocused=true');
     this.inputFocused = true;
-    this.cdr.markForCheck();
-    console.log('✅ inputFocused jetzt:', this.inputFocused);
+    // this.cdr.markForCheck();
   }
 
   onSearchBlur() {
     // this.inputFocused = false;
-    setTimeout(() => {
-      this.inputFocused = false;
-      this.cdr.markForCheck();  // ← WICHTIG!
-    }, 100);
+    // setTimeout(() => {
+    //   this.inputFocused = false;
+    //   this.cdr.markForCheck();
+    // }, 100);
   }
 }
