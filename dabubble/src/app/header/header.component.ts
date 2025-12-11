@@ -31,7 +31,6 @@ export class HeaderComponent {
   overlayActive = false;
   inputFocused = false;
 
-
   messages: any[] = [];
 
   userService = inject(UserService)
@@ -70,6 +69,11 @@ export class HeaderComponent {
     }
   }
 
+  get relevantChannels() {
+    if (!this.currentUser) return [];
+    return this.channels.filter(c => c.participants?.includes(this.currentUser?.uid));
+  }
+
   private async loadDmMessages() {
     const dmIds = await this.dmService.getDmIdsForUser(this.currentUser!.uid);
     for (const dmId of dmIds) {
@@ -89,11 +93,6 @@ export class HeaderComponent {
     }
   }
 
-  get relevantChannels() {
-    if (!this.currentUser) return [];
-    return this.channels.filter(c => c.participants?.includes(this.currentUser?.uid));
-  }
-
   updateCaret(el: HTMLInputElement) {
     if (!el) return;
     this.caretIndex = el.selectionStart || 0;
@@ -111,8 +110,6 @@ export class HeaderComponent {
   onSearchBlur() {
     this.inputFocused = false;
   }
-
-
 
   getAvatarImg(user?: User): string {
     return user?.img || 'default-user';

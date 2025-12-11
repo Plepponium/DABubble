@@ -17,7 +17,7 @@ import { ProfileOverlayComponent } from '../profile-overlay/profile-overlay.comp
 import { LogoutOverlayComponent } from '../logout-overlay/logout-overlay.component';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
-import { firstValueFrom, Subscription } from 'rxjs';
+import { combineLatest, firstValueFrom, of, Subscription, switchMap } from 'rxjs';
 import { NewMessageComponent } from '../new-message/new-message.component';
 import { AddChannelMembersOverlayComponent } from '../add-channel-members-overlay/add-channel-members-overlay.component';
 import { InputMissingOverlayComponent } from "../input-missing-overlay/input-missing-overlay.component";

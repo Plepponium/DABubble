@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, ChangeDetectionStrategy, Component, signal, OnInit, Output, EventEmitter, inject, Input } from '@angular/core';
+import { ChangeDetectorRef, ChangeDetectionStrategy, Component, signal, OnInit, Output, EventEmitter, inject, Input, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,16 +6,18 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { UserService } from '../../services/user.service';
-import { combineLatest, map, Observable } from 'rxjs';
+import { combineLatest, firstValueFrom, map, Observable } from 'rxjs';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { User } from '../../models/user.class';
 import { ChannelService } from '../../services/channel.service';
 import { Channel } from '../../models/channel.class';
+import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
+import { DirectMessageService } from '../../services/direct-messages.service';
 
 @Component({
   selector: 'app-menu',
-  imports: [CommonModule, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, RoundBtnComponent, FormsModule, RouterModule],
+  imports: [CommonModule, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, RoundBtnComponent, FormsModule, RouterModule, MentionsOverlayComponent],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,22 +25,32 @@ import { Channel } from '../../models/channel.class';
 export class MenuComponent implements OnInit {
   readonly panelOpenState = signal(false);
   channelsExpanded = true;
-  channels: Channel[] = [];
-  // activeChannelId?: string;
+  // channels: Channel[] = [];
   usersExpanded = true;
-  // activeUserId?: string;
-  // showAddChannelDialogue = false;
+
+  searchText = '';
+  caretIndex: number | null = null;
+  overlayActive = false;
+  inputFocused = false;
+
+  messages: any[] = [];
 
   @Input() activeChannelId?: string;
   @Input() activeUserId?: string;
+  @Input() users: any[] = [];
+  @Input() channels: any[] = [];
+  @Input() currentUser: User | undefined;
 
   @Output() openNewMessage = new EventEmitter<string>();
   @Output() openAddChannel = new EventEmitter<void>();
   @Output() openChannel = new EventEmitter<string>();
   @Output() openUserChat = new EventEmitter<User>();
+  @Output() selectedItem = new EventEmitter<any>();
 
   userService = inject(UserService);
   channelService = inject(ChannelService);
+  dmService = inject(DirectMessageService)
+  cdr = inject(ChangeDetectorRef);
 
   currentUser$ = this.userService.getCurrentUser();
   users$ = this.userService.getUsers();
@@ -54,11 +66,25 @@ export class MenuComponent implements OnInit {
     })
   );
 
-
-  constructor(private cdr: ChangeDetectorRef) { }
+  // constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.getChannels();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    console.log('🔄 ngOnChanges:', changes);
+    if (changes['channels'] || changes['users'] || changes['currentUser']) {
+    // if (changes['channels']) {
+      console.log('📦 Daten da:', {
+        users: this.users?.length,
+        channels: this.channels?.length,
+        currentUser: !!this.currentUser
+      });
+      this.loadMessages();
+      this.sortChannels();
+      this.cdr.markForCheck();
+    }
   }
 
   private getChannels() {
@@ -67,6 +93,63 @@ export class MenuComponent implements OnInit {
       this.sortChannels();
       this.cdr.markForCheck();
     });
+  }
+
+  private async loadMessages() {
+    if (!this.currentUser || !this.channels?.length || !this.users?.length) {
+      this.messages = [];
+      return;
+    }
+    
+    this.messages = [];
+    await this.loadChannelMessages();
+    await this.loadDmMessages();
+  }
+
+  private async loadChannelMessages() {
+    for (const ch of this.relevantChannels) {
+      try {
+        const chats = await firstValueFrom(this.channelService.getChatsForChannel(ch.id));
+        const mapped = chats.map(c => {
+          const sender = this.users.find(u => u.uid === c.user);
+          return {
+            type: 'channel-message',
+            channelId: ch.id,
+            channelName: ch.name,
+            senderName: sender?.name || 'Unbekannt',
+            participants: ch.participants,
+            ...c
+          };
+        });
+        this.messages.push(...mapped);
+      } catch (error) {
+        console.error('Fehler beim Laden von Channel-Nachrichten:', error);
+      }
+    }
+  }
+
+  get relevantChannels() {
+    if (!this.currentUser) return [];
+    return this.channels.filter(c => c.participants?.includes(this.currentUser?.uid));
+  }
+
+  private async loadDmMessages() {
+    const dmIds = await this.dmService.getDmIdsForUser(this.currentUser!.uid);
+    for (const dmId of dmIds) {
+      const dmDoc = await firstValueFrom(this.dmService.getDmDoc(dmId));
+      const dmMsgs = await firstValueFrom(this.dmService.getMessages(dmId));
+      const mapped = dmMsgs.map(m => {
+        const sender = this.users.find(u => u.uid === m.senderId);
+        return {
+          type: 'dm-message',
+          dmId,
+          participants: dmDoc.participants,
+          senderName: sender?.name || 'Unbekannt',
+          ...m
+        };
+      });
+      this.messages.push(...mapped);
+    }
   }
 
   private sortChannels() {
@@ -83,8 +166,7 @@ export class MenuComponent implements OnInit {
   private toDate(value: any): Date {
     if (value?.seconds) return new Date(value.seconds * 1000 + value.nanoseconds / 1e6);
     return new Date(value);
-  }
-
+  }  
 
   toggleChannels() {
     this.channelsExpanded = !this.channelsExpanded;
@@ -121,5 +203,30 @@ export class MenuComponent implements OnInit {
 
   trackByUserId(index: number, user: User): string {
     return user.uid;
+  }
+
+  updateCaret(el: HTMLInputElement) {
+    if (!el) return;
+    this.caretIndex = el.selectionStart || 0;
+  }
+
+  onNavigateToChat(item: any) {
+    this.searchText = '';
+    this.selectedItem.emit(item);
+  }
+
+  onSearchFocus() {
+    console.log('🔍 FOCUS - inputFocused=true');
+    this.inputFocused = true;
+    this.cdr.markForCheck();
+    console.log('✅ inputFocused jetzt:', this.inputFocused);
+  }
+
+  onSearchBlur() {
+    // this.inputFocused = false;
+    setTimeout(() => {
+      this.inputFocused = false;
+      this.cdr.markForCheck();  // ← WICHTIG!
+    }, 100);
   }
 }

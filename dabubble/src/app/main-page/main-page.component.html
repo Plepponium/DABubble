@@ -1,7 +1,8 @@
 <div class="main-page">
     <app-header class="header" (selectedItem)="openChatFromHeader($event)" (openLogoutOverlay)="openLogoutOverlay()"
         (openUserProfile)="openUserProfile()" [currentUser]="currentUser" [users]="allUsers"
-        [channels]="allChannels"></app-header>
+        [channels]="allChannels">
+    </app-header>
 
     <button class="toggle-menu-btn hide-responsive" type="button" (click)="toggleMenu()">
         <div class="toggle-btn-container">
@@ -23,7 +24,8 @@
         <div #drawer class="sidenav" [class.closed]="!menuOpen" mode="side">
             <app-menu (openNewMessage)="openNewMessage()" (openAddChannel)="openAddChannel()"
                 (openChannel)="openChannel($event)" (openUserChat)="openUserChat($event)"
-                [activeChannelId]="currentChannelId" [activeUserId]="activeUserId">
+                [activeChannelId]="currentChannelId" [activeUserId]="activeUserId"
+                [channels]="allChannels" [users]="allUsers" [currentUser]="currentUser">
             </app-menu>
         </div>
 
