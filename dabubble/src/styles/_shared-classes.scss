@@ -50,6 +50,28 @@
   span {
     font-size: 20px;
   }
+
+  @media (max-width: 500px) {
+    gap: 15px;
+    margin-bottom: 0;
+
+    h1 {
+      font-size: 32px;
+    }
+    span {
+      font-size: 17px;
+    }
+  }
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+  @media (max-width: 500px) {
+    gap: 20px;
+  }
 }
 
 .input-group {
@@ -92,7 +114,13 @@
           transition: filter 125ms ease;
         }
       }
+
+      @media (max-width: 500px) {
+        padding: 13px 32px;
+        gap: 30px;
+      }
     }
+
     .error {
       position: absolute;
       left: 0;
@@ -100,6 +128,13 @@
       font-size: 14px;
       color: $rose;
     }
+  }
+
+  @media (max-width: 500px) {
+    gap: 30px;
+  }
+  @media (max-width: 420px) {
+    gap: 20px;
   }
 }
 

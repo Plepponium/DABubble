@@ -163,6 +163,10 @@
       color: $purple1;
       box-shadow: 0 0 0 1px $lightpurple;
     }
+
+    @media (max-width: 420px) {
+      font-size: 16px;
+    }
   }
 }
 
@@ -181,7 +185,7 @@
   position: relative;
   background-color: white;
   max-width: 606px;
-  width: 606px;
+  min-width: 300px;
   padding: 40px 50px;
   border-radius: 30px;
 }
@@ -219,4 +223,47 @@
   position: absolute;
   left: 150px;
   bottom: 150px;
+}
+
+@media (max-width: 500px) {
+  .login {
+    padding: 0px 10px;
+  }
+
+  .login-card.default {
+    padding: 35px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .legal-links {
+    display: none;
+  }
+
+  .logo {
+    width: 205px;
+    height: 56px;
+    top: 92px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .register {
+    top: unset;
+    bottom: 75px;
+    right: unset;
+    left: 50%;
+    transform: translateX(-50%);
+
+    button {
+      margin-left: 0;
+      padding: 7px 18px;
+      font-weight: 700;
+      color: $purple1;
+      background-color: transparent;
+      border: 1px solid $purple2;
+      border-radius: 25px;
+    }
+  }
 }

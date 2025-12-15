@@ -4,7 +4,6 @@
 .forgot-container {
   display: flex;
   justify-content: center;
-  margin-top: 32px;
 
   button {
     padding: 5px 15px;
@@ -14,7 +13,7 @@
     color: $purple2;
     font-family: "Nunito";
     font-weight: 400;
-    font-size: 18px;
+    font-size: 17px;
     transition: all 125ms ease-in-out;
     cursor: pointer;
 
@@ -27,7 +26,6 @@
 }
 
 .separator {
-  margin: 32px 0;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -54,7 +52,6 @@
   border-radius: 100px;
   padding: 11px 32px;
   font-size: 18px;
-
   color: $purple1;
   transition: box-shadow 125ms ease-in-out, font-weight 125ms ease-in-out;
 
@@ -62,21 +59,36 @@
     box-shadow: 0 0 0 1px $purple1;
     font-weight: 700;
   }
+
+  @media (max-width: 500px) {
+    padding: 6px 15px;
+    gap: 10px;
+  }
+
+  @media (max-width: 420px) {
+    span {
+      font-size: 16px;
+    }
+  }
 }
 
 .button-group {
-  margin-top: 32px;
   display: flex;
   justify-content: center;
   gap: 30px;
 
   button {
     cursor: pointer;
-    padding: 12px 24px;
+    padding: 12px 25px;
     border-radius: 25px;
     border: 1px solid $purple2;
     font-size: 18px;
     font-weight: 700;
+
+    @media (max-width: 420px) {
+      font-size: 16px;
+      padding: 12px 15px;
+    }
   }
 
   button:nth-child(1) {
@@ -95,5 +107,9 @@
       color: white;
       background-color: $purple1;
     }
+  }
+
+  @media (max-width: 500px) {
+    gap: 20px;
   }
 }

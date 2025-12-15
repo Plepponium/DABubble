@@ -7,8 +7,8 @@
             verwendest.
         </span>
     </div>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <mat-card-content class="input-group" [formGroup]="loginForm">
+    <form [formGroup]="loginForm" class="login-form" (ngSubmit)="onSubmit()">
+        <div class="input-group" [formGroup]="loginForm">
             <div class="input-wrapper">
                 <div class="input-item">
                     <img src="/assets/icons/login-mail.svg">
@@ -33,10 +33,10 @@
                 </span>
                 }
             </div>
-        </mat-card-content>
-        <mat-card-actions class="forgot-container">
+        </div>
+        <div class="forgot-container">
             <button type="button" routerLink="/password/reset">Passwort vergessen?</button>
-        </mat-card-actions>
+        </div>
         <div class="separator">
             <div class="line"></div>
             <span>ODER</span>
