@@ -50,6 +50,7 @@
 
 .header-left {
   width: 278px;
+  box-sizing: border-box;
   padding: 6px 10px;
   border-radius: 100px;
   cursor: pointer;
@@ -795,12 +796,9 @@
 }
 
 @media (max-width: 880px) {
-  // .chats {
-  //   width: 100%;
-  //   // max-width: 989px;
-  //   // height: calc(100vh - 120px) !important;
-  //   border-radius: 0px;
-  //   // padding: 32px 30px;
-  //   // transition: margin-left 0.3s ease;
-  // }
+  .chats {
+    width: 100%;
+    height: calc(100vh - 80px);
+    border-radius: unset;
+  }
 }

@@ -1,7 +1,7 @@
 <div class="dm-chats" *ngIf="otherUser as u">
 
     <div class="header">
-        <div class="user" (click)="openProfile.emit(u)">
+        <div class="dm-user" (click)="openProfile.emit(u)">
             <div class="img-container">
                 <img class="user-img" [src]="'assets/user-icons/' + (u.img || 'default-user') + '.svg'" />
                 <div [class]="'online-signal ' + (u.presence || 'offline')"></div>
