@@ -1,7 +1,10 @@
 <div class="header">
-    <div class="logo">
-        <img src="assets/img/login-logo.svg" alt="">
+    <div class="logo hide-responsive">
+        <img src="assets/img/login-logo.svg" alt="logo">
         <div class="font-32 font-w-700">DABubble</div>
+    </div>
+    <div class="responsive-logo show-responsive">
+        <img src="assets/img/login-logo-small.svg" alt="logo">
     </div>
 
     <div class="searchbar-wrapper hide-responsive">
@@ -24,7 +27,7 @@
         <div id="user-name" class="user-name font-32 font-w-700 hide-responsive">{{ user.name }}</div>
         <div class="img-container">
             <img class="user-img" [src]="'assets/user-icons/' + getAvatarImg(user) + '.svg'" alt="Avatar">
-            <div [class]="'online-signal-header ' + user.presence"></div>
+            <div class="hide-responsive" [class]="'online-signal-header ' + user.presence"></div>
         </div>
 
         <div class="icon-container hide-responsive">

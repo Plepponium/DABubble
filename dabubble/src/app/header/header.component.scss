@@ -1,16 +1,15 @@
 .header {
-  width: 100%;
+  width: 100vw;
   height: 95px;
   box-sizing: border-box;
-  padding-top: 25px;
+  padding: 25px 45px 0 45px;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   position: relative;
 }
 
 .logo {
-  position: absolute;
-  top: 25px;
-  left: 45px;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -22,10 +21,10 @@
 }
 
 .searchbar-wrapper {
-  position: relative;
+  position: absolute;
   display: flex;
-  width: 100%;
-  margin-left: 406px;
+  width: calc(100vw - 800px);
+  margin-left: 362px;
   margin-right: 526px;
 }
 
@@ -69,9 +68,7 @@
 }
 
 .user {
-  position: absolute;
-  top: 25px;
-  right: 45px;
+  top: 2px;
   display: flex;
   align-items: center;
   gap: 20px;
@@ -96,6 +93,7 @@
 
 .img-container {
   position: relative;
+  height: 70px;
 }
 
 .user-img {
@@ -139,6 +137,10 @@
   z-index: 7;
 }
 
+.show-responsive {
+  display: none;
+}
+
 @media (max-width: 1445px) {
   .searchBar {
     width: 514px;
@@ -150,14 +152,37 @@
   .hide-responsive {
     display: none;
   }
+
+  .show-responsive {
+    display: flex;
+  }
 }
 
-// @media (max-width: 940px) {
-//   .searchBar {
-//     margin-left: 260px;
-//   }
-// }
-
 @media (max-width: 880px) {
+  .header {
+    height: 80px;
+    padding-top: unset;
+    padding: 15px 16px;
+  }
 
+  .responsive-logo img{
+    height: 45px;
+    position: absolute;
+    top: 15px;
+    left: 16px;
+  }
+
+  .user {
+    top: 15px;
+    right: 45px;
+  }
+
+  .img-container {
+    height: 50px;
+  }
+
+  .user-img {
+    width: 50px;
+    border-radius: 42px;
+  }
 }
