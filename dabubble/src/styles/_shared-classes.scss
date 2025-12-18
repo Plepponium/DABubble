@@ -62,6 +62,10 @@
       font-size: 17px;
     }
   }
+
+  @media (max-height: 500px) {
+    gap: 10px;
+  }
 }
 
 .login-form {
@@ -72,6 +76,9 @@
   @media (max-width: 500px) {
     gap: 20px;
   }
+  @media (max-height: 900px) {
+    gap: 10px;
+  }
 }
 
 .input-group {
@@ -79,6 +86,13 @@
   flex-direction: column;
   gap: 40px;
   padding: 0;
+
+  @media (max-width: 500px) {
+    gap: 30px;
+  }
+  @media (max-width: 420px) {
+    gap: 20px;
+  }
 
   .input-wrapper {
     position: relative;
@@ -128,13 +142,6 @@
       font-size: 14px;
       color: $rose;
     }
-  }
-
-  @media (max-width: 500px) {
-    gap: 30px;
-  }
-  @media (max-width: 420px) {
-    gap: 20px;
   }
 }
 

@@ -8,7 +8,7 @@
         <span>Mit deinem Namen und deiner E-Mail-Adresse hast du dein neues DABubble-Konto</span>
     </div>
     <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-        <mat-card-content class="input-group">
+        <div class="input-group">
             <div class="input-wrapper">
                 <div class="input-item">
                     <img src="/assets/icons/login-person.svg">
@@ -49,7 +49,7 @@
                 <span class="error">Bitte stimmen Sie der Datenschutzerklärung zu.</span>
                 }
             </div>
-        </mat-card-content>
+        </div>
 
         <div class="continue">
             <button type="submit" [disabled]="signupForm.invalid">Weiter</button>

@@ -179,6 +179,10 @@
   justify-content: center;
   gap: 32px;
   padding: 35px 20px;
+
+  @media (max-width: 420px) {
+    padding: 0 !important;
+  }
 }
 
 .login-card {
@@ -225,36 +229,42 @@
   bottom: 150px;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 500px), (max-height: 900px) {
   .login {
-    padding: 0px 10px;
-  }
-
-  .login-card.default {
-    padding: 35px 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .legal-links {
-    display: none;
+    height: auto;
+    min-height: 100vh;
+    justify-content: center;
+    padding: 24px 16px;
+    gap: 8px;
   }
 
   .logo {
-    width: 205px;
-    height: 56px;
-    top: 92px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: static;
+    margin: 8px auto 0 auto;
+    width: 180px;
+    height: auto;
+    transform: none;
+    cursor: pointer;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 24px 16px;
+  }
+
+  .login-card.default {
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
 
   .register {
-    top: unset;
-    bottom: 75px;
-    right: unset;
-    left: 50%;
-    transform: translateX(-50%);
+    position: static;
+    margin: 0 auto 8px auto; // unter der Card, zentriert
+    font-size: 16px;
+    align-items: center;
 
     button {
       margin-left: 0;
@@ -264,6 +274,69 @@
       background-color: transparent;
       border: 1px solid $purple2;
       border-radius: 25px;
+      font-size: 16px;
     }
   }
+
+  .legal-links {
+    display: none; // wie bisher mobil ausgeblendet
+  }
 }
+
+// @media (max-width: 500px) {
+//   .login {
+//     padding: 0px 16px;
+//   }
+
+//   .login-card.default {
+//     padding: 35px 15px;
+//     display: flex;
+//     flex-direction: column;
+//     gap: 20px;
+//   }
+
+//   .legal-links {
+//     display: none;
+//   }
+
+//   .logo {
+//     width: 205px;
+//     height: 56px;
+//     top: 92px;
+//     left: 50%;
+//     transform: translateX(-50%);
+//   }
+
+//   .register {
+//     top: unset;
+//     bottom: 75px;
+//     right: unset;
+//     left: 50%;
+//     transform: translateX(-50%);
+
+//     button {
+//       margin-left: 0;
+//       padding: 7px 18px;
+//       font-weight: 700;
+//       color: $purple1;
+//       background-color: transparent;
+//       border: 1px solid $purple2;
+//       border-radius: 25px;
+//     }
+//   }
+// }
+
+// @media (max-height: 900px) {
+//   .login-card.default {
+//     padding: 15px;
+//     gap: 10px;
+//   }
+
+//   .logo {
+//     top: 25px;
+//   }
+
+//   .register {
+//     bottom: 25px;
+//   }
+// }

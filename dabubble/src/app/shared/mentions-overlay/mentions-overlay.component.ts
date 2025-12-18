@@ -260,6 +260,7 @@ export class MentionsOverlayComponent {
   }
 
   onItemClick(item: any) {
+    console.log('CLICK', item);
     if (!item) return;
     this.navigateToChat.emit(item);
     this.closeOverlay();

@@ -77,6 +77,10 @@
   justify-content: center;
   gap: 30px;
 
+  @media (max-width: 500px) {
+    gap: 20px;
+  }
+
   button {
     cursor: pointer;
     padding: 12px 25px;
@@ -107,9 +111,5 @@
       color: white;
       background-color: $purple1;
     }
-  }
-
-  @media (max-width: 500px) {
-    gap: 20px;
   }
 }

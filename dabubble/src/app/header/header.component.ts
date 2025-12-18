@@ -30,6 +30,7 @@ export class HeaderComponent {
   caretIndex: number | null = null;
   overlayActive = false;
   inputFocused = false;
+  private clickFromOverlay = false;
 
   messages: any[] = [];
 
@@ -99,8 +100,10 @@ export class HeaderComponent {
   }
 
   onNavigateToChat(item: any) {
+    this.clickFromOverlay = true;
     this.searchText = '';
     this.selectedItem.emit(item);
+    this.inputFocused = false;
   }
 
   onSearchFocus() {
@@ -108,7 +111,12 @@ export class HeaderComponent {
   }
 
   onSearchBlur() {
-    this.inputFocused = false;
+    setTimeout(() => {
+      if (!this.clickFromOverlay) {
+        this.inputFocused = false;
+      }
+      this.clickFromOverlay = false;
+    }, 100);
   }
 
   getAvatarImg(user?: User): string {
