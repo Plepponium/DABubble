@@ -3,8 +3,17 @@
         <img src="assets/img/login-logo.svg" alt="logo">
         <div class="font-32 font-w-700">DABubble</div>
     </div>
-    <div class="responsive-logo show-responsive">
+
+    <div *ngIf="menuOpen" class="responsive-logo show-responsive">
         <img src="assets/img/login-logo-small.svg" alt="logo">
+    </div>
+
+    <div *ngIf="!menuOpen" class="back-to-menu">
+        <img src="assets/icons/keyboard_arrow_down.svg" alt="zum Menü">
+        <div class="responsive-devspace show-responsive">
+            <img src="assets/icons/workspace-logo.svg" alt="logo">
+            <div class="font-20 font-w-700">Devspace</div>
+        </div>
     </div>
 
     <div class="searchbar-wrapper hide-responsive">
@@ -16,6 +25,7 @@
                 <img src="assets/icons/lens.svg" alt="">
             </button>
         </div>
+
         <app-mentions-overlay *ngIf="inputFocused" [text]="searchText" [caretIndex]="caretIndex"
             [currentUserId]="currentUser?.uid" [context]="'Searchbar'" [users]="users" [channels]="relevantChannels"
             [messages]="messages" (navigateToChat)="onNavigateToChat($event)"

@@ -25,12 +25,14 @@ export class HeaderComponent {
   @Input() users: any[] = [];
   @Input() channels: any[] = [];
   @Input() currentUser: User | undefined;
+  @Input() menuOpen: boolean = true;
 
   searchText = '';
   caretIndex: number | null = null;
   overlayActive = false;
   inputFocused = false;
   private clickFromOverlay = false;
+  // menuOpen = true;
 
   messages: any[] = [];
 

@@ -1,6 +1,6 @@
 <div class="main-page">
     <app-header class="header" (selectedItem)="openChatFromHeader($event)" (openLogoutOverlay)="openLogoutOverlay()"
-        (openUserProfile)="openUserProfile()" [currentUser]="currentUser" [users]="allUsers"
+        (openUserProfile)="openUserProfile()" [menuOpen]="menuOpen" [currentUser]="currentUser" [users]="allUsers"
         [channels]="allChannels">
     </app-header>
 
