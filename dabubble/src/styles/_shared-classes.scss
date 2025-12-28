@@ -50,35 +50,12 @@
   span {
     font-size: 20px;
   }
-
-  @media (max-width: 500px) {
-    gap: 15px;
-    margin-bottom: 0;
-
-    h1 {
-      font-size: 32px;
-    }
-    span {
-      font-size: 17px;
-    }
-  }
-
-  @media (max-height: 500px) {
-    gap: 10px;
-  }
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
   gap: 32px;
-
-  @media (max-width: 500px) {
-    gap: 20px;
-  }
-  @media (max-height: 900px) {
-    gap: 10px;
-  }
 }
 
 .input-group {
@@ -86,13 +63,6 @@
   flex-direction: column;
   gap: 40px;
   padding: 0;
-
-  @media (max-width: 500px) {
-    gap: 30px;
-  }
-  @media (max-width: 420px) {
-    gap: 20px;
-  }
 
   .input-wrapper {
     position: relative;
@@ -127,11 +97,6 @@
           filter: brightness(0);
           transition: filter 125ms ease;
         }
-      }
-
-      @media (max-width: 500px) {
-        padding: 13px 32px;
-        gap: 30px;
       }
     }
 
@@ -169,6 +134,42 @@
       background-color: $gray;
       border-color: $gray;
       pointer-events: none;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .login-header {
+    gap: 15px;
+    margin-bottom: 0;
+
+    h1 {
+      font-size: 32px;
+    }
+    span {
+      font-size: 17px;
+    }
+  }
+
+  .login-form {
+    gap: 20px;
+  }
+
+  .input-group {
+    gap: 30px;
+
+    .input-item {
+      padding: 13px 32px !important;
+      gap: 10px !important;
+    }
+  }
+}
+
+@media (max-width: 420px) {
+  .input-group {
+    gap: 20px;
+    .input-item {
+      padding: 13px 16px !important;
     }
   }
 }
