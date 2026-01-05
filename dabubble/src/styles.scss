@@ -14,6 +14,11 @@ body {
   font-size: 18px;
 }
 
+body.intro-active {
+  overflow: hidden;
+  height: 100%;
+}
+
 .online-signal {
   width: 14px;
   height: 14px;
@@ -129,12 +134,11 @@ body {
   justify-content: center;
   align-items: center;
   opacity: 1;
-  background-color: rgba($color: #000000, $alpha: .05);
+  background-color: rgba($color: #000000, $alpha: 0.05);
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-
 }
