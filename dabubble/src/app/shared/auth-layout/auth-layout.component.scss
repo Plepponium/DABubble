@@ -19,6 +19,8 @@
     position: relative;
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 187px;
     height: 184px;
     animation: moveToCorner 1s ease forwards;
     animation-delay: 4s;
@@ -62,6 +64,12 @@
 @keyframes moveToCorner {
   to {
     transform: translate(calc(-50vw + 145px), calc(-50vh + 110px)) scale(0.38);
+  }
+}
+
+@keyframes moveToTopCenter {
+  to {
+    transform: translate(-70px, calc(-50vh + 50px));
   }
 }
 
@@ -231,6 +239,27 @@
 }
 
 @media (max-width: 1300px) {
+  .intro-container {
+    .logo-wrapper {
+      animation: moveToTopCenter 1s ease forwards;
+      animation-delay: 4s;
+      width: 205px;
+      height: 60px;
+    }
+
+    .logo-wrapper img {
+      width: auto;
+      height: 60px;
+      animation: none;
+      transform: none;
+    }
+
+    .logo-wrapper .text {
+      font-size: 29px;
+      top: 16px;
+    }
+  }
+
   .login {
     height: auto;
     min-height: 100vh;
@@ -281,6 +310,19 @@
 }
 
 @media (max-width: 500px) {
+  .intro-container {
+    animation: fadeOutBg 0.5s ease forwards;
+    animation-delay: 3s;
+    .logo-wrapper {
+      animation-delay: 2s;
+    }
+
+    .logo-wrapper .text {
+      display: none;
+      animation: none;
+    }
+  }
+
   .login-card {
     padding: 24px 16px;
   }
