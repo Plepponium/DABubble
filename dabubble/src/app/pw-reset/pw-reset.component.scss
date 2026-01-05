@@ -2,6 +2,7 @@
 @use "../../styles/shared-classes";
 
 .arrow-back {
+  top: 50px;
   left: 15px;
 }
 
@@ -10,5 +11,21 @@
     text-align: center;
     margin: 0px 65px;
     color: $gray;
+  }
+}
+
+@media (max-width: 1300px) {
+}
+
+@media (max-width: 500px) {
+  .input-group {
+    span {
+      margin: 0;
+      font-size: 17px;
+    }
+  }
+  .arrow-back {
+    top: 15px;
+    left: 8px;
   }
 }

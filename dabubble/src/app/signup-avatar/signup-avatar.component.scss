@@ -2,7 +2,12 @@
 @use "../../styles/shared-classes";
 
 .arrow-back {
-  left: 20px;
+  top: 50px;
+  left: 15px;
+}
+
+.login-header{
+  margin-bottom: 14px;
 }
 
 .preview {
@@ -10,7 +15,6 @@
   flex-direction: column;
   align-items: center;
   gap: 32px;
-  margin-bottom: 8px;
 
   img {
     width: 168px;
@@ -24,7 +28,6 @@
   gap: 8px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-top: 16px;
 }
 
 .avatar-wrapper {
@@ -54,5 +57,62 @@
 }
 
 .continue {
-  margin-top: 48px;
+  margin-top: 32px;
+}
+
+@media (max-width: 1300px) {
+  .login-header {
+    margin: 0;
+    h1 {
+      font-size: 32px;
+    }
+  }
+  .arrow-back {
+    top: 35px;
+  }
+  .preview {
+    gap: 16px;
+    img {
+      width: 120px;
+      height: auto;
+    }
+  }
+
+  .avatar-wrapper {
+    width: 56px;
+    height: 56px;
+
+    img {
+      width: 48px;
+      height: 48px;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .login-header {
+    margin: 0;
+  }
+  .preview {
+    gap: 16px;
+    margin: 0;
+    img {
+      width: 120px;
+      height: auto;
+    }
+  }
+
+  .avatar-wrapper {
+    width: 56px;
+    height: 56px;
+
+    img {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  .login-card {
+    gap: 16px;
+  }
 }

@@ -184,7 +184,7 @@
 }
 
 .login {
-  height: 100vh;
+  min-height: 100vh;
   background-color: $lightblue;
   display: flex;
   flex-direction: column;
@@ -201,6 +201,10 @@
   min-width: 300px;
   padding: 40px 50px;
   border-radius: 30px;
+}
+
+.login-card.avatar{
+  gap: 16px;
 }
 
 .login-card.privacy {
@@ -268,7 +272,7 @@
     justify-content: flex-start;
     align-items: center;
     gap: 24px;
-    padding: 20px 16px 0;
+    padding: 20px 16px 16px;
   }
 
   .logo {
@@ -280,7 +284,6 @@
   }
 
   .login-card {
-    position: static;
     width: 100%;
     max-width: 480px;
     padding: 32px 24px;
@@ -324,6 +327,7 @@
   }
 
   .login-card {
+    position: static;
     padding: 24px 16px;
   }
 

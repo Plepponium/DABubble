@@ -12,7 +12,7 @@ import { SignupDraftService } from '../../../services/signup-draft.service';
 })
 
 export class AuthLayoutComponent {
-  @Input() variant: 'default' | 'privacy' | 'imprint' = 'default';
+  @Input() variant: 'default' | 'privacy' | 'imprint' | 'avatar' = 'default';
   @Input() hideLegalLinks: boolean = false;
   @Input() showRegister: boolean = false;
   @Input() showIntro: boolean = false;
