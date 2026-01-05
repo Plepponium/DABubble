@@ -184,8 +184,6 @@
   .container {
     display: flex;
     width: 100%;
-    // height: 100vh;
-    // height: calc(100vh - 80px);
     background-color: #eceefe;
     display: flex;
     align-items: end;
@@ -195,21 +193,31 @@
     position: unset;
     top: 80px;
     left: 20px;
-    width: 366px;
-    // width: 100vw;
+    width: 100vw;
     height: calc(100vh - 80px);
-    // height: calc(100vh - 120px - 25px); /* Höhe ggf. anpassen */
     border-radius: 0px;
+  }
+
+  .sidenav.closed {
+    display: none;
   }
 
   .content {
     display: flex;
-    // height: calc(100vh - 80px);
-    // gap: 20px;
-    // padding: 25px 20px !important;
+    width: 100vw;
     padding: 0;
-    // flex-grow: 1;
-    // transition: margin-left 0.3s ease, margin-right 0.3s ease;
-    margin-left: unset;
+  }
+
+  .content.thread-open {
+    margin-right: 0;
+  }
+
+  .thread {
+    top: 80px;
+    right: 0;
+  }
+
+  .thread.fullwidth-without-menu {
+    width: 100vw;
   }
 }

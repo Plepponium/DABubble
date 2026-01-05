@@ -49,6 +49,7 @@ export class MainPageComponent {
   missingInfo: { recipientMissing: boolean; textMissing: boolean; } | null = null;
   isSmallScreen = false;
   isResponsiveScreen = false;
+  contentOpen = false;
 
   allUsers: any[] = [];
   allChannels: any[] = [];
@@ -104,15 +105,15 @@ export class MainPageComponent {
   openMenu() {
     this.menuOpen = true;
 
-    if (this.isResponsiveScreen) {
-      // Content ausblenden
-      this.newMessageOpen = false;
-      this.channelOpen = false;
-      this.threadOpen = false;
-      this.currentChannelId = undefined;
-      this.userChatOpen = false;
-      this.activeUserId = undefined;
-    }
+    // if (this.isResponsiveScreen) {
+    //   // Content ausblenden
+    //   this.newMessageOpen = false;
+    //   this.channelOpen = false;
+    //   this.threadOpen = false;
+    //   this.currentChannelId = undefined;
+    //   this.userChatOpen = false;
+    //   this.activeUserId = undefined;
+    // }
   }
 
   openNewMessage() {
@@ -122,6 +123,7 @@ export class MainPageComponent {
     this.currentChannelId = undefined;
     this.userChatOpen = false;
     this.activeUserId = undefined;
+    this.contentOpen = true;
 
     if (this.isResponsiveScreen) {
       this.menuOpen = false;

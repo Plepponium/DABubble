@@ -650,3 +650,10 @@
     }
   }
 }
+
+@media(max-width: 880px) {
+  .thread {
+    height: calc(100vh - 80px) !important;
+    border-radius: 0 !important;
+  }
+}
