@@ -48,6 +48,7 @@ export class MainPageComponent {
   inputMissing = false;
   missingInfo: { recipientMissing: boolean; textMissing: boolean; } | null = null;
   isSmallScreen = false;
+  isResponsiveScreen = false;
 
   allUsers: any[] = [];
   allChannels: any[] = [];
@@ -68,6 +69,7 @@ export class MainPageComponent {
   @HostListener('window:resize', [])
   onResize() {
     this.isSmallScreen = window.innerWidth < 1512;
+    this.isResponsiveScreen = window.innerWidth < 880;
   }
 
   ngOnInit() {
@@ -99,6 +101,20 @@ export class MainPageComponent {
     this.menuOpen = !this.menuOpen;
   }
 
+  openMenu() {
+    this.menuOpen = true;
+
+    if (this.isResponsiveScreen) {
+      // Content ausblenden
+      this.newMessageOpen = false;
+      this.channelOpen = false;
+      this.threadOpen = false;
+      this.currentChannelId = undefined;
+      this.userChatOpen = false;
+      this.activeUserId = undefined;
+    }
+  }
+
   openNewMessage() {
     this.newMessageOpen = true;
     this.channelOpen = false;
@@ -106,6 +122,10 @@ export class MainPageComponent {
     this.currentChannelId = undefined;
     this.userChatOpen = false;
     this.activeUserId = undefined;
+
+    if (this.isResponsiveScreen) {
+      this.menuOpen = false;
+    }
   }
 
   openAddChannel() {
@@ -134,6 +154,10 @@ export class MainPageComponent {
     this.threadOpen = false;
     this.channelOpen = true;
     this.newMessageOpen = false;
+
+    if (this.isResponsiveScreen) {
+      this.menuOpen = false;
+    }
   }
 
   openUserChat(user: User) {
@@ -143,6 +167,10 @@ export class MainPageComponent {
     this.channelOpen = false;
     this.threadOpen = false;
     this.newMessageOpen = false;
+
+    if (this.isResponsiveScreen) {
+      this.menuOpen = false;
+    }
   }
 
   openChatFromHeader(item: any) {

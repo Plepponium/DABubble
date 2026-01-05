@@ -153,8 +153,16 @@
     display: none;
   }
 
+  .logo.hide-responsive {
+    display: flex;
+  }
+
   .show-responsive {
     display: flex;
+  }
+
+  .responsive-logo.show-responsive {
+    display: none;
   }
 
   .back-to-menu {
@@ -167,6 +175,14 @@
     height: 80px;
     padding-top: unset;
     padding: 15px 16px;
+  }
+
+  .logo.hide-responsive {
+    display: none;
+  }
+
+  .responsive-logo.show-responsive {
+    display: flex;
   }
 
   .responsive-logo img{

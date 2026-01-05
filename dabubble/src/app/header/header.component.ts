@@ -21,6 +21,7 @@ export class HeaderComponent {
   @Output() openLogoutOverlay = new EventEmitter<void>();
   @Output() openUserProfile = new EventEmitter<void>();
   @Output() selectedItem = new EventEmitter<any>();
+  @Output() openMenu = new EventEmitter<string>();
 
   @Input() users: any[] = [];
   @Input() channels: any[] = [];
@@ -46,6 +47,10 @@ export class HeaderComponent {
     if (changes['currentUser'] || changes['channels'] || changes['users']) {
       this.loadMessages();
     }
+  }
+
+  handleOpenMenu() {
+    this.openMenu.emit()
   }
 
   private async loadMessages() {

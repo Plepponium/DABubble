@@ -1,6 +1,6 @@
 <div class="main-page">
     <app-header class="header" (selectedItem)="openChatFromHeader($event)" (openLogoutOverlay)="openLogoutOverlay()"
-        (openUserProfile)="openUserProfile()" [menuOpen]="menuOpen" [currentUser]="currentUser" [users]="allUsers"
+        (openUserProfile)="openUserProfile()" [menuOpen]="menuOpen" (openMenu)="openMenu()" [currentUser]="currentUser" [users]="allUsers"
         [channels]="allChannels">
     </app-header>
 
@@ -29,7 +29,7 @@
             </app-menu>
         </div>
 
-        <div class="content" [class.fullwidth]="!menuOpen" [class.dm-open]="isDmOpen" [class.nm-open]="isNmOpen"
+        <div *ngIf="!isResponsiveScreen || !menuOpen" class="content" [class.fullwidth]="!menuOpen" [class.dm-open]="isDmOpen" [class.nm-open]="isNmOpen"
             [class.thread-open]="threadOpen">
 
             <app-chats #chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId"

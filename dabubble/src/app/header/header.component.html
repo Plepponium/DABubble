@@ -8,7 +8,7 @@
         <img src="assets/img/login-logo-small.svg" alt="logo">
     </div>
 
-    <div *ngIf="!menuOpen" class="back-to-menu">
+    <div (click)="handleOpenMenu()" *ngIf="!menuOpen" class="back-to-menu">
         <img src="assets/icons/keyboard_arrow_down.svg" alt="zum Menü">
         <div class="responsive-devspace show-responsive">
             <img src="assets/icons/workspace-logo.svg" alt="logo">
