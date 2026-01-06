@@ -3,6 +3,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 45px;
@@ -92,5 +93,13 @@
 
   &:hover {
     background-color: #797ef3;
+  }
+}
+
+@media(max-width: 880px) {
+  .dialogue-overlay {
+    width: 398px;
+    gap: 45px;
+    padding: 40px 20px;
   }
 }

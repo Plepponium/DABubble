@@ -4,6 +4,7 @@
   right: 20px;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
   gap: 45px;
   padding: 40px;
   background-color: #ffffff;
@@ -79,4 +80,22 @@
   color: #1381ff;
   padding-left: 50px;
   padding-right: 10px;
+}
+
+@media(max-width: 880px) {
+  .dialogue-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    right: unset;
+    transform: translate(-50%, -50%);
+    width: 398px;
+    gap: 38px;
+    padding: 40px 20px;
+    border-top-right-radius: 30px;
+  }
+
+  .name-container {
+    width: 100%;
+  }
 }
