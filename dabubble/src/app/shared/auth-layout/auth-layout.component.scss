@@ -203,7 +203,7 @@
   border-radius: 30px;
 }
 
-.login-card.avatar{
+.login-card.avatar {
   gap: 16px;
 }
 
@@ -273,6 +273,12 @@
     align-items: center;
     gap: 24px;
     padding: 20px 16px 16px;
+
+    span.text {
+      position: static;
+      // left: 150px;
+      // bottom: 150px;
+    }
   }
 
   .logo {
@@ -309,6 +315,17 @@
 
   .legal-links {
     display: none;
+  }
+
+  .overlay-panel {
+    width: 166px;
+    height: 70px;
+    padding: 20px 30px;
+    div {
+      h2 {
+        font-size: 22px;
+      }
+    }
   }
 }
 
