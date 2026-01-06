@@ -801,4 +801,11 @@
     height: calc(100vh - 80px);
     border-radius: unset;
   }
+
+  .overlay-box {
+    &.overlay-channel-description {
+      top: 0;
+      left: 0;
+    }
+  }
 }

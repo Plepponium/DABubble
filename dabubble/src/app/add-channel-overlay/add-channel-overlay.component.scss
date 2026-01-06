@@ -117,3 +117,17 @@ input {
     cursor: not-allowed;
   }
 }
+
+@media(max-width: 880px) {
+  .dialogue-overlay {
+    top: 0;
+    left: 0;
+    transform: unset;
+    width: 100vw;
+    height: 100vh;
+    gap: 20px;
+    padding: 40px 20px;
+    border-radius: 0px;
+    box-shadow: none;
+  }
+}
