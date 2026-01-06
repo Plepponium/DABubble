@@ -28,8 +28,12 @@
 </div>
 
 
-<div class="login">
-  <img src="/assets/img/login-logo-small.svg" class="logo" (click)="onLogoClick()" />
+<div class="login" [ngClass]="variant">
+  <div class="logo-header-mobile" *ngIf="variant === 'privacy'">
+    <img src="/assets/img/login-logo-small.svg" class="logo" (click)="onLogoClick()" />
+  </div>
+
+  <img src="/assets/img/login-logo-small.svg" class="logo hide-mobile" (click)="onLogoClick()" />
 
   <mat-card class="login-card" [ngClass]="variant">
     <ng-content></ng-content>
