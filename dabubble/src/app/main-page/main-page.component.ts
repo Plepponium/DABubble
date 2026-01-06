@@ -50,6 +50,7 @@ export class MainPageComponent {
   isSmallScreen = false;
   isResponsiveScreen = false;
   contentOpen = false;
+  dataReady = false;
 
   allUsers: any[] = [];
   allChannels: any[] = [];
@@ -83,6 +84,15 @@ export class MainPageComponent {
       this.currentUser = user;
       this.userService.getUsers().subscribe(u => this.allUsers = u);
       this.channelService.getChannels().subscribe(c => this.allChannels = c);
+      this.dataReady = true;  
+      // combineLatest([
+      //   this.userService.getUsers(),
+      //   this.channelService.getChannels()
+      // ]).subscribe(([u, c]) => {
+      //   this.allUsers = u;
+      //   this.allChannels = c;
+      //   this.dataReady = true;    // <- erst jetzt ist alles „bereit“
+      // });
     });
   }
 
@@ -104,16 +114,6 @@ export class MainPageComponent {
 
   openMenu() {
     this.menuOpen = true;
-
-    // if (this.isResponsiveScreen) {
-    //   // Content ausblenden
-    //   this.newMessageOpen = false;
-    //   this.channelOpen = false;
-    //   this.threadOpen = false;
-    //   this.currentChannelId = undefined;
-    //   this.userChatOpen = false;
-    //   this.activeUserId = undefined;
-    // }
   }
 
   openNewMessage() {

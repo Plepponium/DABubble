@@ -21,7 +21,7 @@
     </button>
 
     <div class="container">
-        <div #drawer class="sidenav" [class.closed]="!menuOpen" mode="side">
+        <div #drawer class="sidenav" *ngIf="dataReady" [class.closed]="!menuOpen" mode="side">
             <app-menu (openNewMessage)="openNewMessage()" (openAddChannel)="openAddChannel()"
                 (openChannel)="openChannel($event)" (openUserChat)="openUserChat($event)"
                 [activeChannelId]="currentChannelId" [activeUserId]="activeUserId"
