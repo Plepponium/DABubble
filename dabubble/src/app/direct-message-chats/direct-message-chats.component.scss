@@ -489,5 +489,10 @@
   .header {
     padding: 10px 16px;
     min-height: unset;
+
+    .dm-user {
+      gap: 15px;
+      padding: 4px 8px 4px 0;
+    }
   }
 }
