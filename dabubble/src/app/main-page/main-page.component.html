@@ -57,7 +57,7 @@
     <app-logout-overlay *ngIf="showLogoutOverlay" (close)="closeAllOverlays()" (openUser)="openUserProfile()"
         (logout)="logout()"></app-logout-overlay>
 
-    <app-user-profile *ngIf="showUserProfile" (close)="closeAllOverlays()"
+    <app-user-profile *ngIf="showUserProfile" (close)="closeUserOverlay()"
         (openEdit)="openEditUser()"></app-user-profile>
 
     <app-edit-user *ngIf="showEditUser" (close)="closeAllOverlays()"></app-edit-user>

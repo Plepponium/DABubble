@@ -243,7 +243,9 @@ export class MainPageComponent {
   }
 
   openUserProfile() {
-    this.closeAllOverlays();
+    // if(window.innerWidth>880) {
+    //   this.closeAllOverlays();
+    // }
     this.showUserProfile = true;
   }
 
@@ -253,7 +255,7 @@ export class MainPageComponent {
   }
 
   openProfileOverlay(user: User) {
-    this.closeAllOverlays();
+    // this.closeAllOverlays();
     if (this.currentUser?.uid === user.uid) {
       this.showUserProfile = true;
       return;
@@ -275,6 +277,10 @@ export class MainPageComponent {
   closeInputMissingOverlay() {
     this.inputMissing = false;
     this.missingInfo = null;
+  }
+
+  closeUserOverlay() {
+    this.showUserProfile = false;
   }
 
   closeAllOverlays() {
