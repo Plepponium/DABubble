@@ -485,4 +485,9 @@
     height: calc(100vh - 80px);
     border-radius: 0;
   }
+
+  .header {
+    padding: 10px 16px;
+    min-height: unset;
+  }
 }
