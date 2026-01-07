@@ -40,6 +40,7 @@ export class MainPageComponent {
   newMessageOpen = true;
 
   showLogoutOverlay = false;
+  isClosingLogoutOverlay = false;
   showUserProfile = false;
   showEditUser = false;
   showProfileOverlay = false;
@@ -84,15 +85,7 @@ export class MainPageComponent {
       this.currentUser = user;
       this.userService.getUsers().subscribe(u => this.allUsers = u);
       this.channelService.getChannels().subscribe(c => this.allChannels = c);
-      this.dataReady = true;  
-      // combineLatest([
-      //   this.userService.getUsers(),
-      //   this.channelService.getChannels()
-      // ]).subscribe(([u, c]) => {
-      //   this.allUsers = u;
-      //   this.allChannels = c;
-      //   this.dataReady = true;    // <- erst jetzt ist alles „bereit“
-      // });
+      this.dataReady = true;
     });
   }
 
@@ -238,14 +231,11 @@ export class MainPageComponent {
   }
 
   openLogoutOverlay() {
-    this.closeAllOverlays();
+    // this.closeAllOverlays();
     this.showLogoutOverlay = true;
   }
 
   openUserProfile() {
-    // if(window.innerWidth>880) {
-    //   this.closeAllOverlays();
-    // }
     this.showUserProfile = true;
   }
 
@@ -284,12 +274,21 @@ export class MainPageComponent {
   }
 
   closeAllOverlays() {
+    this.isClosingLogoutOverlay = true;
     this.showUserProfile = false;
     this.showEditUser = false;
     this.showProfileOverlay = false;
-    this.showLogoutOverlay = false;
     this.showAddChannelDialogue = false;
     this.selectedProfile = null;
+
+    if (this.isResponsiveScreen) {
+      setTimeout(() => {
+        this.showLogoutOverlay = false;
+        this.isClosingLogoutOverlay = false;
+      }, 350); 
+    } else {
+      this.showLogoutOverlay = false;
+    }
   }
 
   anyOverlayOpen() {

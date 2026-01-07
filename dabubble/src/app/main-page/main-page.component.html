@@ -54,7 +54,8 @@
 
     <div (click)="closeAllOverlays()" *ngIf="anyOverlayOpen()" class="dialogue-backdrop"></div>
 
-    <app-logout-overlay *ngIf="showLogoutOverlay" (close)="closeAllOverlays()" (openUser)="openUserProfile()"
+    <app-logout-overlay *ngIf="showLogoutOverlay" (close)="closeAllOverlays()" 
+        [closing]="isClosingLogoutOverlay" (openUser)="openUserProfile()"
         (logout)="logout()"></app-logout-overlay>
 
     <app-user-profile *ngIf="showUserProfile" (close)="closeUserOverlay()"
