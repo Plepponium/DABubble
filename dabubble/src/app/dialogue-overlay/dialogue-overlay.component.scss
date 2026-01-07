@@ -104,3 +104,16 @@
 .hover-icon-purple {
   display: none;
 }
+
+@media(max-width: 880px) {
+  .dialogue-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px 16px;
+  }
+}

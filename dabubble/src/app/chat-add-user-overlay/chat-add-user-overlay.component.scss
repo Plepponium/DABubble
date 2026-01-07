@@ -6,6 +6,7 @@
   flex-direction: column;
   gap: 20px;
   padding: 40px;
+  box-sizing: border-box;
   background-color: #ffffff;
   border-radius: 30px;
   box-shadow: 4px 4px 7px 0 rgba(0, 0, 0, 0.2);
@@ -142,5 +143,28 @@
   &:disabled {
     background-color: #686868;
     cursor: not-allowed;
+  }
+}
+
+@media(max-width: 880px) {
+  .hide-responsive {
+    display: none;
+  }
+
+  .dialogue-overlay {
+    width: 398px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 30px 16px;
+    // border-radius: 30px;
+    border-top-right-radius: unset;
+    // box-shadow: 4px 4px 7px 0 rgba(0, 0, 0, 0.2);
+    // z-index: 8;
+  }
+
+  .input-with-chips {
+    width: calc(100% - 40px);
   }
 }

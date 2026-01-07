@@ -426,6 +426,14 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
+  chooseOpenDialogue() {
+    if(window.innerWidth <= 1010) {
+      this.openDialogueShowUser();
+    } else {
+      this.openDialogueAddUser();
+    }
+  }
+
   openDialogueAddUser() {
     this.showAddDialogue = true;
     this.showUserDialogue = false;
