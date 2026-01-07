@@ -139,7 +139,7 @@
 }
 
 @media (max-width: 500px) {
-  .login-header {
+  .login-header:not(.imprint) {
     gap: 15px;
     margin-bottom: 0;
 
@@ -170,6 +170,15 @@
     gap: 20px;
     .input-item {
       padding: 13px 16px !important;
+    }
+  }
+
+  .login-header.imprint {
+    h1{
+      font-size: 32px;
+    }
+    span{
+      font-size: 17px;
     }
   }
 }

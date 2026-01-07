@@ -227,6 +227,8 @@
 .login-card.imprint {
   padding: 48px 56px;
   padding-bottom: 64px;
+  width: 676px;
+  height: 469px;
 }
 
 .legal-links {
@@ -352,7 +354,8 @@
 }
 
 @media (max-width: 880px) {
-  .login.privacy {
+  .login.privacy,
+  .login.imprint {
     padding: 0;
     background-color: white;
     .logo-header-mobile {
@@ -369,6 +372,14 @@
       display: none;
     }
   }
+
+  .login-card.imprint {
+    width: 400px;
+    height: 556px;
+    padding-bottom: 48px;
+    gap: 32px;
+  }
+
 }
 
 @media (max-width: 500px) {
@@ -401,5 +412,10 @@
 @media (max-width: 420px) {
   .login {
     padding: 20px 0 0;
+  }
+
+  .login-card.imprint {
+    width: auto;
+    padding: 48px 28px;
   }
 }
