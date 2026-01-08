@@ -127,19 +127,26 @@ export class MainPageComponent {
     this.showAddChannelDialogue = true;
   }
 
+  chooseToCloseAddChannel() {
+    if(window.innerWidth > 880 ) {
+      this.closeAddChannel();
+    }
+  }
+
   closeAddChannel() {
     this.showAddChannelDialogue = false;
   }
 
   openChannelMemberOverlay(channelData: any) {
     this.createdChannel = channelData;
-    this.closeAllOverlays();
+    // this.closeAllOverlays();
     this.showMemberOverlay = true;
   }
 
   closeMemberOverlay() {
     this.showMemberOverlay = false;
     this.createdChannel = null;
+    this.closeAllOverlays();
   }
 
   openChannel(channelId: string) {

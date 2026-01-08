@@ -16,6 +16,7 @@ export class AddChannelOverlayComponent implements OnInit {
 
   @Output() close = new EventEmitter<void>();
   @Output() createdChannel = new EventEmitter<any>();
+  // @Output() createdChannelKeepOpen = new EventEmitter<any>();
 
   @Input() channels: any[] = [];
 
@@ -57,7 +58,24 @@ export class AddChannelOverlayComponent implements OnInit {
 
     this.channelService.addChannel(newChannel).then(channelRef => {
       this.createdChannel.emit({ id: channelRef.id, ...newChannel });
+      // const channelData = { id: channelRef.id, ...newChannel };
       this.handleClose();
+
+      // if (window.innerWidth < 880) {
+      //   // Responsive: NICHT schließen, nur Event
+      //   this.createdChannelKeepOpen.emit(channelData);
+      // } else {
+      //   // Desktop: Normal schließen
+      //   this.createdChannel.emit(channelData);
+      //   this.handleClose();
+      // }
+
+      // this.createdChannelKeepOpen.emit(channelData);
+      // this.createdChannel.emit(channelData);
+
+      // if (window.innerWidth > 880) {
+      //   this.handleClose();
+      // }
     });
   }
 

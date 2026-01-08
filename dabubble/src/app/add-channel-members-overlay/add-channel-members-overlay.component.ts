@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, inject, Input, Output, SimpleChanges } from '@angular/core';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -27,7 +27,12 @@ export class AddChannelMembersOverlayComponent {
   userService = inject(UserService);
   channelService = inject(ChannelService);
 
+  showOverlayResponsive = false;
+  private isResponsive = false;
+
   ngOnInit() {
+    this.isResponsive = window.innerWidth < 880;
+    // this.showOverlayResponsive = this.isResponsive;
     this.userService.getUsers().subscribe(users => {
       this.allUsers = users;
     });
@@ -39,8 +44,31 @@ export class AddChannelMembersOverlayComponent {
     });
   }
 
+  ngAfterViewInit() {
+    // ✅ DOM ist fertig → JETZT animieren
+    setTimeout(() => {
+      if (this.isResponsive) {
+        this.showOverlayResponsive = true;
+      }
+    }, 10);  // Minimale Verzögerung für CSS-Transition
+  }
+
+  @HostListener('window:resize', [])
+  onResize() {
+    this.isResponsive = window.innerWidth < 880;
+    // if (this.isOverlayVisible()) {
+      this.showOverlayResponsive = this.isResponsive;
+    // }
+  }
+
   handleClose() {
-    this.close.emit();
+    // this.close.emit();
+    if (this.isResponsive) {
+      this.showOverlayResponsive = false;
+      setTimeout(() => this.close.emit(), 350);
+    } else {
+      this.close.emit();
+    }
   }
 
   isCreateDisabled(): boolean {
