@@ -164,13 +164,11 @@
 }
 
 .thread.fullwidth {
-  // width: calc(100vw - 40px);
   width: calc(100vw - 426px);
 }
 
 .thread.fullwidth-without-menu {
   width: calc(100vw - 40px);
-  // width: calc(100vw - 426px);
 }
 
 .thread.closed {
@@ -218,7 +216,21 @@
     right: 0;
   }
 
+  .thread {
+    transition: unset;
+    transform: unset;
+  }
+
+  .thread.open {
+    transform: unset;
+  }
+
   .thread.fullwidth-without-menu {
     width: 100vw;
+  }
+
+  .thread.closed {
+    transform: unset;
+    display: none;
   }
 }
