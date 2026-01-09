@@ -92,16 +92,35 @@
 }
 
 .responsive-btn {
+  width: fit-content;
   display: flex;
   align-items: center;
   gap: 20px;
   padding: 10px 30px;
   font-size: 20px;
   font-weight: 600;
+  border-radius: 30px;
   cursor: pointer;
+
+  .active-icon {
+    display: none;
+  }
 }
 
-.profil-img {
+.responsive-btn.active {
+  // &:hover{
+    background-color: #eceefe;
+    color: #535af1;
+  // }
+  .non-active-icon {
+    display: none;
+  }
+  .active-icon {
+    display: block;
+  }
+}
+
+.profile-img {
   width: 25px;
   height: 25px;
 }

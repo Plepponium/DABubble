@@ -13,8 +13,9 @@
     </div>
     
     <div class="btn-container">
-        <div (click)="handleOpenUserProfile()" class="responsive-btn">
-            <img class="profil-img" src="assets/icons/account_circle.svg" alt="">
+        <div (click)="handleOpenUserProfile()" class="responsive-btn" [class.active]="buttonActive">
+            <img class="profile-img non-active-icon" src="assets/icons/account_circle.svg" alt="">
+            <img class="profile-img active-icon" src="assets/icons/account_circle-purple.svg" alt="">
             <div>Profil</div>
         </div>
         <div (click)="handleLogout()" class="responsive-btn">

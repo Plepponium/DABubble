@@ -14,18 +14,33 @@ export class LogoutOverlayComponent implements OnInit, AfterViewInit, OnChanges 
   @Output() logout = new EventEmitter<void>();
 
   @Input() closing = false;
+  @Input() resetActive = false;
 
   showLogoutOverlayResponsive = false;
   private isResponsive = false;
+  buttonActive = false;
 
   ngOnInit() {
     this.isResponsive = window.innerWidth < 880;
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['closing'] && this.closing && this.isResponsive) {
-      this.showLogoutOverlayResponsive = false;
-      setTimeout(() => this.close.emit(), 350);
+    // if (changes['closing'] && this.closing && this.isResponsive) {
+    //   this.showLogoutOverlayResponsive = false;
+    //   this.buttonActive = false;
+    //   setTimeout(() => this.close.emit(), 350);
+    // }
+
+    if (changes['closing']) {
+      if (this.closing && this.isResponsive) {
+        this.showLogoutOverlayResponsive = false;
+        this.buttonActive = false;
+        setTimeout(() => this.close.emit(), 350);
+      }
+    } 
+
+    if (changes['resetActive'] && !this.resetActive) {
+      this.buttonActive = false;
     }
   }
 
@@ -43,6 +58,7 @@ export class LogoutOverlayComponent implements OnInit, AfterViewInit, OnChanges 
   // }
 
   handleOpenUserProfile() {
+    this.buttonActive = true;
     this.openUser.emit();
   }
 

@@ -55,7 +55,7 @@
     <div (click)="closeAllOverlays()" *ngIf="anyOverlayOpen()" class="dialogue-backdrop"></div>
 
     <app-logout-overlay *ngIf="showLogoutOverlay" (close)="closeAllOverlays()" 
-        [closing]="isClosingLogoutOverlay" (openUser)="openUserProfile()"
+        [closing]="isClosingLogoutOverlay" [resetActive]="showUserProfile" (openUser)="openUserProfile()"
         (logout)="logout()"></app-logout-overlay>
 
     <app-user-profile *ngIf="showUserProfile" (close)="closeUserOverlay()"
@@ -66,7 +66,7 @@
     <app-profile-overlay *ngIf="showProfileOverlay" [user]="selectedProfile"
         (openDmChat)="openDmChatFromOverlay($event)" (close)="closeAllOverlays()"></app-profile-overlay>
 
-    <app-add-channel-overlay *ngIf="showAddChannelDialogue" (close)="chooseToCloseAddChannel()" [channels]="allChannels"
+    <app-add-channel-overlay *ngIf="showAddChannelDialogue" (close)="closeAddChannel()" (closeResonsive)="chooseToCloseAddChannel()" [channels]="allChannels"
         (createdChannel)="openChannelMemberOverlay($event)"></app-add-channel-overlay>
 
     <app-add-channel-members-overlay *ngIf="showMemberOverlay && currentUser" [channel]="createdChannel"

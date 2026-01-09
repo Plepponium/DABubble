@@ -13,13 +13,11 @@ import { CommonModule } from '@angular/common';
   styleUrl: './add-channel-overlay.component.scss'
 })
 export class AddChannelOverlayComponent implements OnInit {
-
   @Output() close = new EventEmitter<void>();
+  @Output() closeResponsive = new EventEmitter<void>();
   @Output() createdChannel = new EventEmitter<any>();
-  // @Output() createdChannelKeepOpen = new EventEmitter<any>();
 
   @Input() channels: any[] = [];
-
 
   channelName: string = '';
   description: string = '';
@@ -38,11 +36,14 @@ export class AddChannelOverlayComponent implements OnInit {
     this.close.emit();
   }
 
+  handleCloseResponsive() {
+    this.closeResponsive.emit();
+  }
+
   get channelNameExists(): boolean {
     const name = this.channelName.trim().toLowerCase();
     return this.channels.some(c => c.name.trim().toLowerCase() === name);
   }
-
 
   handleAddChannel() {
     if (!this.currentUser || this.channelNameExists) return;
@@ -58,25 +59,7 @@ export class AddChannelOverlayComponent implements OnInit {
 
     this.channelService.addChannel(newChannel).then(channelRef => {
       this.createdChannel.emit({ id: channelRef.id, ...newChannel });
-      // const channelData = { id: channelRef.id, ...newChannel };
-      this.handleClose();
-
-      // if (window.innerWidth < 880) {
-      //   // Responsive: NICHT schließen, nur Event
-      //   this.createdChannelKeepOpen.emit(channelData);
-      // } else {
-      //   // Desktop: Normal schließen
-      //   this.createdChannel.emit(channelData);
-      //   this.handleClose();
-      // }
-
-      // this.createdChannelKeepOpen.emit(channelData);
-      // this.createdChannel.emit(channelData);
-
-      // if (window.innerWidth > 880) {
-      //   this.handleClose();
-      // }
+      this.handleCloseResponsive();
     });
   }
-
 }
