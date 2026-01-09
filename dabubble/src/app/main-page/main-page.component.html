@@ -1,7 +1,7 @@
 <div class="main-page">
-    <app-header class="header" (selectedItem)="openChatFromHeader($event)" (openLogoutOverlay)="openLogoutOverlay()"
-        (openUserProfile)="openUserProfile()" [menuOpen]="menuOpen" (openMenu)="openMenu()" [currentUser]="currentUser" [users]="allUsers"
-        [channels]="allChannels">
+    <app-header class="header" (selectedItem)="openChatFromSearchbar($event)" (openLogoutOverlay)="openLogoutOverlay()"
+        (openUserProfile)="openUserProfile()" [menuOpen]="menuOpen" (openMenu)="openMenu()" [currentUser]="currentUser"
+        [users]="allUsers" [channels]="allChannels">
     </app-header>
 
     <button class="toggle-menu-btn hide-responsive" type="button" (click)="toggleMenu()">
@@ -22,15 +22,15 @@
 
     <div class="container">
         <div #drawer class="sidenav" *ngIf="dataReady" [class.closed]="!menuOpen" mode="side">
-            <app-menu (openNewMessage)="openNewMessage()" (openAddChannel)="openAddChannel()"
-                (openChannel)="openChannel($event)" (openUserChat)="openUserChat($event)"
-                [activeChannelId]="currentChannelId" [activeUserId]="activeUserId"
+            <app-menu (selectedItem)="openChatFromSearchbar($event)" (openNewMessage)="openNewMessage()"
+                (openAddChannel)="openAddChannel()" (openChannel)="openChannel($event)"
+                (openUserChat)="openUserChat($event)" [activeChannelId]="currentChannelId" [activeUserId]="activeUserId"
                 [channels]="allChannels" [users]="allUsers" [currentUser]="currentUser">
             </app-menu>
         </div>
 
-        <div *ngIf="!isResponsiveScreen || !menuOpen" class="content" [class.fullwidth]="!menuOpen" [class.dm-open]="isDmOpen" [class.nm-open]="isNmOpen"
-            [class.thread-open]="threadOpen">
+        <div *ngIf="!isResponsiveScreen || !menuOpen" class="content" [class.fullwidth]="!menuOpen"
+            [class.dm-open]="isDmOpen" [class.nm-open]="isNmOpen" [class.thread-open]="threadOpen">
 
             <app-chats #chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId"
                 (openThread)="openThread($event)" (openProfile)="openProfileOverlay($event)"
@@ -44,7 +44,7 @@
 
             <app-direct-message-chats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
                 (openProfile)="openProfileOverlay($event)"></app-direct-message-chats>
-            
+
             <app-new-message class="new-message" *ngIf="newMessageOpen" (openChannel)="openChannel($event)"
                 (openUserChat)="openUserChat($event)"
                 (inputMissing)="openInputMissingOverlay($event)"></app-new-message>
@@ -54,9 +54,8 @@
 
     <div (click)="closeAllOverlays()" *ngIf="anyOverlayOpen()" class="dialogue-backdrop"></div>
 
-    <app-logout-overlay *ngIf="showLogoutOverlay" (close)="closeAllOverlays()" 
-        [closing]="isClosingLogoutOverlay" [resetActive]="showUserProfile" (openUser)="openUserProfile()"
-        (logout)="logout()"></app-logout-overlay>
+    <app-logout-overlay *ngIf="showLogoutOverlay" (close)="closeAllOverlays()" [closing]="isClosingLogoutOverlay"
+        [resetActive]="showUserProfile" (openUser)="openUserProfile()" (logout)="logout()"></app-logout-overlay>
 
     <app-user-profile *ngIf="showUserProfile" (close)="closeUserOverlay()"
         (openEdit)="openEditUser()"></app-user-profile>
@@ -66,7 +65,8 @@
     <app-profile-overlay *ngIf="showProfileOverlay" [user]="selectedProfile"
         (openDmChat)="openDmChatFromOverlay($event)" (close)="closeAllOverlays()"></app-profile-overlay>
 
-    <app-add-channel-overlay *ngIf="showAddChannelDialogue" (close)="closeAddChannel()" (closeIfNotResonsive)="chooseToCloseAddChannel()" [channels]="allChannels"
+    <app-add-channel-overlay *ngIf="showAddChannelDialogue" (close)="closeAddChannel()"
+        (closeIfNotResonsive)="chooseToCloseAddChannel()" [channels]="allChannels"
         (createdChannel)="openChannelMemberOverlay($event)"></app-add-channel-overlay>
 
     <app-add-channel-members-overlay *ngIf="showMemberOverlay && currentUser" [channel]="createdChannel"

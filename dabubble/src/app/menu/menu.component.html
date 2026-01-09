@@ -6,8 +6,8 @@
                 <span class="font-24 font-w-700 f-nunito">Devspace</span>
             </div>
 
-            <app-round-btn (click)="handleOpenNewMessage()" iconSrc="assets/icons/edit_square.svg" iconHoverSrc="assets/icons/edit_square-purple.svg"
-                altText="Bearbeiten">
+            <app-round-btn (click)="handleOpenNewMessage()" iconSrc="assets/icons/edit_square.svg"
+                iconHoverSrc="assets/icons/edit_square-purple.svg" altText="Bearbeiten">
             </app-round-btn>
         </mat-toolbar>
 
@@ -21,10 +21,10 @@
                 </button>
             </div>
 
-            <app-mentions-overlay *ngIf="inputFocused" class="mentions-overlay" [text]="searchText" [caretIndex]="caretIndex"
-                [currentUserId]="currentUser?.uid" [context]="'Searchbar'" [users]="users" [channels]="relevantChannels"
-                [messages]="messages" (navigateToChat)="onNavigateToChat($event)"
-                (overlayStateChange)="overlayActive = $event">
+            <app-mentions-overlay *ngIf="inputFocused" class="mentions-overlay" [text]="searchText"
+                [caretIndex]="caretIndex" [currentUserId]="currentUser?.uid" [context]="'Searchbar'" [source]="'menu'"
+                [users]="users" [channels]="relevantChannels" [messages]="messages"
+                (navigateToChat)="onNavigateToChat($event)" (overlayStateChange)="overlayActive = $event">
             </app-mentions-overlay>
         </div>
     </div>

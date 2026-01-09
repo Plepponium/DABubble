@@ -32,6 +32,7 @@ export class MenuComponent implements OnInit {
   caretIndex: number | null = null;
   overlayActive = false;
   inputFocused = false;
+  private clickFromOverlay = false;
 
   messages: any[] = [];
 
@@ -74,7 +75,7 @@ export class MenuComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['channels'] || changes['users'] || changes['currentUser']) {
-    // if (changes['channels']) {
+      // if (changes['channels']) {
       this.loadMessages();
       this.sortChannels();
       this.cdr.markForCheck();
@@ -94,7 +95,7 @@ export class MenuComponent implements OnInit {
       this.messages = [];
       return;
     }
-    
+
     this.messages = [];
     await this.loadChannelMessages();
     await this.loadDmMessages();
@@ -160,7 +161,7 @@ export class MenuComponent implements OnInit {
   private toDate(value: any): Date {
     if (value?.seconds) return new Date(value.seconds * 1000 + value.nanoseconds / 1e6);
     return new Date(value);
-  }  
+  }
 
   toggleChannels() {
     this.channelsExpanded = !this.channelsExpanded;
@@ -205,20 +206,24 @@ export class MenuComponent implements OnInit {
   }
 
   onNavigateToChat(item: any) {
+    this.clickFromOverlay = true;
     this.searchText = '';
     this.selectedItem.emit(item);
+    this.inputFocused = false;
   }
 
   onSearchFocus() {
     this.inputFocused = true;
-    // this.cdr.markForCheck();
+    this.cdr.markForCheck();
   }
 
   onSearchBlur() {
-    // this.inputFocused = false;
-    // setTimeout(() => {
-    //   this.inputFocused = false;
-    //   this.cdr.markForCheck();
-    // }, 100);
+    setTimeout(() => {
+      if (!this.clickFromOverlay) {
+        this.inputFocused = false;
+      }
+      this.clickFromOverlay = false;
+      this.cdr.markForCheck();
+    }, 100);
   }
 }

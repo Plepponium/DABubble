@@ -1,6 +1,6 @@
 <div class="mentions-overlay" [class.add-user]="context === 'AddUser'"
     [class.add-recipient]="context === 'AddRecipient'" [class.searchbar]="context === 'Searchbar'"
-    *ngIf="filteredItems.length > 0">
+    [class.menu-searchbar]="source === 'menu'" *ngIf="filteredItems.length > 0">
 
 
     <ng-container *ngIf="activeTrigger || context === 'AddUser' || context === 'AddRecipient'">

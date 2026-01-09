@@ -45,6 +45,16 @@
       width: 550px;
     }
   }
+
+  &.menu-searchbar {
+    left: -20px;
+    width: 100%;
+    gap: 8px;
+
+    .mention-item {
+      width: unset;
+    }
+  }
 }
 
 .mention-item {

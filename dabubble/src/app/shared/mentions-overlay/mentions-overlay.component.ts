@@ -21,6 +21,7 @@ export class MentionsOverlayComponent {
   @Input() users: Partial<User>[] = [];
   @Input() channels: any[] = [];
   @Input() messages: any[] = [];
+  @Input() source: 'default' | 'menu' = 'default';
 
   @Output() mentionSelected = new EventEmitter<{ name: string, type: 'user' | 'channel' | 'email' }>();
   @Output() overlayStateChange = new EventEmitter<boolean>();

@@ -128,7 +128,7 @@ export class MainPageComponent {
   }
 
   chooseToCloseAddChannel() {
-    if(window.innerWidth > 880 ) {
+    if (window.innerWidth > 880) {
       this.closeAddChannel();
     }
   }
@@ -175,7 +175,7 @@ export class MainPageComponent {
     }
   }
 
-  openChatFromHeader(item: any) {
+  openChatFromSearchbar(item: any) {
     if (!item) return;
     if (item.type === 'channel-message') return this.handleChannelMessage(item);
     if (item.type === 'dm-message') return this.handleDmMessage(item);
@@ -292,7 +292,7 @@ export class MainPageComponent {
       setTimeout(() => {
         this.showLogoutOverlay = false;
         this.isClosingLogoutOverlay = false;
-      }, 350); 
+      }, 350);
     } else {
       this.showLogoutOverlay = false;
     }
