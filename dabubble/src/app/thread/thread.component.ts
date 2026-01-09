@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input, inject, OnInit, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, OnInit, SimpleChanges, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,6 +34,7 @@ export class ThreadComponent implements OnInit {
   activeReactionDialogueAnswersIndex: number | null = null;
   activeReactionDialogueBelowAnswersIndex: number | null = null;
   insertedAtPending = false;
+  isResponsive = false;
 
   currentUserId: string = '';
   participantIds: string[] = [];
@@ -71,6 +72,7 @@ export class ThreadComponent implements OnInit {
   constructor(private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
+    this.updateIsResponsive();
     this.getCurrentUserAndChannels();
     this.loadChannelWithId(this.channelId);
     this.chat$ = this.getEnrichedChat();
@@ -94,6 +96,15 @@ export class ThreadComponent implements OnInit {
       this.getCurrentUserAndChannels();
       this.loadChannelWithId(this.channelId);
     }
+  }
+
+  @HostListener('window:resize')  // ← NEU!
+  onResize() {
+    this.updateIsResponsive();
+  }
+
+  private updateIsResponsive() {  // ← NEU!
+    this.isResponsive = window.innerWidth < 881;
   }
 
   focusAnswerInput() {

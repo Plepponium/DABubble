@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input, inject, OnChanges, SimpleChanges, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, OnChanges, SimpleChanges, OnInit, ViewChild, ElementRef, AfterViewInit, HostListener } from '@angular/core';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -39,6 +39,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   activeReactionDialogueBelowIndex: number | null = null;
   overlayActive = false;
   insertedAtPending = false;
+  isResponsive = false;
 
   currentUserId: string = '';
   channels: any[] = [];
@@ -71,6 +72,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   constructor(private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
+    this.updateIsResponsive();
     this.getCurrentUser();
     this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
       this.channels = channels;
@@ -89,6 +91,22 @@ export class ChatsComponent implements OnInit, OnChanges {
         this.loadChannelWithId(newChannelId);
       }
     }
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.updateIsResponsive();
+  }
+
+  private updateIsResponsive() {
+    this.isResponsive = window.innerWidth < 881;
+  }
+
+  getMaxReactionsToShow(chat: any, index: number): any[] {
+    const max = this.isResponsive ? 3 : 7;
+    return this.showAllReactions[index] 
+      ? chat.reactionArray 
+      : chat.reactionArray.slice(0, max);
   }
 
   scrollToBottom() {

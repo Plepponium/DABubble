@@ -142,3 +142,9 @@ body.intro-active {
     object-fit: cover;
   }
 }
+
+@media(max-width: 880px) {
+  .font-24 {
+    font-size: 20px;
+  }
+}

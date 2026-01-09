@@ -65,7 +65,7 @@
                         <div class="reactions">
                             <div class="reaction-btns">
                                 <div (click)="toggleReactionForChat(chat.id, reaction.type)"
-                                    *ngFor="let reaction of (showAllReactionsForChat[chat.id] ? chat.reactionArray : (chat.reactionArray | slice:0:7))" class="reaction-btn"
+                                    *ngFor="let reaction of (showAllReactionsForChat[chat.id] ? chat.reactionArray : (chat.reactionArray | slice:0:(isResponsive ? 3 : 7)))" class="reaction-btn"
                                     [ngClass]="{'reacted': reaction.currentUserReacted}">
                                     <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
                                         [alt]="reaction.type">
@@ -108,10 +108,10 @@
                                     <!-- <pre>{{ chat.reactionArray | json }}</pre> -->
                                 </div>
 
-                                <div (click)="showAllReactionsForChat[chat.id] = true" *ngIf="chat.reactionArray!.length > 7 && !showAllReactionsForChat[chat.id]" class="reaction-btn more-reactions">
-                                    {{chat.reactionArray!.length-7}} weitere
+                                <div (click)="showAllReactionsForChat[chat.id] = true" *ngIf="chat.reactionArray!.length > (isResponsive ? 3 : 7) && !showAllReactionsForChat[chat.id]" class="reaction-btn more-reactions">
+                                    {{chat.reactionArray!.length - (isResponsive ? 3 : 7)}} weitere
                                 </div>
-                                <div (click)="showAllReactionsForChat[chat.id] = false" *ngIf="showAllReactionsForChat[chat.id]" class="reaction-btn more-reactions">
+                                <div (click)="showAllReactionsForChat[chat.id] = false" *ngIf="showAllReactionsForChat[chat.id]" class="reaction-btn more-reactions no-wrap">
                                     Weniger anzeigen
                                 </div>
                             </div>
@@ -204,7 +204,7 @@
                                 <div class="reactions">
                                     <div class="reaction-btns">
                                         <div (click)="toggleReactionForAnswer(answer.id, reaction.type)"
-                                            *ngFor="let reaction of (showAllReactionsForAnswer[answer.id] ? answer.reactionArray : (answer.reactionArray | slice:0:7))" class="reaction-btn"
+                                            *ngFor="let reaction of (showAllReactionsForAnswer[answer.id] ? answer.reactionArray : (answer.reactionArray | slice:0:(isResponsive ? 3 : 7)))" class="reaction-btn"
                                             [ngClass]="{'reacted': reaction.currentUserReacted}">
                                             <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
                                                 [alt]="reaction.type">
@@ -248,10 +248,10 @@
                                             <!-- <pre>{{ reaction | json }}</pre> -->
                                         </div>
                                         
-                                        <div (click)="showAllReactionsForAnswer[answer.id] = true" *ngIf="answer.reactionArray!.length > 7 && !showAllReactionsForAnswer[answer.id]" class="reaction-btn more-reactions">
-                                            {{answer.reactionArray!.length-7}} weitere
+                                        <div (click)="showAllReactionsForAnswer[answer.id] = true" *ngIf="answer.reactionArray!.length > (isResponsive ? 3 : 7) && !showAllReactionsForAnswer[answer.id]" class="reaction-btn more-reactions">
+                                            {{answer.reactionArray!.length - (isResponsive ? 3 : 7)}} weitere
                                         </div>
-                                        <div (click)="showAllReactionsForAnswer[answer.id] = false" *ngIf="showAllReactionsForAnswer[answer.id]" class="reaction-btn more-reactions">
+                                        <div (click)="showAllReactionsForAnswer[answer.id] = false" *ngIf="showAllReactionsForAnswer[answer.id]" class="reaction-btn more-reactions no-wrap">
                                             Weniger anzeigen
                                         </div>
                                     </div>

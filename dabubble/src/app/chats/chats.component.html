@@ -25,10 +25,14 @@
                     </div>
                 </div>
 
-                <app-round-btn (click)="chooseOpenDialogue()" style="--btn-bg: #eceefe;"
+                <!-- <app-round-btn (click)="chooseOpenDialogue()" style="--btn-bg: #eceefe;"
                     iconSrc="assets/icons/person_add.svg" iconHoverSrc="assets/icons/person_add-purple.svg"
                     altText="Senden">
-                </app-round-btn>
+                </app-round-btn> -->
+                <button (click)="chooseOpenDialogue()" class="add-user-btn">
+                    <img class="btn-img hover-icon" src="assets/icons/person_add.svg" alt="Senden">
+                    <img class="btn-img hover-icon-purple" src="assets/icons/person_add-purple.svg" alt="Senden">
+                </button>
             </div>
         </div>
 
@@ -130,14 +134,14 @@
                                     <div (click)="handleOpenThread(chat.id)" class="answer t-purple">{{
                                         chat.answersCount }}
                                         Antworten</div>
-                                    <div class="last-answer font-14 t-gray">Letzte Antwort {{ chat.lastAnswerTime ?
+                                    <div class="last-answer font-14 t-gray hide-small">Letzte Antwort {{ chat.lastAnswerTime ?
                                         (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}</div>
                                 </div>
 
                                 <div class="reactions">
                                     <div class="reaction-btns">
                                         <div (click)="toggleReaction(i, reaction.type)"
-                                            *ngFor="let reaction of (showAllReactions[i] ? chat.reactionArray : (chat.reactionArray | slice:0:7))" 
+                                            *ngFor="let reaction of getMaxReactionsToShow(chat, i)" 
                                             class="reaction-btn" [ngClass]="{'reacted': reaction.currentUserReacted}">
                                             
                                             <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
@@ -176,8 +180,8 @@
                                             </div>
                                         </div>
                                         
-                                        <div (click)="showAllReactions[i] = true" *ngIf="chat.reactionArray!.length > 7 && !showAllReactions[i]" class="reaction-btn more-reactions">
-                                            {{chat.reactionArray!.length-7}} weitere
+                                        <div (click)="showAllReactions[i] = true" *ngIf="chat.reactionArray!.length > (isResponsive ? 3 : 7) && !showAllReactions[i]" class="reaction-btn more-reactions">
+                                            {{chat.reactionArray!.length - (isResponsive ? 3 : 7)}} weitere
                                         </div>
                                         <div (click)="showAllReactions[i] = false" *ngIf="showAllReactions[i]" class="reaction-btn more-reactions">
                                             Weniger anzeigen
