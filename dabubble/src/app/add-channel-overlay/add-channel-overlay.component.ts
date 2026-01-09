@@ -14,7 +14,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AddChannelOverlayComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
-  @Output() closeResponsive = new EventEmitter<void>();
+  @Output() closeIfNotResponsive = new EventEmitter<void>();
   @Output() createdChannel = new EventEmitter<any>();
 
   @Input() channels: any[] = [];
@@ -37,7 +37,7 @@ export class AddChannelOverlayComponent implements OnInit {
   }
 
   handleCloseResponsive() {
-    this.closeResponsive.emit();
+    this.closeIfNotResponsive.emit();
   }
 
   get channelNameExists(): boolean {
