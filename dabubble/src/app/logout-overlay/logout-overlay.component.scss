@@ -109,8 +109,8 @@
 
 .responsive-btn.active {
   // &:hover{
-    background-color: #eceefe;
-    color: #535af1;
+  background-color: #eceefe;
+  color: #535af1;
   // }
   .non-active-icon {
     display: none;
@@ -134,12 +134,18 @@
   display: none;
 }
 
-@media(max-width: 880px) {
+@media (max-width: 880px) {
   .hide-responsive {
     display: none;
   }
 
   .show-responsive {
     display: flex;
+  }
+}
+
+@media (max-width: 430px) {
+  .dialogue-overlay-responsive {
+    width: 100%;
   }
 }
