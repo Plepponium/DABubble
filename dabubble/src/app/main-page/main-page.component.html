@@ -70,7 +70,7 @@
         (createdChannel)="openChannelMemberOverlay($event)"></app-add-channel-overlay>
 
     <app-add-channel-members-overlay *ngIf="showMemberOverlay && currentUser" [channel]="createdChannel"
-        [currentUser]="currentUser" (close)="closeMemberOverlay()">
+        [currentUser]="currentUser" (close)="closeMemberOverlay()" (channelCreated)="openCreatedChannel($event)">
     </app-add-channel-members-overlay>
 
     <app-input-missing-overlay *ngIf="inputMissing" [missingInfo]="missingInfo!"

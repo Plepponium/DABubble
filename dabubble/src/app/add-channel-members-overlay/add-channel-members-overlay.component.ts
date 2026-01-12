@@ -15,6 +15,7 @@ import { ChannelService } from '../../services/channel.service';
 })
 export class AddChannelMembersOverlayComponent {
   @Output() close = new EventEmitter<void>();
+  @Output() channelCreated = new EventEmitter<any>();
   @Input() channel!: any;
   @Input() currentUser?: User;
 
@@ -57,7 +58,7 @@ export class AddChannelMembersOverlayComponent {
   onResize() {
     this.isResponsive = window.innerWidth < 880;
     // if (this.isOverlayVisible()) {
-      this.showOverlayResponsive = this.isResponsive;
+    this.showOverlayResponsive = this.isResponsive;
     // }
   }
 
@@ -89,22 +90,23 @@ export class AddChannelMembersOverlayComponent {
   }
 
   async handleCreate() {
-    if (!this.channel || !this.channel.id) return;
+    if (!this.channel || !this.currentUser) return;
     if (this.isCreateDisabled()) return;
-
-    let participantIds: string[] = [];
-
+    let extraParticipants: string[] = [];
     if (this.selectedMode === 'all' && this.firstUserChannel) {
-      participantIds = this.firstUserChannel.participants;
+      extraParticipants = this.firstUserChannel.participants;
     }
-
     if (this.selectedMode === 'custom' && this.selectedUser?.uid) {
-      participantIds = [this.selectedUser.uid];
+      extraParticipants = [this.selectedUser.uid];
     }
-
-    if (participantIds.length > 0) {
-      await this.channelService.addParticipants(this.channel.id, participantIds);
-    }
+    const baseParticipants = this.channel.participants || [this.currentUser.uid];
+    const allParticipants = Array.from(new Set([...baseParticipants, ...extraParticipants]));
+    const newChannelData = {
+      ...this.channel,
+      participants: allParticipants
+    };
+    const channelRef = await this.channelService.addChannel(newChannelData);
+    this.channelCreated.emit({ id: channelRef.id, ...newChannelData });
     this.handleClose();
   }
 

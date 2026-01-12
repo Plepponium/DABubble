@@ -21,7 +21,7 @@ export class AddChannelOverlayComponent implements OnInit {
 
   channelName: string = '';
   description: string = '';
-  currentUser?: User; 
+  currentUser?: User;
   private initialChannelNames: string[] = [];  // Namen beim Öffnen
   nameExistsError = false;
 
@@ -56,7 +56,7 @@ export class AddChannelOverlayComponent implements OnInit {
   handleAddChannel() {
     if (!this.currentUser || this.channelNameExists) return;
 
-    const newChannel = {
+    const channelDraft = {
       name: this.channelName.trim(),
       description: this.description,
       createdBy: this.currentUser.uid,
@@ -64,10 +64,6 @@ export class AddChannelOverlayComponent implements OnInit {
       participants: [this.currentUser.uid],
       createdAt: new Date()
     };
-
-    this.channelService.addChannel(newChannel).then(channelRef => {
-      this.createdChannel.emit({ id: channelRef.id, ...newChannel });
-      this.handleCloseResponsive();
-    });
+    this.createdChannel.emit(channelDraft);
   }
 }

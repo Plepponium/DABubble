@@ -101,6 +101,7 @@ mat-toolbar {
 }
 
 .add-channel-btn {
+  cursor: pointer;
   width: 30px;
   height: 30px;
   display: flex;
@@ -314,7 +315,7 @@ mat-toolbar {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 16px; 
+  padding-top: 16px;
   cursor: pointer;
 }
 
@@ -322,7 +323,7 @@ mat-toolbar {
   display: none;
 }
 
-@media(max-width: 1010px) {
+@media (max-width: 1010px) {
   .show-responsive {
     display: flex;
   }

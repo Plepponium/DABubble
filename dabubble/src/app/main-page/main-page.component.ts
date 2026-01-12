@@ -44,8 +44,11 @@ export class MainPageComponent {
   showUserProfile = false;
   showEditUser = false;
   showProfileOverlay = false;
+
   showAddChannelDialogue = false;
   showMemberOverlay = false;
+  createdChannel: any = null;
+
   inputMissing = false;
   missingInfo: { recipientMissing: boolean; textMissing: boolean; } | null = null;
   isSmallScreen = false;
@@ -62,7 +65,6 @@ export class MainPageComponent {
   threadChatId?: string;
 
   selectedProfile: any = null;
-  createdChannel: any = null;
 
   private userService = inject(UserService);
   private channelService = inject(ChannelService);
@@ -137,9 +139,9 @@ export class MainPageComponent {
     this.showAddChannelDialogue = false;
   }
 
-  openChannelMemberOverlay(channelData: any) {
-    this.createdChannel = channelData;
-    // this.closeAllOverlays();
+  openChannelMemberOverlay(draft: any) {
+    this.createdChannel = draft;
+    // NICHT: this.closeAllOverlays();
     this.showMemberOverlay = true;
   }
 
@@ -160,6 +162,11 @@ export class MainPageComponent {
     if (this.isResponsiveScreen) {
       this.menuOpen = false;
     }
+  }
+
+  openCreatedChannel(channel: any) {
+    this.openChannel(channel.id);
+    this.closeMemberOverlay();
   }
 
   openUserChat(user: User) {
