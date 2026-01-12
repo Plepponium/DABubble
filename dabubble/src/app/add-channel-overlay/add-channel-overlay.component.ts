@@ -43,6 +43,7 @@ export class AddChannelOverlayComponent implements OnInit {
   }
 
   handleCloseResponsive() {
+    console.log('closeResponsive');
     this.closeIfNotResponsive.emit();
   }
 

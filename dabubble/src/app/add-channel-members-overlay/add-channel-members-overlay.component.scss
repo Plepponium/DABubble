@@ -172,7 +172,7 @@
 .dialogue-overlay-responsive {
   width: 430px;
   // height: 200px;
-  padding: 30px 26px;
+  padding: 30px 20px;
   box-sizing: border-box;
   position: fixed;
   bottom: 0px;
@@ -187,6 +187,10 @@
   flex-direction: column;
   gap: 20px;
   transition: transform 0.3s ease-out;
+}
+
+.dialogue-overlay-responsive.selection {
+  padding: 30px 20px 100px 20px;
 }
 
 .dialogue-overlay-responsive.open {
@@ -218,17 +222,10 @@
   .show-responsive {
     display: flex;
   }
+}
 
-  // .dialogue-overlay {
-  //   width: 398px;
-  //   position: fixed;
-  //   top: 50%;
-  //   left: 50%;
-  //   transform: translate(-50%, -50%);
-  //   padding: 30px 16px;
-  //   // border-radius: 30px;
-  //   border-top-right-radius: unset;
-  //   // box-shadow: 4px 4px 7px 0 rgba(0, 0, 0, 0.2);
-  //   // z-index: 8;
-  // }
+@media(max-width: 430px) {
+  .dialogue-overlay-responsive {
+    width: 100%;
+  }
 }

@@ -52,7 +52,8 @@
 </div>
 
 
-<div class="dialogue-overlay-responsive show-responsive" [class.open]="showOverlayResponsive">
+<div class="dialogue-overlay-responsive show-responsive" [class.open]="showOverlayResponsive" 
+    [class.selection]="selectedMode === 'custom'">
     <div class="line-container">
         <div class="line"></div>
     </div>

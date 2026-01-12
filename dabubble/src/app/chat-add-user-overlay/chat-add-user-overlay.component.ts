@@ -29,6 +29,7 @@ export class ChatAddUserOverlayComponent {
   userService = inject(UserService);
   channelService = inject(ChannelService);
 
+  showOverlayResponsive = true;
 
   ngOnInit() {
     this.loadAllUsers();

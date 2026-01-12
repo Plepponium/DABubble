@@ -1,4 +1,4 @@
-<div class="dialogue-overlay">
+<div class="dialogue-overlay hide-responsive-small">
     <div class="header-container">
 
         <div class="header-channel-container">
@@ -44,3 +44,53 @@
             </button>
         </div>
     </div>
+</div>
+
+<div class="dialogue-overlay-responsive show-responsive-small" [class.open]="showOverlayResponsive">
+    <div class="line-container">
+        <div class="line"></div>
+    </div>
+
+    <div class="header-channel-container">
+        <div class="dialogue-overlay-header">
+            <div>Leute hinzufügen</div>
+            <app-round-btn (click)="handleClose()" iconSrc="assets/icons/close.svg"
+                iconHoverSrc="assets/icons/close-purple.svg" altText="Schließen">
+            </app-round-btn>
+        </div>
+        <div class="channel-container hide-responsive">
+            <img src="assets/icons/tag-light-purple.svg">
+            <div>{{channelName}}</div>
+        </div>
+    </div>
+
+
+    <div class="name-container">
+        <div class="input-with-chips" [class.has-user]="selectedUser">
+
+            <div class="chip" *ngIf="selectedUser">
+                <img [src]="'assets/user-icons/' + (selectedUser.img || 'default-user') + '.svg'" />
+                <span>{{ selectedUser.name }}</span>
+                <button class="remove-btn" (click)="removeUser()">×</button>
+            </div>
+
+            <input #searchInput *ngIf="!selectedUser" class="user-name" type="text" placeholder="Name eingeben"
+                [(ngModel)]="searchText" />
+
+            <app-mentions-overlay *ngIf="!selectedUser" [context]="'AddUser'" [users]="allUsers" [text]="searchText"
+                (mentionSelected)="selectUser($event)">
+            </app-mentions-overlay>
+            <!-- <app-mentions-overlay [text]="searchText" [caretIndex]="mentionCaretIndex" [cursorPos]="cursorPosMessage"
+                [currentUserId]="currentUserId" [context]="'AddUser'" [users]="allUsers"
+                [channels]="filteredChannels" (mentionSelected)="insertMention($event, 'message')"
+                (overlayStateChange)="overlayActiveMessage  = $event">
+            </app-mentions-overlay> -->
+        </div>
+    </div>
+
+    <div class="btn-container">
+        <button class="add-btn" [disabled]="!selectedUser" (click)="addUserToChannel()">
+            <div class="f-nunito">Hinzufügen</div>
+        </button>
+    </div>
+</div>
