@@ -130,7 +130,9 @@ export class MainPageComponent {
   }
 
   chooseToCloseAddChannel() {
+    console.log('chooseToCloseAddChannel');
     if (window.innerWidth > 880) {
+      console.log('> 880 true');
       this.closeAddChannel();
     }
   }
