@@ -21,7 +21,9 @@ export class AddChannelOverlayComponent implements OnInit {
 
   channelName: string = '';
   description: string = '';
-  currentUser?: User;
+  currentUser?: User; 
+  private initialChannelNames: string[] = [];  // Namen beim Öffnen
+  nameExistsError = false;
 
   private userService = inject(UserService);
   private channelService = inject(ChannelService);
@@ -30,6 +32,10 @@ export class AddChannelOverlayComponent implements OnInit {
     this.userService.getCurrentUser().subscribe(user => {
       if (user) this.currentUser = user;
     });
+
+    this.initialChannelNames = this.channels.map(c =>
+      c.name.trim().toLowerCase()
+    );
   }
 
   handleClose() {
@@ -42,7 +48,8 @@ export class AddChannelOverlayComponent implements OnInit {
 
   get channelNameExists(): boolean {
     const name = this.channelName.trim().toLowerCase();
-    return this.channels.some(c => c.name.trim().toLowerCase() === name);
+    // return this.channels.some(c => c.name.trim().toLowerCase() === name);
+    return this.initialChannelNames.includes(name);
   }
 
   handleAddChannel() {
