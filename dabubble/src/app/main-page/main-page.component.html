@@ -34,7 +34,7 @@
 
             <app-chats #chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId"
                 (openThread)="openThread($event)" (openProfile)="openProfileOverlay($event)"
-                (channelDeleted)="onChannelDeleted()" [profileOpen]="showUserProfile"></app-chats>
+                (channelDeleted)="onChannelDeleted()" [profileOpen]="showProfileBackdrop"></app-chats>
 
             <app-thread id="thread" class="thread" *ngIf="threadChatId && currentChannelId" [chatId]="threadChatId"
                 [channelId]="currentChannelId" [class.open]="threadOpen" [class.closed]="!threadOpen"
