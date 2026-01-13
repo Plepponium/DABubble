@@ -41,6 +41,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   overlayActive = false;
   insertedAtPending = false;
   isResponsive = false;
+  // profileOpened = false;
 
   currentUserId: string = '';
   channels: any[] = [];
@@ -66,6 +67,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   allSmileys = reactionIcons;
 
   @Input() channelId?: string;
+  @Input() profileOpen = false;
   @Output() openThread = new EventEmitter<{ channelId: string; chatId: string }>();
   @Output() openProfile = new EventEmitter<User>();
   @Output() channelDeleted = new EventEmitter<void>();
@@ -73,6 +75,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   constructor(private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
+    console.log('profileOpen', this.profileOpen);
     this.updateIsResponsive();
     this.getCurrentUser();
     this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
@@ -462,7 +465,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   // }
 
   openDialogueAddUser() {
-    console.log('non responsive add user');
     this.showAddDialogue = true;
     this.showAddDialogueResponsive = false;
     this.showUserDialogue = false;
@@ -476,11 +478,13 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   closeDialogueAddUser() {
     this.showAddDialogue = false;
-    this.showAddDialogueResponsive = true;
+    this.showAddDialogueResponsive = false;
     this.usersDisplayActive = false;
   }
 
   openDialogueShowProfile(user: User) {
+    console.log('openProfileDialogue profileOpen', this.profileOpen);
+    this.profileOpen = true;
     this.openProfile.emit(user);
   }
 

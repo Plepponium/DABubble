@@ -34,7 +34,7 @@
 
             <app-chats #chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId"
                 (openThread)="openThread($event)" (openProfile)="openProfileOverlay($event)"
-                (channelDeleted)="onChannelDeleted()"></app-chats>
+                (channelDeleted)="onChannelDeleted()" [profileOpen]="showUserProfile"></app-chats>
 
             <app-thread id="thread" class="thread" *ngIf="threadChatId && currentChannelId" [chatId]="threadChatId"
                 [channelId]="currentChannelId" [class.open]="threadOpen" [class.closed]="!threadOpen"
@@ -63,7 +63,7 @@
     <app-edit-user *ngIf="showEditUser" (close)="closeAllOverlays()"></app-edit-user>
 
     <app-profile-overlay *ngIf="showProfileOverlay" [user]="selectedProfile"
-        (openDmChat)="openDmChatFromOverlay($event)" (close)="closeAllOverlays()"></app-profile-overlay>
+        (openDmChat)="openDmChatFromOverlay($event)" (close)="closeProfileOverlay()"></app-profile-overlay>
 
     <app-add-channel-overlay *ngIf="showAddChannelDialogue" (close)="closeAddChannel()"
         (closeIfNotResonsive)="chooseToCloseAddChannel()" [channels]="allChannels"

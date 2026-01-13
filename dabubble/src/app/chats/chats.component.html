@@ -37,8 +37,12 @@
         </div>
 
         <div (click)="closeDialogueShowUser(); closeDialogueAddUser(); closeDialogChannelDescription()"
-            *ngIf="showUserDialogue || showAddDialogue || showChannelDescription" class="dialogue-backdrop-chats">
+            *ngIf="(showUserDialogue || showAddDialogue || showChannelDescription) && !showAddDialogueResponsive && !profileOpen" class="dialogue-backdrop-chats">
         </div>
+        <div (click)="closeDialogueShowUser(); closeDialogueAddUser()"
+            *ngIf="showAddDialogueResponsive" class="dialogue-backdrop-chats-add-user">
+        </div>
+
         <div class="overlay-box" [ngClass]="{'overlay-channel-description': showChannelDescription}">
             <app-dialogue-overlay *ngIf="showUserDialogue" [participants]="(participants$ | async) ?? []"
                 [currentUserId]="currentUserId" (close)="closeDialogueShowUser()"

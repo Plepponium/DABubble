@@ -135,14 +135,22 @@
   }
 }
 
-.dialogue-backdrop-chats {
+.dialogue-backdrop-chats, .dialogue-backdrop-chats-add-user {
   position: fixed;
   inset: 0; /* top, right, bottom, left: 0 */
-  background-color: rgba(0, 0, 0, 0.5); /* Abdunklung */
+  background-color: rgba(0, 0, 0, 0.3); /* Abdunklung */
   display: flex;
   justify-content: flex-end; /* Panel rechts andocken */
   align-items: flex-start; /* oben ausrichten */
+  
+}
+
+.dialogue-backdrop-chats {
   z-index: 4;
+}
+
+.dialogue-backdrop-chats-add-user {
+  z-index: 9;
 }
 
 .overlay-box {

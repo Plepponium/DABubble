@@ -34,7 +34,6 @@ export class ChatAddUserOverlayComponent {
 
   ngOnInit() {
     this.loadAllUsers();
-    console.log('isResponsive in chat add user', this.isResponsive);
   }
 
   ngAfterViewInit() {
