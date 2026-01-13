@@ -33,6 +33,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   showChannelDescription = false;
   showUserDialogue = false;
   showAddDialogue = false;
+  showAddDialogueResponsive = false;
   usersDisplayActive = false;
   editCommentDialogueExpanded = false;
   activeReactionDialogueIndex: number | null = null;
@@ -452,13 +453,30 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
+  // chooseDialogueAddUser() {
+  //   if(window.innerWidth > 880) {
+  //     this.openDialogueAddUser();
+  //   } else {
+  //     this.openDialogueAddUserResponsive();
+  //   }
+  // }
+
   openDialogueAddUser() {
+    console.log('non responsive add user');
     this.showAddDialogue = true;
+    this.showAddDialogueResponsive = false;
     this.showUserDialogue = false;
+  }
+
+  openDialogueAddUserResponsive() {
+    this.showAddDialogue = true;
+    this.showAddDialogueResponsive = true;
+    // this.showUserDialogue = false;
   }
 
   closeDialogueAddUser() {
     this.showAddDialogue = false;
+    this.showAddDialogueResponsive = true;
     this.usersDisplayActive = false;
   }
 

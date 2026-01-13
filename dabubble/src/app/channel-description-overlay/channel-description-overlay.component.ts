@@ -21,7 +21,7 @@ export class ChannelDescriptionOverlayComponent {
   @Output() channelDeleted = new EventEmitter<void>();
 
   @Output() openProfile = new EventEmitter<User>();
-  @Output() openAddUser = new EventEmitter<void>();
+  @Output() openAddUserResponsive = new EventEmitter<void>();
 
   channel?: Channel;
   channelService = inject(ChannelService);
@@ -104,6 +104,6 @@ export class ChannelDescriptionOverlayComponent {
   }
 
   handleOpenAddUser() {
-    this.openAddUser.emit();
+    this.openAddUserResponsive.emit();
   }
 }

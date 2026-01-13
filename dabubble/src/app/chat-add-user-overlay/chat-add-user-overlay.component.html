@@ -1,4 +1,4 @@
-<div class="dialogue-overlay hide-responsive-small">
+<div *ngIf="!isResponsive" class="dialogue-overlay">
     <div class="header-container">
 
         <div class="header-channel-container">
@@ -13,7 +13,6 @@
                 <div>{{channelName}}</div>
             </div>
         </div>
-
 
         <div class="name-container">
             <div class="input-with-chips" [class.has-user]="selectedUser">
@@ -46,7 +45,7 @@
     </div>
 </div>
 
-<div class="dialogue-overlay-responsive show-responsive-small" [class.open]="showOverlayResponsive">
+<div *ngIf="isResponsive" class="dialogue-overlay-responsive" [class.open]="showOverlayResponsive">
     <div class="line-container">
         <div class="line"></div>
     </div>
@@ -63,7 +62,6 @@
             <div>{{channelName}}</div>
         </div>
     </div>
-
 
     <div class="name-container">
         <div class="input-with-chips" [class.has-user]="selectedUser">

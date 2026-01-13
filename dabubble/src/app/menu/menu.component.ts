@@ -82,13 +82,13 @@ export class MenuComponent implements OnInit {
     }
   }
 
-  private getChannels() {
-    this.channelService.getChannels().subscribe(data => {
-      this.channels = [...data];
-      this.sortChannels();
-      this.cdr.markForCheck();
-    });
-  }
+  // private getChannels() {
+  //   this.channelService.getChannels().subscribe(data => {
+  //     this.channels = [...data];
+  //     this.sortChannels();
+  //     this.cdr.markForCheck();
+  //   });
+  // }
 
   private async loadMessages() {
     if (!this.currentUser || !this.channels?.length || !this.users?.length) {

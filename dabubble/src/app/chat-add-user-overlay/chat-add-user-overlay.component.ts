@@ -20,6 +20,7 @@ export class ChatAddUserOverlayComponent {
   @Input() channelId?: string;
   @Input() currentUserId!: string;
   @Input() participants: Partial<User>[] = [];
+  @Input() isResponsive = false;
   @Output() close = new EventEmitter<void>();
 
   searchText = '';
@@ -33,6 +34,7 @@ export class ChatAddUserOverlayComponent {
 
   ngOnInit() {
     this.loadAllUsers();
+    console.log('isResponsive in chat add user', this.isResponsive);
   }
 
   ngAfterViewInit() {
@@ -77,6 +79,7 @@ export class ChatAddUserOverlayComponent {
   }
 
   handleClose() {
+    this.isResponsive = false;
     this.close.emit();
   }
 }

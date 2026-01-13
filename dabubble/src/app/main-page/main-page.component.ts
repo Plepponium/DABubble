@@ -74,7 +74,7 @@ export class MainPageComponent {
   @HostListener('window:resize', [])
   onResize() {
     this.isSmallScreen = window.innerWidth < 1512;
-    this.isResponsiveScreen = window.innerWidth < 880;
+    this.isResponsiveScreen = window.innerWidth <= 880;
   }
 
   ngOnInit() {
