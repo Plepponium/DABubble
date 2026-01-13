@@ -42,7 +42,7 @@
                 (answerAdded)="onAnswerAdded($event)" [class.fullwidth]="!channelOpen"
                 [class.fullwidth-without-menu]="!menuOpen && !channelOpen"></app-thread>
 
-            <app-direct-message-chats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
+            <app-direct-message-chats #dmChats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
                 (openProfile)="openProfileOverlay($event)"></app-direct-message-chats>
 
             <app-new-message class="new-message" *ngIf="newMessageOpen" (openChannel)="openChannel($event)"

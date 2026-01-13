@@ -52,7 +52,8 @@
                                 </div>
 
                                 <div class="chat-message-row" [class.me]="m.senderId === currentUser?.uid"
-                                    [class.edit-mode]="m.isEditing">
+                                    [class.edit-mode]="m.isEditing" #chatMessageRow [attr.data-message-id]="m.id">
+
                                     <img class="chat-user-img"
                                         [src]="'assets/user-icons/' + (m.senderImg || 'default-user') + '.svg'" />
 
@@ -89,17 +90,21 @@
                                                                     alt="reaction.type" />
                                                                 <div class="reaction-btn-t-box">
                                                                     <div class="font-w-700">{{
-                                                                        getReactionHoverText(m.reactions[reaction.type]) }}
+                                                                        getReactionHoverText(m.reactions[reaction.type])
+                                                                        }}
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
 
-                                                    <div (click)="showAllReactions[i] = true" *ngIf="getReactionArray(m).length > 7 && !showAllReactions[i]" class="reaction-btn more-reactions">
+                                                    <div (click)="showAllReactions[i] = true"
+                                                        *ngIf="getReactionArray(m).length > 7 && !showAllReactions[i]"
+                                                        class="reaction-btn more-reactions">
                                                         {{ getReactionArray(m).length - 7 }} weitere
                                                     </div>
-                                                    <div (click)="showAllReactions[i] = false" *ngIf="showAllReactions[i]" class="reaction-btn more-reactions">
+                                                    <div (click)="showAllReactions[i] = false"
+                                                        *ngIf="showAllReactions[i]" class="reaction-btn more-reactions">
                                                         Weniger anzeigen
                                                     </div>
                                                 </div>
@@ -173,14 +178,13 @@
                         [placeholder]="'Nachricht an ' + otherUser.name" (keydown.enter)="onEnterPress($any($event))">
                 </textarea>
 
-                <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
-                    (selected)="onSmileySelected($event)"
-                    (activeChange)="activeSmiley = $event">
-                </app-smiley-overlay>
-                <app-mentions-overlay [text]="messageText" [currentUserId]="currentUser?.uid" [context]="'DM'"
-                    [users]="mentionUsers" (mentionSelected)="insertMention($event)"
-                    (overlayStateChange)="overlayActive = $event">
-                </app-mentions-overlay>
+                    <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
+                        (selected)="onSmileySelected($event)" (activeChange)="activeSmiley = $event">
+                    </app-smiley-overlay>
+                    <app-mentions-overlay [text]="messageText" [currentUserId]="currentUser?.uid" [context]="'DM'"
+                        [users]="mentionUsers" (mentionSelected)="insertMention($event)"
+                        (overlayStateChange)="overlayActive = $event">
+                    </app-mentions-overlay>
 
                     <div class="input-icon-bar">
                         <div class="icon-bar t-gray">
@@ -188,8 +192,8 @@
                                 iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
                                 altText="Reaktion hinzufügen" (click)="openSmileyOverlay()"></app-round-btn>
                             <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
-                                iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
-                                altText="Mail hinzufügen" (click)="insertAtCursor('@')"></app-round-btn>
+                                iconHoverSrc="assets/message-icons/alternate_email-purple.svg" altText="Mail hinzufügen"
+                                (click)="insertAtCursor('@')"></app-round-btn>
                         </div>
 
                         <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"

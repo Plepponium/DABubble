@@ -31,6 +31,7 @@ import { ChannelService } from '../../services/channel.service';
 })
 export class MainPageComponent {
   @ViewChild('chats') chatsComponent!: ChatsComponent;
+  @ViewChild('dmChats') dmChatsComponent!: DirectMessageChatsComponent;
 
   menuOpen = true;
   menuBtnClose = true;
@@ -195,21 +196,17 @@ export class MainPageComponent {
   }
 
   private handleChannelMessage(item: any) {
-    const id = item.channelId;
-    if (!id) {
-      console.warn('ChannelId not found in message:', item);
-      return;
-    }
-    this.openChannel(id);
+    this.openChannel(item.channelId);
+    setTimeout(() => this.chatsComponent?.scrollToMessage(item.id), 200);
   }
 
   private handleDmMessage(item: any) {
-    const otherUid =
-      item.participants.find((p: string) => p !== this.currentUser?.uid)
-      || item.participants[0];
+    const otherUid = item.participants.find((p: string) => p !== this.currentUser?.uid) || item.participants[0];
     const user = this.allUsers.find(u => u.uid === otherUid);
-    if (user) this.openUserChat(user);
-    else console.warn('DM participant not found:', otherUid);
+    if (user) {
+      this.openUserChat(user);
+      setTimeout(() => this.dmChatsComponent?.scrollToMessage(item.id), 200);
+    }
   }
 
   private handleUserMention(item: any) {

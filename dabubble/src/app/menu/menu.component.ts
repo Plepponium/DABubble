@@ -123,11 +123,6 @@ export class MenuComponent implements OnInit {
     }
   }
 
-  get relevantChannels() {
-    if (!this.currentUser) return [];
-    return this.channels.filter(c => c.participants?.includes(this.currentUser?.uid));
-  }
-
   private async loadDmMessages() {
     const dmIds = await this.dmService.getDmIdsForUser(this.currentUser!.uid);
     for (const dmId of dmIds) {
@@ -145,6 +140,11 @@ export class MenuComponent implements OnInit {
       });
       this.messages.push(...mapped);
     }
+  }
+
+  get relevantChannels() {
+    if (!this.currentUser) return [];
+    return this.channels.filter(c => c.participants?.includes(this.currentUser?.uid));
   }
 
   private sortChannels() {

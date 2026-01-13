@@ -77,11 +77,6 @@ export class HeaderComponent {
     }
   }
 
-  get relevantChannels() {
-    if (!this.currentUser) return [];
-    return this.channels.filter(c => c.participants?.includes(this.currentUser?.uid));
-  }
-
   private async loadDmMessages() {
     const dmIds = await this.dmService.getDmIdsForUser(this.currentUser!.uid);
     for (const dmId of dmIds) {
@@ -99,6 +94,11 @@ export class HeaderComponent {
       });
       this.messages.push(...mapped);
     }
+  }
+
+  get relevantChannels() {
+    if (!this.currentUser) return [];
+    return this.channels.filter(c => c.participants?.includes(this.currentUser?.uid));
   }
 
   updateCaret(el: HTMLInputElement) {

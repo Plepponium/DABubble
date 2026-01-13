@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, inject, Input, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject, Input, SimpleChanges, Output, EventEmitter, ViewChildren, QueryList } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable, of, combineLatest, firstValueFrom, Subscription } from 'rxjs';
@@ -21,6 +21,7 @@ import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.
   styleUrls: ['./direct-message-chats.component.scss']
 })
 export class DirectMessageChatsComponent {
+  @ViewChildren('chatMessageRow') chatMessageRows!: QueryList<ElementRef<HTMLElement>>;
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
 
   @Input() userId!: string;
@@ -161,7 +162,7 @@ export class DirectMessageChatsComponent {
     if (showAll) {
       return all;
     }
-    return all.slice(0, 7); 
+    return all.slice(0, 7);
   }
 
   insertMention(event: { name: string; type: 'user' | 'channel' | 'email' }) {
@@ -468,4 +469,14 @@ export class DirectMessageChatsComponent {
 
     return this.sanitizer.bypassSecurityTrustHtml(replaced);
   }
+
+  scrollToMessage(messageId: string) {
+    const chatRow = this.chatMessageRows
+      .find(row => row.nativeElement.dataset['messageId'] === messageId)
+      ?.nativeElement;
+    if (chatRow) {
+      chatRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
 }
+

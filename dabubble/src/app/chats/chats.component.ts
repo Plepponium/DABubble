@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input, inject, OnChanges, SimpleChanges, OnInit, ViewChild, ElementRef, AfterViewInit, HostListener } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, OnChanges, SimpleChanges, OnInit, ViewChild, ElementRef, AfterViewInit, HostListener, ViewChildren, QueryList } from '@angular/core';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,6 +29,8 @@ registerLocaleData(localeDe);
   styleUrl: './chats.component.scss',
 })
 export class ChatsComponent implements OnInit, OnChanges {
+  @ViewChildren('chatSection') chatSections!: QueryList<ElementRef<HTMLElement>>;
+
   value = 'Clear me';
   showChannelDescription = false;
   showUserDialogue = false;
@@ -108,8 +110,8 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   getMaxReactionsToShow(chat: any, index: number): any[] {
     const max = this.isResponsive ? 3 : 7;
-    return this.showAllReactions[index] 
-      ? chat.reactionArray 
+    return this.showAllReactions[index]
+      ? chat.reactionArray
       : chat.reactionArray.slice(0, max);
   }
 
@@ -328,7 +330,7 @@ export class ChatsComponent implements OnInit, OnChanges {
         otherUserReacted
       };
     })
-    .sort((a, b) => a.type.localeCompare(b.type));
+      .sort((a, b) => a.type.localeCompare(b.type));
   }
 
   private parseUserIds(users: string[]): string[] {
@@ -449,7 +451,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
   chooseOpenDialogue() {
-    if(window.innerWidth <= 1010) {
+    if (window.innerWidth <= 1010) {
       this.openDialogueShowUser();
     } else {
       this.openDialogueAddUser();
@@ -688,5 +690,19 @@ export class ChatsComponent implements OnInit, OnChanges {
   handleChannelDeleted() {
     this.channelDeleted.emit();
     this.closeDialogChannelDescription();
+  }
+
+  scrollToMessage(messageId: string) {
+    const chatSection = this.chatSections
+      .find(section => section.nativeElement.dataset['messageId'] === messageId)
+      ?.nativeElement;
+
+    if (chatSection) {
+      chatSection.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest'
+      });
+    }
   }
 }
