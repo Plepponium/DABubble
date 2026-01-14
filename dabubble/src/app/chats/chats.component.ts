@@ -457,14 +457,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  // chooseDialogueAddUser() {
-  //   if(window.innerWidth > 880) {
-  //     this.openDialogueAddUser();
-  //   } else {
-  //     this.openDialogueAddUserResponsive();
-  //   }
-  // }
-
   openDialogueAddUser() {
     this.showAddDialogue = true;
     this.showAddDialogueResponsive = false;

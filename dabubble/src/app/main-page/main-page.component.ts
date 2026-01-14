@@ -301,7 +301,10 @@ export class MainPageComponent {
     this.showProfileOverlay = false;
     this.showAddChannelDialogue = false;
     this.selectedProfile = null;
+    this.logoutOverlayAnimationPlayed();
+  }
 
+  logoutOverlayAnimationPlayed() {
     if (this.isResponsiveScreen) {
       setTimeout(() => {
         this.showLogoutOverlay = false;

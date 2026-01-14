@@ -23,6 +23,7 @@
 
   .header-left {
     display: flex;
+    align-items: center;
     gap: 15px;
 
     h2 {
@@ -255,5 +256,14 @@
     padding: 40px 20px;
     border-radius: 0;
     box-shadow: unset;
+  }
+
+  .header-left {
+    gap: 5px !important;
+  }
+
+  .tag-icon {
+    width: 25px;
+    height: 25px;
   }
 }
