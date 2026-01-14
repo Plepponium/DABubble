@@ -165,20 +165,35 @@
   }
 }
 
+@media (max-width: 447px) {
+  .input-wrapper .error.pw {
+    bottom: -42px !important;
+  }
+}
+
 @media (max-width: 420px) {
   .input-group {
-    gap: 20px;
     .input-item {
       padding: 13px 16px !important;
     }
   }
 
   .login-header.imprint {
-    h1{
+    h1 {
       font-size: 32px;
     }
-    span{
+    span {
       font-size: 17px;
     }
+  }
+
+  .input-wrapper .error.pw {
+    bottom: -24px !important;
+  }
+}
+
+@media (max-width: 415px) {
+  .input-wrapper .error.pw {
+    bottom: -42px !important;
   }
 }

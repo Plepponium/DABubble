@@ -17,3 +17,16 @@
     }
   }
 }
+
+.input-group {
+  padding-top: 0 !important;
+}
+
+@media (max-width: 359px) {
+  .input-wrapper .error.set-pw {
+    bottom: -42px !important;
+  }
+  .input-group {
+    gap: 45px;
+  }
+}

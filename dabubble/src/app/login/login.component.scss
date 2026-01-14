@@ -16,6 +16,7 @@
     font-size: 17px;
     transition: all 125ms ease-in-out;
     cursor: pointer;
+    z-index: 2;
 
     &:hover {
       font-weight: 500;
@@ -116,5 +117,11 @@
   .google-login {
     font-size: 16px;
     padding: 6px 16px;
+  }
+}
+
+@media (max-width: 344px){
+  .forgot-container {
+    padding-top: 19px;
   }
 }

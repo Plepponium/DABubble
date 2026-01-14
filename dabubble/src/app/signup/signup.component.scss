@@ -13,18 +13,10 @@
     bottom: -24px;
     font-size: 14px;
     color: $rose;
-
-    @media (max-width: 420px) {
-      bottom: -40px;
-    }
   }
 
   p {
     font-size: 16px;
-
-    @media (max-width: 420px) {
-      font-size: 14px;
-    }
 
     a {
       font-size: 18px;
@@ -32,11 +24,6 @@
       text-decoration: none;
       padding: 4px;
       border-radius: 20px;
-
-      @media (max-width: 420px) {
-        font-size: 14px;
-        padding: 0;
-      }
 
       &:hover {
         color: $purple1;
@@ -74,9 +61,27 @@
   }
 }
 
-@media (max-width: 500px), (max-height: 900px) {
+@media (max-width: 500px) {
   .arrow-back {
     top: 24px;
     left: 8px;
+  }
+}
+
+@media (max-width: 420px) {
+  .agree {
+    p {
+      font-size: 14px;
+      a {
+        font-size: 14px;
+        padding: 0;
+      }
+    }
+  }
+}
+
+@media (max-width: 329px) {
+  .agree .error {
+    bottom: -42px !important;
   }
 }

@@ -7,7 +7,8 @@
 }
 
 .input-group {
-  span {
+  padding-top: 0 !important;
+  span.text {
     text-align: center;
     margin: 0px 65px;
     color: $gray;
@@ -19,7 +20,7 @@
 
 @media (max-width: 500px) {
   .input-group {
-    span {
+    span.text {
       margin: 0;
       font-size: 17px;
     }
