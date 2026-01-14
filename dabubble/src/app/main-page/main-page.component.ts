@@ -312,6 +312,10 @@ export class MainPageComponent {
     }
   }
 
+  closeAddUserToChannel() {
+    this.showAddChannelDialogue = false;
+  }
+
   anyOverlayOpen() {
     return this.showUserProfile || this.showEditUser || this.showProfileOverlay || this.showLogoutOverlay || this.showAddChannelDialogue || this.showMemberOverlay;
   }

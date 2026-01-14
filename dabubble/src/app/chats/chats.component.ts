@@ -77,7 +77,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   constructor(private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
-    console.log('profileOpen', this.profileOpen);
     this.updateIsResponsive();
     this.getCurrentUser();
     this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
@@ -485,7 +484,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
   openDialogueShowProfile(user: User) {
-    console.log('openProfileDialogue profileOpen', this.profileOpen);
     this.profileOpen = true;
     this.openProfile.emit(user);
   }
