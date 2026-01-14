@@ -135,11 +135,23 @@
   display: none;
 }
 
-@media(max-width: 430px) {
+@media (max-width: 430px) {
   .mentions-overlay {
     &.add-user {
       top: -32px;
       max-height: 120px;
+    }
+  }
+}
+
+@media (max-width: 880px) {
+  .mentions-overlay {
+    max-height: unset;
+    &.menu-searchbar {
+      border: none;
+      width: 100vw;
+      height: 100vh;
+      overflow-y: auto;
     }
   }
 }

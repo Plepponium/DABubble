@@ -11,6 +11,16 @@
             </app-round-btn>
         </mat-toolbar>
 
+
+        <div class="search-header" *ngIf="showSearchHeader">
+            <span class="title">Search</span>
+            <app-round-btn (click)="clearSearch()" iconSrc="assets/icons/close.svg"
+                iconHoverSrc="assets/icons/close-purple.svg" altText="Schließen">
+            </app-round-btn>
+            <div class="separator"></div>
+        </div>
+
+
         <div class="searchbar-wrapper show-responsive">
             <div class="searchbar-container">
                 <input #searchInput class="searchbar t-gray font-24" type="text" placeholder="Gehe zu..."
@@ -24,7 +34,7 @@
             <app-mentions-overlay *ngIf="inputFocused" class="mentions-overlay" [text]="searchText"
                 [caretIndex]="caretIndex" [currentUserId]="currentUser?.uid" [context]="'Searchbar'" [source]="'menu'"
                 [users]="users" [channels]="relevantChannels" [messages]="messages"
-                (navigateToChat)="onNavigateToChat($event)" (overlayStateChange)="overlayActive = $event">
+                (navigateToChat)="onNavigateToChat($event)" (overlayStateChange)="onOverlayStateChange($event)">
             </app-mentions-overlay>
         </div>
     </div>

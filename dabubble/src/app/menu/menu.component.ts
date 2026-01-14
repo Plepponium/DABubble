@@ -25,8 +25,8 @@ import { DirectMessageService } from '../../services/direct-messages.service';
 export class MenuComponent implements OnInit {
   readonly panelOpenState = signal(false);
   channelsExpanded = true;
-  // channels: Channel[] = [];
   usersExpanded = true;
+  showSearchHeader = false;
 
   searchText = '';
   caretIndex: number | null = null;
@@ -67,28 +67,26 @@ export class MenuComponent implements OnInit {
     })
   );
 
-  // constructor(private cdr: ChangeDetectorRef) { }
-
   ngOnInit() {
-    // this.getChannels();
+    this.updateSearchHeaderState();
+  }
+
+  private updateSearchHeaderState() {
+    const text = this.searchText || '';
+    const hasTrigger = text.startsWith('@') || text.startsWith('#');
+    const hasTextSearch = text.length >= 3;
+    this.showSearchHeader = (hasTrigger || hasTextSearch) && this.inputFocused;
+    this.cdr.markForCheck();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['channels'] || changes['users'] || changes['currentUser']) {
-      // if (changes['channels']) {
       this.loadMessages();
       this.sortChannels();
       this.cdr.markForCheck();
     }
   }
 
-  // private getChannels() {
-  //   this.channelService.getChannels().subscribe(data => {
-  //     this.channels = [...data];
-  //     this.sortChannels();
-  //     this.cdr.markForCheck();
-  //   });
-  // }
 
   private async loadMessages() {
     if (!this.currentUser || !this.channels?.length || !this.users?.length) {
@@ -203,6 +201,7 @@ export class MenuComponent implements OnInit {
   updateCaret(el: HTMLInputElement) {
     if (!el) return;
     this.caretIndex = el.selectionStart || 0;
+    this.updateSearchHeaderState();
   }
 
   onNavigateToChat(item: any) {
@@ -210,20 +209,41 @@ export class MenuComponent implements OnInit {
     this.searchText = '';
     this.selectedItem.emit(item);
     this.inputFocused = false;
+    this.showSearchHeader = false;
+    this.cdr.markForCheck();
   }
 
   onSearchFocus() {
     this.inputFocused = true;
-    this.cdr.markForCheck();
+    this.updateSearchHeaderState();
   }
 
   onSearchBlur() {
     setTimeout(() => {
       if (!this.clickFromOverlay) {
         this.inputFocused = false;
+        this.showSearchHeader = false;
       }
       this.clickFromOverlay = false;
       this.cdr.markForCheck();
     }, 100);
   }
+
+  clearSearch() {
+    this.searchText = '';
+    this.inputFocused = false;
+    this.showSearchHeader = false;
+    this.cdr.markForCheck();
+  }
+
+  onOverlayStateChange(active: boolean) {
+    this.overlayActive = active;
+    if (!active) {
+      this.showSearchHeader = false;
+    } else {
+      this.updateSearchHeaderState();
+    }
+  }
+
 }
+
