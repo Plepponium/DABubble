@@ -45,7 +45,7 @@ export class MainPageComponent {
   showUserProfile = false;
   showEditUser = false;
   showProfileOverlay = false;
-  showProfileBackdrop = false;
+  // showProfileBackdrop = false;
 
   showAddChannelDialogue = false;
   showMemberOverlay = false;
@@ -72,6 +72,10 @@ export class MainPageComponent {
   private channelService = inject(ChannelService);
   private router = inject(Router);
   private authSub?: Subscription;
+
+  get showProfileBackdrop(): boolean {
+    return this.showUserProfile || this.showProfileOverlay;
+  }
 
   @HostListener('window:resize', [])
   onResize() {
@@ -238,7 +242,6 @@ export class MainPageComponent {
   onThreadClosed() {
     this.threadOpen = false;
 
-    // Auf kleinen Screens Chats wieder anzeigen
     if (this.isSmallScreen) {
       this.channelOpen = true;
     }
@@ -251,7 +254,6 @@ export class MainPageComponent {
 
   openUserProfile() {
     this.showUserProfile = true;
-    this.showProfileBackdrop = true;
   }
 
   openDmChatFromOverlay(user: User) {
@@ -267,7 +269,6 @@ export class MainPageComponent {
     }
     this.selectedProfile = user;
     this.showProfileOverlay = true;
-    this.showProfileBackdrop = true;
   }
 
   openEditUser() {
@@ -286,15 +287,11 @@ export class MainPageComponent {
   }
 
   closeUserOverlay() {
-    console.log('closeUser showProfileBackdrop', this.showProfileBackdrop);
     this.showUserProfile = false;
-    this.showProfileBackdrop = false;
   }
 
   closeProfileOverlay() {
-    console.log('closeProfile showProfileBackdrop', this.showProfileBackdrop);
     this.showProfileOverlay = false;
-    this.showProfileBackdrop = false;
   }
 
   closeAllOverlays() {
