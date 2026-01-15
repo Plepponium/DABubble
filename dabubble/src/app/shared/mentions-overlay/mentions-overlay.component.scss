@@ -147,11 +147,37 @@
 @media (max-width: 880px) {
   .mentions-overlay {
     max-height: unset;
+
     &.menu-searchbar {
-      border: none;
+      position: fixed !important;
+      top: 140px;
+      left: 0;
+      right: 0;
+      bottom: 0;
       width: 100vw;
-      height: 100vh;
-      overflow-y: auto;
+      height: auto;
+      max-height: none;
+      border: none;
+      border-radius: 0 0 24px 24px;
+      padding: 20px;
+      z-index: 1000;
+      background: white;
+
+      .mentions-scroll-wrapper {
+        flex: 1;
+        overflow-y: auto !important;
+        max-height: 100%;
+        padding-right: 4px;
+
+        &::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: #adb0d9;
+          border-radius: 2px;
+        }
+      }
     }
   }
 }
