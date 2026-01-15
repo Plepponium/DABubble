@@ -854,9 +854,13 @@
   }
 
   .chat-section {
-    // display: flex;
-    gap: 20px;
-    padding: 10px 16px;
+    gap: 16px;
+    padding: 10px 50px 10px 16px;
+  }
+
+  .chat-section.reverse {
+    flex-direction: row-reverse;
+    padding: 10px 16px 10px 50px;
   }
 
   .chat-date-section::before {

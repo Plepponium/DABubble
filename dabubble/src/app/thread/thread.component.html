@@ -136,16 +136,13 @@
                 </div>
             </div>
 
-
             <div class="hidden-answers-line">
                 <div class="hidden-answers t-light-purple">
                     {{ (answers$ | async)?.length }} Antworten
                 </div>
                 <div class="line"></div>
             </div>
-
         </div>
-
 
         <div *ngIf="answers$ | async as answers" id="thread-history" class="chat-history">
             <div *ngFor="let answer of answers; let i = index" class="chat-day-section"
@@ -300,7 +297,6 @@
                                 </div>
                             </div>
                         </ng-template>
-
 
                     </div>
                 </div>

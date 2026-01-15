@@ -105,14 +105,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  opacity: 0.5;
 }
 
 .chat-date-section::before,
 .chat-date-section::after {
   content: "";
   flex: 1;
-  height: 1px;
+  height: 0.5px;
   background: #adb0d9;
   margin: 0 0px;
 }
@@ -655,5 +654,45 @@
   .thread {
     height: calc(100vh - 80px) !important;
     border-radius: 0 !important;
+  }
+
+  .header {
+    padding: 10px 16px;
+  }
+
+  .chat-content {
+    height: calc(100% - 80px);
+  }
+
+  .chat-section {
+    gap: 16px;
+    padding: 10px 50px 10px 16px;
+  }
+
+  .chat-section.reverse {
+    flex-direction: row-reverse;
+    padding: 10px 16px 10px 50px;
+  }
+
+  .chat-user-img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .hidden-answers-line {
+    width: calc(100% - 40px);
+    padding: 0 20px;
+  }
+
+  .chat-date-section::before {
+    margin-left: 20px;
+  }
+
+  .chat-date-section::after {
+    margin-right: 20px;
+  }
+
+  .icon-bar {
+    gap: 5px;
   }
 }
