@@ -103,3 +103,9 @@
     padding: 40px 20px;
   }
 }
+
+@media(max-width: 430px) {
+  .dialogue-overlay {
+    width: 100%;
+  }
+}
