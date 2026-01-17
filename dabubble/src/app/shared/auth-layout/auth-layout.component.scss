@@ -1,6 +1,77 @@
 @use "../../../styles/variables" as *;
 @use "../../../styles/shared-classes";
 
+@keyframes fadeOutBg {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+@keyframes gapExpand {
+  0% {
+    gap: 0;
+  }
+  100% {
+    gap: 24px;
+  }
+}
+
+@keyframes textWidthExpand {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: auto;
+  }
+}
+
+@keyframes textSlideAndFade {
+  0% {
+    opacity: 0;
+    transform: translateX(-420px);
+  }
+  60% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes moveToTopLeft {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50vw + 195px), calc(-50vh + 110px)) scale(0.38);
+    opacity: 0;
+  }
+}
+
+@keyframes moveToTopCenter {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(-50vh + 46px)) scale(0.8);
+    opacity: 0;
+  }
+}
+
 .intro-container {
   position: fixed;
   top: 0;
@@ -12,79 +83,36 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  animation: fadeOutBg 1s ease forwards;
-  animation-delay: 4.5s;
+  animation: fadeOutBg 500ms ease-out forwards;
+  animation-delay: 2.5s;
 
   .logo-wrapper {
-    position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 187px;
+    gap: 0px;
     height: 184px;
-    animation: moveToCorner 1s ease forwards;
-    animation-delay: 4s;
-    transform: translate(0, 0);
+    position: relative;
+    animation: gapExpand 500ms ease-out forwards;
+    animation-delay: 1.5s;
 
     img {
-      width: 187px;
-      height: 184px;
-      animation: logoShift 0.6s ease forwards;
-      animation-delay: 1s;
+      flex-shrink: 0;
+      z-index: 10;
     }
 
-    .text {
-      position: absolute;
-      top: 44px;
+    .intro-text {
+      width: 0;
       opacity: 0;
-      transform: translateX(-20px);
-      animation: textFadeIn 0.8s ease forwards;
-      animation-delay: 1.3s;
-      white-space: nowrap;
       font-size: 88px;
       font-weight: 700;
       color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      animation: textWidthExpand 500ms ease-in-out forwards,
+        textSlideAndFade 500ms ease-out forwards;
+      animation-delay: 1s, 1.5s;
+      z-index: 5;
     }
-  }
-}
-
-@keyframes logoShift {
-  to {
-    transform: translateX(-100px);
-  }
-}
-
-@keyframes textFadeIn {
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes moveToCorner {
-  to {
-    transform: translate(calc(-50vw + 145px), calc(-50vh + 110px)) scale(0.38);
-  }
-}
-
-@keyframes moveToTopCenter {
-  to {
-    transform: translate(-70px, calc(-50vh + 50px));
-  }
-}
-
-@keyframes fadeOutBg {
-  0% {
-    opacity: 1;
-  }
-  70% {
-    opacity: 0.3;
-    background: transparent;
-  }
-  100% {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
   }
 }
 
@@ -264,25 +292,28 @@
   justify-content: flex-start;
 }
 
+@media (min-width: 1301px) {
+  .intro-container .logo-wrapper {
+    animation: gapExpand 500ms ease-out forwards,
+      moveToTopLeft 500ms ease-out forwards;
+    animation-delay: 1.5s, 2.5s;
+  }
+}
+
 @media (max-width: 1300px) {
-  .intro-container {
-    .logo-wrapper {
-      animation: moveToTopCenter 1s ease forwards;
-      animation-delay: 4s;
-      width: 205px;
-      height: 60px;
-    }
+  .intro-container .logo-wrapper {
+    height: 70px;
+    animation: gapExpand 500ms ease-out forwards,
+      moveToTopCenter 500ms ease-out forwards;
+    animation-delay: 1.5s, 2.5s;
 
-    .logo-wrapper img {
+    img {
+      height: 70px;
       width: auto;
-      height: 60px;
-      animation: none;
-      transform: none;
     }
 
-    .logo-wrapper .text {
+    .intro-text {
       font-size: 29px;
-      top: 16px;
     }
   }
 
@@ -382,19 +413,6 @@
 }
 
 @media (max-width: 500px) {
-  .intro-container {
-    animation: fadeOutBg 0.5s ease forwards;
-    animation-delay: 3s;
-    .logo-wrapper {
-      animation-delay: 2s;
-    }
-
-    .logo-wrapper .text {
-      display: none;
-      animation: none;
-    }
-  }
-
   .login-card {
     position: static;
     padding: 24px 16px;
