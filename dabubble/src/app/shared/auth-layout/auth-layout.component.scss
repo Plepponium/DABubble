@@ -108,7 +108,8 @@
       color: #fff;
       white-space: nowrap;
       overflow: hidden;
-      animation: textWidthExpand 500ms ease-in-out forwards,
+      animation:
+        textWidthExpand 500ms ease-in-out forwards,
         textSlideAndFade 500ms ease-out forwards;
       animation-delay: 1s, 1.5s;
       z-index: 5;
@@ -147,7 +148,8 @@
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
   transform: translateX(100%);
   opacity: 0;
-  animation: slideIn 1500ms cubic-bezier(0.2, 0.9, 0.24, 1) forwards;
+  animation: slideIn 200ms ease-out forwards;
+  animation-delay: 1.3s;
 
   div {
     display: flex;
@@ -202,7 +204,9 @@
     border: none;
     border-radius: 100px;
     cursor: pointer;
-    transition: box-shadow 125ms ease-in-out, color 125ms ease-in-out;
+    transition:
+      box-shadow 125ms ease-in-out,
+      color 125ms ease-in-out;
 
     &:hover {
       color: $purple1;
@@ -269,7 +273,9 @@
     color: $purple2;
     padding: 10px 15px;
     border-radius: 100px;
-    transition: box-shadow 125ms ease-in-out, color 125ms ease-in-out;
+    transition:
+      box-shadow 125ms ease-in-out,
+      color 125ms ease-in-out;
 
     &:hover {
       color: $purple1;
@@ -294,7 +300,8 @@
 
 @media (min-width: 1301px) {
   .intro-container .logo-wrapper {
-    animation: gapExpand 500ms ease-out forwards,
+    animation:
+      gapExpand 500ms ease-out forwards,
       moveToTopLeft 500ms ease-out forwards;
     animation-delay: 1.5s, 2.5s;
   }
@@ -303,7 +310,8 @@
 @media (max-width: 1300px) {
   .intro-container .logo-wrapper {
     height: 70px;
-    animation: gapExpand 500ms ease-out forwards,
+    animation:
+      gapExpand 500ms ease-out forwards,
       moveToTopCenter 500ms ease-out forwards;
     animation-delay: 1.5s, 2.5s;
 
@@ -371,17 +379,6 @@
   .legal-links {
     display: none;
   }
-
-  .overlay-panel {
-    width: 166px;
-    height: 70px;
-    padding: 20px 30px;
-    div {
-      h2 {
-        font-size: 22px;
-      }
-    }
-  }
 }
 
 @media (max-width: 880px) {
@@ -409,6 +406,17 @@
     height: 556px;
     padding-bottom: 48px;
     gap: 32px;
+  }
+
+  .overlay-panel {
+    height: 70px;
+    padding: 20px 30px;
+    div {
+      gap: 18px;
+      h2 {
+        font-size: 22px;
+      }
+    }
   }
 }
 

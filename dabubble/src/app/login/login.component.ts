@@ -79,14 +79,13 @@ export class LoginComponent implements OnInit {
     this.showOverlay = true;
     try {
       const cred = await fn();
-      const uid = cred.user.uid;
-
       if (checkDoc) {
         await this.ensureUserDocument(cred.user);
       }
-
-      await this.setUserPresenceOnline(uid);
-      this.router.navigate(['/main']);
+      await this.setUserPresenceOnline(cred.user.uid);
+      setTimeout(() => {
+        this.router.navigate(['/main']);
+      }, 1500);
     } catch (err) {
       this.showOverlay = false;
       this.loginForm.markAllAsTouched();

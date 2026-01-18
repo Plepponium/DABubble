@@ -38,14 +38,20 @@ export class PwResetComponent {
     this.sendMail();
   }
 
-  sendMail() {
+  async sendMail() {
     this.overlayVariant = 'sent';
     this.showOverlay = true;
-    sendPasswordResetEmail(this.auth, this.resetForm.value.email)
-
-    setTimeout(() => {
-      this.showOverlay = false;
-      this.router.navigate(['password/change']);
-    }, 1500);
+    try {
+      await sendPasswordResetEmail(this.auth, this.resetForm.value.email, {
+        url: 'http://localhost:4200/password/change'
+      });
+      setTimeout(() => {
+        this.showOverlay = false;
+        this.router.navigate(['/']);
+      }, 1500);
+    } catch (error) {
+      console.error('Reset-Email fehlgeschlagen:', error);
+    }
   }
+
 }
