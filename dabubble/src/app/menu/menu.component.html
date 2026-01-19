@@ -63,7 +63,7 @@
 
             <div class="channel-section" *ngIf="channelsExpanded">
                 <div class="channel-list">
-                    <div (click)="handleOpenChannel(channel)" class="channel" *ngFor="let channel of channels"
+                    <div (click)="handleOpenChannel(channel)" class="channel" *ngFor="let channel of relevantChannels"
                         [class.active]="channel.id === activeChannelId">
                         <div class="channel-icon-container">
                             <img class="hover-icon" src="assets/icons/tag.svg" alt="">
