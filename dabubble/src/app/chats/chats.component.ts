@@ -15,7 +15,6 @@ import { User } from '../../models/user.class';
 import { Chat } from '../../models/chat.class';
 import { BehaviorSubject, combineLatest, forkJoin, map, Observable, of, switchMap, take } from 'rxjs';
 import { reactionIcons } from '../reaction-icons';
-// import { ChatWithDetails } from '../../models/chat-with-details.class';
 import localeDe from '@angular/common/locales/de';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -43,7 +42,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   overlayActive = false;
   insertedAtPending = false;
   isResponsive = false;
-  // profileOpened = false;
 
   currentUserId: string = '';
   channels: any[] = [];
@@ -211,7 +209,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
 
     return forkJoin({
-      reactions: of(normalizedReactions), // kein weiterer Firestore Call nötig
+      reactions: of(normalizedReactions), 
       user: of(users.find(u => u.uid === chat.user)),
       answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1))
     }).pipe(
@@ -231,28 +229,6 @@ export class ChatsComponent implements OnInit, OnChanges {
       })
     );
   }
-  // private enrichChat(channelId: string, chat: Chat, users: User[]): Observable<Chat> {
-  //   return forkJoin({
-  //     // reactions: this.channelService.getReactionsForChat(channelId, chat.id).pipe(take(1)),
-  //     // Reactions werden als Map im chat geladen
-  //     reactions: of(chat.reactions || {}), // kein weiterer Firestore Call nötig
-  //     user: of(users.find(u => u.uid === chat.user)),
-  //     answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1))
-  //   }).pipe(
-  //     map(({ reactions, user, answers }) => {
-  //       const enriched: Chat = {
-  //         ...chat,
-  //         userName: user?.name,
-  //         userImg: user?.img,
-  //         answersCount: answers.length,
-  //         lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
-  //         reactions: reactions,
-  //         reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
-  //       };
-  //       return enriched;
-  //     })
-  //   );
-  // }
 
   getChatDate(chat: any): Date | undefined {
     return chat.time ? new Date(chat.time * 1000) : undefined;
@@ -277,7 +253,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     } else if (this.isSameDate(date, yesterday)) {
       return 'Gestern';
     } else {
-      // normales Datum: Montag, 20. September
       return new Intl.DateTimeFormat('de-DE', {
         weekday: 'long',
         day: 'numeric',
@@ -288,20 +263,20 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   openReactionsDialogue(chatIndex: number) {
     if (this.activeReactionDialogueIndex === chatIndex) {
-      this.activeReactionDialogueIndex = null; // schließe, wenn bereits offen
+      this.activeReactionDialogueIndex = null; 
     } else {
       this.editCommentDialogueExpanded = false;
-      this.activeReactionDialogueIndex = chatIndex; // öffne aktuellen
+      this.activeReactionDialogueIndex = chatIndex;
       this.activeReactionDialogueBelowIndex = null;
     }
   }
 
   openReactionsDialogueBelow(chatIndex: number) {
     if (this.activeReactionDialogueBelowIndex === chatIndex) {
-      this.activeReactionDialogueBelowIndex = null; // schließe, wenn bereits offen
+      this.activeReactionDialogueBelowIndex = null;
     } else {
       this.editCommentDialogueExpanded = false;
-      this.activeReactionDialogueBelowIndex = chatIndex; // öffne aktuellen
+      this.activeReactionDialogueBelowIndex = chatIndex; 
       this.activeReactionDialogueIndex = null;
     }
   }
@@ -323,13 +298,8 @@ export class ChatsComponent implements OnInit, OnChanges {
     return Object.entries(reactionsMap).map(([type, usersRaw]) => {
       const userIds = this.parseUserIds(Array.isArray(usersRaw) ? usersRaw : [usersRaw]);
       const currentUserReacted = userIds.includes(currentUserId);
-      // const otherUserIds = userIds.filter(id => id !== currentUserId);
       const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
       const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
-      // const otherUserName = otherUserIds.length > 0
-      //   ? participants.find(u => u.uid === otherUserIds[0])?.name
-      //   : undefined;
-      // const otherUserReacted = otherUserIds.length > 0;
 
       return {
         type,
@@ -362,10 +332,9 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
     chat.reactionArray = this.transformReactionsToArray(chat.reactions, this.participants, this.currentUserId);
 
-    // Aktualisiere den BehaviorSubject State mit neuem Chat Objekt
     const chats = this.chatsSubject.getValue();
     const newChats = [...chats];
-    newChats[chatIndex] = chat;  // Ersetze den Chat an Index
+    newChats[chatIndex] = chat; 
     this.chatsSubject.next(newChats);
   }
 
@@ -476,7 +445,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   openDialogueAddUserResponsive() {
     this.showAddDialogue = true;
     this.showAddDialogueResponsive = true;
-    // this.showUserDialogue = false;
   }
 
   closeDialogueAddUser() {
