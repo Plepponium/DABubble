@@ -42,6 +42,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   overlayActive = false;
   insertedAtPending = false;
   isResponsive = false;
+  pendingScroll  = false;
 
   currentUserId: string = '';
   channels: any[] = [];
@@ -74,29 +75,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
 
   constructor(private sanitizer: DomSanitizer) { }
-
-  ngOnInit() {
-    this.updateIsResponsive();
-    this.getCurrentUser();
-    this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
-      this.channels = channels;
-    });
-    if (!this.channelId) {
-      this.loadFirstChannel();
-    } else {
-      this.loadChannelWithId(this.channelId);
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['channelId']) {
-      const newChannelId = changes['channelId'].currentValue;
-      if (newChannelId) {
-        this.loadChannelWithId(newChannelId);
-      }
-    }
-  }
-
+  
   @HostListener('window:resize')
   onResize() {
     this.updateIsResponsive();
@@ -130,105 +109,193 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  getCurrentUser() {
+  ngOnInit() {
+    this.updateIsResponsive();
+    this.getCurrentUser();
+    this.loadChannels();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['channelId']) {
+      const newChannelId = changes['channelId'].currentValue;
+      if (newChannelId) {
+        this.pendingScroll  = true;
+        this.loadChannelWithId(newChannelId);
+      }
+    }
+  }
+
+  private getCurrentUser() {
     this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
       if (user) {
         this.currentUserId = user.uid;
-        this.channelService.getChannels().subscribe(channels => {
-          this.channels = channels;
-          this.filteredChannels = channels.filter(c =>
-            c.participants.includes(this.currentUserId)
-          );
-        });
+        this.filterChannelsForCurrentUser();
       }
     });
   }
 
-  private loadFirstChannel() {
+  private filterChannelsForCurrentUser() {
+    this.channelService.getChannels().subscribe(channels => {
+      this.channels = channels;
+      this.filteredChannels = channels.filter(c => c.participants.includes(this.currentUserId));
+    });
+  }
+
+  private loadChannels() {
     this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
-      if (channels.length > 0) {
-        const firstChannel = channels[0];
-        this.channelId = firstChannel.id;
-        this.channelName$ = of(firstChannel.name);
-        this.participants$ = this.userService.getUsersByIds(firstChannel.participants);
-        this.subscribeToParticipants();
-        this.subscribeToChatsAndUsers(this.channelId, this.participants$);
-      } else {
-      }
+      this.channels = channels;
     });
   }
 
   private loadChannelWithId(channelId: string) {
     this.channelId = channelId;
     const channel$ = this.channelService.getChannelById(channelId);
-    this.channelName$ = channel$.pipe(
-      map(channel => channel?.name ?? '')
-    );
+    this.setupChannelObservables(channel$);
+  }
+
+  private setupChannelObservables(channel$: Observable<any>) {
+    this.channelName$ = channel$.pipe(map(channel => channel?.name ?? ''));
     this.participants$ = channel$.pipe(
       switchMap(channel => this.userService.getUsersByIds(channel?.participants ?? []))
     );
-    this.participants$.subscribe(users => {
-      this.participants = users;
-    });
-    this.subscribeToChatsAndUsers(channelId, this.participants$);
+    this.participants$.subscribe(users => this.participants = users);
+    this.subscribeToChatsAndUsers(this.channelId!, this.participants$);
   }
 
   subscribeToParticipants() {
-    this.participants$.subscribe(users => {
-      this.participants = users;
-    });
+    this.participants$.subscribe(users => {this.participants = users;});
   }
 
+  // private subscribeToChatsAndUsers(channelId: string, participants$: Observable<User[]>) {
+  //   combineLatest([
+  //     this.channelService.getChatsForChannel(channelId),
+  //     participants$
+  //   ]).pipe(
+  //     switchMap(([chats, users]) => {
+  //       if (!chats.length || !users.length) return of([]);
+  //       const enrichedChats$ = chats.map(chat => this.enrichChat(channelId, chat, users));
+  //       return forkJoin(enrichedChats$);
+  //     }),
+  //     map(chats => chats.sort((a, b) => a.time - b.time))
+  //   ).subscribe(enrichedChats => {
+  //     this.chatsSubject.next(enrichedChats);
+  //     setTimeout(() => this.scrollToBottom());
+  //   });
+  // }
   private subscribeToChatsAndUsers(channelId: string, participants$: Observable<User[]>) {
     combineLatest([
       this.channelService.getChatsForChannel(channelId),
       participants$
-    ]).pipe(
-      switchMap(([chats, users]) => {
-        if (!chats.length || !users.length) return of([]);
-        const enrichedChats$ = chats.map(chat => this.enrichChat(channelId, chat, users));
-        return forkJoin(enrichedChats$);
-      }),
-      map(chats => chats.sort((a, b) => a.time - b.time))
-    ).subscribe(enrichedChats => {
-      this.chatsSubject.next(enrichedChats);
-      setTimeout(() => this.scrollToBottom());
+    ])
+    .pipe(
+      switchMap(([chats, users]) => this.processChatsAndUsers(chats, users, channelId)),
+      map(chats => this.sortChatsByTime(chats))
+    )
+    .subscribe({
+      next: chats => this.handleLoadedChats(chats)
     });
   }
 
-  private enrichChat(channelId: string, chat: Chat, users: User[]): Observable<Chat> {
-    const normalizedReactions: Record<string, string[]> = {};
-    Object.entries(chat.reactions || {}).forEach(([key, val]) => {
-      if (Array.isArray(val)) {
-        normalizedReactions[key] = val;
-      } else if (typeof val === 'string') {
-        normalizedReactions[key] = [val];
-      } else {
-        normalizedReactions[key] = [];
-      }
-    });
+  private processChatsAndUsers(chats: Chat[], users: User[], channelId: string): Observable<Chat[]> {
+    if (!chats.length || !users.length) return of([]);
+    const enrichedChats$ = chats.map(chat => this.enrichSingleChat(chat, users, channelId));
+    return forkJoin(enrichedChats$);
+  }
 
+  private enrichSingleChat(chat: Chat, users: User[], channelId: string): Observable<Chat> {
+    const reactions = this.normalizeChatReactions(chat.reactions || {});
     return forkJoin({
-      reactions: of(normalizedReactions), 
-      user: of(users.find(u => u.uid === chat.user)),
+      reactions: of(reactions),
+      user: of(this.findChatUser(chat.user, users)),
       answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1))
     }).pipe(
-      map(({ reactions, user, answers }) => {
-        const isMissingUser = !user;
-        const enriched: Chat = {
-          ...chat,
-          userName: isMissingUser ? 'Ehemaliger Nutzer' : user.name,
-          userImg: isMissingUser ? 'default-user' : user.img,
-          isUserMissing: isMissingUser,
-          answersCount: answers.length,
-          lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
-          reactions: reactions,
-          reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
-        };
-        return enriched;
-      })
+      map(({ reactions, user, answers }) => this.buildEnrichedChat(chat, user, reactions, answers))
     );
   }
+
+  private normalizeChatReactions(reactions: any): Record<string, string[]> {
+    const normalized: Record<string, string[]> = {};
+    Object.entries(reactions).forEach(([key, val]) => {
+      normalized[key] = Array.isArray(val) ? val : typeof val === 'string' ? [val] : [];
+    });
+    return normalized;
+  }
+
+  private findChatUser(chatUserId: string, users: User[]): User | undefined {
+    return users.find(u => u.uid === chatUserId);
+  }
+
+  private buildEnrichedChat(
+    chat: Chat, 
+    user: User | undefined, 
+    reactions: Record<string, string[]>, 
+    answers: any[]
+  ): Chat {
+    const isMissingUser = !user;
+    return {
+      ...chat,
+      userName: isMissingUser ? 'Ehemaliger Nutzer' : user!.name,
+      userImg: isMissingUser ? 'default-user' : user!.img,
+      isUserMissing: isMissingUser,
+      answersCount: answers.length,
+      lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
+      reactions,
+      reactionArray: this.transformReactionsToArray(reactions, this.participants, this.currentUserId)
+    };
+  }
+
+  private sortChatsByTime(chats: Chat[]): Chat[] {
+    return chats.sort((a, b) => a.time - b.time);
+  }
+
+  private handleLoadedChats(chats: Chat[]) {
+    this.chatsSubject.next(chats);
+    // this.scrollToBottom();
+    // setTimeout(() => this.scrollToBottom());
+    // if (this.shouldScrollToBottom) {
+    //   setTimeout(() => this.scrollToBottom(), 0);
+    // }
+    if (this.pendingScroll ) {
+    setTimeout(() => {
+      this.scrollToBottom();
+      this.pendingScroll  = false;  // ← Nach Scroll deaktivieren
+    }, 0);
+  }
+  }
+
+  // private enrichChat(channelId: string, chat: Chat, users: User[]): Observable<Chat> {
+  //   const normalizedReactions: Record<string, string[]> = {};
+  //   Object.entries(chat.reactions || {}).forEach(([key, val]) => {
+  //     if (Array.isArray(val)) {
+  //       normalizedReactions[key] = val;
+  //     } else if (typeof val === 'string') {
+  //       normalizedReactions[key] = [val];
+  //     } else {
+  //       normalizedReactions[key] = [];
+  //     }
+  //   });
+
+  //   return forkJoin({
+  //     reactions: of(normalizedReactions), 
+  //     user: of(users.find(u => u.uid === chat.user)),
+  //     answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1))
+  //   }).pipe(
+  //     map(({ reactions, user, answers }) => {
+  //       const isMissingUser = !user;
+  //       const enriched: Chat = {
+  //         ...chat,
+  //         userName: isMissingUser ? 'Ehemaliger Nutzer' : user.name,
+  //         userImg: isMissingUser ? 'default-user' : user.img,
+  //         isUserMissing: isMissingUser,
+  //         answersCount: answers.length,
+  //         lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
+  //         reactions: reactions,
+  //         reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
+  //       };
+  //       return enriched;
+  //     })
+  //   );
+  // }
 
   getChatDate(chat: any): Date | undefined {
     return chat.time ? new Date(chat.time * 1000) : undefined;
@@ -241,24 +308,56 @@ export class ChatsComponent implements OnInit, OnChanges {
       d1.getDate() === d2.getDate();
   }
 
+  // getDisplayDate(date: Date | undefined): string {
+  //   if (!date) return '';
+
+  //   const today = new Date();
+  //   const yesterday = new Date();
+  //   yesterday.setDate(today.getDate() - 1);
+
+  //   if (this.isSameDate(date, today)) {
+  //     return 'Heute';
+  //   } else if (this.isSameDate(date, yesterday)) {
+  //     return 'Gestern';
+  //   } else {
+  //     return new Intl.DateTimeFormat('de-DE', {
+  //       weekday: 'long',
+  //       day: 'numeric',
+  //       month: 'long'
+  //     }).format(date);
+  //   }
+  // }
   getDisplayDate(date: Date | undefined): string {
     if (!date) return '';
+    const referenceDates = this.getReferenceDates();
+    
+    if (this.isToday(date, referenceDates.today)) return 'Heute';
+    if (this.isYesterday(date, referenceDates.yesterday)) return 'Gestern';
+    
+    return this.formatFullDate(date);
+  }
 
+  private getReferenceDates() {
     const today = new Date();
-    const yesterday = new Date();
+    const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
+    return { today, yesterday };
+  }
 
-    if (this.isSameDate(date, today)) {
-      return 'Heute';
-    } else if (this.isSameDate(date, yesterday)) {
-      return 'Gestern';
-    } else {
-      return new Intl.DateTimeFormat('de-DE', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long'
-      }).format(date);
-    }
+  private isToday(date: Date, today: Date): boolean {
+    return this.isSameDate(date, today);
+  }
+
+  private isYesterday(date: Date, yesterday: Date): boolean {
+    return this.isSameDate(date, yesterday);
+  }
+
+  private formatFullDate(date: Date): string {
+    return new Intl.DateTimeFormat('de-DE', {
+      weekday: 'long',
+      day: 'numeric', 
+      month: 'long'
+    }).format(date);
   }
 
   openReactionsDialogue(chatIndex: number) {
