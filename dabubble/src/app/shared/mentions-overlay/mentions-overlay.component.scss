@@ -129,6 +129,11 @@
   display: flex;
   gap: 15px;
   align-items: center;
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .hover-icon-purple {
