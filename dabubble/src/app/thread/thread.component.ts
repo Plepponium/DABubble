@@ -107,6 +107,16 @@ export class ThreadComponent implements OnInit {
     this.isResponsive = window.innerWidth < 881;
   }
 
+  focusInput(event: MouseEvent) {
+    if (event.target === this.answerInput?.nativeElement ||
+        event.target instanceof HTMLElement && 
+        event.target.closest('.input-icon-bar')) {
+      return;
+    }
+    
+    this.answerInput?.nativeElement?.focus();
+  }
+
   focusAnswerInput() {
     setTimeout(() => {
       this.answerInput?.nativeElement?.focus();

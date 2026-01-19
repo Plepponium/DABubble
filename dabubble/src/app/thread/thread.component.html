@@ -304,7 +304,7 @@
         </div>
 
         <form class="form" (ngSubmit)="submitAnswer()" #answerForm="ngForm">
-            <div class="form-field full-width">
+            <div class="form-field full-width" (click)="focusInput($event)">
                 <textarea #answerInput id="answer-message" class="input" name="answer" [(ngModel)]="newAnswer"
                     (keydown.enter)="onEnterPress($any($event))" type="text" [placeholder]="'Antworten...'"
                     (input)="updateCaretPosition(); autoGrow(answerInput)"

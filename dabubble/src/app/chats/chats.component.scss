@@ -1,12 +1,9 @@
 .chats {
   width: 100%;
-  // max-width: 989px;
   height: calc(100vh - 145px);
   box-sizing: border-box;
   background-color: #ffffff;
   border-radius: 30px;
-  // padding: 32px 30px;
-  // transition: margin-left 0.3s ease;
 }
 
 .header {
@@ -22,29 +19,12 @@
   display: flex;
   justify-content: space-between;
   padding: 25px 45px;
-  // box-shadow: 0 2px 10px 0px rgba(0, 0, 0, 0.08);
 }
-
-// .header-inner-container::after {
-//   content: "";
-//   position: absolute;
-//   left: 0;
-//   right: 0;
-//   bottom: 0;
-//   height: 8px;
-//   background: linear-gradient(
-//     to bottom,
-//     rgba(0, 0, 0, 0.06) 0%,
-//     rgba(0, 0, 0, 0) 100%
-//   );
-//   pointer-events: none;
-// }
 
 .header-left,
 .header-right {
   display: flex;
   align-items: center;
-  // justify-content: center;
   gap: 10px;
 }
 
@@ -91,7 +71,6 @@
   border-radius: 30px;
   font-size: 20px;
   font-weight: 600;
-  // position: relative;
   &:hover {
     background-color: #eceefe;
     color: #444df2;
@@ -137,12 +116,11 @@
 
 .dialogue-backdrop-chats, .dialogue-backdrop-chats-add-user {
   position: fixed;
-  inset: 0; /* top, right, bottom, left: 0 */
-  background-color: rgba(0, 0, 0, 0.3); /* Abdunklung */
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.3); 
   display: flex;
-  justify-content: flex-end; /* Panel rechts andocken */
-  align-items: flex-start; /* oben ausrichten */
-  
+  justify-content: flex-end; 
+  align-items: flex-start;  
 }
 
 .dialogue-backdrop-chats {
@@ -166,12 +144,6 @@
   }
 }
 
-// .dialogue-overlay-show-user {
-//     // position: absolute;
-//     // top: 60px;
-//     // z-index: 9;
-// }
-
 .dialogue-backdrop-profile {
   position: fixed;
   inset: 0;
@@ -193,7 +165,6 @@
   align-items: center;
   cursor: pointer;
   &:hover {
-    // background-color: #eceefe;
     background-color: var(--btn-bg-hover, #eceefe);
     .hover-icon {
       display: none;
@@ -240,17 +211,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  // margin-bottom: 10px;
 }
 
-/* DIE LINIEN */
+/* The lines */
 .chat-date-section::before,
 .chat-date-section::after {
   content: "";
   flex: 1;
   height: 1px;
   background: #adb0d9;
-  /* Du kannst optional den Abstand neben dem Datum festlegen: */
   margin: 0 0px;
 }
 
@@ -325,10 +294,7 @@
     display: flex;
   }
   .add-reaction-dialogue {
-    // position: absolute;
-    // top: 20px;
     left: 28px;
-    // background-color: #ffffff;
     border-top-left-radius: unset;
     border-top-right-radius: 30px;
     border-bottom-left-radius: 30px;
@@ -364,12 +330,6 @@
   display: none;
 }
 
-// .add-reaction {
-//     width: 24px;
-//     height: 24px;
-//     cursor: pointer;
-// }
-
 .smiley-img {
   width: 24px;
   height: 24px;
@@ -386,11 +346,9 @@
   overflow-x: auto;
   position: absolute;
   top: 20px;
-  // left: 28px;
   right: 28px;
   background-color: #ffffff;
   border-top-left-radius: 30px;
-  // border-top-right-radius: 30px;
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
   box-sizing: border-box;
@@ -492,8 +450,7 @@
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  // gap: 20px;
-  column-gap: 20px; /* Abstand zwischen Elementen in derselben Zeile */
+  column-gap: 20px;
   row-gap: 6px;
 }
 
@@ -522,7 +479,6 @@
 .reactions {
   display: flex;
   align-items: center;
-  // flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -626,16 +582,11 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  // justify-content: flex-end;
   border: 1px solid #adb0d9;
+  cursor: pointer;
   &:hover {
     border-color: #797ef3;
   }
-  // &:focus {
-  //     // border-color: #535af1;
-  //     // outline: none;
-
-  // }
   &:focus-within {
     border-color: #535af1;
   }

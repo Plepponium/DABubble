@@ -73,6 +73,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   @Output() openThread = new EventEmitter<{ channelId: string; chatId: string }>();
   @Output() openProfile = new EventEmitter<User>();
   @Output() channelDeleted = new EventEmitter<void>();
+  @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
 
   constructor(private sanitizer: DomSanitizer) { }
 
@@ -105,6 +106,16 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   private updateIsResponsive() {
     this.isResponsive = window.innerWidth < 881;
+  }
+
+  focusInput(event: MouseEvent) {
+    if (event.target === this.messageInput?.nativeElement ||
+        event.target instanceof HTMLElement && 
+        event.target.closest('.input-icon-bar')) {
+      return;
+    }
+    
+    this.messageInput?.nativeElement?.focus();
   }
 
   getMaxReactionsToShow(chat: any, index: number): any[] {
@@ -377,7 +388,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   async toggleReaction(chatIndex: number, reactionType: string) {
     const chat = await this.getChatByIndex(chatIndex);
     if (!chat) return;
-    
+
     const currentUsers = this.extractUserIds(chat.reactions || {}, reactionType);
     let updatedUsers: string[];
     if (currentUsers.includes(this.currentUserId)) {
@@ -394,7 +405,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     let usersRaw = reactions[reactionType];
     if (!usersRaw) return [];
 
-    // usersRaw in Array umwandeln, falls es ein String ist
     if (!Array.isArray(usersRaw)) {
       usersRaw = [usersRaw];
     }

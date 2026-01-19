@@ -78,6 +78,16 @@ export class DirectMessageChatsComponent {
     this.subs.unsubscribe();
   }
 
+  focusInput(event: MouseEvent) {
+    if (event.target === this.messageInput?.nativeElement ||
+        event.target instanceof HTMLElement && 
+        event.target.closest('.input-icon-bar')) {
+      return;
+    }
+    
+    this.messageInput?.nativeElement?.focus();
+  }
+
   private ensureInitialized() {
     if (!this.userId || !this.currentUser) return;
     if (this.initializedForUserId === this.userId) return;

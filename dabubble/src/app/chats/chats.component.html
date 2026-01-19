@@ -19,16 +19,11 @@
                             <img [src]="'/assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
                         </div>
                     </div>
-                    <!-- <div class="user-counter">{{ participants.length }}</div> -->
                     <div *ngIf="participants">
                         <div class="user-counter">{{ participants.length }}</div>
                     </div>
                 </div>
 
-                <!-- <app-round-btn (click)="chooseOpenDialogue()" style="--btn-bg: #eceefe;"
-                    iconSrc="assets/icons/person_add.svg" iconHoverSrc="assets/icons/person_add-purple.svg"
-                    altText="Senden">
-                </app-round-btn> -->
                 <button (click)="chooseOpenDialogue()" class="add-user-btn">
                     <img class="btn-img hover-icon" src="assets/icons/person_add.svg" alt="Senden">
                     <img class="btn-img hover-icon-purple" src="assets/icons/person_add-purple.svg" alt="Senden">
@@ -71,12 +66,10 @@
             <div *ngFor="let chat of chatList; let i = index" class="chat-day-section"
                 [ngClass]="{'reverse': chat.user === currentUserId}" #chatSection [attr.data-message-id]="chat.id">
 
-
                 <div *ngIf="i === 0 || !isSameDate(getChatDate(chat), getChatDate(chatList[i-1]))"
                     class="chat-date-section">
                     <div class="chat-date">{{ getDisplayDate(getChatDate(chat)) }}</div>
                 </div>
-
 
                 <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}"
                     [class.edit-mode]="chat.isEditing">
@@ -134,7 +127,6 @@
                             </div>
                             <div class="chat-message" [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 
                                 'right': chat.user === currentUserId}" [innerHTML]="renderMessage(chat.message)">
-                                <!-- {{ chat.message }} -->
                             </div>
                             <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}">
                                 <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0">
@@ -248,14 +240,13 @@
         </div>
 
         <form class="form" (ngSubmit)="submitChatMessage()" #chatForm="ngForm">
-            <div class="form-field">
+            <div class="form-field" (click)="focusInput($event)">
                 <ng-container *ngIf="channelName$ | async as channelName">
                     <textarea #messageInput id="chat-message" class="input" name="message" [(ngModel)]="newMessage"
                         (keydown.enter)="onEnterPress($any($event))" type="text"
                         [placeholder]="'Nachricht an #' + channelName"
                         (input)="updateCaretPosition(messageInput); autoGrow(messageInput)"
                         (keyup)="updateCaretPosition(messageInput)"></textarea>
-
 
                     <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
                         (selected)="onSmileySelected($event, messageInput)" (activeChange)="activeSmiley = $event">
@@ -265,8 +256,6 @@
                         [channels]="filteredChannels" (mentionSelected)="insertMention($event, messageInput)"
                         (overlayStateChange)="overlayActive = $event">
                     </app-mentions-overlay>
-
-
 
                     <div class="input-icon-bar">
                         <div class="icon-bar t-gray">

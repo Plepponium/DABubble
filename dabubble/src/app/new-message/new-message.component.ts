@@ -50,6 +50,17 @@ export class NewMessageComponent {
     recipientMissing: boolean;
     textMissing: boolean;
   }>();
+  @ViewChild('newMessageInput') newMessageInput!: ElementRef<HTMLTextAreaElement>;
+
+  focusInput(event: MouseEvent) {
+    if (event.target === this.newMessageInput?.nativeElement ||
+        event.target instanceof HTMLElement && 
+        event.target.closest('.input-icon-bar')) {
+      return;
+    }
+    
+    this.newMessageInput?.nativeElement?.focus();
+  }
 
   ngOnInit() {
     this.getCurrentUserAndChannels();

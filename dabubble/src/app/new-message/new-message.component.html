@@ -26,7 +26,7 @@
     <div class="message-content">
 
         <form class="form" (ngSubmit)="submitMessage()" #newMessageForm="ngForm">
-            <div class="form-field">
+            <div class="form-field" (click)="focusInput($event)">
                 <textarea #newMessageInput id="new-message" class="input" name="message" [(ngModel)]="newMessage"
                     (keydown.enter)="onEnterPress($any($event))" type="text" placeholder="Starte eine neue Nachricht"
                     (input)="updateCaretPosition(newMessageInput)"

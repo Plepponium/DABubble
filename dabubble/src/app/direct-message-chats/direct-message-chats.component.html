@@ -172,7 +172,7 @@
 
         <form (ngSubmit)="sendMessage()">
             <div class="form-field-wrapper">
-                <div class="form-field full-width">
+                <div class="form-field full-width" (click)="focusInput($event)">
                     <textarea #messageInput class="input font-18" name="message" type="text" [(ngModel)]="messageText"
                         [placeholder]="'Nachricht an ' + otherUser.name" (keydown.enter)="onEnterPress($any($event))">
                 </textarea>
