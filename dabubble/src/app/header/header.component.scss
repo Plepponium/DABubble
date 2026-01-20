@@ -1,5 +1,6 @@
 .header {
   width: 100vw;
+  max-width: 2560px;
   height: 95px;
   box-sizing: border-box;
   padding: 25px 45px 0 45px;
@@ -24,6 +25,7 @@
   position: absolute;
   display: flex;
   width: calc(100vw - 800px);
+  max-width: calc(2560px - 800px);
   margin-left: 362px;
   margin-right: 526px;
 }
