@@ -16,7 +16,7 @@
                     [ngClass]="{'users-display-active': usersDisplayActive}">
                     <div class="user-pics">
                         <div class="img-box" *ngFor="let user of participants$ | async | slice:0:3">
-                            <img [src]="'/assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
+                            <img [src]="'assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
                         </div>
                     </div>
                     <div *ngIf="participants">
