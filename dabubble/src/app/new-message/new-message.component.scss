@@ -240,9 +240,31 @@
 
 @media(max-width: 880px) {
   .message {
-  width: 100%;
-  height: calc(100vh - 80px);
-  // flex-grow: 1;
-  border-radius: 0px;
-}
+    width: 100%;
+    height: calc(100vh - 80px);
+    border-radius: 0px;
+  }
+
+  .header-inner-container {
+    width: 100%;
+    min-height: 96px;
+    gap: 20px;  
+    padding: 20px 16px 7px 16px;
+  }
+
+  .input-field {
+    padding: 13px 20px;
+  }
+
+  .message-content {
+    height: calc(100% - 130px);
+  }
+
+  .form {
+    padding: 16px;
+  }
+
+  .icon-bar {
+    gap: 5px;
+  }
 }

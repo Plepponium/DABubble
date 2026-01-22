@@ -192,7 +192,7 @@
   // box-sizing: border-box;
   margin: 0 -45px;
   position: relative;
-  z-index: 1;
+  // z-index: 1;
   transition: background-color 125ms ease-in-out;
 
   .dm-reactions-dialog-hover {
@@ -528,6 +528,6 @@
   }
 
   .form-field-wrapper {
-    padding: 0 20px;
+    padding: 0 16px;
   }
 }
