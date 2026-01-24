@@ -1,11 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
 @font-face {
   font-family: "Nunito";
-  src: url("dabubble/assets/fonts/nunito.ttf");
+  src: url("/assets/fonts/nunito.ttf");
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
-
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap");
 
 html,
 body {
@@ -146,7 +145,7 @@ body.intro-active {
   }
 }
 
-@media(max-width: 880px) {
+@media (max-width: 880px) {
   .font-24 {
     font-size: 20px;
   }
@@ -156,5 +155,4 @@ body.intro-active {
       left: 40px;
     }
   }
-  
 }
