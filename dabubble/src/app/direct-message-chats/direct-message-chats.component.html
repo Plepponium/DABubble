@@ -131,7 +131,8 @@
                                     <ng-template #editMode>
                                         <div class="chat-edit-wrapper">
                                             <textarea #editTa id="edit-{{m.id}}" class="edit-textarea"
-                                                (input)="autoGrow(editTa)" [(ngModel)]="m.editedText"
+                                                (input)="autoGrow(editTa);  updateEditCaret(m, editTa)"
+                                                (keyup)=" updateEditCaret(m, editTa)" [(ngModel)]="m.editedText"
                                                 [placeholder]="m.text"></textarea>
 
                                             <app-mentions-overlay [text]="m.editedText"
@@ -173,7 +174,8 @@
             <div class="form-field-wrapper">
                 <div class="form-field full-width" (click)="focusInput($event)">
                     <textarea #messageInput class="input font-18" name="message" type="text" [(ngModel)]="messageText"
-                        [placeholder]="'Nachricht an ' + otherUser.name" (keydown.enter)="onEnterPress($any($event))">
+                        [placeholder]="'Nachricht an ' + otherUser.name" (keydown.enter)="onEnterPress($any($event))"
+                        (input)="updateCaretPosition()" (keyup)="updateCaretPosition()">
                 </textarea>
 
                     <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
