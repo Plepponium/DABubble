@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, inject, Input, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, HostListener, inject, Input, Output } from '@angular/core';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -24,16 +24,14 @@ export class AddChannelMembersOverlayComponent {
   selectedMode: 'all' | 'custom' | null = null;
   selectedUser: Partial<User> | null = null;
   firstUserChannel: any = null;
-
   userService = inject(UserService);
   channelService = inject(ChannelService);
-
   showOverlayResponsive = false;
   private isResponsive = false;
 
-  ngOnInit() {
+  /** Initializes responsive state, loads users and first user channel. */
+  ngOnInit(): void {
     this.isResponsive = window.innerWidth < 880;
-    // this.showOverlayResponsive = this.isResponsive;
     this.userService.getUsers().subscribe(users => {
       this.allUsers = users;
     });
@@ -45,25 +43,28 @@ export class AddChannelMembersOverlayComponent {
     });
   }
 
-  ngAfterViewInit() {
-    // ✅ DOM ist fertig → JETZT animieren
+  /** Starts overlay entry animation after view init on small screens. */
+  ngAfterViewInit(): void {
     setTimeout(() => {
       if (this.isResponsive) {
         this.showOverlayResponsive = true;
       }
-    }, 10);  // Minimale Verzögerung für CSS-Transition
+    }, 10);
   }
 
+  /**
+  * Handles window resize to update responsive state and overlay visibility.
+  */
   @HostListener('window:resize', [])
-  onResize() {
+  onResize(): void {
     this.isResponsive = window.innerWidth < 880;
-    // if (this.isOverlayVisible()) {
     this.showOverlayResponsive = this.isResponsive;
-    // }
   }
 
-  handleClose() {
-    // this.close.emit();
+  /**
+  * Closes overlay with animation on small screens, immediately on desktop.
+  */
+  handleClose(): void {
     if (this.isResponsive) {
       this.showOverlayResponsive = false;
       setTimeout(() => this.close.emit(), 350);
@@ -72,6 +73,12 @@ export class AddChannelMembersOverlayComponent {
     }
   }
 
+  /**
+  * Returns whether the create button should be disabled.
+  * - Disabled if no mode selected.
+  * - Enabled for 'all'.
+  * - For 'custom', requires a selected user.
+  */
   isCreateDisabled(): boolean {
     if (!this.selectedMode) return true;
     if (this.selectedMode === 'all') return false;
@@ -79,35 +86,63 @@ export class AddChannelMembersOverlayComponent {
     return false;
   }
 
-  selectUser(event: { name: string }) {
+  /**
+  * Selects a user by name from mention overlay.
+  * @param event Event containing selected user name
+  */
+  selectUser(event: { name: string }): void {
     this.selectedUser = this.allUsers.find(u => u.name === event.name) || null;
     this.searchText = '';
   }
 
-  removeUser() {
+  /** Clears selected user and resets search text. */
+  removeUser(): void {
     this.selectedUser = null;
     this.searchText = '';
   }
 
-  async handleCreate() {
+  /**
+  * Handles channel creation based on selected mode.
+  * - Validates input.
+  * - Builds participant list.
+  * - Creates channel and emits result.
+  */
+  async handleCreate(): Promise<void> {
     if (!this.channel || !this.currentUser) return;
     if (this.isCreateDisabled()) return;
-    let extraParticipants: string[] = [];
-    if (this.selectedMode === 'all' && this.firstUserChannel) {
-      extraParticipants = this.firstUserChannel.participants;
-    }
-    if (this.selectedMode === 'custom' && this.selectedUser?.uid) {
-      extraParticipants = [this.selectedUser.uid];
-    }
-    const baseParticipants = this.channel.participants || [this.currentUser.uid];
-    const allParticipants = Array.from(new Set([...baseParticipants, ...extraParticipants]));
-    const newChannelData = {
-      ...this.channel,
-      participants: allParticipants
-    };
+    const extraParticipants = this.getExtraParticipants();
+    const newChannelData = this.buildNewChannelData(extraParticipants);
     const channelRef = await this.channelService.addChannel(newChannelData);
     this.channelCreated.emit({ id: channelRef.id, ...newChannelData });
     this.handleClose();
   }
 
+  /**
+  * Computes additional participants based on selected mode.
+  * @returns Array of user IDs to be added as extra participants
+  */
+  private getExtraParticipants(): string[] {
+    if (this.selectedMode === 'all' && this.firstUserChannel) {
+      return this.firstUserChannel.participants;
+    }
+    if (this.selectedMode === 'custom' && this.selectedUser?.uid) {
+      return [this.selectedUser.uid];
+    }
+    return [];
+  }
+
+  /**
+  * Builds a new channel payload including merged participant list.
+  * Ensures currentUser is included at least once.
+  * @param extraParticipants Extra participant user IDs
+  * @returns New channel data object
+  */
+  private buildNewChannelData(extraParticipants: string[]): any {
+    const baseParticipants = this.channel.participants || [this.currentUser!.uid];
+    const allParticipants = Array.from(new Set([...baseParticipants, ...extraParticipants]));
+    return {
+      ...this.channel,
+      participants: allParticipants
+    };
+  }
 }
