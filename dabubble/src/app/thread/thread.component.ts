@@ -17,6 +17,7 @@ import { reactionIcons } from '../reaction-icons';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
 import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.component";
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { RawReactionsMap, TransformedReaction } from '../../models/reaction.types';
 
 @Component({
   selector: 'app-thread',
@@ -290,30 +291,49 @@ export class ThreadComponent implements OnInit {
   }
 
   transformReactionsToArray(
-    reactionsMap: Record<string, string[] | string> | undefined,
+    // reactionsMap: Record<string, string[] | string> | undefined,
+    reactionsMap: RawReactionsMap | undefined,
     participants: User[],
     currentUserId: string
-  ): {
-    type: string,
-    count: number,
-    userIds: string[],
-    currentUserReacted: boolean,
-    otherUserName?: string,
-    otherUserReacted: boolean
-  }[] {
+  ): TransformedReaction[] {
     if (!reactionsMap) return [];
-    return Object.entries(reactionsMap).map(([type, usersRaw]) => {
-      // Fallback: falls single userId als String, dann Array draus machen
-      let userIds: string[] = [];
-      if (Array.isArray(usersRaw)) userIds = usersRaw;
-      else if (typeof usersRaw === 'string') userIds = [usersRaw];
-      else userIds = [];
+
+    // return Object.entries(reactionsMap).map(([type, usersRaw]) => {
+    //   // Fallback: falls single userId als String, dann Array draus machen
+    //   let userIds: string[] = [];
+    //   if (Array.isArray(usersRaw)) userIds = usersRaw;
+    //   else if (typeof usersRaw === 'string') userIds = [usersRaw];
+    //   else userIds = [];
+    //   const currentUserReacted = userIds.includes(currentUserId);
+    //   const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
+    //   const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
+    //   return { type, count: userIds.length, userIds, currentUserReacted, otherUserName, otherUserReacted };
+    // })
+    // .sort((a, b) => a.type.localeCompare(b.type));
+
+    return Object.entries(reactionsMap)
+    .map(([type, usersRaw]) => {
+      const userIds = this.parseUserIds(Array.isArray(usersRaw) ? usersRaw : [usersRaw]);
       const currentUserReacted = userIds.includes(currentUserId);
       const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
       const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
-      return { type, count: userIds.length, userIds, currentUserReacted, otherUserName, otherUserReacted };
+
+      return {
+        type,
+        count: userIds.length,
+        userIds,
+        currentUserReacted,
+        otherUserName,
+        otherUserReacted,
+      };
     })
     .sort((a, b) => a.type.localeCompare(b.type));
+  }
+
+  private parseUserIds(users: string[]): string[] {
+    return users.flatMap(u =>
+      u.includes(',') ? u.split(',').map(id => id.trim()) : [u]
+    );
   }
 
   private findOtherUserName(userIds: string[], currentUserId: string, participants: User[]): string | undefined {
@@ -436,7 +456,7 @@ export class ThreadComponent implements OnInit {
     await this.channelService.setAnswerReaction(this.channelId, this.chatId, answerId, reactionType, updatedUsers);
 
     if (updatedUsers.length === 0) {
-      const { [reactionType]: _, ...rest } = answer.reactions;
+      const { [reactionType]: _, ...rest } = answer.reactions!;
       answer.reactions = rest;
     } else {
       answer.reactions = { ...answer.reactions, [reactionType]: updatedUsers };

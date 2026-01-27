@@ -1,3 +1,5 @@
+import { TransformedReaction, RawReactionsMap } from "./reaction.types";
+
 export interface Answer {
   isUserMissing: any;
   _caretIndex: number | null | undefined;
@@ -10,6 +12,8 @@ export interface Answer {
   user: string;
   userName?: string;
   userImg?: string;
-  reactions?: any;
-  reactionArray?: any[];
+  // reactions?: any;
+  // reactionArray?: any[];
+  reactions?: RawReactionsMap;
+  reactionArray?: TransformedReaction[];
 }

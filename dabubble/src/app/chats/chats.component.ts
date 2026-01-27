@@ -19,7 +19,17 @@ import localeDe from '@angular/common/locales/de';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.component";
+import { RawReactionsMap, TransformedReaction } from '../../models/reaction.types';
 registerLocaleData(localeDe);
+
+// type TransformedReaction = {
+//   type: string;
+//   count: number;
+//   userIds: string[];
+//   currentUserReacted: boolean;
+//   otherUserName?: string;
+//   otherUserReacted: boolean;
+// };
 
 @Component({
   selector: 'app-chats',
@@ -381,35 +391,38 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
   transformReactionsToArray(
-    reactionsMap: Record<string, string[]>,
+    reactionsMap: RawReactionsMap,
     participants: User[],
     currentUserId: string
-  ): {
-    type: string,
-    count: number,
-    userIds: string[],
-    currentUserReacted: boolean,
-    otherUserName?: string,
-    otherUserReacted: boolean
-  }[] {
+  ): TransformedReaction[] {
     if (!reactionsMap) return [];
 
-    return Object.entries(reactionsMap).map(([type, usersRaw]) => {
-      const userIds = this.parseUserIds(Array.isArray(usersRaw) ? usersRaw : [usersRaw]);
-      const currentUserReacted = userIds.includes(currentUserId);
-      const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
-      const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
-
-      return {
-        type,
-        count: userIds.length,
-        userIds,
-        currentUserReacted,
-        otherUserName,
-        otherUserReacted
-      };
-    })
+    return Object.entries(reactionsMap)
+      .map(([type, usersRaw]) =>
+        this.transformSingleReaction(type, usersRaw, participants, currentUserId)
+      )
       .sort((a, b) => a.type.localeCompare(b.type));
+  }
+
+  private transformSingleReaction(
+    type: string,
+    usersRaw: string[] | string,
+    participants: User[],
+    currentUserId: string
+  ): TransformedReaction {
+    const userIds = this.parseUserIds(Array.isArray(usersRaw) ? usersRaw : [usersRaw]);
+    const currentUserReacted = this.hasCurrentUserReacted(userIds, currentUserId);
+    const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
+    const otherUserReacted = this.haveOtherUsersReacted(userIds, currentUserId);
+
+    return {
+      type,
+      count: userIds.length,
+      userIds,
+      currentUserReacted,
+      otherUserName,
+      otherUserReacted,
+    };
   }
 
   private parseUserIds(users: string[]): string[] {
@@ -420,6 +433,14 @@ export class ChatsComponent implements OnInit, OnChanges {
     const others = userIds.filter(id => id !== currentUserId);
     if (others.length === 0) return undefined;
     return participants.find(u => u.uid === others[0])?.name || 'Unbekannt';
+  }
+
+  private hasCurrentUserReacted(userIds: string[], currentUserId: string): boolean {
+    return userIds.includes(currentUserId);
+  }
+
+  private haveOtherUsersReacted(userIds: string[], currentUserId: string): boolean {
+    return userIds.filter(id => id !== currentUserId).length > 1;
   }
 
   private updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[], chatIndex: number) {
@@ -482,12 +503,10 @@ export class ChatsComponent implements OnInit, OnChanges {
     );
   }
 
-  // Hilfsmethode, um den Chat aus Observable oder Cache zu erhalten
   private async getChatByIndex(chatIndex: number): Promise<any> {
     if (this.channelChats && this.channelChats.length > chatIndex) {
       return this.channelChats[chatIndex];
     }
-    // Alternativ Chats aus Observable abrufen, dann Wert zurückgeben
     return new Promise(resolve => {
       this.chats$.pipe(take(1)).subscribe((chats: any) => resolve(chats[chatIndex]));
     })
@@ -567,15 +586,11 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
   submitChatMessage() {
-    if (!this.newMessage.trim()) return;
-    if (!this.channelId || !this.currentUserId) return;
+    if (!this.canSendMessage()) return;
 
-    const messagePayload = {
-      message: this.newMessage.trim(),
-      time: Math.floor(Date.now() / 1000),
-      user: this.currentUserId
-    };
-    this.channelService.addChatToChannel(this.channelId, messagePayload)
+    const messagePayload = this.buildMessagePayload();
+
+    this.channelService.addChatToChannel(this.channelId!, messagePayload)
       .then(() => {
         this.newMessage = '';
         setTimeout(() => this.scrollToBottom());
@@ -583,6 +598,20 @@ export class ChatsComponent implements OnInit, OnChanges {
       .catch(err => {
         console.error('Fehler beim Senden:', err);
       });
+  }
+
+  private canSendMessage(): boolean {
+    if (!this.newMessage?.trim()) return false;
+    if (!this.channelId || !this.currentUserId) return false;
+    return true;
+  }
+
+  private buildMessagePayload() {
+    return {
+      message: this.newMessage.trim(),
+      time: Math.floor(Date.now() / 1000),
+      user: this.currentUserId
+    };
   }
 
   handleOpenThread(chatId: string) {
@@ -615,34 +644,126 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.activeSmiley = !this.activeSmiley;
   }
 
-  onSmileySelected(smiley: string, el: HTMLTextAreaElement) {
-    const start = el.selectionStart ?? 0;
-    const end = el.selectionEnd ?? 0;
-    const before = this.newMessage.slice(0, start);
-    const after = this.newMessage.slice(end);
-    this.newMessage = before + `:${smiley}:` + after;
-    const caret = start + smiley.length + 2;
+
+
+  private insertTextAtCursor(
+    text: string, 
+    textarea: HTMLTextAreaElement, 
+    targetTextRef: string | ((param: any) => string), 
+    setCaretCallback?: (pos: number) => void
+  ) {
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? 0;
+    
+    // Text-Referenz auflösen (String oder Funktion)
+    const currentText = typeof targetTextRef === 'function' 
+      ? targetTextRef(null) 
+      : targetTextRef;
+      
+    const before = currentText.slice(0, start);
+    const after = currentText.slice(end);
+    
+    // Text ersetzen
+    const newText = before + text + after;
+    if (typeof targetTextRef === 'function') {
+      targetTextRef(newText);
+    } else {
+      (targetTextRef as any) = newText;
+    }
+    
+    const caretPos = start + text.length;
     setTimeout(() => {
-      el.selectionStart = el.selectionEnd = caret;
-      el.focus();
+      textarea.selectionStart = textarea.selectionEnd = caretPos;
+      textarea.focus();
+      setCaretCallback?.(caretPos);
     });
+  }
+
+  // onSmileySelected(smiley: string, el: HTMLTextAreaElement) {
+  //   const start = el.selectionStart ?? 0;
+  //   const end = el.selectionEnd ?? 0;
+  //   const before = this.newMessage.slice(0, start);
+  //   const after = this.newMessage.slice(end);
+  //   this.newMessage = before + `:${smiley}:` + after;
+  //   const caret = start + smiley.length + 2;
+  //   setTimeout(() => {
+  //     el.selectionStart = el.selectionEnd = caret;
+  //     el.focus();
+  //   });
+  //   this.activeSmiley = false;
+  // }
+  // onSmileySelected(smiley: string, el: HTMLTextAreaElement) {
+  //   this.insertTextAtCursor(`:${smiley}:`, el, () => this.newMessage, 
+  //     pos => this.mentionCaretIndex = pos);
+  //   this.activeSmiley = false;
+  // }
+  onSmileySelected(smiley: string, el: HTMLTextAreaElement) {
+    const newPos = this.insertTextSimple(`:${smiley}:`, el, () => this.newMessage);
+    this.setCursorPosition(el, newPos);
     this.activeSmiley = false;
   }
 
-  insertMention(
-    event: { name: string; type: 'user' | 'channel' | 'email' },
-    el: HTMLTextAreaElement
-  ) {
+  private insertTextSimple(
+    text: string, 
+    textarea: HTMLTextAreaElement, 
+    textRef: string | ((param: any) => string)
+  ): number {
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? 0;
+    const currentText = typeof textRef === 'function' ? textRef(null) : textRef;
+    
+    const before = currentText.slice(0, start);
+    const after = currentText.slice(end);
+    const newText = before + text + after;
+    
+    if (typeof textRef === 'function') {
+      textRef(newText);
+    } else {
+      (textRef as any) = newText;
+    }
+    
+    return start + text.length;
+  }
+
+  private setCursorPosition(textarea: HTMLTextAreaElement, position: number) {
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = position;
+      textarea.focus();
+    });
+  }
+
+
+  // insertMention(
+  //   event: { name: string; type: 'user' | 'channel' | 'email' },
+  //   el: HTMLTextAreaElement
+  // ) {
+  //   const trigger = event.type === 'user' ? '@' : '#';
+  //   const pos = this.mentionCaretIndex ?? this.newMessage.length;
+  //   const before = this.newMessage.slice(0, pos);
+  //   const after = this.newMessage.slice(pos);
+  //   const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
+  //   this.newMessage = replaced + ' ' + after;
+  //   this.mentionCaretIndex = replaced.length + 1;
+  //   setTimeout(() => {
+  //     el.selectionStart = el.selectionEnd = this.mentionCaretIndex!;
+  //     this.updateCaretPosition(el);
+  //     el.focus();
+  //   });
+  //   this.overlayActive = false;
+  // }
+  insertMention(event: { name: string; type: 'user' | 'channel' | 'email' }, el: HTMLTextAreaElement) {
     const trigger = event.type === 'user' ? '@' : '#';
+    const mentionText = `${trigger}${event.name} `;
+    
     const pos = this.mentionCaretIndex ?? this.newMessage.length;
     const before = this.newMessage.slice(0, pos);
-    const after = this.newMessage.slice(pos);
-    const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
-    this.newMessage = replaced + ' ' + after;
+    const replaced = before.replace(/([@#])([^\s]*)$/, mentionText);
+    
+    this.newMessage = replaced + this.newMessage.slice(pos);
     this.mentionCaretIndex = replaced.length + 1;
+    
     setTimeout(() => {
       el.selectionStart = el.selectionEnd = this.mentionCaretIndex!;
-      this.updateCaretPosition(el);
       el.focus();
     });
     this.overlayActive = false;
@@ -657,37 +778,58 @@ export class ChatsComponent implements OnInit, OnChanges {
     chat._caretIndex = textarea.selectionStart;
   }
 
-  insertMentionInEdit(
-    chat: any,
-    event: { name: string; type: 'user' | 'channel' | 'email' }
-  ) {
+  // insertMentionInEdit(
+  //   chat: any,
+  //   event: { name: string; type: 'user' | 'channel' | 'email' }
+  // ) {
+  //   const trigger = event.type === 'user' ? '@' : '#';
+  //   const pos = chat._caretIndex ?? chat.editedText.length;
+  //   const before = chat.editedText.slice(0, pos);
+  //   const after = chat.editedText.slice(pos);
+  //   const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
+  //   chat.editedText = replaced + ' ' + after;
+  //   chat._caretIndex = replaced.length + 1;
+  //   setTimeout(() => {
+  //     const textarea = document.getElementById(`edit-${chat.id}`) as HTMLTextAreaElement;
+  //     if (textarea) {
+  //       textarea.selectionStart = textarea.selectionEnd = chat._caretIndex;
+  //       textarea.focus();
+  //     }
+  //   });
+  // }
+  insertMentionInEdit(chat: any, event: { name: string; type: 'user' | 'channel' | 'email' }) {
     const trigger = event.type === 'user' ? '@' : '#';
+    const mentionText = `${trigger}${event.name} `;
+    
     const pos = chat._caretIndex ?? chat.editedText.length;
     const before = chat.editedText.slice(0, pos);
-    const after = chat.editedText.slice(pos);
-    const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
-    chat.editedText = replaced + ' ' + after;
+    const replaced = before.replace(/([@#])([^\s]*)$/, mentionText);
+    
+    chat.editedText = replaced + ' ' + chat.editedText.slice(pos);
     chat._caretIndex = replaced.length + 1;
+    
     setTimeout(() => {
       const textarea = document.getElementById(`edit-${chat.id}`) as HTMLTextAreaElement;
-      if (textarea) {
-        textarea.selectionStart = textarea.selectionEnd = chat._caretIndex;
-        textarea.focus();
-      }
+      textarea?.focus();
+      textarea && (textarea.selectionStart = textarea.selectionEnd = chat._caretIndex);
     });
   }
 
+  // insertAtCursor(character: string = '@', el: HTMLTextAreaElement) {
+  //   const start = el.selectionStart;
+  //   const end = el.selectionEnd;
+  //   const before = this.newMessage.slice(0, start);
+  //   const after = this.newMessage.slice(end);
+  //   this.newMessage = before + character + after;
+  //   this.mentionCaretIndex = start + character.length;
+  //   setTimeout(() => {
+  //     el.selectionStart = el.selectionEnd = this.mentionCaretIndex!;
+  //     el.focus();
+  //   });
+  // }
   insertAtCursor(character: string = '@', el: HTMLTextAreaElement) {
-    const start = el.selectionStart;
-    const end = el.selectionEnd;
-    const before = this.newMessage.slice(0, start);
-    const after = this.newMessage.slice(end);
-    this.newMessage = before + character + after;
-    this.mentionCaretIndex = start + character.length;
-    setTimeout(() => {
-      el.selectionStart = el.selectionEnd = this.mentionCaretIndex!;
-      el.focus();
-    });
+    this.insertTextAtCursor(character, el, () => this.newMessage, 
+      pos => this.mentionCaretIndex = pos);
   }
 
   enableEditChat(chat: any) {
