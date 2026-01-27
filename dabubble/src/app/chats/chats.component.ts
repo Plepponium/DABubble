@@ -20,6 +20,7 @@ import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-ov
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.component";
 import { RawReactionsMap, TransformedReaction } from '../../models/reaction.types';
+import { ChatsReactionService } from '../../services/chats-reaction.service';
 registerLocaleData(localeDe);
 
 @Component({
@@ -75,7 +76,10 @@ export class ChatsComponent implements OnInit, OnChanges {
   @Output() channelDeleted = new EventEmitter<void>();
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
 
-  constructor(private sanitizer: DomSanitizer) { }
+  constructor(
+    private sanitizer: DomSanitizer,
+    private reactionService: ChatsReactionService
+  ) { }
   
   @HostListener('window:resize')
   onResize() {
@@ -225,7 +229,7 @@ export class ChatsComponent implements OnInit, OnChanges {
       answersCount: answers.length,
       lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
       reactions,
-      reactionArray: this.transformReactionsToArray(reactions, this.participants, this.currentUserId)
+      reactionArray: this.reactionService.transformReactionsToArray(reactions, this.participants, this.currentUserId)
     };
   }
 
@@ -307,73 +311,73 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  transformReactionsToArray(
-    reactionsMap: RawReactionsMap,
-    participants: User[],
-    currentUserId: string
-  ): TransformedReaction[] {
-    if (!reactionsMap) return [];
+  // transformReactionsToArray(
+  //   reactionsMap: RawReactionsMap,
+  //   participants: User[],
+  //   currentUserId: string
+  // ): TransformedReaction[] {
+  //   if (!reactionsMap) return [];
 
-    return Object.entries(reactionsMap)
-      .map(([type, usersRaw]) =>
-        this.transformSingleReaction(type, usersRaw, participants, currentUserId)
-      )
-      .sort((a, b) => a.type.localeCompare(b.type));
-  }
+  //   return Object.entries(reactionsMap)
+  //     .map(([type, usersRaw]) =>
+  //       this.transformSingleReaction(type, usersRaw, participants, currentUserId)
+  //     )
+  //     .sort((a, b) => a.type.localeCompare(b.type));
+  // }
 
-  private transformSingleReaction(
-    type: string,
-    usersRaw: string[] | string,
-    participants: User[],
-    currentUserId: string
-  ): TransformedReaction {
-    const userIds = this.parseUserIds(Array.isArray(usersRaw) ? usersRaw : [usersRaw]);
-    const currentUserReacted = this.hasCurrentUserReacted(userIds, currentUserId);
-    const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
-    const otherUserReacted = this.haveOtherUsersReacted(userIds, currentUserId);
+  // private transformSingleReaction(
+  //   type: string,
+  //   usersRaw: string[] | string,
+  //   participants: User[],
+  //   currentUserId: string
+  // ): TransformedReaction {
+  //   const userIds = this.parseUserIds(Array.isArray(usersRaw) ? usersRaw : [usersRaw]);
+  //   const currentUserReacted = this.hasCurrentUserReacted(userIds, currentUserId);
+  //   const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
+  //   const otherUserReacted = this.haveOtherUsersReacted(userIds, currentUserId);
 
-    return {
-      type,
-      count: userIds.length,
-      userIds,
-      currentUserReacted,
-      otherUserName,
-      otherUserReacted,
-    };
-  }
+  //   return {
+  //     type,
+  //     count: userIds.length,
+  //     userIds,
+  //     currentUserReacted,
+  //     otherUserName,
+  //     otherUserReacted,
+  //   };
+  // }
 
-  private parseUserIds(users: string[]): string[] {
-    return users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
-  }
+  // private parseUserIds(users: string[]): string[] {
+  //   return users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
+  // }
 
-  private findOtherUserName(userIds: string[], currentUserId: string, participants: User[]): string | undefined {
-    const others = userIds.filter(id => id !== currentUserId);
-    if (others.length === 0) return undefined;
-    return participants.find(u => u.uid === others[0])?.name || 'Unbekannt';
-  }
+  // private findOtherUserName(userIds: string[], currentUserId: string, participants: User[]): string | undefined {
+  //   const others = userIds.filter(id => id !== currentUserId);
+  //   if (others.length === 0) return undefined;
+  //   return participants.find(u => u.uid === others[0])?.name || 'Unbekannt';
+  // }
 
-  private hasCurrentUserReacted(userIds: string[], currentUserId: string): boolean {
-    return userIds.includes(currentUserId);
-  }
+  // private hasCurrentUserReacted(userIds: string[], currentUserId: string): boolean {
+  //   return userIds.includes(currentUserId);
+  // }
 
-  private haveOtherUsersReacted(userIds: string[], currentUserId: string): boolean {
-    return userIds.filter(id => id !== currentUserId).length > 1;
-  }
+  // private haveOtherUsersReacted(userIds: string[], currentUserId: string): boolean {
+  //   return userIds.filter(id => id !== currentUserId).length > 1;
+  // }
 
-  private updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[], chatIndex: number) {
-    chat.reactions = { ...chat.reactions };
-    if (updatedUsers.length === 0) {
-      delete chat.reactions[reactionType];
-    } else {
-      chat.reactions[reactionType] = updatedUsers;
-    }
-    chat.reactionArray = this.transformReactionsToArray(chat.reactions, this.participants, this.currentUserId);
+  // private updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[], chatIndex: number) {
+  //   chat.reactions = { ...chat.reactions };
+  //   if (updatedUsers.length === 0) {
+  //     delete chat.reactions[reactionType];
+  //   } else {
+  //     chat.reactions[reactionType] = updatedUsers;
+  //   }
+  //   chat.reactionArray = this.transformReactionsToArray(chat.reactions, this.participants, this.currentUserId);
 
-    const chats = this.chatsSubject.getValue();
-    const newChats = [...chats];
-    newChats[chatIndex] = chat; 
-    this.chatsSubject.next(newChats);
-  }
+  //   const chats = this.chatsSubject.getValue();
+  //   const newChats = [...chats];
+  //   newChats[chatIndex] = chat; 
+  //   this.chatsSubject.next(newChats);
+  // }
 
   async addReaction(chatIndex: number, reactionType: string) {
     const chats = this.chatsSubject.getValue();
@@ -387,7 +391,10 @@ export class ChatsComponent implements OnInit, OnChanges {
     if (!currentReactionUsers.includes(this.currentUserId)) {
       const updatedUsers = [...currentReactionUsers, this.currentUserId];
       await this.channelService.setReaction(this.channelId!, chat.id, reactionType, updatedUsers);
-      this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
+      this.reactionService.updateLocalReaction(
+        chat, reactionType, updatedUsers, chatIndex, 
+        this.chatsSubject, this.participants, this.currentUserId
+      );
     }
   }
 
@@ -395,7 +402,8 @@ export class ChatsComponent implements OnInit, OnChanges {
     const chat = await this.getChatByIndex(chatIndex);
     if (!chat) return;
 
-    const currentUsers = this.extractUserIds(chat.reactions || {}, reactionType);
+    // const currentUsers = this.extractUserIds(chat.reactions || {}, reactionType);
+    const currentUsers = this.reactionService.extractUserIds(chat.reactions || {}, reactionType);  // ← Service!
     let updatedUsers: string[];
     if (currentUsers.includes(this.currentUserId)) {
       updatedUsers = currentUsers.filter(uid => uid !== this.currentUserId);
@@ -404,21 +412,13 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
 
     await this.channelService.setReaction(this.channelId!, chat.id, reactionType, updatedUsers);
-    this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
+    // this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
+    this.reactionService.updateLocalReaction(
+      chat, reactionType, updatedUsers, chatIndex, 
+      this.chatsSubject, this.participants, this.currentUserId
+    );  // ← Service!
   }
-
-  private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
-    let usersRaw = reactions[reactionType];
-    if (!usersRaw) return [];
-
-    if (!Array.isArray(usersRaw)) {
-      usersRaw = [usersRaw];
-    }
-
-    return usersRaw.flatMap((u: string) =>
-      u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
-    );
-  }
+ 
 
   private async getChatByIndex(chatIndex: number): Promise<any> {
     if (this.channelChats && this.channelChats.length > chatIndex) {
@@ -428,6 +428,19 @@ export class ChatsComponent implements OnInit, OnChanges {
       this.chats$.pipe(take(1)).subscribe((chats: any) => resolve(chats[chatIndex]));
     })
   }
+
+  // private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
+  //   let usersRaw = reactions[reactionType];
+  //   if (!usersRaw) return [];
+
+  //   if (!Array.isArray(usersRaw)) {
+  //     usersRaw = [usersRaw];
+  //   }
+
+  //   return usersRaw.flatMap((u: string) =>
+  //     u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
+  //   );
+  // }
 
   openAddComment(chat: Chat) {
     if (!this.channelId) return;
