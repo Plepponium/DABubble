@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
-import { BehaviorSubject, combineLatest, filter, firstValueFrom, forkJoin, map, Observable, of, switchMap, take } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, firstValueFrom, forkJoin, map, Observable, of, switchMap, take, takeUntil } from 'rxjs';
 import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.class';
@@ -18,6 +18,7 @@ import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-ov
 import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.component";
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { RawReactionsMap, TransformedReaction } from '../../models/reaction.types';
+import { LogoutService } from '../../services/logout.service';
 
 @Component({
   selector: 'app-thread',
@@ -60,6 +61,8 @@ export class ThreadComponent implements OnInit {
 
   channelService = inject(ChannelService);
   userService = inject(UserService);
+  logoutService = inject(LogoutService);
+  private destroy$ = this.logoutService.logout$;
 
   activeSmiley = false;
   allSmileys = reactionIcons;
@@ -78,7 +81,7 @@ export class ThreadComponent implements OnInit {
     this.loadChannelWithId(this.channelId);
     this.chat$ = this.getEnrichedChat();
     this.answers$ = this.getEnrichedAnswers();
-    this.answers$.pipe(take(1)).subscribe(() => {
+    this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
       this.scrollToBottom();
       this.focusAnswerInput()
     });
@@ -88,7 +91,7 @@ export class ThreadComponent implements OnInit {
     if (changes['chatId'] && !changes['chatId'].firstChange) {
       this.chat$ = this.getEnrichedChat();
       this.answers$ = this.getEnrichedAnswers();
-      this.answers$.pipe(take(1)).subscribe(() => {
+      this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
         this.scrollToBottom();
         this.focusAnswerInput();
       });
@@ -110,11 +113,11 @@ export class ThreadComponent implements OnInit {
 
   focusInput(event: MouseEvent) {
     if (event.target === this.answerInput?.nativeElement ||
-        event.target instanceof HTMLElement && 
-        event.target.closest('.input-icon-bar')) {
+      event.target instanceof HTMLElement &&
+      event.target.closest('.input-icon-bar')) {
       return;
     }
-    
+
     this.answerInput?.nativeElement?.focus();
   }
 
@@ -134,10 +137,10 @@ export class ThreadComponent implements OnInit {
   }
 
   getCurrentUserAndChannels() {
-    this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
+    this.userService.getCurrentUser().pipe(take(1), takeUntil(this.destroy$)).subscribe(user => {
       if (user) {
         this.currentUserId = user.uid;
-        this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
+        this.channelService.getChannels().pipe(take(1), takeUntil(this.destroy$)).subscribe(channels => {
           this.filteredChannels = channels.filter(c =>
             Array.isArray(c.participants) && c.participants.includes(this.currentUserId)
           );
@@ -149,7 +152,7 @@ export class ThreadComponent implements OnInit {
   private loadChannelWithId(channelId: string) {
     // console.log('loadChannelWithId channelId', channelId);
 
-    this.channelService.getChannelById(channelId).pipe(take(1)).subscribe(channel => {
+    this.channelService.getChannelById(channelId).pipe(take(1), takeUntil(this.destroy$)).subscribe(channel => {
       if (!channel) return;
       // console.log('loadChannelWithId channel participants', channel.participants);
       this.channelId = channelId;
@@ -205,7 +208,7 @@ export class ThreadComponent implements OnInit {
   }
 
   async loadChatById(channelId: string) {
-    this.channelService.getChannelById(channelId).pipe(take(1)).subscribe(async channel => {
+    this.channelService.getChannelById(channelId).pipe(take(1), takeUntil(this.destroy$)).subscribe(async channel => {
       if (!channel) return;
 
       this.channelId = channelId;
@@ -215,7 +218,7 @@ export class ThreadComponent implements OnInit {
   }
 
   subscribeToParticipants() {
-    this.participants$.subscribe(users => {
+    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => {
       this.participants = users;
       // console.log('participants', this.participants)
     });
@@ -312,22 +315,22 @@ export class ThreadComponent implements OnInit {
     // .sort((a, b) => a.type.localeCompare(b.type));
 
     return Object.entries(reactionsMap)
-    .map(([type, usersRaw]) => {
-      const userIds = this.parseUserIds(Array.isArray(usersRaw) ? usersRaw : [usersRaw]);
-      const currentUserReacted = userIds.includes(currentUserId);
-      const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
-      const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
+      .map(([type, usersRaw]) => {
+        const userIds = this.parseUserIds(Array.isArray(usersRaw) ? usersRaw : [usersRaw]);
+        const currentUserReacted = userIds.includes(currentUserId);
+        const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
+        const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
 
-      return {
-        type,
-        count: userIds.length,
-        userIds,
-        currentUserReacted,
-        otherUserName,
-        otherUserReacted,
-      };
-    })
-    .sort((a, b) => a.type.localeCompare(b.type));
+        return {
+          type,
+          count: userIds.length,
+          userIds,
+          currentUserReacted,
+          otherUserName,
+          otherUserReacted,
+        };
+      })
+      .sort((a, b) => a.type.localeCompare(b.type));
   }
 
   private parseUserIds(users: string[]): string[] {
@@ -504,7 +507,7 @@ export class ThreadComponent implements OnInit {
 
   onUserNameClick(userId: string) {
     if (!userId) return;
-    this.userService.getSingleUserById(userId).pipe(take(1)).subscribe(user => {
+    this.userService.getSingleUserById(userId).pipe(take(1), takeUntil(this.destroy$)).subscribe(user => {
       if (user) {
         this.openProfile.emit(user);
       }

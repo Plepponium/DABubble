@@ -6,6 +6,8 @@ import { UserService } from '../../services/user.service';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
 import { FormsModule } from '@angular/forms';
 import { ChannelService } from '../../services/channel.service';
+import { takeUntil } from 'rxjs/internal/operators/takeUntil';
+import { LogoutService } from '../../services/logout.service';
 
 @Component({
   selector: 'app-chat-add-user-overlay',
@@ -26,11 +28,12 @@ export class ChatAddUserOverlayComponent {
   searchText = '';
   allUsers: Partial<User>[] = [];
   selectedUser: Partial<User> | null = null;
+  showOverlayResponsive = true;
 
   userService = inject(UserService);
   channelService = inject(ChannelService);
-
-  showOverlayResponsive = true;
+  logoutService = inject(LogoutService);
+  private destroy$ = this.logoutService.logout$;
 
   ngOnInit() {
     this.loadAllUsers();
@@ -43,7 +46,9 @@ export class ChatAddUserOverlayComponent {
   }
 
   loadAllUsers() {
-    this.userService.getUsers().subscribe({
+    this.userService.getUsers().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: (users) => {
         this.allUsers = users
           .filter(u => u.uid !== this.currentUserId)

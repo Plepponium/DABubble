@@ -2,7 +2,7 @@ import { Component, Output, EventEmitter, Input, inject, ViewChild, ElementRef, 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
-import { Observable, of, take } from 'rxjs';
+import { Observable, of, take, takeUntil } from 'rxjs';
 import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 import { DirectMessageService } from '../../services/direct-messages.service';
@@ -11,6 +11,7 @@ import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-ov
 import { Channel } from '../../models/channel.class';
 import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.component";
 import { reactionIcons } from '../reaction-icons';
+import { LogoutService } from '../../services/logout.service';
 
 @Component({
   selector: 'app-new-message',
@@ -40,6 +41,8 @@ export class NewMessageComponent {
   channelService = inject(ChannelService);
   userService = inject(UserService);
   dmService = inject(DirectMessageService);
+  logoutService = inject(LogoutService);
+  private destroy$ = this.logoutService.logout$;
 
   activeSmiley = false;
   allSmileys = reactionIcons;
@@ -54,11 +57,11 @@ export class NewMessageComponent {
 
   focusInput(event: MouseEvent) {
     if (event.target === this.newMessageInput?.nativeElement ||
-        event.target instanceof HTMLElement && 
-        event.target.closest('.input-icon-bar')) {
+      event.target instanceof HTMLElement &&
+      event.target.closest('.input-icon-bar')) {
       return;
     }
-    
+
     this.newMessageInput?.nativeElement?.focus();
   }
 
@@ -68,10 +71,16 @@ export class NewMessageComponent {
   }
 
   getCurrentUserAndChannels() {
-    this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
+    this.userService.getCurrentUser().pipe(
+      take(1),
+      takeUntil(this.destroy$)
+    ).subscribe(user => {
       if (user) {
         this.currentUserId = user.uid;
-        this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
+        this.channelService.getChannels().pipe(
+          take(1),
+          takeUntil(this.destroy$)
+        ).subscribe(channels => {
           this.filteredChannels = channels.filter(c =>
             Array.isArray(c.participants) && c.participants.includes(this.currentUserId)
           );
@@ -81,11 +90,12 @@ export class NewMessageComponent {
   }
 
   loadAllUsers() {
-    this.userService.getUsers().pipe(take(1)).subscribe(users => {
+    this.userService.getUsers().pipe(
+      take(1),
+      takeUntil(this.destroy$)
+    ).subscribe(users => {
       this.participants$ = of(users);
       this.participants = users;
-      // console.log('🔹 Alle User geladen:', users.length);
-      // console.log('participants', this.participants);
     });
   }
 

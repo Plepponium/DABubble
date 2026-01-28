@@ -6,6 +6,8 @@ import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-ov
 import { User } from '../../models/user.class';
 import { UserService } from '../../services/user.service';
 import { ChannelService } from '../../services/channel.service';
+import { takeUntil } from 'rxjs/internal/operators/takeUntil';
+import { LogoutService } from '../../services/logout.service';
 
 @Component({
   selector: 'app-add-channel-members-overlay',
@@ -24,18 +26,25 @@ export class AddChannelMembersOverlayComponent {
   selectedMode: 'all' | 'custom' | null = null;
   selectedUser: Partial<User> | null = null;
   firstUserChannel: any = null;
-  userService = inject(UserService);
-  channelService = inject(ChannelService);
   showOverlayResponsive = false;
   private isResponsive = false;
+
+  userService = inject(UserService);
+  channelService = inject(ChannelService);
+  logoutService = inject(LogoutService);
+  private destroy$ = this.logoutService.logout$;
 
   /** Initializes responsive state, loads users and first user channel. */
   ngOnInit(): void {
     this.isResponsive = window.innerWidth < 880;
-    this.userService.getUsers().subscribe(users => {
+    this.userService.getUsers().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(users => {
       this.allUsers = users;
     });
-    this.channelService.getChannels().subscribe(channels => {
+    this.channelService.getChannels().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(channels => {
       const userChannels = channels.filter(ch => ch.participants.includes(this.currentUser!.uid));
       if (userChannels.length > 0) {
         this.firstUserChannel = userChannels[0];

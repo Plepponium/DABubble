@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild, inject, Input, SimpleChanges, Output, EventEmitter, ViewChildren, QueryList } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { combineLatest, map, Observable, shareReplay, Subscription } from 'rxjs';
+import { combineLatest, map, Observable, shareReplay, Subscription, takeUntil } from 'rxjs';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { User } from '../../models/user.class';
 import { UserService } from '../../services/user.service';
@@ -13,6 +13,7 @@ import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-ov
 import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.component";
 import { DirectMessageUtilsService } from '../../services/direct-message-utils.service';
 import { SafeHtml } from '@angular/platform-browser';
+import { LogoutService } from '../../services/logout.service';
 
 @Component({
   selector: 'app-direct-message-chats',
@@ -51,13 +52,16 @@ export class DirectMessageChatsComponent {
   private userService = inject(UserService);
   private dmService = inject(DirectMessageService);
   private utils = inject(DirectMessageUtilsService);
+  logoutService = inject(LogoutService);
+  private destroy$ = this.logoutService.logout$;
 
   /** Initializes current user subscription and triggers chat setup */
   ngOnInit(): void {
-    this.authSub = this.userService.getCurrentUser().subscribe(user => {
-      this.currentUser = user;
-      this.ensureInitialized();
-    });
+    this.authSub = this.userService.getCurrentUser().pipe(
+      takeUntil(this.destroy$)).subscribe(user => {
+        this.currentUser = user;
+        this.ensureInitialized();
+      });
   }
 
   /** Reacts to changes of @Input userId */
@@ -216,7 +220,8 @@ export class DirectMessageChatsComponent {
 
   /** Subscription to otherUser updates */
   private subscribeToOtherUser(): void {
-    const s = this.userService.getSingleUserById(this.userId).subscribe(u => this.otherUser = u);
+    const s = this.userService.getSingleUserById(this.userId).pipe(
+      takeUntil(this.destroy$)).subscribe(u => this.otherUser = u);
     this.subs.add(s);
   }
 
@@ -233,7 +238,8 @@ export class DirectMessageChatsComponent {
   /** Subscription to messages$ for latestMessages + scroll */
   private subscribeToMessages(): void {
     if (!this.messages$) return;
-    const s = this.messages$.subscribe(msgs => this.handleNewMessages(msgs));
+    const s = this.messages$.pipe(
+      takeUntil(this.destroy$)).subscribe(msgs => this.handleNewMessages(msgs));
     this.subs.add(s);
   }
 

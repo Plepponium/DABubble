@@ -13,7 +13,7 @@ import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.class';
 import { Chat } from '../../models/chat.class';
-import { BehaviorSubject, combineLatest, forkJoin, map, Observable, of, switchMap, take } from 'rxjs';
+import { BehaviorSubject, combineLatest, firstValueFrom, forkJoin, map, Observable, of, switchMap, take, takeUntil } from 'rxjs';
 import { reactionIcons } from '../reaction-icons';
 import localeDe from '@angular/common/locales/de';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
@@ -21,6 +21,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.component";
 import { RawReactionsMap, TransformedReaction } from '../../models/reaction.types';
 import { ChatsReactionService } from '../../services/chats-reaction.service';
+import { LogoutService } from '../../services/logout.service';
 registerLocaleData(localeDe);
 
 @Component({
@@ -44,7 +45,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   overlayActive = false;
   insertedAtPending = false;
   isResponsive = false;
-  pendingScroll  = false;
+  pendingScroll = false;
 
   currentUserId: string = '';
   channels: any[] = [];
@@ -65,6 +66,8 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   channelService = inject(ChannelService);
   userService = inject(UserService);
+  logoutService = inject(LogoutService);
+  private destroy$ = this.logoutService.logout$;
 
   activeSmiley = false;
   allSmileys = reactionIcons;
@@ -80,7 +83,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     private sanitizer: DomSanitizer,
     private reactionService: ChatsReactionService
   ) { }
-  
+
   @HostListener('window:resize')
   onResize() {
     this.updateIsResponsive();
@@ -92,11 +95,11 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   focusInput(event: MouseEvent) {
     if (event.target === this.messageInput?.nativeElement ||
-        event.target instanceof HTMLElement && 
-        event.target.closest('.input-icon-bar')) {
+      event.target instanceof HTMLElement &&
+      event.target.closest('.input-icon-bar')) {
       return;
     }
-    
+
     this.messageInput?.nativeElement?.focus();
   }
 
@@ -124,14 +127,17 @@ export class ChatsComponent implements OnInit, OnChanges {
     if (changes['channelId']) {
       const newChannelId = changes['channelId'].currentValue;
       if (newChannelId) {
-        this.pendingScroll  = true;
+        this.pendingScroll = true;
         this.loadChannelWithId(newChannelId);
       }
     }
   }
 
   private getCurrentUser() {
-    this.userService.getCurrentUser().pipe(take(1)).subscribe(user => {
+    this.userService.getCurrentUser().pipe(
+      take(1),
+      takeUntil(this.destroy$)
+    ).subscribe(user => {
       if (user) {
         this.currentUserId = user.uid;
         this.filterChannelsForCurrentUser();
@@ -140,14 +146,19 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
   private filterChannelsForCurrentUser() {
-    this.channelService.getChannels().subscribe(channels => {
+    this.channelService.getChannels().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(channels => {
       this.channels = channels;
       this.filteredChannels = channels.filter(c => c.participants.includes(this.currentUserId));
     });
   }
 
   private loadChannels() {
-    this.channelService.getChannels().pipe(take(1)).subscribe(channels => {
+    this.channelService.getChannels().pipe(
+      take(1),
+      takeUntil(this.destroy$)
+    ).subscribe(channels => {
       this.channels = channels;
     });
   }
@@ -163,12 +174,12 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.participants$ = channel$.pipe(
       switchMap(channel => this.userService.getUsersByIds(channel?.participants ?? []))
     );
-    this.participants$.subscribe(users => this.participants = users);
+    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => this.participants = users);
     this.subscribeToChatsAndUsers(this.channelId!, this.participants$);
   }
 
   subscribeToParticipants() {
-    this.participants$.subscribe(users => {this.participants = users;});
+    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => { this.participants = users; });
   }
 
   private subscribeToChatsAndUsers(channelId: string, participants$: Observable<User[]>) {
@@ -176,13 +187,14 @@ export class ChatsComponent implements OnInit, OnChanges {
       this.channelService.getChatsForChannel(channelId),
       participants$
     ])
-    .pipe(
-      switchMap(([chats, users]) => this.processChatsAndUsers(chats, users, channelId)),
-      map(chats => this.sortChatsByTime(chats))
-    )
-    .subscribe({
-      next: chats => this.handleLoadedChats(chats)
-    });
+      .pipe(
+        switchMap(([chats, users]) => this.processChatsAndUsers(chats, users, channelId)),
+        map(chats => this.sortChatsByTime(chats)),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: chats => this.handleLoadedChats(chats)
+      });
   }
 
   private processChatsAndUsers(chats: Chat[], users: User[], channelId: string): Observable<Chat[]> {
@@ -215,9 +227,9 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
   private buildEnrichedChat(
-    chat: Chat, 
-    user: User | undefined, 
-    reactions: Record<string, string[]>, 
+    chat: Chat,
+    user: User | undefined,
+    reactions: Record<string, string[]>,
     answers: any[]
   ): Chat {
     const isMissingUser = !user;
@@ -239,10 +251,10 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   private handleLoadedChats(chats: Chat[]) {
     this.chatsSubject.next(chats);
-    if (this.pendingScroll ) {
+    if (this.pendingScroll) {
       setTimeout(() => {
         this.scrollToBottom();
-        this.pendingScroll  = false; 
+        this.pendingScroll = false;
       }, 0);
     }
   }
@@ -261,10 +273,10 @@ export class ChatsComponent implements OnInit, OnChanges {
   getDisplayDate(date: Date | undefined): string {
     if (!date) return '';
     const referenceDates = this.getReferenceDates();
-    
+
     if (this.isToday(date, referenceDates.today)) return 'Heute';
     if (this.isYesterday(date, referenceDates.yesterday)) return 'Gestern';
-    
+
     return this.formatFullDate(date);
   }
 
@@ -286,14 +298,14 @@ export class ChatsComponent implements OnInit, OnChanges {
   private formatFullDate(date: Date): string {
     return new Intl.DateTimeFormat('de-DE', {
       weekday: 'long',
-      day: 'numeric', 
+      day: 'numeric',
       month: 'long'
     }).format(date);
   }
 
   openReactionsDialogue(chatIndex: number) {
     if (this.activeReactionDialogueIndex === chatIndex) {
-      this.activeReactionDialogueIndex = null; 
+      this.activeReactionDialogueIndex = null;
     } else {
       this.editCommentDialogueExpanded = false;
       this.activeReactionDialogueIndex = chatIndex;
@@ -306,7 +318,7 @@ export class ChatsComponent implements OnInit, OnChanges {
       this.activeReactionDialogueBelowIndex = null;
     } else {
       this.editCommentDialogueExpanded = false;
-      this.activeReactionDialogueBelowIndex = chatIndex; 
+      this.activeReactionDialogueBelowIndex = chatIndex;
       this.activeReactionDialogueIndex = null;
     }
   }
@@ -392,7 +404,7 @@ export class ChatsComponent implements OnInit, OnChanges {
       const updatedUsers = [...currentReactionUsers, this.currentUserId];
       await this.channelService.setReaction(this.channelId!, chat.id, reactionType, updatedUsers);
       this.reactionService.updateLocalReaction(
-        chat, reactionType, updatedUsers, chatIndex, 
+        chat, reactionType, updatedUsers, chatIndex,
         this.chatsSubject, this.participants, this.currentUserId
       );
     }
@@ -414,19 +426,20 @@ export class ChatsComponent implements OnInit, OnChanges {
     await this.channelService.setReaction(this.channelId!, chat.id, reactionType, updatedUsers);
     // this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
     this.reactionService.updateLocalReaction(
-      chat, reactionType, updatedUsers, chatIndex, 
+      chat, reactionType, updatedUsers, chatIndex,
       this.chatsSubject, this.participants, this.currentUserId
     );  // ← Service!
   }
- 
+
 
   private async getChatByIndex(chatIndex: number): Promise<any> {
     if (this.channelChats && this.channelChats.length > chatIndex) {
       return this.channelChats[chatIndex];
     }
-    return new Promise(resolve => {
-      this.chats$.pipe(take(1)).subscribe((chats: any) => resolve(chats[chatIndex]));
-    })
+    const chats = await firstValueFrom(this.chats$.pipe(
+      takeUntil(this.destroy$)
+    ));
+    return chats?.[chatIndex];
   }
 
   // private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
@@ -581,24 +594,24 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
   private insertTextSimple(
-    text: string, 
-    textarea: HTMLTextAreaElement, 
+    text: string,
+    textarea: HTMLTextAreaElement,
     textRef: string | ((param: any) => string)
   ): number {
     const start = textarea.selectionStart ?? 0;
     const end = textarea.selectionEnd ?? 0;
     const currentText = typeof textRef === 'function' ? textRef(null) : textRef;
-    
+
     const before = currentText.slice(0, start);
     const after = currentText.slice(end);
     const newText = before + text + after;
-    
+
     if (typeof textRef === 'function') {
       textRef(newText);
     } else {
       (textRef as any) = newText;
     }
-    
+
     return start + text.length;
   }
 
@@ -612,14 +625,14 @@ export class ChatsComponent implements OnInit, OnChanges {
   insertMention(event: { name: string; type: 'user' | 'channel' | 'email' }, el: HTMLTextAreaElement) {
     const trigger = event.type === 'user' ? '@' : '#';
     const mentionText = `${trigger}${event.name} `;
-    
+
     const pos = this.mentionCaretIndex ?? this.newMessage.length;
     const before = this.newMessage.slice(0, pos);
     const replaced = before.replace(/([@#])([^\s]*)$/, mentionText);
-    
+
     this.newMessage = replaced + this.newMessage.slice(pos);
     this.mentionCaretIndex = replaced.length + 1;
-    
+
     setTimeout(() => {
       el.selectionStart = el.selectionEnd = this.mentionCaretIndex!;
       el.focus();
@@ -639,14 +652,14 @@ export class ChatsComponent implements OnInit, OnChanges {
   insertMentionInEdit(chat: any, event: { name: string; type: 'user' | 'channel' | 'email' }) {
     const trigger = event.type === 'user' ? '@' : '#';
     const mentionText = `${trigger}${event.name} `;
-    
+
     const pos = chat._caretIndex ?? chat.editedText.length;
     const before = chat.editedText.slice(0, pos);
     const replaced = before.replace(/([@#])([^\s]*)$/, mentionText);
-    
+
     chat.editedText = replaced + ' ' + chat.editedText.slice(pos);
     chat._caretIndex = replaced.length + 1;
-    
+
     setTimeout(() => {
       const textarea = document.getElementById(`edit-${chat.id}`) as HTMLTextAreaElement;
       textarea?.focus();
@@ -655,30 +668,30 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
   insertAtCursor(character: string = '@', el: HTMLTextAreaElement) {
-    this.insertTextAtCursor(character, el, () => this.newMessage, 
+    this.insertTextAtCursor(character, el, () => this.newMessage,
       pos => this.mentionCaretIndex = pos);
   }
-  
+
   private insertTextAtCursor(
-    text: string, 
-    textarea: HTMLTextAreaElement, 
-    targetTextRef: string | ((param: any) => string), 
+    text: string,
+    textarea: HTMLTextAreaElement,
+    targetTextRef: string | ((param: any) => string),
     setCaretCallback?: (pos: number) => void
   ) {
     const start = textarea.selectionStart ?? 0;
     const end = textarea.selectionEnd ?? 0;
     const currentText = typeof targetTextRef === 'function' ? targetTextRef(null) : targetTextRef;
-      
+
     const before = currentText.slice(0, start);
     const after = currentText.slice(end);
-    
+
     const newText = before + text + after;
     if (typeof targetTextRef === 'function') {
       targetTextRef(newText);
     } else {
       (targetTextRef as any) = newText;
     }
-    
+
     const caretPos = start + text.length;
     setTimeout(() => {
       textarea.selectionStart = textarea.selectionEnd = caretPos;

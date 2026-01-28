@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.class';
 import { CommonModule } from '@angular/common';
+import { takeUntil } from 'rxjs';
+import { LogoutService } from '../../services/logout.service';
 
 @Component({
   selector: 'app-add-channel-overlay',
@@ -22,14 +24,17 @@ export class AddChannelOverlayComponent implements OnInit {
   channelName: string = '';
   description: string = '';
   currentUser?: User;
-  private initialChannelNames: string[] = [];  // Namen beim Öffnen
+  private initialChannelNames: string[] = [];
   nameExistsError = false;
 
   private userService = inject(UserService);
-  private channelService = inject(ChannelService);
+  logoutService = inject(LogoutService);
+  private destroy$ = this.logoutService.logout$;
 
   ngOnInit() {
-    this.userService.getCurrentUser().subscribe(user => {
+    this.userService.getCurrentUser().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(user => {
       if (user) this.currentUser = user;
     });
 

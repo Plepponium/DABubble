@@ -5,6 +5,8 @@ import { ChannelService } from '../../services/channel.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { User } from '../../models/user.class';
+import { LogoutService } from '../../services/logout.service';
+import { takeUntil } from 'rxjs/internal/operators/takeUntil';
 
 @Component({
   selector: 'app-channel-description-overlay',
@@ -16,34 +18,32 @@ export class ChannelDescriptionOverlayComponent {
   @Input() channelId?: string;
   @Input() currentUserId?: string;
   @Input() participants: User[] = [];
-
   @Output() close = new EventEmitter<void>();
   @Output() channelDeleted = new EventEmitter<void>();
-
   @Output() openProfile = new EventEmitter<User>();
   @Output() openAddUserResponsive = new EventEmitter<void>();
 
   channel?: Channel;
-  channelService = inject(ChannelService);
-
   isEditingName = false;
   isEditingDescription = false;
-  // isScreenUnder1512 = false;
   isScreenUnder1010 = false;
-  // isScreenUnder1512 = false;
-
   editedName = '';
   editedDescription = '';
 
+  channelService = inject(ChannelService);
+  private logoutService = inject(LogoutService);
+  private destroy$ = this.logoutService.logout$;
+
   @HostListener('window:resize', [])
   onResize() {
-    // this.isScreenUnder1512 = window.innerWidth < 1512;
     this.isScreenUnder1010 = window.innerWidth < 1010;
   }
 
   ngOnInit() {
     if (this.channelId) {
-      this.channelService.getChannelById(this.channelId).subscribe(channel => {
+      this.channelService.getChannelById(this.channelId).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(channel => {
         this.channel = channel;
         this.editedName = channel?.name ?? '';
         this.editedDescription = channel?.description ?? '';

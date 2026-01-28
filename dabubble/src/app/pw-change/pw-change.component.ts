@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthLayoutComponent } from '../shared/auth-layout/auth-layout.component';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, ValidationErrors } from '@angular/forms';
 import { Auth, getAuth } from '@angular/fire/auth';
 import { confirmPasswordReset, verifyPasswordResetCode } from 'firebase/auth';
+import { takeUntil } from 'rxjs/internal/operators/takeUntil';
+import { UserService } from '../../services/user.service';
+import { LogoutService } from '../../services/logout.service';
 
 @Component({
   selector: 'app-pw-change',
@@ -19,9 +22,12 @@ export class PwChangeComponent implements OnInit {
   confirmVisible = false;
   showOverlay = false;
   overlayVariant: 'login' | 'created' | 'sent' | 'changed' = 'changed';
-
   oobCode = '';
   isResetMode = false;
+
+  userService = inject(UserService);
+  logoutService = inject(LogoutService);
+  private destroy$ = this.logoutService.logout$;
 
   constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute,     // ← hinzufügen
     private auth: Auth) {
@@ -32,7 +38,9 @@ export class PwChangeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(params => {
       this.oobCode = params['oobCode'] || '';
       this.isResetMode = !!this.oobCode;
     });
