@@ -33,15 +33,6 @@
                         </button>
                     </div>
 
-                    <!-- <div class="edit-comment-container">
-                        <div class="edit-comment-dialogue" *ngIf="editCommentDialogueExpanded">
-                            <div class="edit-comment" (click)="editChat(chat)">Nachricht bearbeiten</div>
-                        </div>
-                        <button (click)="openEditCommentDialogue()" class="add-reaction-btn reverse">
-                            <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="">
-                            <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg" alt="">
-                        </button>
-                    </div> -->
                 </div>
                 <img class="chat-user-img" [src]="'assets/user-icons/' + chat.userImg + '.svg'" [alt]="chat.userName"
                     [ngClass]="{'grayscale': chat.isUserMissing}">
@@ -52,16 +43,11 @@
                         </div>
                         <div class="font-14 t-gray">{{ chat.time * 1000 | date: 'HH:mm' }} Uhr</div>
                     </div>
-                    <div class="chat-message"
-                        [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 'right': chat.user === currentUserId}">
-                        {{ chat.message }}
+                    <div class="chat-message" [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 
+                        'right': chat.user === currentUserId}" [innerHTML]="renderMessage(chat.message)">
                     </div>
                     <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}">
-                        <!-- <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0"> -->
 
-                        <!-- <div class="answer t-purple">{{ chat.answersCount }} Antworten</div> -->
-                        <!-- <div class="last-answer font-14 t-gray">Letzte Antwort {{ chat.lastAnswerTime ? (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}</div> -->
-                        <!-- </div> -->
                         <div class="reactions">
                             <div class="reaction-btns">
                                 <div (click)="toggleReactionForChat(chat.id, reaction.type)"
@@ -103,9 +89,6 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- <pre>{{ reaction | json }}</pre> -->
-                                    <!-- <pre>{{ chat.reactionArray | json }}</pre> -->
                                 </div>
 
                                 <div (click)="showAllReactionsForChat[chat.id] = true" *ngIf="chat.reactionArray!.length > (isResponsive ? 3 : 7) && !showAllReactionsForChat[chat.id]" class="reaction-btn more-reactions">
@@ -192,9 +175,8 @@
                                 <div class="font-14 t-gray">{{ answer.time * 1000 | date: 'HH:mm' }} Uhr</div>
                             </div>
                             <div class="chat-message"
-                                [ngClass]="{'left bg-light-purple': answer.user !== currentUserId, 'right': answer.user === currentUserId}"
-                                [innerHTML]="renderMessage(answer.message)">
-                                <!-- {{ answer.message }} -->
+                                [ngClass]="{'left bg-light-purple': answer.user !== currentUserId, 
+                                'right': answer.user === currentUserId}" [innerHTML]="renderMessage(answer.message)">
                             </div>
                             <div class="chat-answered" [ngClass]="{'right': answer.user === currentUserId}">
 
@@ -241,8 +223,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <!-- <pre>{{ reaction | json }}</pre> -->
                                         </div>
                                         
                                         <div (click)="showAllReactionsForAnswer[answer.id] = true" *ngIf="answer.reactionArray!.length > (isResponsive ? 3 : 7) && !showAllReactionsForAnswer[answer.id]" class="reaction-btn more-reactions">
@@ -269,13 +249,8 @@
                                             altText="Reaktion hinzufügen">
                                         </app-round-btn>
                                     </div>
-                                    <!-- <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
-                                    iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
-                                    altText="Reaktion hinzufügen">
-                                </app-round-btn> -->
                                 </div>
                             </div>
-
                         </ng-container>
 
                         <ng-template #editMode>
