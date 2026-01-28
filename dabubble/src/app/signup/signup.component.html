@@ -1,6 +1,6 @@
 <app-auth-layout>
     <button [routerLink]="['/']" class="arrow-back">
-        <img src="/assets/icons/arrow_back.svg">
+        <img src="assets/icons/arrow_back.svg">
     </button>
 
     <div class="login-header">
@@ -11,7 +11,7 @@
         <div class="input-group">
             <div class="input-wrapper">
                 <div class="input-item">
-                    <img src="/assets/icons/login-person.svg">
+                    <img src="assets/icons/login-person.svg">
                     <input type="text" placeholder="Name und Nachname" formControlName="name" autocomplete="name">
                 </div>
                 @if (name?.invalid && (name?.touched || submitted)) {
@@ -21,7 +21,7 @@
 
             <div class="input-wrapper">
                 <div class="input-item">
-                    <img src="/assets/icons/login-mail.svg">
+                    <img src="assets/icons/login-mail.svg">
                     <input type="text" placeholder="beispielname@email.com" formControlName="email"
                         autocomplete="email">
                 </div>
@@ -32,7 +32,7 @@
 
             <div class="input-wrapper">
                 <div class="input-item">
-                    <img src="/assets/icons/login-lock.svg">
+                    <img src="assets/icons/login-lock.svg">
                     <input type="password" placeholder="Passwort" formControlName="password"
                         autocomplete="new-password">
                 </div>
