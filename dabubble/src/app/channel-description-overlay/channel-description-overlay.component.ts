@@ -34,11 +34,20 @@ export class ChannelDescriptionOverlayComponent {
   private logoutService = inject(LogoutService);
   private destroy$ = this.logoutService.logout$;
 
+
+  /**
+  * Updates the screen size flag when window is resized.
+  * Triggers on window resize events for responsive layout handling.
+  */
   @HostListener('window:resize', [])
   onResize() {
     this.isScreenUnder1010 = window.innerWidth < 1010;
   }
 
+  /**
+  * Initializes the component by loading the channel data.
+  * Fetches the channel by ID and initializes edit fields with current values.
+  */
   ngOnInit() {
     if (this.channelId) {
       this.channelService.getChannelById(this.channelId).pipe(
@@ -51,10 +60,17 @@ export class ChannelDescriptionOverlayComponent {
     }
   }
 
+  /**
+  * Closes the overlay by emitting the close event.
+  */
   handleClose() {
     this.close.emit();
   }
 
+  /**
+  * Toggles the channel name edit mode.
+  * Saves changes if exiting edit mode with a new valid name.
+  */
   toggleEditName() {
     if (this.isEditingName && this.channel) {
       if (this.editedName && this.editedName !== this.channel.name) {
@@ -67,6 +83,10 @@ export class ChannelDescriptionOverlayComponent {
     this.isEditingName = !this.isEditingName;
   }
 
+  /**
+  * Toggles the channel description edit mode.
+  * Saves changes if exiting edit mode with a new description.
+  */
   toggleEditDescription() {
     if (this.isEditingDescription && this.channel) {
       if (this.editedDescription !== this.channel.description) {
@@ -79,30 +99,54 @@ export class ChannelDescriptionOverlayComponent {
     this.isEditingDescription = !this.isEditingDescription;
   }
 
+  /**
+  * Removes the current user from the channel or deletes it if empty.
+  * If no participants remain, the channel is deleted.
+  */
   async leaveChannel() {
     if (!this.channel || !this.currentUserId) return;
-
-    const updatedParticipants = this.channel.participants?.filter(id => id !== this.currentUserId) || [];
-
+    const updatedParticipants = this.getUpdatedParticipants();
     try {
       if (updatedParticipants.length === 0) {
-        await this.channelService.deleteChannel(this.channel.id);
-        this.channelDeleted.emit();
-        this.handleClose();
+        await this.deleteChannelAndClose();
         return;
       }
       await this.channelService.updateChannel(this.channel.id, { participants: updatedParticipants });
       this.handleClose();
-
     } catch (error) {
       console.error('Fehler beim Verlassen des Channels:', error);
     }
   }
 
+  /**
+  * Returns the updated participants list without the current user.
+  * @returns {string[]} List of remaining participant IDs.
+  */
+  private getUpdatedParticipants(): string[] {
+    return this.channel?.participants?.filter(id => id !== this.currentUserId) || [];
+  }
+
+  /**
+  * Deletes the channel and emits necessary events.
+  */
+  private async deleteChannelAndClose(): Promise<void> {
+    if (!this.channel) return;
+    await this.channelService.deleteChannel(this.channel.id);
+    this.channelDeleted.emit();
+    this.handleClose();
+  }
+
+  /**
+  * Emits the openProfile event with the selected user.
+  * @param {User} user - The user whose profile should be opened.
+  */
   handleOpenProfile(user: User) {
     this.openProfile.emit(user);
   }
 
+  /**
+  * Emits the openAddUserResponsive event for responsive view.
+  */
   handleOpenAddUser() {
     this.openAddUserResponsive.emit();
   }

@@ -2,7 +2,7 @@
     <div class="header-container">
         <div class="dialogue-overlay-header">
             <div>Channel erstellen</div>
-            <app-round-btn (click)="handleClose()" iconSrc="assets/icons/close.svg"
+            <app-round-btn (click)="onClose()" iconSrc="assets/icons/close.svg"
                 iconHoverSrc="assets/icons/close-purple.svg" altText="Schließen">
             </app-round-btn>
         </div>
@@ -37,7 +37,7 @@
     </div>
 
     <div class="btn-container">
-        <button (click)="handleAddChannel()" class="add-btn" [disabled]="!channelName.trim() || channelNameExists">
+        <button (click)="onAddChannel()" class="add-btn" [disabled]="!channelName.trim() || channelNameExists">
             <div class="f-nunito">Erstellen</div>
         </button>
     </div>
