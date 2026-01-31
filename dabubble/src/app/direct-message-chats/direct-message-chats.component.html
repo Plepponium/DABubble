@@ -14,7 +14,7 @@
 
     <div class="dm-chat-container">
 
-        <ng-container *ngIf="messages$ | async as messages; else loading">
+        <ng-container *ngIf="!devForceLoading && (messages$ | async) as messages; else loading">
             <ng-container *ngIf="users$ | async as users">
                 <div *ngIf="messages.length === 0; else chatContent" class="empty-conversation">
                     <div class="recipient">
@@ -208,5 +208,7 @@
 </div>
 
 <ng-template #loading>
-    <div class="dm-loading">Lade Unterhaltung…</div>
+    <div class="dm-loading">
+        <div class="loading-block">Lade Unterhaltung…</div>
+    </div>
 </ng-template>

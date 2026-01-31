@@ -42,6 +42,7 @@ export class DirectMessageChatsComponent {
   showAllReactions: Record<number, boolean> = {};
   activeSmiley = false;
   allSmileys = reactionIcons;
+  devForceLoading = false;
 
   private authSub?: Subscription;
   private subs = new Subscription();

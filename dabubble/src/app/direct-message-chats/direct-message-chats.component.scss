@@ -481,8 +481,40 @@
   }
 }
 
+.dm-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #8b8b8b;
+  font-size: 16px;
+  font-weight: 500;
+}
 
-@media(max-width: 880px) {
+.loading-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 4px 16px;
+  background-color: #adb0d9;
+  border-radius: 8px;
+  color: white;
+  animation: pulse 1.3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (max-width: 880px) {
   .dm-chats {
     height: calc(100vh - 80px);
     border-radius: 0;
