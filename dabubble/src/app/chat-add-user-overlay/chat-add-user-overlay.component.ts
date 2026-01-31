@@ -35,16 +35,26 @@ export class ChatAddUserOverlayComponent {
   logoutService = inject(LogoutService);
   private destroy$ = this.logoutService.logout$;
 
+
+  /**
+  * Initializes the component and loads all available users.
+  */
   ngOnInit() {
     this.loadAllUsers();
   }
 
+  /**
+  * Sets focus to the search input field after view initialization.
+  */
   ngAfterViewInit() {
     setTimeout(() => {
       this.searchInput?.nativeElement?.focus();
     });
   }
 
+  /**
+  * Loads all users from the service and filters out the current user and existing participants.
+  */
   loadAllUsers() {
     this.userService.getUsers().pipe(
       takeUntil(this.destroy$)
@@ -58,17 +68,32 @@ export class ChatAddUserOverlayComponent {
     });
   }
 
-
+  /**
+  * Selects a user from the search results.
+  * 
+  * @param {Object} event - Event object containing the selected user's name
+  * @param {string} event.name - The name of the selected user
+  */
   selectUser(event: { name: string }) {
     this.selectedUser = this.allUsers.find(u => u.name === event.name) || null;
     this.searchText = '';
   }
 
+  /**
+  * Removes the currently selected user and clears the search text.
+  */
   removeUser() {
     this.selectedUser = null;
     this.searchText = '';
   }
 
+  /**
+  * Adds the selected user to the channel.
+  * 
+  * @async
+  * @returns {Promise<void>}
+  * @throws Will log an error if the user cannot be added to the channel
+  */
   async addUserToChannel() {
     if (!this.channelId || !this.selectedUser?.uid) return;
     try {
@@ -82,6 +107,9 @@ export class ChatAddUserOverlayComponent {
     }
   }
 
+  /**
+  * Closes the overlay and emits the close event.
+  */
   handleClose() {
     this.isResponsive = false;
     this.close.emit();

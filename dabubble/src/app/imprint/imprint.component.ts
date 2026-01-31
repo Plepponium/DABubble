@@ -9,5 +9,4 @@ import { RouterLink } from '@angular/router';
   styleUrl: './imprint.component.scss'
 })
 export class ImprintComponent {
-
 }

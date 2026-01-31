@@ -10,10 +10,18 @@ export class InputMissingOverlayComponent {
   @Input() missingInfo!: { recipientMissing: boolean; textMissing: boolean };
   @Output() close = new EventEmitter<void>();
 
+  /**
+  * Emits the close event to signal that the current dialog or component should be closed.
+  */
   handleClose() {
     this.close.emit();
   }
 
+  /**
+  * Returns a message indicating which required information is missing.
+  * Displays different hints based on whether the recipient and/or message text are missing.
+  * @returns {string} A localized hint string for the user prompting required input.
+  */
   get message(): string {
     if (this.missingInfo.recipientMissing && this.missingInfo.textMissing) {
       return 'Bitte Empfänger und Nachricht eingeben.';
