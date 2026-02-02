@@ -520,18 +520,13 @@ export class ThreadComponent implements OnInit {
 
   onSmileySelected(smiley: string) {
     const textarea = this.answerInput.nativeElement;
-
     const start = textarea.selectionStart ?? 0;
     const end = textarea.selectionEnd ?? 0;
-
     const before = this.newAnswer.slice(0, start);
     const after = this.newAnswer.slice(end);
 
-    // Format frei – hier z.B. :thumb: oder 👍 möglich
     this.newAnswer = before + `:${smiley}:` + after;
-
     const caret = start + smiley.length + 2;
-    // const caret = start + img.length;
 
     setTimeout(() => {
       textarea.selectionStart = textarea.selectionEnd = caret;
@@ -547,13 +542,14 @@ export class ThreadComponent implements OnInit {
     const before = this.newAnswer.slice(0, pos);
     const after = this.newAnswer.slice(pos);
     const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
+
     this.newAnswer = replaced + ' ' + after;
-    const textarea = this.answerInput.nativeElement;
     this.mentionCaretIndex = replaced.length + 1;
 
     setTimeout(() => {
+      const textarea = this.answerInput.nativeElement;
       textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
-      this.updateCaretPosition();
+      // this.updateCaretPosition();
       textarea.focus();
     });
     this.overlayActive = false;

@@ -128,15 +128,16 @@
                             <div class="chat-message" [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 
                                 'right': chat.user === currentUserId}" [innerHTML]="renderMessage(chat.message)">
                             </div>
-                            <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}">
-                                <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0">
+                            <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}"
+                                [ngClass]="{'has-answers': chat.answersCount && chat.answersCount > 0}">
 
-                                    <div (click)="handleOpenThread(chat.id)" class="answer t-purple">{{
-                                        chat.answersCount }}
-                                        Antworten</div>
-                                    <div class="last-answer font-14 t-gray hide-small">Letzte Antwort {{
-                                        chat.lastAnswerTime ?
-                                        (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}</div>
+                                <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0">
+                                    <div (click)="handleOpenThread(chat.id)" class="answer t-purple">
+                                        {{ chat.answersCount }} Antworten
+                                    </div>
+                                    <div class="last-answer font-14 t-gray hide-small">
+                                        Letzte Antwort {{ chat.lastAnswerTime ? (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}
+                                    </div>
                                 </div>
 
                                 <div class="reactions">

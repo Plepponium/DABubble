@@ -363,13 +363,13 @@
 
 .chat-answered {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 20px;
 }
 
-.chat-answered.right {
-  justify-content: end;
-}
+// .chat-answered.right {
+//   justify-content: end;
+// }
 
 .reactions {
   display: flex;

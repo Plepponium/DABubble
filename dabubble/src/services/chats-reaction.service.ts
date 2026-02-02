@@ -1,16 +1,11 @@
 import { Injectable } from "@angular/core";
-import { ChannelService } from "./channel.service";
 import { RawReactionsMap, TransformedReaction } from "../models/reaction.types";
 import { User } from '../models/user.class';
 import { Chat } from '../models/chat.class';
 import { BehaviorSubject } from "rxjs";
-// import { take } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
 export class ChatsReactionService {
-  // constructor(
-  //   private channelService: ChannelService
-  // ) {}
 
   transformReactionsToArray(
     reactionsMap: RawReactionsMap,
