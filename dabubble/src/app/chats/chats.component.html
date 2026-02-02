@@ -245,15 +245,15 @@
                     <textarea #messageInput id="chat-message" class="input" name="message" [(ngModel)]="newMessage"
                         (keydown.enter)="onEnterPress($any($event))" type="text"
                         [placeholder]="'Nachricht an #' + channelName"
-                        (input)="updateCaretPosition(messageInput); autoGrow(messageInput)"
-                        (keyup)="updateCaretPosition(messageInput)"></textarea>
+                        (input)="updateCaretPosition(); autoGrow(messageInput)"
+                        (keyup)="updateCaretPosition()"></textarea>
 
                     <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
                         (selected)="onSmileySelected($event, messageInput)" (activeChange)="activeSmiley = $event">
                     </app-smiley-overlay>
                     <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex"
                         [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || [] "
-                        [channels]="filteredChannels" (mentionSelected)="insertMention($event, messageInput)"
+                        [channels]="filteredChannels" (mentionSelected)="insertMention($event)"
                         (overlayStateChange)="overlayActive = $event">
                     </app-mentions-overlay>
 

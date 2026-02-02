@@ -8,9 +8,9 @@ import { BehaviorSubject } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
 export class ChatsReactionService {
-  constructor(
-    private channelService: ChannelService
-  ) {}
+  // constructor(
+  //   private channelService: ChannelService
+  // ) {}
 
   transformReactionsToArray(
     reactionsMap: RawReactionsMap,
@@ -79,31 +79,6 @@ export class ChatsReactionService {
     newChats[chatIndex] = chat; 
     chatsSubject.next(newChats);
   }
-
-//   async toggleReaction(chatIndex: number, reactionType: string) {
-//     const chat = await this.getChatByIndex(chatIndex);
-//     if (!chat) return;
-
-//     const currentUsers = this.extractUserIds(chat.reactions || {}, reactionType);
-//     let updatedUsers: string[];
-//     if (currentUsers.includes(this.currentUserId)) {
-//       updatedUsers = currentUsers.filter(uid => uid !== this.currentUserId);
-//     } else {
-//       updatedUsers = [...currentUsers, this.currentUserId];
-//     }
-
-//     await this.channelService.setReaction(this.channelId!, chat.id, reactionType, updatedUsers);
-//     this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
-//   }
-
-//   private async getChatByIndex(chatIndex: number): Promise<any> {
-//     if (this.channelChats && this.channelChats.length > chatIndex) {
-//     return this.channelChats[chatIndex];
-//     }
-//     return new Promise(resolve => {
-//     this.chats$.pipe(take(1)).subscribe((chats: any) => resolve(chats[chatIndex]));
-//     })
-//   }
 
   extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
     let usersRaw = reactions[reactionType];
