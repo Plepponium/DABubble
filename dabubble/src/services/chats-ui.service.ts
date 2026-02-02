@@ -3,39 +3,48 @@ import { Injectable } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class ChatsUiService {
 
-  getChatDate(chat: any): Date | undefined {
-    return chat.time ? new Date(chat.time * 1000) : undefined;
-  }
+  // openReactionsDialogue()
+  // openReactionsDialogueBelow()
+  // openDialogChannelDescription()
+  // openDialogueShowUser()
+  // openDialogueAddUser()
+  // openEditCommentDialogue()
+  // focusInput()
+  // scrollToBottom()
 
-  isSameDate(d1: Date | undefined, d2: Date | undefined): boolean {
-    if (!d1 || !d2) return false;
-    return d1.getFullYear() === d2.getFullYear() &&
-      d1.getMonth() === d2.getMonth() &&
-      d1.getDate() === d2.getDate();
-  }
+  // getChatDate(chat: any): Date | undefined {
+  //   return chat.time ? new Date(chat.time * 1000) : undefined;
+  // }
 
-  getDisplayDate(date: Date | undefined): string {
-    if (!date) return '';
-    const { today, yesterday } = this.getReferenceDates();
+  // isSameDate(d1: Date | undefined, d2: Date | undefined): boolean {
+  //   if (!d1 || !d2) return false;
+  //   return d1.getFullYear() === d2.getFullYear() &&
+  //     d1.getMonth() === d2.getMonth() &&
+  //     d1.getDate() === d2.getDate();
+  // }
 
-    if (this.isSameDate(date, today)) return 'Heute';
-    if (this.isSameDate(date, yesterday)) return 'Gestern';
+  // getDisplayDate(date: Date | undefined): string {
+  //   if (!date) return '';
+  //   const { today, yesterday } = this.getReferenceDates();
 
-    return this.formatFullDate(date);
-  }
+  //   if (this.isSameDate(date, today)) return 'Heute';
+  //   if (this.isSameDate(date, yesterday)) return 'Gestern';
 
-  private getReferenceDates() {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
-    return { today, yesterday };
-  }
+  //   return this.formatFullDate(date);
+  // }
 
-  private formatFullDate(date: Date): string {
-    return new Intl.DateTimeFormat('de-DE', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long'
-    }).format(date);
-  }
+  // private getReferenceDates() {
+  //   const today = new Date();
+  //   const yesterday = new Date(today);
+  //   yesterday.setDate(today.getDate() - 1);
+  //   return { today, yesterday };
+  // }
+
+  // private formatFullDate(date: Date): string {
+  //   return new Intl.DateTimeFormat('de-DE', {
+  //     weekday: 'long',
+  //     day: 'numeric',
+  //     month: 'long'
+  //   }).format(date);
+  // }
 }

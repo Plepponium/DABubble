@@ -63,7 +63,7 @@
     <div *ngIf="(chats$ | async) as chatList" class="chat-content">
         <div id="chat-history" class="chat-history">
 
-            <div *ngFor="let chat of chatList; let i = index" class="chat-day-section"
+            <div *ngFor="let chat of chatList; let i = index; trackBy: trackByChatId" class="chat-day-section"
                 [ngClass]="{'reverse': chat.user === currentUserId}" #chatSection [attr.data-message-id]="chat.id">
 
                 <div *ngIf="i === 0 || !isSameDate(getChatDate(chat), getChatDate(chatList[i-1]))"
