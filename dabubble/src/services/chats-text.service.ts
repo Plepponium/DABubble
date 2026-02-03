@@ -9,9 +9,11 @@ export class ChatsTextService {
   private messageCache = new Map<string, string>();
   
   constructor() {
+    /** Initializes the service and preloads emoji assets. */
     this.preCacheEmojis();
   }
 
+  /** Preloads all reaction emoji images to warm up the browser cache. */
   private preCacheEmojis() {
     reactionIcons.forEach(iconName => {
       const img = new Image();
@@ -19,20 +21,21 @@ export class ChatsTextService {
     });
   }
 
+  /** Inserts text at the current cursor position and restores the caret. */
   insertTextAtCursor(
     text: string,
     textarea: HTMLTextAreaElement,
-    updateMessage: (newText: string) => void  // ✅ CALLBACK statt this.newMessage
+    updateMessage: (newText: string) => void
   ): number {
     const start = textarea.selectionStart ?? 0;
     const end = textarea.selectionEnd ?? 0;
-    const currentText = textarea.value;  // ✅ textarea.value statt getText()
+    const currentText = textarea.value;
 
     const before = currentText.slice(0, start);
     const after = currentText.slice(end);
     const newText = before + text + after;
 
-    updateMessage(newText);  // ✅ Component setzt newMessage!
+    updateMessage(newText);
 
     const caretPos = start + text.length;
     setTimeout(() => {
@@ -42,23 +45,7 @@ export class ChatsTextService {
     return caretPos;
   }
 
-  // renderMessage(text: string): SafeHtml {
-  //   if (!text) return this.sanitizer.bypassSecurityTrustHtml('');
-
-  //   // ✅ Sofortiger Cache-Hit
-  //   if (this.messageCache.has(text)) {
-  //     return this.messageCache.get(text)!;
-  //   }
-
-  //   const html = text.replace(/:([a-zA-Z0-9_+-]+):/g, (match, name) => {
-  //     return this.getEmojiHtml(name);
-  //   });
-
-  //   const safeHtml = this.sanitizer.bypassSecurityTrustHtml(html);
-  //   this.messageCache.set(text, safeHtml);  // ✅ Cache speichern
-    
-  //   return safeHtml;
-  // }
+  /** Renders a message by replacing emoji shortcodes with sanitized HTML. */
   renderMessage(text: string): SafeHtml {
     if (!text) return this.sanitizer.bypassSecurityTrustHtml('');
     
@@ -74,16 +61,7 @@ export class ChatsTextService {
     return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 
-  /** Holt oder cached einzelnes Emoji */
-  // private getEmojiHtml(name: string): string {
-  //   if (!this.emojiCache.has(name)) {
-  //     const html = `<img src="assets/reaction-icons/${name}.svg" 
-  //                         alt="${name}" 
-  //                         class="inline-smiley">`;
-  //     this.emojiCache.set(name, this.sanitizer.bypassSecurityTrustHtml(html));
-  //   }
-  //   return this.emojiCache.get(name)!.toString();
-  // }
+  /** Returns cached or newly generated HTML for a single emoji shortcode. */
   private getEmojiHtml(name: string): string {
     if (!this.emojiCache.has(name)) {
       this.emojiCache.set(name, `<img src="assets/reaction-icons/${name}.svg" alt="${name}" class="inline-smiley">`);
@@ -91,14 +69,14 @@ export class ChatsTextService {
     return this.emojiCache.get(name)!;
   }
 
-  /** Auto-Grow für Textareas */
+  /** Automatically adjusts textarea height to fit its content. */
   autoGrow(textarea: HTMLTextAreaElement): void {
     if (!textarea) return;
     textarea.style.height = 'auto';
     textarea.style.height = `${textarea.scrollHeight}px`;
   }
 
-  /** Cache leeren (für Tests/Debug) */
+  /** Clears all internal emoji and message caches. */
   clearCache() {
     this.emojiCache.clear();
     this.messageCache.clear();
