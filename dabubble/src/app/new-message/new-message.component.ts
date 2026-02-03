@@ -20,6 +20,14 @@ import { LogoutService } from '../../services/logout.service';
   styleUrl: './new-message.component.scss'
 })
 export class NewMessageComponent {
+  @ViewChild('newMessageInput') newMessageInput!: ElementRef<HTMLTextAreaElement>;
+  @Output() openChannel = new EventEmitter<string>();
+  @Output() openUserChat = new EventEmitter<User>();
+  @Output() inputMissing = new EventEmitter<{
+    recipientMissing: boolean;
+    textMissing: boolean;
+  }>();
+
   currentUserId: string = '';
   participants: User[] = [];
   filteredChannels: any[] = [];
@@ -46,14 +54,6 @@ export class NewMessageComponent {
 
   activeSmiley = false;
   allSmileys = reactionIcons;
-
-  @Output() openChannel = new EventEmitter<string>();
-  @Output() openUserChat = new EventEmitter<User>();
-  @Output() inputMissing = new EventEmitter<{
-    recipientMissing: boolean;
-    textMissing: boolean;
-  }>();
-  @ViewChild('newMessageInput') newMessageInput!: ElementRef<HTMLTextAreaElement>;
 
   focusInput(event: MouseEvent) {
     if (event.target === this.newMessageInput?.nativeElement ||

@@ -32,6 +32,8 @@ export class MentionsOverlayComponent {
   filteredItems: any[] = [];
   activeIndex = 0;
 
+  private isOverlayActive = false;
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['text'] || changes['caretIndex']) {
       if (this.context === 'AddUser') {
@@ -65,7 +67,8 @@ export class MentionsOverlayComponent {
       .filter(u => u.name?.toLowerCase().includes(term))
       .slice(0, 10);
 
-    this.overlayStateChange.emit(this.filteredItems.length > 0);
+    this.isOverlayActive = this.filteredItems.length > 0;
+    this.overlayStateChange.emit(this.isOverlayActive);
   }
 
   private filterRecipientUsers() {
@@ -109,7 +112,8 @@ export class MentionsOverlayComponent {
       .slice(0, 10);
 
     this.activeTrigger = null;
-    this.overlayStateChange.emit(this.filteredItems.length > 0);
+    this.isOverlayActive = this.filteredItems.length > 0;
+    this.overlayStateChange.emit(this.isOverlayActive);
   }
 
   private filterSearchbar() {
@@ -135,7 +139,8 @@ export class MentionsOverlayComponent {
         (m.type === 'dm-message' && m.text?.toLowerCase().includes(term))
       )
       .slice(0, 20);
-    this.overlayStateChange.emit(this.filteredItems.length > 0);
+    this.isOverlayActive = this.filteredItems.length > 0;
+    this.overlayStateChange.emit(this.isOverlayActive);
     if (!this.filteredItems.length) {
       this.closeOverlay();
       this.overlayStateChange.emit(false);
@@ -191,6 +196,8 @@ export class MentionsOverlayComponent {
         })
         .slice(0, 10);
     }
+    this.isOverlayActive = this.filteredItems.length > 0;
+    this.overlayStateChange.emit(this.isOverlayActive);
   }
 
   select(item: any) {
@@ -255,13 +262,14 @@ export class MentionsOverlayComponent {
   }
 
   private closeOverlay() {
+    this.isOverlayActive = false;
     this.activeTrigger = null;
     this.filteredItems = [];
     this.activeIndex = 0;
+    this.overlayStateChange.emit(false);
   }
 
   onItemClick(item: any) {
-    console.log('CLICK', item);
     if (!item) return;
     this.navigateToChat.emit(item);
     this.closeOverlay();
@@ -269,7 +277,7 @@ export class MentionsOverlayComponent {
 
   @HostListener('document:keydown', ['$event'])
   onKeyDown(e: KeyboardEvent) {
-    if (!this.filteredItems.length) return;
+    if (!this.isOverlayActive || !this.filteredItems.length) return;
     if (e.key === 'ArrowDown') {
       this.activeIndex = (this.activeIndex + 1) % this.filteredItems.length;
       this.scrollToActive();
