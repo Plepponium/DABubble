@@ -7,6 +7,7 @@ import { BehaviorSubject } from "rxjs";
 @Injectable({ providedIn: 'root' })
 export class ChatsReactionService {
 
+  /** Transforms a raw reactions map into a sorted array of reaction objects. */
   transformReactionsToArray(
     reactionsMap: RawReactionsMap,
     participants: User[],
@@ -21,6 +22,7 @@ export class ChatsReactionService {
     .sort((a, b) => a.type.localeCompare(b.type));
   }
 
+  /** Builds a single transformed reaction entry with user-related metadata. */
   private transformSingleReaction(
     type: string,
     usersRaw: string[] | string,
@@ -42,24 +44,29 @@ export class ChatsReactionService {
     };
   }
 
+  /** Parses and normalizes user ID strings into a flat array of IDs. */
   private parseUserIds(users: string[]): string[] {
     return users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
   }
   
+  /** Returns the display name of another reacting user, if present. */
   private findOtherUserName(userIds: string[], currentUserId: string, participants: User[]): string | undefined {
     const others = userIds.filter(id => id !== currentUserId);
     if (others.length === 0) return undefined;
     return participants.find(u => u.uid === others[0])?.name || 'Unbekannt';
   }
 
+  /** Checks whether the current user has reacted. */
   private hasCurrentUserReacted(userIds: string[], currentUserId: string): boolean {
     return userIds.includes(currentUserId);
   }
 
+  /** Determines whether users other than the current user have reacted. */
   private haveOtherUsersReacted(userIds: string[], currentUserId: string): boolean {
     return userIds.filter(id => id !== currentUserId).length > 1;
   }
 
+  /** Updates reactions locally and synchronizes the chat state without reloading. */
   updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[], chatIndex: number, chatsSubject: BehaviorSubject<Chat[]>, participants: User[], currentUserId: string) {
     chat.reactions = { ...chat.reactions };
     if (updatedUsers.length === 0) {
@@ -75,6 +82,7 @@ export class ChatsReactionService {
     chatsSubject.next(newChats);
   }
 
+  /** Extracts and normalizes user IDs for a given reaction type. */
   extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
     let usersRaw = reactions[reactionType];
     if (!usersRaw) return [];
