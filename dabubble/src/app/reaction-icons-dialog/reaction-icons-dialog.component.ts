@@ -13,11 +13,10 @@ export class ReactionIconsDialogComponent {
   @Input() messageId!: string;
   @Input() position: 'left' | 'right' = 'right';
   @Input() source: 'chat' | 'hover' = 'chat';
-
-
   @Output() addReactionEvent = new EventEmitter<{ messageId: string; icon: string }>();
   @Output() toggleEvent = new EventEmitter<string>();
 
+  /** Adds a reaction to the message and emits the event. */
   addReaction(icon: string) {
     if (!this.messageId) return;
     this.addReactionEvent.emit({ messageId: this.messageId, icon });

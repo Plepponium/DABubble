@@ -13,22 +13,44 @@ import { Auth } from '@angular/fire/auth';
   styleUrl: './pw-reset.component.scss'
 })
 export class PwResetComponent {
-  resetForm: FormGroup;
-  auth = inject(Auth)
+  resetForm!: FormGroup;
   submitted = false;
   showOverlay = false;
   overlayVariant: 'login' | 'created' | 'sent' | 'changed' = 'sent';
 
-  constructor(private fb: FormBuilder, private router: Router) {
-    this.resetForm = this.fb.group({
-      email: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
+  private auth = inject(Auth)
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+
+  /**
+  * Lifecycle hook: initializes the password reset form.
+  */
+  ngOnInit(): void {
+    this.resetForm = this.createResetForm();
+  }
+
+  /**
+  * Creates and configures the password reset form with email validation.
+  * @returns Configured FormGroup with email control and validators.
+  */
+  private createResetForm(): FormGroup {
+    return this.fb.group({
+      email: ['', [
+        Validators.required,
+        Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+      ]],
     });
   }
 
+  /** Convenience getter for the email form control. */
   get email() {
     return this.resetForm.get('email');
   }
 
+  /**
+  * Handles form submission.
+  * Validates the form and triggers password reset email if valid.
+  */
   onSubmit(): void {
     this.submitted = true;
     if (this.resetForm.invalid) {
@@ -38,20 +60,58 @@ export class PwResetComponent {
     this.sendMail();
   }
 
-  async sendMail() {
-    this.overlayVariant = 'sent';
+  /**
+  * Sends password reset email to the provided address.
+  * Shows overlay and navigates to login on success.
+  * @async
+  */
+  async sendMail(): Promise<void> {
     this.showOverlay = true;
+    this.overlayVariant = 'sent';
+
     try {
-      await sendPasswordResetEmail(this.auth, this.resetForm.value.email, {
-        url: 'http://localhost:4200/password/change'
-      });
-      setTimeout(() => {
-        this.showOverlay = false;
-        this.router.navigate(['/']);
-      }, 1500);
+      const email = this.getEmailFromForm();
+      await this.sendPasswordResetEmail(email);
+      this.navigateToLoginWithDelay();
     } catch (error) {
-      console.error('Reset-Email fehlgeschlagen:', error);
+      this.handleResetError(error);
     }
   }
 
+  /**
+  * Retrieves the email address from the form.
+  * @returns The email string entered by the user.
+  */
+  private getEmailFromForm(): string {
+    return this.resetForm.value.email;
+  }
+
+  /**
+  * Sends the password reset email via Firebase Auth.
+  * @param email - The recipient email address.
+  * @async
+  */
+  private async sendPasswordResetEmail(email: string): Promise<void> {
+    await sendPasswordResetEmail(this.auth, email, {
+      url: 'http://localhost:4200/password/change'
+    });
+  }
+
+  /**
+  * Navigates to the login page after a short delay and hides the overlay.
+  */
+  private navigateToLoginWithDelay(): void {
+    setTimeout(() => {
+      this.showOverlay = false;
+      this.router.navigate(['/']);
+    }, 1500);
+  }
+
+  /**
+  * Handles errors that occur during password reset email sending.
+  * @param error - The error object thrown during the operation.
+  */
+  private handleResetError(error: unknown): void {
+    console.error('Password reset email failed:', error);
+  }
 }
