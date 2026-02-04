@@ -9,13 +9,14 @@ import { CommonModule } from '@angular/common';
 })
 export class SmileyOverlayComponent {
   @Input() emojis: string[] = [];   
-  @Input() active = false;              // Wird vom Parent gesteuert
+  @Input() active = false;     
   @Output() selected = new EventEmitter<string>();
   @Output() activeChange = new EventEmitter<boolean>();
 
   filteredItems: string[] = [];
   activeIndex = 0;
 
+  /** Resets filtered emojis and selection when the overlay becomes active. */
   ngOnChanges() {
     if (this.active) {
       this.filteredItems = [...this.emojis];
@@ -23,16 +24,19 @@ export class SmileyOverlayComponent {
     }
   }
 
+  /** Emits the selected emoji and closes the overlay. */
   select(smiley: string) {
     this.selected.emit(smiley);
     this.close();
   }
 
+  /** Deactivates the overlay and emits the active state change. */
   close() {
     this.active = false;
     this.activeChange.emit(false);
   }
 
+  /** Closes the overlay when clicking outside of it. */
   @HostListener('document:click', ['$event'])
   onDocClick(event: Event) {
     if (!this.active) return;
@@ -43,6 +47,7 @@ export class SmileyOverlayComponent {
     }
   }
 
+  /** Handles keyboard navigation and selection within the overlay. */
   @HostListener('document:keydown', ['$event'])
   onKeyDown(e: KeyboardEvent) {
     if (!this.active) return;
