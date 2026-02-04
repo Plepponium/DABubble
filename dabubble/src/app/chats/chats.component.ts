@@ -131,19 +131,19 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.updateIsResponsive();
-    // this.dataService.destroy$ = this.logoutService.logout$;
     this.dataService.destroy$ = this.destroy$;
     this.dataService.getCurrentUser();
     this.dataService.loadChannels();
-    // setInterval(() => {
-    //   this.currentUserId = this.dataService.currentUserId;
-    //   this.participants = this.dataService.participants;
-    //   this.filteredChannels = this.dataService.filteredChannels;
-    // }, 100);
 
-    this.dataService.currentUserId$.subscribe(id => this.currentUserId = id);
-    this.dataService.participants$.subscribe(p => this.participants = p);
-    // this.dataService.filteredChannels$.subscribe(c => this.filteredChannels = c);
+    this.participants$ = this.dataService.participants$;
+    this.dataService.currentUserId$.pipe(takeUntil(this.destroy$)).subscribe(id => this.currentUserId = id);
+    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(p => this.participants = p);
+
+    if ((this.dataService as any).filteredChannels$) {
+      (this.dataService as any).filteredChannels$.pipe(takeUntil(this.destroy$)).subscribe((fc: any[]) => this.filteredChannels = fc);
+    } else {
+      this.filteredChannels = this.dataService.filteredChannels;
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -718,7 +718,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.textService.insertTextAtCursor(character, messageInput, (newText) => {
       this.newMessage = newText;
     }, (caretPos) => {
-      this.mentionCaretIndex = caretPos;  // ✅ WIEDER SETZEN!
+      this.mentionCaretIndex = caretPos; 
     });
   }
 

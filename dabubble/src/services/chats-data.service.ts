@@ -12,6 +12,8 @@ export class ChatsDataService {
   currentUserId: string = '';
   channels: any[] = [];
   filteredChannels: any[] = []
+  private filteredChannelsSubject = new BehaviorSubject<any[]>([]);
+  public filteredChannels$ = this.filteredChannelsSubject.asObservable();
   participants: User[] = [];
   
   channelId: string = '';
@@ -53,6 +55,7 @@ export class ChatsDataService {
     ).subscribe(channels => {
       this.channels = channels;
       this.filteredChannels = channels.filter(c => c.participants.includes(this.currentUserId));
+      this.filteredChannelsSubject.next(this.filteredChannels);
     });
   }
 
@@ -63,6 +66,10 @@ export class ChatsDataService {
       takeUntil(this.destroy$)
     ).subscribe(channels => {
       this.channels = channels;
+      if (this.currentUserId) {
+        this.filteredChannels = channels.filter(c => c.participants.includes(this.currentUserId));
+        this.filteredChannelsSubject.next(this.filteredChannels);
+      }
     });
   }
 
