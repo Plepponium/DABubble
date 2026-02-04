@@ -25,7 +25,8 @@ export class ChatsTextService {
   insertTextAtCursor(
     text: string,
     textarea: HTMLTextAreaElement,
-    updateMessage: (newText: string) => void
+    updateMessage: (newText: string) => void,
+    setCaretCallback?: (pos: number) => void 
   ): number {
     const start = textarea.selectionStart ?? 0;
     const end = textarea.selectionEnd ?? 0;
@@ -41,6 +42,7 @@ export class ChatsTextService {
     setTimeout(() => {
       textarea.selectionStart = textarea.selectionEnd = caretPos;
       textarea.focus();
+      setCaretCallback?.(caretPos); 
     });
     return caretPos;
   }

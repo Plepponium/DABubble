@@ -162,7 +162,7 @@ export class ChatsComponent implements OnInit, OnChanges {
         this.participants$ = this.dataService.participants$;
         this.chats$ = this.dataService.chatsSubject.asObservable();
         // this.participants = this.dataService.participants;
-        // this.filteredChannels = this.dataService.filteredChannels;
+        this.filteredChannels = this.dataService.filteredChannels;
       }
     }
   }
@@ -709,9 +709,16 @@ export class ChatsComponent implements OnInit, OnChanges {
   // insertAtCursor(character: string = '@', messageInput: HTMLTextAreaElement) {
   //   this.textService.insertAtCursor(character, messageInput);
   // }
+  // insertAtCursor(character: string = '@', messageInput: HTMLTextAreaElement) {
+  //   this.textService.insertTextAtCursor(character, messageInput, (newText) => {
+  //     this.newMessage = newText;
+  //   });
+  // }
   insertAtCursor(character: string = '@', messageInput: HTMLTextAreaElement) {
     this.textService.insertTextAtCursor(character, messageInput, (newText) => {
       this.newMessage = newText;
+    }, (caretPos) => {
+      this.mentionCaretIndex = caretPos;  // ✅ WIEDER SETZEN!
     });
   }
 
