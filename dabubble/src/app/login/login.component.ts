@@ -30,29 +30,35 @@ export class LoginComponent implements OnInit {
   showOverlay = false;
   overlayVariant: 'login' | 'created' | 'sent' = 'login';
 
-  googleAuthProvider = new GoogleAuthProvider();
-  auth = inject(Auth);
 
-  loginForm: FormGroup;
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private firestore = inject(Firestore);
+  auth = inject(Auth);
+  googleAuthProvider = new GoogleAuthProvider();
+  loginForm: FormGroup = this.createForm();
 
   private guestEmail = 'guest@dabubble.de';
   private guestPassword = 'guest123';
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private firestore: Firestore,
-  ) {
-    this.loginForm = this.createForm();
-  }
-
+  /**
+  * Lifecycle hook that runs once the component is initialized.
+  * Used here to determine whether the intro animation should play.
+  */
   ngOnInit(): void {
     this.checkIntroAnimation();
   }
 
+  /** Convenience getter for the email form control. */
   get email() { return this.loginForm.get('email'); }
+
+  /** Convenience getter for the password form control. */
   get password() { return this.loginForm.get('password'); }
 
+  /**
+  * Handles login form submission.
+  * Validates the form and triggers email/password login if valid.
+  */
   onSubmit(): void {
     this.submitted = true;
     if (this.loginForm.invalid) {
@@ -62,57 +68,76 @@ export class LoginComponent implements OnInit {
     this.loginWithEmail();
   }
 
+  /**
+  * Logs the user in using email and password from the form.
+  * Wraps Firebase auth call in the shared login handler.
+  */
   async loginWithEmail(): Promise<void> {
     const { email, password } = this.loginForm.value;
     await this.login(() => signInWithEmailAndPassword(this.auth, email, password));
   }
 
+  /**
+  * Logs the user in via Google OAuth popup.
+  * Ensures a Firestore user document is created if it does not exist.
+  */
   async loginWithGoogle(): Promise<void> {
     await this.login(() => signInWithPopup(this.auth, this.googleAuthProvider), true);
   }
 
+  /**
+  * Logs in with predefined guest credentials.
+  * Useful for demos or quick access without registration.
+  */
   async loginAsGuest(): Promise<void> {
     await this.login(() => signInWithEmailAndPassword(this.auth, this.guestEmail, this.guestPassword));
   }
 
-  private async login(fn: () => Promise<any>, checkDoc = false): Promise<void> {
+  /**
+  * Central login handler that manages overlay state, user doc checks,
+  * presence update, and navigation on success.
+  * @param authFn Function that performs the Firebase auth call.
+  * @param checkDoc Whether to ensure a Firestore user document exists.
+  */
+  private async login(authFn: () => Promise<any>, checkDoc = false): Promise<void> {
     this.showOverlay = true;
     try {
-      const cred = await fn();
+      const cred = await authFn();
       if (checkDoc) {
         await this.ensureUserDocument(cred.user);
       }
       await this.setUserPresenceOnline(cred.user.uid);
-      setTimeout(() => {
-        this.router.navigate(['/main']);
-      }, 1500);
+      this.navigateToMainWithDelay();
     } catch (err) {
-      this.showOverlay = false;
-      this.loginForm.markAllAsTouched();
-      this.loginForm.get('password')?.reset();
-      console.error('Login fehlgeschlagen:', err);
+      this.handleLoginError(err);
     }
   }
 
+  /**
+  * Ensures a Firestore user document exists for the given user.
+  * Creates a minimal profile document if none is found.
+  * @param user Firebase user object returned from authentication.
+  */
   private async ensureUserDocument(user: any): Promise<void> {
     const userRef = doc(this.firestore, 'users', user.uid);
     const snap = await getDoc(userRef);
-
-    if (!snap.exists()) {
-      await setDoc(userRef, {
-        name: user.displayName ?? 'Unbekannter Nutzer',
-        email: user.email,
-        img: 'default-user',
-        createdAt: serverTimestamp(),
-        lastSeen: serverTimestamp(),
-        presence: 'offline'
-      });
-    }
+    if (snap.exists()) return;
+    await setDoc(userRef, {
+      name: user.displayName ?? 'Unbekannter Nutzer',
+      email: user.email,
+      img: 'default-user',
+      createdAt: serverTimestamp(),
+      lastSeen: serverTimestamp(),
+      presence: 'offline'
+    });
   }
 
+  /**
+  * Marks the user as online in Firestore and updates lastSeen.
+  * @param uid Unique user identifier in the users collection.
+  */
   private async setUserPresenceOnline(uid: string) {
     const userRef = doc(this.firestore, 'users', uid);
-
     try {
       await updateDoc(userRef, {
         presence: 'online',
@@ -123,6 +148,30 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  /**
+   * Navigates to the main view after a short delay.
+   * Used to keep the overlay visible briefly after successful login.
+   */
+  private navigateToMainWithDelay(): void {
+    setTimeout(() => this.router.navigate(['/main']), 1500);
+  }
+
+  /**
+  * Handles errors that occur during login.
+  * Hides the overlay, marks the form as touched, and clears the password field.
+  * @param err Error thrown by the authentication call.
+  */
+  private handleLoginError(err: unknown): void {
+    this.showOverlay = false;
+    this.loginForm.markAllAsTouched();
+    this.loginForm.get('password')?.reset();
+    console.error('Login failed:', err);
+  }
+
+  /**
+   * Creates and configures the reactive login form group.
+   * Applies required and email pattern validation to the controls.
+   */
   private createForm(): FormGroup {
     return this.fb.group({
       email: ['', [
@@ -133,6 +182,10 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  /**
+  * Checks if the intro animation was already shown using localStorage.
+  * Updates the local flag and persists the state if needed.
+  */
   private checkIntroAnimation(): void {
     const alreadyShown = localStorage.getItem('introShown');
     this.showIntro = !alreadyShown;
