@@ -19,7 +19,7 @@
                             <img [src]="'assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
                         </div>
                     </div>
-                    <div *ngIf="participants">
+                    <div *ngIf="participants$ | async as participants">
                         <div class="user-counter">{{ participants.length }}</div>
                     </div>
                 </div>
