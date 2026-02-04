@@ -1,14 +1,19 @@
-import { Injectable } from "@angular/core"
-import { BehaviorSubject, combineLatest, forkJoin, map, Observable, of, Subject, switchMap, take, takeUntil } from "rxjs"
-import { Chat } from "../models/chat.class"
-import { User } from "../models/user.class"
-import { ChannelService } from "./channel.service"
-import { UserService } from "./user.service"
-import { ChatsReactionService } from "./chats-reaction.service"
+import { inject, Injectable, DestroyRef } from "@angular/core";
+import { BehaviorSubject, combineLatest, forkJoin, map, Observable, of, Subject, switchMap, take, takeUntil } from "rxjs";
+import { Chat } from "../models/chat.class";
+import { User } from "../models/user.class";
+import { ChannelService } from "./channel.service";
+import { UserService } from "./user.service";
+import { ChatsReactionService } from "./chats-reaction.service";
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({ providedIn: 'root' })
 export class ChatsDataService {
-  destroy$!: Observable<void>;
+  private channelService = inject(ChannelService);
+  private userService = inject(UserService);
+  private reactionService = inject(ChatsReactionService);
+  private destroyRef = inject(DestroyRef);
+
   currentUserId: string = '';
   channels: any[] = [];
   filteredChannels: any[] = []
@@ -24,34 +29,25 @@ export class ChatsDataService {
 
   private currentUserIdSubject = new BehaviorSubject<string>('');
   public currentUserId$ = this.currentUserIdSubject.asObservable();
-  
-  /** Injects required services for channel, user, and reaction handling. */
-  constructor(
-    private channelService: ChannelService,
-    private userService: UserService,
-    private reactionService: ChatsReactionService
-  ) {}
 
   /** Fetches the current user and initializes user-dependent state and filters. */
   getCurrentUser() {
     this.userService.getCurrentUser().pipe(
-    take(1),
-    takeUntil(this.destroy$)
-    ).subscribe(user => {
-    if (user) {
-        this.currentUserId = user.uid;
-        this.filterChannelsForCurrentUser();
+    take(1)
+      ).subscribe(user => {
+      if (user) {
+          this.currentUserId = user.uid;
+          this.filterChannelsForCurrentUser();
 
-        this.currentUserIdSubject.next(user.uid); 
-        this.currentUserId = user.uid;
-    }
+          this.currentUserIdSubject.next(user.uid); 
+      }
     });
   }
 
   /** Filters available channels to those including the current user. */
   private filterChannelsForCurrentUser() {
     this.channelService.getChannels().pipe(
-      takeUntil(this.destroy$)
+      take(1)
     ).subscribe(channels => {
       this.channels = channels;
       this.filteredChannels = channels.filter(c => c.participants.includes(this.currentUserId));
@@ -62,8 +58,7 @@ export class ChatsDataService {
   /** Loads all channels once and stores them locally. */
   loadChannels() {
     this.channelService.getChannels().pipe(
-      take(1),
-      takeUntil(this.destroy$)
+      take(1)
     ).subscribe(channels => {
       this.channels = channels;
       if (this.currentUserId) {
@@ -86,7 +81,7 @@ export class ChatsDataService {
     this.participants$ = channel$.pipe(
       switchMap(channel => this.userService.getUsersByIds(channel?.participants ?? []))
     );
-    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => this.participants = users);
+    this.participants$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(users => this.participants = users);
     this.subscribeToChatsAndUsers(this.channelId!, this.participants$);
   }
 
@@ -103,7 +98,7 @@ export class ChatsDataService {
       .pipe(
         switchMap(([chats, users]) => this.processChatsAndUsers(chats, users, channelId)),
         map(chats => this.sortChatsByTime(chats)),
-        takeUntil(this.destroy$)
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
         next: chats => this.handleLoadedChats(chats)

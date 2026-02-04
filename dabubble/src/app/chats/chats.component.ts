@@ -131,7 +131,7 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.updateIsResponsive();
-    this.dataService.destroy$ = this.destroy$;
+    // this.dataService.destroy$ = this.destroy$;
     this.dataService.getCurrentUser();
     this.dataService.loadChannels();
 
@@ -151,7 +151,7 @@ export class ChatsComponent implements OnInit, OnChanges {
       const newChannelId = changes['channelId'].currentValue;
       if (newChannelId) {
         this.pendingScroll = true;
-        this.dataService.destroy$ = this.destroy$;
+        // this.dataService.destroy$ = this.destroy$;
         this.dataService.channelId = newChannelId;
         this.dataService.pendingScroll = true;
         this.dataService.currentUserId = this.currentUserId;
