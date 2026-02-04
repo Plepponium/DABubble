@@ -7,8 +7,8 @@ import { Component, Input } from '@angular/core';
   styleUrl: './round-btn.component.scss'
 })
 export class RoundBtnComponent {
-  @Input() iconSrc = '';          // normal Icon
-  @Input() iconHoverSrc = '';     // Hover Icon
+  @Input() iconSrc = '';         
+  @Input() iconHoverSrc = '';    
   @Input() altText = '';   
   
   @Input() type: 'button' | 'submit' | 'reset' = 'button';
