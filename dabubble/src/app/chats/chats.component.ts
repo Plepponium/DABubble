@@ -167,138 +167,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  // private getCurrentUser() {
-  //   this.userService.getCurrentUser().pipe(
-  //     take(1),
-  //     takeUntil(this.destroy$)
-  //   ).subscribe(user => {
-  //     if (user) {
-  //       this.currentUserId = user.uid;
-  //       this.filterChannelsForCurrentUser();
-  //     }
-  //   });
-  // }
-
-  // private filterChannelsForCurrentUser() {
-  //   this.channelService.getChannels().pipe(
-  //     takeUntil(this.destroy$)
-  //   ).subscribe(channels => {
-  //     this.channels = channels;
-  //     this.filteredChannels = channels.filter(c => c.participants.includes(this.currentUserId));
-  //   });
-  // }
-
-  // private loadChannels() {
-  //   this.channelService.getChannels().pipe(
-  //     take(1),
-  //     takeUntil(this.destroy$)
-  //   ).subscribe(channels => {
-  //     this.channels = channels;
-  //   });
-  // }
-
-  // private loadChannelWithId(channelId: string) {
-  //   this.channelId = channelId;
-  //   const channel$ = this.channelService.getChannelById(channelId);
-  //   this.setupChannelObservables(channel$);
-  // }
-
-  // private setupChannelObservables(channel$: Observable<any>) {
-  //   this.channelName$ = channel$.pipe(map(channel => channel?.name ?? ''));
-  //   this.participants$ = channel$.pipe(
-  //     switchMap(channel => this.userService.getUsersByIds(channel?.participants ?? []))
-  //   );
-  //   this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => this.participants = users);
-  //   this.subscribeToChatsAndUsers(this.channelId!, this.participants$);
-  // }
-
-  // subscribeToParticipants() {
-  //   this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => { this.participants = users; });
-  // }
-
-  // private subscribeToChatsAndUsers(channelId: string, participants$: Observable<User[]>) {
-  //   combineLatest([
-  //     this.channelService.getChatsForChannel(channelId),
-  //     participants$
-  //   ])
-  //     .pipe(
-  //       switchMap(([chats, users]) => this.processChatsAndUsers(chats, users, channelId)),
-  //       map(chats => this.sortChatsByTime(chats)),
-  //       takeUntil(this.destroy$)
-  //     )
-  //     .subscribe({
-  //       next: chats => this.handleLoadedChats(chats)
-  //     });
-  // }
-
-  // private processChatsAndUsers(chats: Chat[], users: User[], channelId: string): Observable<Chat[]> {
-  //   if (!chats.length || !users.length) return of([]);
-  //   const enrichedChats$ = chats.map(chat => this.enrichSingleChat(chat, users, channelId));
-  //   return forkJoin(enrichedChats$);
-  // }
-
-  // private enrichSingleChat(chat: Chat, users: User[], channelId: string): Observable<Chat> {
-  //   const reactions = this.normalizeChatReactions(chat.reactions || {});
-  //   return forkJoin({
-  //     reactions: of(reactions),
-  //     user: of(this.findChatUser(chat.user, users)),
-  //     answers: this.channelService.getAnswersForChat(channelId, chat.id).pipe(take(1))
-  //   }).pipe(
-  //     map(({ reactions, user, answers }) => this.buildEnrichedChat(chat, user, reactions, answers))
-  //   );
-  // }
-
-  // private normalizeChatReactions(reactions: any): Record<string, string[]> {
-  //   const normalized: Record<string, string[]> = {};
-  //   Object.entries(reactions).forEach(([key, val]) => {
-  //     normalized[key] = Array.isArray(val) ? val : typeof val === 'string' ? [val] : [];
-  //   });
-  //   return normalized;
-  // }
-
-  // private findChatUser(chatUserId: string, users: User[]): User | undefined {
-  //   return users.find(u => u.uid === chatUserId);
-  // }
-
-  // private buildEnrichedChat(
-  //   chat: Chat,
-  //   user: User | undefined,
-  //   reactions: Record<string, string[]>,
-  //   answers: any[]
-  // ): Chat {
-  //   const isMissingUser = !user;
-  //   return {
-  //     ...chat,
-  //     userName: isMissingUser ? 'Ehemaliger Nutzer' : user!.name,
-  //     userImg: isMissingUser ? 'default-user' : user!.img,
-  //     isUserMissing: isMissingUser,
-  //     answersCount: answers.length,
-  //     lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null,
-  //     reactions,
-  //     // reactionArray: this.transformReactionsToArray(reactions, this.participants, this.currentUserId)
-  //     reactionArray: this.reactionService.transformReactionsToArray(reactions, this.participants, this.currentUserId)
-  //   };
-  // }
-
-  // private sortChatsByTime(chats: Chat[]): Chat[] {
-  //   return chats.sort((a, b) => a.time - b.time);
-  // }
-
-  // private handleLoadedChats(chats: Chat[]) {
-  //   this.chatsSubject.next(chats);
-  //   if (this.pendingScroll) {
-  //     setTimeout(() => {
-  //       this.scrollToBottom();
-  //       this.pendingScroll = false;
-  //     }, 0);
-  //   }
-  // }
-
   getChatDate(chat: any): Date | undefined {
     return chat.time ? new Date(chat.time * 1000) : undefined;
   }
@@ -363,74 +231,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  // transformReactionsToArray(
-  //   reactionsMap: RawReactionsMap,
-  //   participants: User[],
-  //   currentUserId: string
-  // ): TransformedReaction[] {
-  //   if (!reactionsMap) return [];
-
-  //   return Object.entries(reactionsMap)
-  //     .map(([type, usersRaw]) =>
-  //       this.transformSingleReaction(type, usersRaw, participants, currentUserId)
-  //     )
-  //     .sort((a, b) => a.type.localeCompare(b.type));
-  // }
-
-  // private transformSingleReaction(
-  //   type: string,
-  //   usersRaw: string[] | string,
-  //   participants: User[],
-  //   currentUserId: string
-  // ): TransformedReaction {
-  //   const userIds = this.parseUserIds(Array.isArray(usersRaw) ? usersRaw : [usersRaw]);
-  //   const currentUserReacted = this.hasCurrentUserReacted(userIds, currentUserId);
-  //   const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
-  //   const otherUserReacted = this.haveOtherUsersReacted(userIds, currentUserId);
-
-  //   return {
-  //     type,
-  //     count: userIds.length,
-  //     userIds,
-  //     currentUserReacted,
-  //     otherUserName,
-  //     otherUserReacted,
-  //   };
-  // }
-
-  // private parseUserIds(users: string[]): string[] {
-  //   return users.flatMap(u => u.includes(',') ? u.split(',').map(id => id.trim()) : [u]);
-  // }
-
-  // private findOtherUserName(userIds: string[], currentUserId: string, participants: User[]): string | undefined {
-  //   const others = userIds.filter(id => id !== currentUserId);
-  //   if (others.length === 0) return undefined;
-  //   return participants.find(u => u.uid === others[0])?.name || 'Unbekannt';
-  // }
-
-  // private hasCurrentUserReacted(userIds: string[], currentUserId: string): boolean {
-  //   return userIds.includes(currentUserId);
-  // }
-
-  // private haveOtherUsersReacted(userIds: string[], currentUserId: string): boolean {
-  //   return userIds.filter(id => id !== currentUserId).length > 1;
-  // }
-
-  // private updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[], chatIndex: number) {
-  //   chat.reactions = { ...chat.reactions };
-  //   if (updatedUsers.length === 0) {
-  //     delete chat.reactions[reactionType];
-  //   } else {
-  //     chat.reactions[reactionType] = updatedUsers;
-  //   }
-  //   chat.reactionArray = this.transformReactionsToArray(chat.reactions, this.participants, this.currentUserId);
-
-  //   const chats = this.chatsSubject.getValue();
-  //   const newChats = [...chats];
-  //   newChats[chatIndex] = chat; 
-  //   this.chatsSubject.next(newChats);
-  // }
-
   async addReaction(chatIndex: number, reactionType: string) {
     const chats = this.chatsSubject.getValue();
     const chat = chats[chatIndex];
@@ -483,18 +283,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     return chats?.[chatIndex];
   }
 
-  // private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
-  //   let usersRaw = reactions[reactionType];
-  //   if (!usersRaw) return [];
-
-  //   if (!Array.isArray(usersRaw)) {
-  //     usersRaw = [usersRaw];
-  //   }
-
-  //   return usersRaw.flatMap((u: string) =>
-  //     u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
-  //   );
-  // }
 
   openAddComment(chat: Chat) {
     if (!this.channelId) return;
@@ -628,27 +416,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.activeSmiley = !this.activeSmiley;
   }
 
-  // onSmileySelected(smiley: string, el: HTMLTextAreaElement) {
-  //   const textarea = el; // oder this.messageInput.nativeElement
-  //   const start = textarea.selectionStart ?? 0;
-  //   const end = textarea.selectionEnd ?? 0;
-  //   const before = this.newMessage.slice(0, start);
-  //   const after = this.newMessage.slice(end);
-
-  //   this.newMessage = before + `:${smiley}:` + after;
-  //   const caret = start + smiley.length + 2;
-
-  //   setTimeout(() => {
-  //     textarea.selectionStart = textarea.selectionEnd = caret;
-  //     textarea.focus();
-  //   });
-
-  //   this.activeSmiley = false;
-  // }
-  // onSmileySelected(smiley: string, el: HTMLTextAreaElement) {
-  //   this.textService.onSmileySelected(smiley, el);
-  //   this.activeSmiley = false;
-  // }
   onSmileySelected(smiley: string, el: HTMLTextAreaElement) {
     this.textService.insertTextAtCursor(`:${smiley}:`, el, (newText) => {
       this.newMessage = newText;  // ✅ Component setzt selbst!
@@ -702,18 +469,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
   }
 
-  // insertAtCursor(character: string = '@', el: HTMLTextAreaElement) {
-  //   this.textService.insertTextAtCursor(character, el, () => this.newMessage,
-  //     pos => this.mentionCaretIndex = pos);
-  // }
-  // insertAtCursor(character: string = '@', messageInput: HTMLTextAreaElement) {
-  //   this.textService.insertAtCursor(character, messageInput);
-  // }
-  // insertAtCursor(character: string = '@', messageInput: HTMLTextAreaElement) {
-  //   this.textService.insertTextAtCursor(character, messageInput, (newText) => {
-  //     this.newMessage = newText;
-  //   });
-  // }
   insertAtCursor(character: string = '@', messageInput: HTMLTextAreaElement) {
     this.textService.insertTextAtCursor(character, messageInput, (newText) => {
       this.newMessage = newText;
@@ -721,32 +476,6 @@ export class ChatsComponent implements OnInit, OnChanges {
       this.mentionCaretIndex = caretPos; 
     });
   }
-
-  // private insertTextAtCursor(
-  //   text: string,
-  //   textarea: HTMLTextAreaElement,
-  //   // targetTextRef: string | ((param: any) => string),
-  //   getText: () => string,
-  //   setCaretCallback?: (pos: number) => void
-  // ) {
-  //   const start = textarea.selectionStart ?? 0;
-  //   const end = textarea.selectionEnd ?? 0;
-  //   // const currentText = typeof targetTextRef === 'function' ? targetTextRef(null) : targetTextRef;
-  //   const currentText = getText();   
-
-  //   const before = currentText.slice(0, start);
-  //   const after = currentText.slice(end);
-  //   const newText = before + text + after;
-
-  //   this.newMessage = newText; 
-
-  //   const caretPos = start + text.length;
-  //   setTimeout(() => {
-  //     textarea.selectionStart = textarea.selectionEnd = caretPos;
-  //     textarea.focus();
-  //     setCaretCallback?.(caretPos);
-  //   });
-  // }
 
   enableEditChat(chat: any) {
     this.editCommentDialogueExpanded = false;
@@ -794,27 +523,10 @@ export class ChatsComponent implements OnInit, OnChanges {
     }, 0);
   }
 
-  // autoGrow(el: HTMLTextAreaElement | null) {
-  //   if (!el) return;
-  //   el.style.height = 'auto';
-  //   el.style.height = `${el.scrollHeight}px`;
-  // }
   autoGrow(el: HTMLTextAreaElement | null) {
     if (el) this.textService.autoGrow(el);
   }
 
-  // renderMessage(text: string): SafeHtml {
-  //   if (!text) return '';
-
-  //   const replaced = text.replace(/:([a-zA-Z0-9_+-]+):/g, (match, name) => {
-  //     return `<img src="assets/reaction-icons/${name}.svg"
-  //                 alt="${name}"
-  //                 class="inline-smiley">`;
-  //   });
-
-  //   return this.sanitizer.bypassSecurityTrustHtml(replaced);
-  // }
-  // ✅ renderMessage DELEGATE
   renderMessage(text: string): SafeHtml {
     return this.textService.renderMessage(text);
   }
