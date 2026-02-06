@@ -6,12 +6,14 @@ import { ChannelService } from "./channel.service";
 import { UserService } from "./user.service";
 import { ChatsReactionService } from "./chats-reaction.service";
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChatsUiService } from "./chats-ui.service";
 
 @Injectable({ providedIn: 'root' })
 export class ChatsDataService {
   private channelService = inject(ChannelService);
   private userService = inject(UserService);
   private reactionService = inject(ChatsReactionService);
+  private uiService = inject(ChatsUiService);
   private destroyRef = inject(DestroyRef);
 
   currentUserId: string = '';
@@ -168,17 +170,9 @@ export class ChatsDataService {
     this.chatsSubject.next(chats);
     if (this.pendingScroll) {
       setTimeout(() => {
-        this.scrollToBottom();
+        this.uiService.scrollToBottom();
         this.pendingScroll = false;
       }, 0);
-    }
-  }
-
-  /** Scrolls the chat history container to the bottom. */
-  scrollToBottom() {
-    const chatHistory = document.getElementById('chat-history');
-    if (chatHistory) {
-        chatHistory.scrollTop = chatHistory.scrollHeight;
     }
   }
 }

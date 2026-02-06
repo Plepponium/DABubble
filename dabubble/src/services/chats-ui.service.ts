@@ -99,18 +99,18 @@ export class ChatsUiService {
   public pendingScroll$ = this.pendingScrollSubject.asObservable();
 
   // ✅ UI Actions (toggle, open, close)
-  openChannelDescription() {
-    this.showChannelDescriptionSubject.next(true);
-  }
+  // openChannelDescription() {
+  //   this.showChannelDescriptionSubject.next(true);
+  // }
 
-  closeChannelDescription() {
-    this.showChannelDescriptionSubject.next(false);
-  }
+  // closeChannelDescription() {
+  //   this.showChannelDescriptionSubject.next(false);
+  // }
 
-  toggleUserDialogue(open: boolean) {
-    this.showUserDialogueSubject.next(open);
-    if (!open) this.usersDisplayActiveSubject.next(false);
-  }
+  // toggleUserDialogue(open: boolean) {
+  //   this.showUserDialogueSubject.next(open);
+  //   if (!open) this.usersDisplayActiveSubject.next(false);
+  // }
 
   toggleAddDialogue(responsive = false) {
     this.showAddDialogueSubject.next(true);

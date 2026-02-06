@@ -24,6 +24,7 @@ import { ChatsReactionService } from '../../services/chats-reaction.service';
 import { LogoutService } from '../../services/logout.service';
 import { ChatsDataService } from '../../services/chats-data.service';
 import { ChatsTextService } from '../../services/chats-text.service';
+import { ChatsUiService } from '../../services/chats-ui.service';
 registerLocaleData(localeDe);
 
 @Component({
@@ -34,7 +35,14 @@ registerLocaleData(localeDe);
   styleUrl: './chats.component.scss',
 })
 export class ChatsComponent implements OnInit, OnChanges {
-  @ViewChildren('chatSection') chatSections!: QueryList<ElementRef<HTMLElement>>;
+  channelService = inject(ChannelService);
+  userService = inject(UserService);
+  logoutService = inject(LogoutService);
+ 
+  private dataService = inject(ChatsDataService);
+  private textService = inject(ChatsTextService);
+  private reactionService = inject(ChatsReactionService);
+  private uiService = inject(ChatsUiService);
 
   value = 'Clear me';
   showChannelDescription = false;
@@ -49,6 +57,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   insertedAtPending = false;
   isResponsive = false;
   pendingScroll = false;
+  activeSmiley = false;
 
   currentUserId: string = '';
   // channels: any[] = [];
@@ -66,16 +75,10 @@ export class ChatsComponent implements OnInit, OnChanges {
   participants$: Observable<User[]> = of([]);
   private chatsSubject = new BehaviorSubject<Chat[]>([]);
   public chats$ = this.chatsSubject.asObservable();
-
-  channelService = inject(ChannelService);
-  userService = inject(UserService);
-  logoutService = inject(LogoutService);
   // private destroy$ = this.logoutService.logout$;
-  private destroy$ = new Subject<void>();  // ← Eigenen Subject
-  // this.chatsDataService.destroy$ = this.destroy$;
-
-  activeSmiley = false;
-  allSmileys = reactionIcons;
+  private destroy$ = new Subject<void>(); 
+  showChannelDescription$ = this.uiService.showChannelDescription$;
+  showUserDialogue$ = this.uiService.showUserDialogue$;
 
   @Input() channelId?: string;
   @Input() profileOpen = false;
@@ -83,18 +86,16 @@ export class ChatsComponent implements OnInit, OnChanges {
   @Output() openProfile = new EventEmitter<User>();
   @Output() channelDeleted = new EventEmitter<void>();
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
-  
+  @ViewChildren('chatSection') chatSections!: QueryList<ElementRef<HTMLElement>>;
 
-  constructor(
-    private sanitizer: DomSanitizer,
-    private dataService: ChatsDataService,
-    private textService: ChatsTextService,
-    private reactionService: ChatsReactionService,
-  ) { }
+  // constructor(
+  //   // private sanitizer: DomSanitizer,
+  // ) { }
 
   @HostListener('window:resize')
   onResize() {
-    this.updateIsResponsive();
+    // this.updateIsResponsive();
+    this.uiService.setResponsive(window.innerWidth < 881);
   }
 
   private updateIsResponsive() {
@@ -131,7 +132,6 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.updateIsResponsive();
-    // this.dataService.destroy$ = this.destroy$;
     this.dataService.getCurrentUser();
     this.dataService.loadChannels();
 
@@ -144,6 +144,9 @@ export class ChatsComponent implements OnInit, OnChanges {
     } else {
       this.filteredChannels = this.dataService.filteredChannels;
     }
+    this.uiService.isResponsive$.pipe(takeUntil(this.destroy$)).subscribe(isResponsive => {
+      this.isResponsive = isResponsive;  // Falls noch lokal benötigt
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -151,7 +154,6 @@ export class ChatsComponent implements OnInit, OnChanges {
       const newChannelId = changes['channelId'].currentValue;
       if (newChannelId) {
         this.pendingScroll = true;
-        // this.dataService.destroy$ = this.destroy$;
         this.dataService.channelId = newChannelId;
         this.dataService.pendingScroll = true;
         this.dataService.currentUserId = this.currentUserId;

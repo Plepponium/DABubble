@@ -249,7 +249,7 @@
                         (input)="updateCaretPosition(); autoGrow(messageInput)"
                         (keyup)="updateCaretPosition()"></textarea>
 
-                    <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
+                    <app-smiley-overlay [active]="activeSmiley" [emojis]="reactionIcons"
                         (selected)="onSmileySelected($event, messageInput)" (activeChange)="activeSmiley = $event">
                     </app-smiley-overlay>
                     <app-mentions-overlay [text]="newMessage" [caretIndex]="mentionCaretIndex"
