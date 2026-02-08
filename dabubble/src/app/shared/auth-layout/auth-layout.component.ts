@@ -23,6 +23,10 @@ export class AuthLayoutComponent {
   private draftService = inject(SignupDraftService)
   private introTimeout: any;
 
+  /**
+  * Handles changes to showIntro input by updating scroll lock and starting timer.
+  * @param changes - SimpleChanges object containing changed inputs.
+  */
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['showIntro']) {
       this.updateIntroScrollLock();
@@ -30,38 +34,52 @@ export class AuthLayoutComponent {
     }
   }
 
-  private updateIntroScrollLock() {
+  /**
+  * Adds or removes 'intro-active' class from document and body based on showIntro state.
+  */
+  private updateIntroScrollLock(): void {
+    const elements = [document.documentElement, document.body];
     if (this.showIntro) {
-      document.documentElement.classList.add('intro-active');
-      document.body.classList.add('intro-active');
+      elements.forEach(el => el.classList.add('intro-active'));
     } else {
-      document.documentElement.classList.remove('intro-active');
-      document.body.classList.remove('intro-active');
+      elements.forEach(el => el.classList.remove('intro-active'));
     }
   }
 
+  /**
+  * Starts intro timer with mobile/desktop duration; clears existing timeout.
+  */
   private startIntroTimer(): void {
     if (this.showIntro && !this.introTimeout) {
-      const isMobile = window.innerWidth <= 500;
-      const duration = isMobile ? 3500 : 5000;
-      console.log(`Intro-Timer gestartet: ${duration}ms (${isMobile ? 'mobil' : 'desktop'})`);
-
       this.introTimeout = setTimeout(() => {
         this.showIntro = false;
         this.updateIntroScrollLock();
-      }, duration);
+      }, this.getIntroDuration());
     }
   }
 
+  /**
+  * Calculates intro duration based on screen width (3500ms mobile, 5000ms desktop).
+  * @returns Duration in milliseconds.
+  */
+  private getIntroDuration(): number {
+    const isMobile = window.innerWidth <= 500;
+    return isMobile ? 3500 : 5000;
+  }
+
+  /**
+  * Handles logo click by clearing signup draft if needed and navigating to home.
+  */
   onLogoClick(): void {
     this.clearDraftIfSignupRoute();
     this.router.navigate(['/']);
   }
 
+  /**
+  * Checks if current route is signup and clears draft service if true.
+  */
   private clearDraftIfSignupRoute(): void {
     const currentUrl = this.router.url;
-    console.log(currentUrl);
-
     if (currentUrl.startsWith('/signup')) {
       this.draftService.clear();
     }
