@@ -6,174 +6,174 @@
   border-radius: 30px;
 }
 
-.header {
-  position: relative;
-  z-index: 1;
-  box-shadow: 0 10px 10px -10px rgba($color: #000000, $alpha: 0.2);
-}
+// .header {
+//   position: relative;
+//   z-index: 1;
+//   box-shadow: 0 10px 10px -10px rgba($color: #000000, $alpha: 0.2);
+// }
 
-.header-inner-container {
-  width: 100%;
-  min-height: 96px;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: space-between;
-  padding: 25px 45px;
-}
+// .header-inner-container {
+//   width: 100%;
+//   min-height: 96px;
+//   box-sizing: border-box;
+//   display: flex;
+//   justify-content: space-between;
+//   padding: 25px 45px;
+// }
 
-.header-left,
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+// .header-left,
+// .header-right {
+//   display: flex;
+//   align-items: center;
+//   gap: 10px;
+// }
 
-.header-left {
-  width: fit-content;
-  box-sizing: border-box;
-  padding: 6px 10px;
-  border-radius: 100px;
-  cursor: pointer;
+// .header-left {
+//   width: fit-content;
+//   box-sizing: border-box;
+//   padding: 6px 10px;
+//   border-radius: 100px;
+//   cursor: pointer;
 
-  &:hover {
-    background-color: #eceefe;
-    color: #535af1;
-    .hover-icon {
-      display: none;
-    }
-    .hover-icon-purple {
-      display: block;
-    }
-  }
-}
+//   &:hover {
+//     background-color: #eceefe;
+//     color: #535af1;
+//     .hover-icon {
+//       display: none;
+//     }
+//     .hover-icon-purple {
+//       display: block;
+//     }
+//   }
+// }
 
-.channel-name-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+// .channel-name-container {
+//   display: flex;
+//   align-items: center;
+//   gap: 10px;
+// }
 
-.hover-icon-purple {
-  display: none;
-}
+// .hover-icon-purple {
+//   display: none;
+// }
 
-.header-right {
-  position: relative;
-}
+// .header-right {
+//   position: relative;
+// }
 
-.users-display {
-  height: 46px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-sizing: border-box;
-  padding: 3px 10px;
-  border-radius: 30px;
-  font-size: 20px;
-  font-weight: 600;
-  &:hover {
-    background-color: #eceefe;
-    color: #444df2;
-    font-weight: 700;
-  }
-}
+// .users-display {
+//   height: 46px;
+//   display: flex;
+//   align-items: center;
+//   gap: 10px;
+//   box-sizing: border-box;
+//   padding: 3px 10px;
+//   border-radius: 30px;
+//   font-size: 20px;
+//   font-weight: 600;
+//   &:hover {
+//     background-color: #eceefe;
+//     color: #444df2;
+//     font-weight: 700;
+//   }
+// }
 
-.users-display-active {
-  background-color: #eceefe;
-  color: #444df2;
-  font-weight: 700;
-}
+// .users-display-active {
+//   background-color: #eceefe;
+//   color: #444df2;
+//   font-weight: 700;
+// }
 
-.user-pics {
-  width: 100px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: row-reverse;
-  cursor: pointer;
+// .user-pics {
+//   width: 100px;
+//   height: 40px;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   flex-direction: row-reverse;
+//   cursor: pointer;
 
-  .img-box:first-child {
-    margin-right: 0;
-  }
-}
+//   .img-box:first-child {
+//     margin-right: 0;
+//   }
+// }
 
-.img-box {
-  width: 40px;
-  height: 40px;
-  border-radius: 30px;
-  margin-right: -12px;
-  box-sizing: border-box;
+// .img-box {
+//   width: 40px;
+//   height: 40px;
+//   border-radius: 30px;
+//   margin-right: -12px;
+//   box-sizing: border-box;
 
-  img {
-    width: 40px;
-    height: 40px;
-    border-radius: 30px;
-    border: 2px solid #ffffff;
-    box-sizing: border-box;
-  }
-}
+//   img {
+//     width: 40px;
+//     height: 40px;
+//     border-radius: 30px;
+//     border: 2px solid #ffffff;
+//     box-sizing: border-box;
+//   }
+// }
 
-.dialogue-backdrop-chats, .dialogue-backdrop-chats-add-user {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.3); 
-  display: flex;
-  justify-content: flex-end; 
-  align-items: flex-start;  
-}
+// .dialogue-backdrop-chats, .dialogue-backdrop-chats-add-user {
+//   position: fixed;
+//   inset: 0;
+//   background-color: rgba(0, 0, 0, 0.3); 
+//   display: flex;
+//   justify-content: flex-end; 
+//   align-items: flex-start;  
+// }
 
-.dialogue-backdrop-chats {
-  z-index: 4;
-}
+// .dialogue-backdrop-chats {
+//   z-index: 4;
+// }
 
-.dialogue-backdrop-chats-add-user {
-  z-index: 9;
-}
+// .dialogue-backdrop-chats-add-user {
+//   z-index: 9;
+// }
 
-.overlay-box {
-  position: absolute;
-  top: 80px;
-  right: 20px;
-  width: 540px;
+// .overlay-box {
+//   position: absolute;
+//   top: 80px;
+//   right: 20px;
+//   width: 540px;
 
-  &.overlay-channel-description {
-    top: 65px;
-    left: 45px;
-    right: unset;
-  }
-}
+//   &.overlay-channel-description {
+//     top: 65px;
+//     left: 45px;
+//     right: unset;
+//   }
+// }
 
-.dialogue-backdrop-profile {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.35);
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-start;
-  z-index: 7;
-}
+// .dialogue-backdrop-profile {
+//   position: fixed;
+//   inset: 0;
+//   background-color: rgba(0, 0, 0, 0.35);
+//   display: flex;
+//   justify-content: flex-end;
+//   align-items: flex-start;
+//   z-index: 7;
+// }
 
-.add-user-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 20px;
-  border: none;
-  background-color: #eceefe;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  &:hover {
-    background-color: var(--btn-bg-hover, #eceefe);
-    .hover-icon {
-      display: none;
-    }
-    .hover-icon-purple {
-      display: block;
-    }
-  }
-}
+// .add-user-btn {
+//   width: 40px;
+//   height: 40px;
+//   border-radius: 20px;
+//   border: none;
+//   background-color: #eceefe;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   cursor: pointer;
+//   &:hover {
+//     background-color: var(--btn-bg-hover, #eceefe);
+//     .hover-icon {
+//       display: none;
+//     }
+//     .hover-icon-purple {
+//       display: block;
+//     }
+//   }
+// }
 
 .chat-content {
   height: calc(100% - 130px);

@@ -1,0 +1,60 @@
+<div class="header">
+        <div class="header-inner-container">
+            <div class="header-left" (click)="openDialogChannelDescription()">
+                <div class="channel-name-container">
+                    <img class="hover-icon" src="assets/icons/tag.svg" alt="">
+                    <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
+                    <div id="channel-name" class="font-24 font-w-700">{{ channelName$ | async }}</div>
+                </div>
+                <img class="hover-icon" src="assets/icons/expand_more.svg" alt="">
+                <img class="hover-icon-purple" src="assets/icons/expand_more-purple.svg" alt="">
+            </div>
+
+            <div class="header-right">
+                <div (click)="openDialogueShowUser()" class="users-display hide-responsive"
+                    [ngClass]="{'users-display-active': usersDisplayActive}">
+                    <div class="user-pics">
+                        <div class="img-box" *ngFor="let user of participants$ | async | slice:0:3">
+                            <img [src]="'assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
+                        </div>
+                    </div>
+                    <div *ngIf="participants$ | async as participants">
+                        <div class="user-counter">{{ participants.length }}</div>
+                    </div>
+                </div>
+
+                <button (click)="chooseOpenDialogue()" class="add-user-btn">
+                    <img class="btn-img hover-icon" src="assets/icons/person_add.svg" alt="Senden">
+                    <img class="btn-img hover-icon-purple" src="assets/icons/person_add-purple.svg" alt="Senden">
+                </button>
+            </div>
+        </div>
+
+        <div (click)="closeDialogueShowUser(); closeDialogueAddUser(); closeDialogChannelDescription()"
+            *ngIf="(showUserDialogue || showAddDialogue || showChannelDescription) && !showAddDialogueResponsive && !profileOpen"
+            class="dialogue-backdrop-chats">
+        </div>
+        <div (click)="closeDialogueShowUser(); closeDialogueAddUser()" *ngIf="showAddDialogueResponsive"
+            class="dialogue-backdrop-chats-add-user">
+        </div>
+
+        <div class="overlay-box" [ngClass]="{'overlay-channel-description': showChannelDescription}">
+            <app-dialogue-overlay *ngIf="showUserDialogue" [participants]="(participants$ | async) ?? []"
+                [currentUserId]="currentUserId" (close)="closeDialogueShowUser()"
+                (openProfile)="openDialogueShowProfile($event)" (openAddUser)="openDialogueAddUser()"
+                class="dialogue-overlay-show-user">
+            </app-dialogue-overlay>
+
+            <app-chat-add-user-overlay *ngIf="showAddDialogue" (close)="closeDialogueAddUser()"
+                class="dialogue-overlay-add-user" [channelName]="(channelName$ | async)" [channelId]="channelId"
+                [currentUserId]="currentUserId" [participants]="participants"
+                [isResponsive]="showAddDialogueResponsive">
+            </app-chat-add-user-overlay>
+
+            <app-channel-description-overlay *ngIf="showChannelDescription" (close)="closeDialogChannelDescription()"
+                [participants]="(participants$ | async) ?? []" [channelId]="channelId" [currentUserId]="currentUserId"
+                (openProfile)="openDialogueShowProfile($event)"
+                (openAddUserResponsive)="openDialogueAddUserResponsive()" (channelDeleted)="handleChannelDeleted()">
+            </app-channel-description-overlay>
+        </div>
+    </div>

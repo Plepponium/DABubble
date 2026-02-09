@@ -1,5 +1,5 @@
 <div class="chats">
-    <div class="header">
+    <!-- <div class="header">
         <div class="header-inner-container">
             <div class="header-left" (click)="openDialogChannelDescription()">
                 <div class="channel-name-container">
@@ -58,7 +58,17 @@
                 (openAddUserResponsive)="openDialogueAddUserResponsive()" (channelDeleted)="handleChannelDeleted()">
             </app-channel-description-overlay>
         </div>
-    </div>
+    </div> -->
+    <app-channel-header 
+        [channelId]="channelId" 
+        [channelName$]="channelName$"
+        [profileOpen]="profileOpen" 
+        [currentUserId]="currentUserId"
+        [participants]="participants" 
+        [participants$]="participants$"
+        (openProfile)="openDialogueShowProfile($event)"
+        (channelDeleted)="handleChannelDeleted()" >
+    </app-channel-header>
 
     <div *ngIf="(chats$ | async) as chatList" class="chat-content">
         <div id="chat-history" class="chat-history">
@@ -68,7 +78,7 @@
 
                 <div *ngIf="i === 0 || !isSameDate(getChatDate(chat), getChatDate(chatList[i-1]))"
                     class="chat-date-section">
-                    <div class="chat-date">{{ getDisplayDate(getChatDate(chat)) }}</div>
+                    <div class="chat-date">{{ getDisplayDate(chat) }}</div>
                 </div>
 
                 <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}"
@@ -91,7 +101,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <button (click)="openReactionsDialogue(i)" class="add-reaction-btn">
+                            <button (click)="openReactionsDialogue(i, false)" class="add-reaction-btn">
                                 <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
                                 <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg"
                                     alt="">
@@ -206,7 +216,7 @@
                                                 </button>
                                             </div>
                                         </div>
-                                        <app-round-btn (click)="openReactionsDialogueBelow(i)"
+                                        <app-round-btn (click)="openReactionsDialogue(i, true)"
                                             iconSrc="assets/message-icons/add_reaction.svg"
                                             iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
                                             altText="Reaktion hinzufügen">

@@ -25,12 +25,13 @@ import { LogoutService } from '../../services/logout.service';
 import { ChatsDataService } from '../../services/chats-data.service';
 import { ChatsTextService } from '../../services/chats-text.service';
 import { ChatsUiService } from '../../services/chats-ui.service';
+import { ChannelHeaderComponent } from "../channel-header/channel-header.component";
 registerLocaleData(localeDe);
 
 @Component({
   selector: 'app-chats',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MentionsOverlayComponent, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, DialogueOverlayComponent, ChatAddUserOverlayComponent, ChannelDescriptionOverlayComponent, SmileyOverlayComponent],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MentionsOverlayComponent, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, SmileyOverlayComponent, ChannelHeaderComponent],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.scss',
 })
@@ -39,10 +40,10 @@ export class ChatsComponent implements OnInit, OnChanges {
   userService = inject(UserService);
   logoutService = inject(LogoutService);
  
-  private dataService = inject(ChatsDataService);
-  private textService = inject(ChatsTextService);
-  private reactionService = inject(ChatsReactionService);
-  private uiService = inject(ChatsUiService);
+  dataService = inject(ChatsDataService);
+  textService = inject(ChatsTextService);
+  reactionService = inject(ChatsReactionService);
+  uiService = inject(ChatsUiService);
 
   value = 'Clear me';
   showChannelDescription = false;
@@ -88,10 +89,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
   @ViewChildren('chatSection') chatSections!: QueryList<ElementRef<HTMLElement>>;
 
-  // constructor(
-  //   // private sanitizer: DomSanitizer,
-  // ) { }
-
   @HostListener('window:resize')
   onResize() {
     // this.updateIsResponsive();
@@ -119,14 +116,14 @@ export class ChatsComponent implements OnInit, OnChanges {
       : chat.reactionArray.slice(0, max);
   }
 
-  scrollToBottom() {
-    const chatHistory = document.getElementById('chat-history');
-    if (chatHistory) {
-      chatHistory.scrollTop = chatHistory.scrollHeight;
-    }
-  }
+  // scrollToBottom() {
+  //   const chatHistory = document.getElementById('chat-history');
+  //   if (chatHistory) {
+  //     chatHistory.scrollTop = chatHistory.scrollHeight;
+  //   }
+  // }
 
-  trackByChatId(index: number, chat: any): string {
+  trackByChatId(chat: any): string {
     return chat.id;
   }
 
@@ -169,6 +166,11 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   getChatDate(chat: any): Date | undefined {
     return chat.time ? new Date(chat.time * 1000) : undefined;
   }
@@ -179,57 +181,52 @@ export class ChatsComponent implements OnInit, OnChanges {
       d1.getMonth() === d2.getMonth() &&
       d1.getDate() === d2.getDate();
   }
-
-  getDisplayDate(date: Date | undefined): string {
-    if (!date) return '';
-    const referenceDates = this.getReferenceDates();
-
-    if (this.isToday(date, referenceDates.today)) return 'Heute';
-    if (this.isYesterday(date, referenceDates.yesterday)) return 'Gestern';
-
-    return this.formatFullDate(date);
+  
+  getDisplayDate(chat: any): string {
+    return this.uiService.getDisplayDate(chat.time);
   }
 
-  private getReferenceDates() {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
-    return { today, yesterday };
-  }
 
-  private isToday(date: Date, today: Date): boolean {
-    return this.isSameDate(date, today);
-  }
 
-  private isYesterday(date: Date, yesterday: Date): boolean {
-    return this.isSameDate(date, yesterday);
-  }
+  // openReactionsDialogue(chatIndex: number, below: boolean) {
+  //   if (this.activeReactionDialogueIndex === chatIndex) {
+  //     this.activeReactionDialogueIndex = null;
+  //   } else {
+  //     this.editCommentDialogueExpanded = false;
+  //     this.activeReactionDialogueIndex = chatIndex;
+  //     this.activeReactionDialogueBelowIndex = null;
+  //   }
+  // }
+  // openReactionsDialogue(chatIndex: number, below: boolean) {
+  //   this.uiService.setReactionDialogue(chatIndex, below);
+  // }
 
-  private formatFullDate(date: Date): string {
-    return new Intl.DateTimeFormat('de-DE', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long'
-    }).format(date);
-  }
+  // openReactionsDialogueBelow(chatIndex: number) {
+  //   if (this.activeReactionDialogueBelowIndex === chatIndex) {
+  //     this.activeReactionDialogueBelowIndex = null;
+  //   } else {
+  //     this.editCommentDialogueExpanded = false;
+  //     this.activeReactionDialogueBelowIndex = chatIndex;
+  //     this.activeReactionDialogueIndex = null;
+  //   }
+  // }
+  openReactionsDialogue(index: number, below: boolean) {
+    const currentIndex = below
+      ? this.activeReactionDialogueBelowIndex
+      : this.activeReactionDialogueIndex;
 
-  openReactionsDialogue(chatIndex: number) {
-    if (this.activeReactionDialogueIndex === chatIndex) {
-      this.activeReactionDialogueIndex = null;
+    const newIndex = currentIndex === index ? null : index;
+
+    if (below) {
+      this.activeReactionDialogueBelowIndex = newIndex;
+      if (newIndex !== null) {
+        this.activeReactionDialogueIndex = null;
+      }
     } else {
-      this.editCommentDialogueExpanded = false;
-      this.activeReactionDialogueIndex = chatIndex;
-      this.activeReactionDialogueBelowIndex = null;
-    }
-  }
-
-  openReactionsDialogueBelow(chatIndex: number) {
-    if (this.activeReactionDialogueBelowIndex === chatIndex) {
-      this.activeReactionDialogueBelowIndex = null;
-    } else {
-      this.editCommentDialogueExpanded = false;
-      this.activeReactionDialogueBelowIndex = chatIndex;
-      this.activeReactionDialogueIndex = null;
+      this.activeReactionDialogueIndex = newIndex;
+      if (newIndex !== null) {
+        this.activeReactionDialogueBelowIndex = null;
+      }
     }
   }
 
@@ -300,50 +297,50 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.editCommentDialogueExpanded = !this.editCommentDialogueExpanded;
   }
 
-  openDialogChannelDescription() {
-    this.showChannelDescription = true;
-  };
+  // openDialogChannelDescription() {
+  //   this.showChannelDescription = true;
+  // };
 
   closeDialogChannelDescription() {
     this.showChannelDescription = false;
   }
 
-  openDialogueShowUser() {
-    this.showUserDialogue = true;
-    this.usersDisplayActive = true;
-  }
+  // openDialogueShowUser() {
+  //   this.showUserDialogue = true;
+  //   this.usersDisplayActive = true;
+  // }
 
-  closeDialogueShowUser() {
-    this.showUserDialogue = false;
-    if (this.showAddDialogue = false) {
-      this.usersDisplayActive = false;
-    }
-  }
+  // closeDialogueShowUser() {
+  //   this.showUserDialogue = false;
+  //   if (this.showAddDialogue = false) {
+  //     this.usersDisplayActive = false;
+  //   }
+  // }
 
-  chooseOpenDialogue() {
-    if (window.innerWidth <= 1010) {
-      this.openDialogueShowUser();
-    } else {
-      this.openDialogueAddUser();
-    }
-  }
+  // chooseOpenDialogue() {
+  //   if (window.innerWidth <= 1010) {
+  //     this.openDialogueShowUser();
+  //   } else {
+  //     this.openDialogueAddUser();
+  //   }
+  // }
 
-  openDialogueAddUser() {
-    this.showAddDialogue = true;
-    this.showAddDialogueResponsive = false;
-    this.showUserDialogue = false;
-  }
+  // openDialogueAddUser() {
+  //   this.showAddDialogue = true;
+  //   this.showAddDialogueResponsive = false;
+  //   this.showUserDialogue = false;
+  // }
 
-  openDialogueAddUserResponsive() {
-    this.showAddDialogue = true;
-    this.showAddDialogueResponsive = true;
-  }
+  // openDialogueAddUserResponsive() {
+  //   this.showAddDialogue = true;
+  //   this.showAddDialogueResponsive = true;
+  // }
 
-  closeDialogueAddUser() {
-    this.showAddDialogue = false;
-    this.showAddDialogueResponsive = false;
-    this.usersDisplayActive = false;
-  }
+  // closeDialogueAddUser() {
+  //   this.showAddDialogue = false;
+  //   this.showAddDialogueResponsive = false;
+  //   this.usersDisplayActive = false;
+  // }
 
   openDialogueShowProfile(user: User) {
     this.profileOpen = true;
@@ -367,7 +364,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.channelService.addChatToChannel(this.channelId!, messagePayload)
       .then(() => {
         this.newMessage = '';
-        setTimeout(() => this.scrollToBottom());
+        setTimeout(() => this.uiService.scrollToBottom());
       })
       .catch(err => {
         console.error('Fehler beim Senden:', err);
