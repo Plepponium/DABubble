@@ -20,8 +20,6 @@ export class ProfileOverlayComponent {
    */
   onMessageClick() {
     this.openDmChat.emit(this.user);
-    console.log(this.user);
-
   }
 
   /**

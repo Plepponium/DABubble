@@ -34,170 +34,196 @@ export class MainPageComponent {
   @ViewChild('chats') chatsComponent!: ChatsComponent;
   @ViewChild('dmChats') dmChatsComponent!: DirectMessageChatsComponent;
 
+  // State flags
   menuOpen = true;
-  menuBtnClose = true;
   threadOpen = false;
   channelOpen = false;
   userChatOpen = false;
   newMessageOpen = true;
+  contentOpen = false;
+  dataReady = false;
+  menuBtnClose = true;
 
+  // Overlay states
   showLogoutOverlay = false;
   isClosingLogoutOverlay = false;
   showUserProfile = false;
   showEditUser = false;
   showProfileOverlay = false;
-  // showProfileBackdrop = false;
-
   showAddChannelDialogue = false;
   showMemberOverlay = false;
-  createdChannel: any = null;
-
   inputMissing = false;
-  missingInfo: { recipientMissing: boolean; textMissing: boolean; } | null = null;
-  isSmallScreen = false;
-  isResponsiveScreen = false;
-  contentOpen = false;
-  dataReady = false;
 
+  // Data
   allUsers: any[] = [];
   allChannels: any[] = [];
+  createdChannel: any = null;
+  missingInfo: { recipientMissing: boolean; textMissing: boolean; } | null = null;
+  selectedProfile: any = null;
 
+  // IDs
   currentUser?: User;
   currentChannelId?: string;
   activeUserId?: string;
   threadChatId?: string;
 
-  selectedProfile: any = null;
+  // Screen sizes
+  isSmallScreen = false;
+  isResponsiveScreen = false;
 
+  // Services
   private userService = inject(UserService);
   private channelService = inject(ChannelService);
   private router = inject(Router);
   private logoutService = inject(LogoutService);
   private destroy$ = this.logoutService.logout$;
 
+  /** Checks if profile backdrop should show. */
   get showProfileBackdrop(): boolean {
     return this.showUserProfile || this.showProfileOverlay;
   }
 
+  /** Checks if new message overlay is open. */
+  get isNmOpen(): boolean {
+    return this.newMessageOpen;
+  }
+
+  /** Checks if DM chat is open. */
+  get isDmOpen(): boolean {
+    return this.userChatOpen && !!this.activeUserId;
+  }
+
+  /** Handles window resize events. */
   @HostListener('window:resize', [])
   onResize() {
     this.isSmallScreen = window.innerWidth < 1512;
     this.isResponsiveScreen = window.innerWidth <= 880;
   }
 
+  /** Initializes component on init. */
   ngOnInit() {
     this.onResize();
-    this.userService.getCurrentUser().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(user => {
+    this.initUserData();
+  }
+
+  /** Initializes user data subscriptions. */
+  private initUserData(): void {
+    this.userService.getCurrentUser().pipe(takeUntil(this.destroy$)).subscribe(user => {
       if (!user) {
         this.router.navigate(['/']);
         return;
       }
       this.currentUser = user;
-      this.userService.getUsers().pipe(
-        takeUntil(this.destroy$)
-      ).subscribe(u => this.allUsers = u);
-      this.channelService.getChannels().pipe(
-        takeUntil(this.destroy$)
-      ).subscribe(c => this.allChannels = c);
+      this.subscribeToUsers();
+      this.subscribeToChannels();
       this.dataReady = true;
     });
   }
 
+  /** Subscribes to users list. */
+  private subscribeToUsers(): void {
+    this.userService.getUsers().pipe(takeUntil(this.destroy$)).subscribe(u => {
+      this.allUsers = u;
+    });
+  }
+
+  /** Subscribes to channels list. */
+  private subscribeToChannels(): void {
+    this.channelService.getChannels().pipe(takeUntil(this.destroy$)).subscribe(c => {
+      this.allChannels = c;
+    });
+  }
+
+  /** Triggers logout on destroy. */
   ngOnDestroy(): void {
     this.logoutService.triggerLogout();
   }
 
-  get isNmOpen(): boolean {
-    return this.newMessageOpen;
-  }
 
-  get isDmOpen(): boolean {
-    return this.userChatOpen && !!this.activeUserId;
-  }
-
+  /** Toggles menu open state. */
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }
 
+  /** Opens menu. */
   openMenu() {
     this.menuOpen = true;
   }
 
+  /** Opens new message overlay. */
   openNewMessage() {
+    this.resetChatStates();
     this.newMessageOpen = true;
-    this.channelOpen = false;
-    this.threadOpen = false;
-    this.currentChannelId = undefined;
-    this.userChatOpen = false;
-    this.activeUserId = undefined;
     this.contentOpen = true;
+    this.closeMenuIfResponsive();
+  }
 
+  /** Resets all chat states. */
+  private resetChatStates(): void {
+    this.channelOpen = false;
+    this.userChatOpen = false;
+    this.threadOpen = false;
+    this.newMessageOpen = false;
+    this.currentChannelId = undefined;
+    this.activeUserId = undefined;
+  }
+
+  /** Closes menu on responsive screens. */
+  private closeMenuIfResponsive(): void {
     if (this.isResponsiveScreen) {
       this.menuOpen = false;
     }
   }
 
-  openAddChannel() {
-    this.showAddChannelDialogue = true;
-  }
+  /** Opens add channel dialogue. */
+  openAddChannel() { this.showAddChannelDialogue = true; }
 
-  chooseToCloseAddChannel() {
-    console.log('chooseToCloseAddChannel');
+  /** Decides whether to close add channel based on screen size. */
+  chooseToCloseAddChannel(): void {
     if (window.innerWidth > 880) {
-      console.log('> 880 true');
       this.closeAddChannel();
     }
   }
 
-  closeAddChannel() {
-    this.showAddChannelDialogue = false;
-  }
+  /** Closes add channel dialogue. */
+  closeAddChannel() { this.showAddChannelDialogue = false; }
 
+  /** Opens member overlay for channel draft. */
   openChannelMemberOverlay(draft: any) {
     this.createdChannel = draft;
-    // NICHT: this.closeAllOverlays();
     this.showMemberOverlay = true;
   }
 
+  /** Closes member overlay. */
   closeMemberOverlay() {
     this.showMemberOverlay = false;
     this.createdChannel = null;
     this.closeAllOverlays();
   }
 
+  /** Opens specific channel. */
   openChannel(channelId: string) {
+    this.resetChatStates();
     this.currentChannelId = channelId;
-    this.userChatOpen = false;
-    this.activeUserId = undefined;
-    this.threadOpen = false;
     this.channelOpen = true;
-    this.newMessageOpen = false;
-
-    if (this.isResponsiveScreen) {
-      this.menuOpen = false;
-    }
+    this.closeMenuIfResponsive();
   }
 
+  /** Opens created channel and closes overlay. */
   openCreatedChannel(channel: any) {
     this.openChannel(channel.id);
     this.closeMemberOverlay();
   }
 
+  /** Opens user chat. */
   openUserChat(user: User) {
+    this.resetChatStates();
     this.activeUserId = user.uid;
     this.userChatOpen = true;
-    this.currentChannelId = undefined;
-    this.channelOpen = false;
-    this.threadOpen = false;
-    this.newMessageOpen = false;
-
-    if (this.isResponsiveScreen) {
-      this.menuOpen = false;
-    }
+    this.closeMenuIfResponsive();
   }
 
+  /** Opens chat from searchbar item. */
   openChatFromSearchbar(item: any) {
     if (!item) return;
     if (item.type === 'channel-message') return this.handleChannelMessage(item);
@@ -207,11 +233,13 @@ export class MainPageComponent {
     console.warn('Unknown item type, cannot open:', item);
   }
 
+  /** Handles channel message navigation. */
   private handleChannelMessage(item: any) {
     this.openChannel(item.channelId);
     setTimeout(() => this.chatsComponent?.scrollToMessage(item.id), 200);
   }
 
+  /** Handles DM message navigation. */
   private handleDmMessage(item: any) {
     const otherUid = item.participants.find((p: string) => p !== this.currentUser?.uid) || item.participants[0];
     const user = this.allUsers.find(u => u.uid === otherUid);
@@ -221,32 +249,37 @@ export class MainPageComponent {
     }
   }
 
+  /** Handles user mention navigation. */
   private handleUserMention(item: any) {
     this.openUserChat(item);
   }
 
+  /** Handles channel mention navigation. */
   private handleChannelMention(item: any) {
     this.openChannel(item.id);
   }
 
+  /** Checks if item is user mention. */
   private isUserMention(item: any): boolean {
     return !!item.uid;
   }
 
+  /** Checks if item is channel mention. */
   private isChannelMention(item: any): boolean {
     return !!(item.id && item.participants && item.name);
   }
 
+  /** Opens thread chat. */
   openThread(event: { channelId: string; chatId: string }) {
     this.threadOpen = true;
     this.threadChatId = event.chatId;
     this.currentChannelId = event.channelId;
-
     if (this.isSmallScreen) {
       this.channelOpen = false;
     }
   }
 
+  /** Handles thread close event. */
   onThreadClosed() {
     this.threadOpen = false;
 
@@ -255,22 +288,24 @@ export class MainPageComponent {
     }
   }
 
+  /** Opens logout overlay. */
   openLogoutOverlay() {
-    // this.closeAllOverlays();
     this.showLogoutOverlay = true;
   }
 
+  /** Opens user profile. */
   openUserProfile() {
     this.showUserProfile = true;
   }
 
+  /** Opens DM chat from overlay. */
   openDmChatFromOverlay(user: User) {
     this.closeAllOverlays();
     this.openUserChat(user);
   }
 
+  /** Opens profile overlay for user. */
   openProfileOverlay(user: User) {
-    // this.closeAllOverlays();
     if (this.currentUser?.uid === user.uid) {
       this.showUserProfile = true;
       return;
@@ -279,29 +314,35 @@ export class MainPageComponent {
     this.showProfileOverlay = true;
   }
 
+  /** Opens edit user overlay. */
   openEditUser() {
     this.closeAllOverlays();
     this.showEditUser = true;
   }
 
+  /** Opens input missing overlay. */
   openInputMissingOverlay(info: { recipientMissing: boolean; textMissing: boolean }) {
     this.missingInfo = info;
     this.inputMissing = true;
   }
 
+  /** Closes input missing overlay. */
   closeInputMissingOverlay() {
     this.inputMissing = false;
     this.missingInfo = null;
   }
 
+  /** Closes user profile overlay. */
   closeUserOverlay() {
     this.showUserProfile = false;
   }
 
+  /** Closes profile overlay. */
   closeProfileOverlay() {
     this.showProfileOverlay = false;
   }
 
+  /** Closes all overlays. */
   closeAllOverlays() {
     this.isClosingLogoutOverlay = true;
     this.showUserProfile = false;
@@ -312,6 +353,7 @@ export class MainPageComponent {
     this.logoutOverlayAnimationPlayed();
   }
 
+  /** Handles logout overlay animation end. */
   logoutOverlayAnimationPlayed() {
     if (this.isResponsiveScreen) {
       setTimeout(() => {
@@ -323,20 +365,24 @@ export class MainPageComponent {
     }
   }
 
+  /** Checks if any overlay is open. */
   anyOverlayOpen() {
     return this.showUserProfile || this.showEditUser || this.showProfileOverlay || this.showLogoutOverlay || this.showAddChannelDialogue || this.showMemberOverlay;
   }
 
+  /** Handles channel deletion. */
   onChannelDeleted() {
     this.channelOpen = false;
     this.newMessageOpen = true;
     this.currentChannelId = undefined;
   }
 
+  /** Handles answer added event. */
   onAnswerAdded(event: { chatId: string; answerTime: number }) {
     this.chatsComponent.handleAnswerAdded(event);
   }
 
+  /** Calls logout on user service and navigates to login page on success. */
   logout() {
     this.userService.logout().then(() => {
       this.router.navigate(['/']);
