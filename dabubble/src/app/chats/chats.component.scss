@@ -6,6 +6,10 @@
   border-radius: 30px;
 }
 
+.hover-icon-purple {
+  display: none;
+}
+
 .chat-content {
   height: calc(100% - 130px);
   display: flex;
@@ -595,28 +599,8 @@
     border-radius: unset;
   }
 
-  .header-inner-container {
-    width: 100vw;
-    min-height: 60px;
-    padding: 10px 16px;
-  }
-
-  .header-left {
-    padding: 2px;
-  }
-
   .hover-icon, .hover-icon-purple {
     width: 27px;
-  }
-
-  .add-user-btn {
-    width: 34px;
-    height: 34px;
-
-    img {
-      width: 18px;
-      height: 18px;
-    }
   }
 
   .chat-section {

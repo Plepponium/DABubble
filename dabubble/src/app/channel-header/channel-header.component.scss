@@ -166,3 +166,58 @@
     }
   }
 }
+
+@media(max-width: 1010px) {
+  .hide-responsive {
+    display: none;
+  }
+
+  .show-responsive {
+    display: block;
+    display: flex;
+  }
+}
+
+@media (max-width: 880px) {
+
+  .header-inner-container {
+    width: 100vw;
+    min-height: 60px;
+    padding: 10px 16px;
+  }
+
+  .header-left {
+    padding: 2px;
+  }
+
+  .hover-icon, .hover-icon-purple {
+    width: 27px;
+  }
+
+  .add-user-btn {
+    width: 34px;
+    height: 34px;
+
+    img {
+      width: 18px;
+      height: 18px;
+    }
+  }  
+
+  .icon-bar {
+    gap: 5px;
+  }
+
+  .overlay-box {
+    &.overlay-channel-description {
+      top: 0;
+      left: 0;
+    }
+  }
+}
+
+@media(max-width: 380px) {
+  .hide-small {
+    display: none;
+  }
+}
