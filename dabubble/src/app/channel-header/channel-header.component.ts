@@ -27,7 +27,7 @@ export class ChannelHeaderComponent {
 
   @Input() currentUserId!: string; 
   @Input() participants!: User[];   
-  @Input() channelName$!: Observable<string>;  // ✅ Von Parent
+  @Input() channelName$!: Observable<string>; 
   @Input() participants$!: Observable<User[]>;
   @Input() channelId?: string;
   @Input() profileOpen = false;
@@ -79,9 +79,12 @@ export class ChannelHeaderComponent {
     this.usersDisplayActive = false;
   }
 
+  // openDialogueShowProfile(user: User) {
+  //   this.profileOpen = true;
+  //   this.openProfile.emit(user);
+  // }
   openDialogueShowProfile(user: User) {
-    this.profileOpen = true;
-    this.openProfile.emit(user);
+    this.openProfile.emit(user); // ✅ Parent managed profileOpen
   }
 
   handleChannelDeleted() {

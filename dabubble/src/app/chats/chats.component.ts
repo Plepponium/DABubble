@@ -47,10 +47,7 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   value = 'Clear me';
   showChannelDescription = false;
-  showUserDialogue = false;
-  showAddDialogue = false;
-  showAddDialogueResponsive = false;
-  usersDisplayActive = false;
+  
   editCommentDialogueExpanded = false;
   activeReactionDialogueIndex: number | null = null;
   activeReactionDialogueBelowIndex: number | null = null;
@@ -297,50 +294,12 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.editCommentDialogueExpanded = !this.editCommentDialogueExpanded;
   }
 
-  // openDialogChannelDescription() {
-  //   this.showChannelDescription = true;
-  // };
+
 
   closeDialogChannelDescription() {
     this.showChannelDescription = false;
   }
 
-  // openDialogueShowUser() {
-  //   this.showUserDialogue = true;
-  //   this.usersDisplayActive = true;
-  // }
-
-  // closeDialogueShowUser() {
-  //   this.showUserDialogue = false;
-  //   if (this.showAddDialogue = false) {
-  //     this.usersDisplayActive = false;
-  //   }
-  // }
-
-  // chooseOpenDialogue() {
-  //   if (window.innerWidth <= 1010) {
-  //     this.openDialogueShowUser();
-  //   } else {
-  //     this.openDialogueAddUser();
-  //   }
-  // }
-
-  // openDialogueAddUser() {
-  //   this.showAddDialogue = true;
-  //   this.showAddDialogueResponsive = false;
-  //   this.showUserDialogue = false;
-  // }
-
-  // openDialogueAddUserResponsive() {
-  //   this.showAddDialogue = true;
-  //   this.showAddDialogueResponsive = true;
-  // }
-
-  // closeDialogueAddUser() {
-  //   this.showAddDialogue = false;
-  //   this.showAddDialogueResponsive = false;
-  //   this.usersDisplayActive = false;
-  // }
 
   openDialogueShowProfile(user: User) {
     this.profileOpen = true;
