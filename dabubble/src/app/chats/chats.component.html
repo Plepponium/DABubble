@@ -190,7 +190,7 @@
             </div>
         </div>
 
-        <form class="form" (ngSubmit)="submitChatMessage()" #chatForm="ngForm">
+        <!-- <form class="form" (ngSubmit)="submitChatMessage()" #chatForm="ngForm">
             <div class="form-field" (click)="focusInput($event)">
                 <ng-container *ngIf="channelName$ | async as channelName">
                     <textarea #messageInput id="chat-message" class="input" name="message" [(ngModel)]="newMessage"
@@ -228,7 +228,20 @@
                 </ng-container>
 
             </div>
-        </form>
+        </form> -->
+
+        <ng-container *ngIf="channelName$ | async as channelName">
+            <app-chat-input
+                [placeholder]="'Nachricht an #' + channelName"
+                [(text)]="newMessage"
+                [emojis]="reactionIcons"
+                [users]="(participants$ | async) || []"
+                [channels]="filteredChannels"
+                [currentUserId]="currentUserId"
+                [context]="'Channel'"
+                (submit)="submitChatMessage()">
+            </app-chat-input>
+        </ng-container>
 
     </div>
 </div>

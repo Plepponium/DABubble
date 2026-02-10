@@ -26,12 +26,13 @@ import { ChatsDataService } from '../../services/chats-data.service';
 import { ChatsTextService } from '../../services/chats-text.service';
 import { ChatsUiService } from '../../services/chats-ui.service';
 import { ChannelHeaderComponent } from "../channel-header/channel-header.component";
+import { ChatInputComponent } from "../chat-input/chat-input.component";
 registerLocaleData(localeDe);
 
 @Component({
   selector: 'app-chats',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MentionsOverlayComponent, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, SmileyOverlayComponent, ChannelHeaderComponent],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MentionsOverlayComponent, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, ChannelHeaderComponent, ChatInputComponent],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.scss',
 })
@@ -306,14 +307,14 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.openProfile.emit(user);
   }
 
-  onEnterPress(e: KeyboardEvent) {
-    if (this.overlayActive) {
-      e.preventDefault();
-      return;
-    }
-    this.submitChatMessage();
-    e.preventDefault();
-  }
+  // onEnterPress(e: KeyboardEvent) {
+  //   if (this.overlayActive) {
+  //     e.preventDefault();
+  //     return;
+  //   }
+  //   this.submitChatMessage();
+  //   e.preventDefault();
+  // }
 
   submitChatMessage() {
     if (!this.canSendMessage()) return;
