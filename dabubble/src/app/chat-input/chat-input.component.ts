@@ -45,6 +45,10 @@ export class ChatInputComponent {
     e.preventDefault();
   }
 
+  openSmileyOverlay() {
+    this.activeSmiley = !this.activeSmiley;
+  }
+
   // onSmileySelected(smiley: string, textarea: HTMLTextAreaElement) {
   //   this.insertAtCursor(`:${smiley}:`, textarea);
   //   this.activeSmiley = false;
@@ -111,10 +115,6 @@ export class ChatInputComponent {
       textarea.focus();
       textarea.selectionStart = textarea.selectionEnd = newPos;
     });
-  }
-
-  openSmileyOverlay() {
-    this.activeSmiley = !this.activeSmiley;
   }
 
   onOverlayStateChange(active: boolean) {

@@ -63,13 +63,13 @@
   }
 }
 
-@media (max-width: 880px) {
-  .icon-bar {
+.icon-bar {
     display: flex;
     align-items: center;
     gap: 10px;
   }
 
+@media (max-width: 880px) {
   .form {
     padding: 10px 16px 0px 16px;
   }

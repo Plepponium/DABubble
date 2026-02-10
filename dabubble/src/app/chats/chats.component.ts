@@ -371,40 +371,42 @@ export class ChatsComponent implements OnInit, OnChanges {
     );
   }
 
-  openSmileyOverlay() {
-    this.activeSmiley = !this.activeSmiley;
-  }
 
-  onSmileySelected(smiley: string, el: HTMLTextAreaElement) {
-    this.textService.insertTextAtCursor(`:${smiley}:`, el, (newText) => {
-      this.newMessage = newText;  // ✅ Component setzt selbst!
-    });
-    this.activeSmiley = false;
-  }
+  // für EDIT??????
+  // openSmileyOverlay() {
+  //   this.activeSmiley = !this.activeSmiley;
+  // }
 
-  insertMention(event: { name: string; type: 'user' | 'channel' | 'email' }) {
-    const trigger = event.type === 'user' ? '@' : '#';
-    const mentionText = `${trigger}${event.name} `;
-    const pos = this.mentionCaretIndex ?? this.newMessage.length;
-    const before = this.newMessage.slice(0, pos);
-    const replaced = before.replace(/([@#])([^\s]*)$/, mentionText);
+  // onSmileySelected(smiley: string, el: HTMLTextAreaElement) {
+  //   this.textService.insertTextAtCursor(`:${smiley}:`, el, (newText) => {
+  //     this.newMessage = newText;  // ✅ Component setzt selbst!
+  //   });
+  //   this.activeSmiley = false;
+  // }
 
-    this.newMessage = replaced + this.newMessage.slice(pos);
-    this.mentionCaretIndex = replaced.length + 1;
+  // insertMention(event: { name: string; type: 'user' | 'channel' | 'email' }) {
+  //   const trigger = event.type === 'user' ? '@' : '#';
+  //   const mentionText = `${trigger}${event.name} `;
+  //   const pos = this.mentionCaretIndex ?? this.newMessage.length;
+  //   const before = this.newMessage.slice(0, pos);
+  //   const replaced = before.replace(/([@#])([^\s]*)$/, mentionText);
 
-    setTimeout(() => {
-      const textarea = this.messageInput.nativeElement;
-      textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
-      textarea.focus();
-    });
-    this.overlayActive = false;
-  }
+  //   this.newMessage = replaced + this.newMessage.slice(pos);
+  //   this.mentionCaretIndex = replaced.length + 1;
 
-  updateCaretPosition() {
-    const textarea = this.messageInput?.nativeElement;
-    if (!textarea) return;
-    this.mentionCaretIndex = textarea.selectionStart ?? 0;
-  }
+  //   setTimeout(() => {
+  //     const textarea = this.messageInput.nativeElement;
+  //     textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
+  //     textarea.focus();
+  //   });
+  //   this.overlayActive = false;
+  // }
+
+  // updateCaretPosition() {
+  //   const textarea = this.messageInput?.nativeElement;
+  //   if (!textarea) return;
+  //   this.mentionCaretIndex = textarea.selectionStart ?? 0;
+  // }
 
   updateEditCaret(chat: any, textarea: HTMLTextAreaElement) {
     chat._caretIndex = textarea.selectionStart;
