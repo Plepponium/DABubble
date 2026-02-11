@@ -64,16 +64,19 @@ export class MentionsOverlayComponent {
     this.updateOverlayState();
   }
 
+  /** Sorts users alphabetically by name. */
   private sortUsersAlphabetically(users: Partial<User>[]): Partial<User>[] {
     return [...users].sort((a, b) =>
       (a.name || '').toLowerCase().localeCompare((b.name || '').toLowerCase())
     );
   }
 
+  /** Filters users by name term. @param users User list. @param term Search term. */
   private filterUsersByTerm(users: Partial<User>[], term: string): Partial<User>[] {
     return users.filter(u => u.name?.toLowerCase().includes(term));
   }
 
+  /** Updates and emits overlay active state. */
   private updateOverlayState() {
     this.isOverlayActive = this.filteredItems.length > 0;
     this.overlayStateChange.emit(this.isOverlayActive);
@@ -102,24 +105,30 @@ export class MentionsOverlayComponent {
     this.updateOverlayState();
   }
 
+  /** Returns text before caret position. */
   private getTextBeforeCaret(): string {
     return typeof this.caretIndex === 'number' ? this.text.slice(0, this.caretIndex) : this.text;
   }
 
+
+  /** Sets active trigger and search term from regex match. @param match Regex result. */
   private setTriggerAndSearch(match: RegExpExecArray) {
     this.activeTrigger = match[1] as '@' | '#';
     this.searchTerm = match[2].toLowerCase();
   }
 
+  /** Checks for trailing space after @. @param text Text to check. */
   private hasTrailingSpaceWithAt(text: string): boolean {
     return text.includes('@') && text.endsWith(' ');
   }
 
+  /** Extracts last token from text. @param text Text to parse. */
   private getLastToken(text: string): string {
     const lastTokenMatch = text.match(/([^\s]+)$/);
     return lastTokenMatch ? lastTokenMatch[1] : '';
   }
 
+  /** Filters available emails excluding selected ones. @param users User list. @param clean Search term. */
   private filterAvailableEmails(users: Partial<User>[], clean: string): any[] {
     const { names: selectedNames, emails: selectedEmails } = this.getSelectedNames();
     return users.filter(u => {
@@ -150,14 +159,13 @@ export class MentionsOverlayComponent {
     if (!this.filteredItems.length) this.closeOverlay();
   }
 
+  /** Filters messages by search term. @param term Search term. */
   private filterMessagesByTerm(term: string): any[] {
     return this.messages.filter(m =>
       (m.type === 'channel-message' && m.message?.toLowerCase().includes(term)) ||
       (m.type === 'dm-message' && m.text?.toLowerCase().includes(term))
     );
   }
-
-
 
   /** Detects @/# trigger and filters users/channels accordingly. */
   private detectTrigger() {
@@ -177,6 +185,7 @@ export class MentionsOverlayComponent {
     this.updateOverlayState();
   }
 
+  /** Filters users for @ trigger excluding selected. */
   private filterUsersWithTrigger() {
     const { names: selectedNames, emails: selectedEmails } = this.getSelectedNames();
     const sortedUsers = this.sortUsersAlphabetically(this.users);
@@ -185,6 +194,7 @@ export class MentionsOverlayComponent {
       .slice(0, 10);
   }
 
+  /** Filters channels for # trigger excluding selected names. */
   private filterChannelsWithTrigger() {
     const { names: selectedNames } = this.getSelectedNames();
     this.filteredItems = this.channels
@@ -197,6 +207,7 @@ export class MentionsOverlayComponent {
       .slice(0, 10);
   }
 
+  /** Checks user match criteria for filtering. @param u User. @param term Search term. */
   private matchesUserCriteria(u: Partial<User>, term: string, selectedNames: Set<string>, selectedEmails: Set<string>): boolean {
     const name = u.name?.toLowerCase();
     const email = u.email?.toLowerCase();
@@ -211,9 +222,7 @@ export class MentionsOverlayComponent {
     return true;
   }
 
-
-  // -------------------------------------------------------------------------------------------------------------------//
-
+  /** Selects mention item and emits event. */
   select(item: any) {
     if (this.context === 'Searchbar') {
       this.navigateToChat.emit(item);
@@ -221,60 +230,61 @@ export class MentionsOverlayComponent {
       return;
     }
     if (!item) return;
+    const { valueToInsert, type } = this.getInsertValue(item);
+    this.mentionSelected.emit({ name: valueToInsert, type: type });
+    this.closeOverlay();
+  }
+
+  /** Determines insert value and type for mention. @param item Selected item. */
+  private getInsertValue(item: any): { valueToInsert: string, type: 'email' | 'user' | 'channel' } {
     let valueToInsert = item.name;
     let type: 'email' | 'user' | 'channel' = this.activeTrigger === '@' ? 'user' : 'channel';
     if (this.context === 'AddRecipient' && !this.activeTrigger) {
       valueToInsert = item.email;
       type = 'email';
     }
-    this.mentionSelected.emit({
-      name: valueToInsert,
-      type: type
-    });
-    this.closeOverlay();
+    return { valueToInsert, type };
   }
 
+  /** Returns selected names/emails from text for exclusion. */
   private getSelectedNames(): { names: Set<string>, emails: Set<string> } {
     const names = new Set<string>();
     const emails = new Set<string>();
-
-    if (this.context !== 'AddRecipient') {
-      return { names, emails };
-    }
-
-    // 1. @Mentions - NUR bis zum nächsten Leerzeichen
-    const userMentionRegex = /@([a-zA-ZÀ-ÿ0-9._-]+(?:\s+[a-zA-ZÀ-ÿ0-9._-]+)?)(?=\s|$)/g;
-    let match: RegExpExecArray | null;
-    while ((match = userMentionRegex.exec(this.text)) !== null) {
-      const mentionedName = match[1].toLowerCase().trim();
-      names.add(mentionedName);
-    }
-
-    // 2. #Channels - NUR bis zum nächsten Leerzeichen
-    const channelMentionRegex = /#([a-zA-ZÀ-ÿ0-9._-]+)(?=\s|$)/g;
-    while ((match = channelMentionRegex.exec(this.text)) !== null) {
-      const channelName = match[1].toLowerCase();
-      names.add(channelName);
-    }
-
-    // 3. ECHTE E-Mails - NUR Tokens ohne @/# am Anfang + gültiges Email-Format
-    this.text
-      .split(/\s+/)
-      .filter(t => {
-        const clean = t.toLowerCase().trim();
-        return clean.includes('@') &&
-          !clean.startsWith('@') &&
-          !clean.startsWith('#') &&
-          clean.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
-      })
-      .forEach(token => {
-        const clean = token.toLowerCase().trim();
-        emails.add(clean);
-      });
-
+    if (this.context !== 'AddRecipient') return { names, emails };
+    this.extractUserMentions(names);
+    this.extractChannelMentions(names);
+    this.extractEmails(emails);
     return { names, emails };
   }
 
+  /** Extracts @user mentions from text. @param names Set to populate. */
+  private extractUserMentions(names: Set<string>) {
+    const regex = /@([a-zA-ZÀ-ÿ0-9._-]+(?:\s+[a-zA-ZÀ-ÿ0-9._-]+)?)(?=\s|$)/g;
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(this.text)) !== null) {
+      names.add(match[1].toLowerCase().trim());
+    }
+  }
+
+  /** Extracts #channel mentions from text. @param names Set to populate. */
+  private extractChannelMentions(names: Set<string>) {
+    const regex = /#([a-zA-ZÀ-ÿ0-9._-]+)(?=\s|$)/g;
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(this.text)) !== null) {
+      names.add(match[1].toLowerCase());
+    }
+  }
+
+  /** Extracts email addresses from text tokens. @param emails Set to populate. */
+  private extractEmails(emails: Set<string>) {
+    this.text.split(/\s+/).filter(t => {
+      const clean = t.toLowerCase().trim();
+      return clean.includes('@') && !clean.startsWith('@') && !clean.startsWith('#') &&
+        clean.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+    }).forEach(token => emails.add(token.toLowerCase().trim()));
+  }
+
+  /** Closes overlay and resets internal state. */
   private closeOverlay() {
     this.isOverlayActive = false;
     this.activeTrigger = null;
@@ -283,12 +293,14 @@ export class MentionsOverlayComponent {
     this.overlayStateChange.emit(false);
   }
 
+  /** Emits chat navigation and closes overlay. */
   onItemClick(item: any) {
     if (!item) return;
     this.navigateToChat.emit(item);
     this.closeOverlay();
   }
 
+  /** Handles keyboard navigation in overlay. */
   @HostListener('document:keydown', ['$event'])
   onKeyDown(e: KeyboardEvent) {
     if (!this.isOverlayActive || !this.filteredItems.length) return;
@@ -321,11 +333,10 @@ export class MentionsOverlayComponent {
     }
   }
 
+  /** Returns selected names/emails from text for exclusion. */
   private scrollToActive() {
     const items = this.mentionItems.toArray();
     const el = items[this.activeIndex]?.nativeElement as HTMLElement;
-    if (el) {
-      el.scrollIntoView({ block: 'nearest' });
-    }
+    if (el) el.scrollIntoView({ block: 'nearest' });
   }
 }
