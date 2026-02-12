@@ -31,8 +31,24 @@ export class ChatInputComponent {
   overlayActive = false;
   mentionCaretIndex: number | null = null;
 
-  onFormSubmit(form: NgForm) {
-    if (!this.text?.trim()) return;
+  // onFormSubmit(form: NgForm) {
+  //   console.log('onFormSubmit');
+  //   if (!this.text?.trim()) return;
+  //   this.submit.emit();
+  // }
+  // onFormSubmit(form: NgForm) {
+  //   console.log('onFormSubmit');
+  //   if (this.overlayActive) {
+  //     // z.B. Mention-Liste offen → nicht senden
+  //     return;
+  //   }
+  //   if (!this.text?.trim()) return;
+  //   this.submit.emit();
+  // }
+  onFormSubmit() {
+    if (this.overlayActive || !this.text?.trim()) {
+      return;
+    }
     this.submit.emit();
   }
 
@@ -41,7 +57,7 @@ export class ChatInputComponent {
       e.preventDefault();
       return;
     }
-    this.submit.emit();
+    this.onFormSubmit();
     e.preventDefault();
   }
 

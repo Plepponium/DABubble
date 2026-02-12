@@ -11,7 +11,7 @@
     </app-channel-header>
 
     <div *ngIf="(chats$ | async) as chatList" class="chat-content">
-        <div id="chat-history" class="chat-history">
+        <div id="chat-history" #chatHistory class="chat-history">
 
             <div *ngFor="let chat of chatList; let i = index; trackBy: trackByChatId" class="chat-day-section"
                 [ngClass]="{'reverse': chat.user === currentUserId}" #chatSection [attr.data-message-id]="chat.id">

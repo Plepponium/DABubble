@@ -57,6 +57,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   isResponsive = false;
   pendingScroll = false;
   activeSmiley = false;
+  private isSubmitting = false;
 
   currentUserId: string = '';
   // channels: any[] = [];
@@ -317,17 +318,24 @@ export class ChatsComponent implements OnInit, OnChanges {
   // }
 
   submitChatMessage() {
-    if (!this.canSendMessage()) return;
-
+    if (this.isSubmitting || !this.canSendMessage()) return;
+    
+    this.isSubmitting = true; // ✅ Block weitere Calls
     const messagePayload = this.buildMessagePayload();
-
+    
     this.channelService.addChatToChannel(this.channelId!, messagePayload)
       .then(() => {
         this.newMessage = '';
-        setTimeout(() => this.uiService.scrollToBottom());
+        // setTimeout(() => this.uiService.scrollToBottom());
+        [0, 50, 150].forEach(delay => 
+          setTimeout(() => this.uiService.scrollToBottom(), delay)
+        );
       })
       .catch(err => {
         console.error('Fehler beim Senden:', err);
+      })
+      .finally(() => {
+        this.isSubmitting = false;
       });
   }
 
@@ -430,13 +438,13 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
   }
 
-  insertAtCursor(character: string = '@', messageInput: HTMLTextAreaElement) {
-    this.textService.insertTextAtCursor(character, messageInput, (newText) => {
-      this.newMessage = newText;
-    }, (caretPos) => {
-      this.mentionCaretIndex = caretPos; 
-    });
-  }
+  // insertAtCursor(character: string = '@', messageInput: HTMLTextAreaElement) {
+  //   this.textService.insertTextAtCursor(character, messageInput, (newText) => {
+  //     this.newMessage = newText;
+  //   }, (caretPos) => {
+  //     this.mentionCaretIndex = caretPos; 
+  //   });
+  // }
 
   enableEditChat(chat: any) {
     this.editCommentDialogueExpanded = false;
