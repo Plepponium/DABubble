@@ -31,13 +31,14 @@ export class ChatsUiService {
   }
 
   // ✅ Scroll & DOM Utilities
-  // scrollToBottom() {
-  //   const chatHistory = document.getElementById('chat-history');
-  //   if (chatHistory) {
-  //     chatHistory.scrollTop = chatHistory.scrollHeight;
-  //   }
-  // }
   scrollToBottom() {
+    const chatHistory = document.getElementById('chat-history');
+    if (chatHistory) {
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+  }
+  
+  scrollToBottomNewMessage() {
     const chatHistory = document.getElementById('chat-history');
     chatHistory?.scrollTo({ top: chatHistory.scrollHeight, behavior: 'smooth' });
   }

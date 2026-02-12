@@ -185,30 +185,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     return this.uiService.getDisplayDate(chat.time);
   }
 
-
-
-  // openReactionsDialogue(chatIndex: number, below: boolean) {
-  //   if (this.activeReactionDialogueIndex === chatIndex) {
-  //     this.activeReactionDialogueIndex = null;
-  //   } else {
-  //     this.editCommentDialogueExpanded = false;
-  //     this.activeReactionDialogueIndex = chatIndex;
-  //     this.activeReactionDialogueBelowIndex = null;
-  //   }
-  // }
-  // openReactionsDialogue(chatIndex: number, below: boolean) {
-  //   this.uiService.setReactionDialogue(chatIndex, below);
-  // }
-
-  // openReactionsDialogueBelow(chatIndex: number) {
-  //   if (this.activeReactionDialogueBelowIndex === chatIndex) {
-  //     this.activeReactionDialogueBelowIndex = null;
-  //   } else {
-  //     this.editCommentDialogueExpanded = false;
-  //     this.activeReactionDialogueBelowIndex = chatIndex;
-  //     this.activeReactionDialogueIndex = null;
-  //   }
-  // }
   openReactionsDialogue(index: number, below: boolean) {
     const currentIndex = below
       ? this.activeReactionDialogueBelowIndex
@@ -308,27 +284,17 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.openProfile.emit(user);
   }
 
-  // onEnterPress(e: KeyboardEvent) {
-  //   if (this.overlayActive) {
-  //     e.preventDefault();
-  //     return;
-  //   }
-  //   this.submitChatMessage();
-  //   e.preventDefault();
-  // }
-
   submitChatMessage() {
     if (this.isSubmitting || !this.canSendMessage()) return;
     
-    this.isSubmitting = true; // ✅ Block weitere Calls
+    this.isSubmitting = true; 
     const messagePayload = this.buildMessagePayload();
-    
+
     this.channelService.addChatToChannel(this.channelId!, messagePayload)
       .then(() => {
         this.newMessage = '';
-        // setTimeout(() => this.uiService.scrollToBottom());
         [0, 50, 150].forEach(delay => 
-          setTimeout(() => this.uiService.scrollToBottom(), delay)
+          setTimeout(() => this.uiService.scrollToBottomNewMessage(), delay)
         );
       })
       .catch(err => {
@@ -437,14 +403,6 @@ export class ChatsComponent implements OnInit, OnChanges {
       textarea && (textarea.selectionStart = textarea.selectionEnd = chat._caretIndex);
     });
   }
-
-  // insertAtCursor(character: string = '@', messageInput: HTMLTextAreaElement) {
-  //   this.textService.insertTextAtCursor(character, messageInput, (newText) => {
-  //     this.newMessage = newText;
-  //   }, (caretPos) => {
-  //     this.mentionCaretIndex = caretPos; 
-  //   });
-  // }
 
   enableEditChat(chat: any) {
     this.editCommentDialogueExpanded = false;
