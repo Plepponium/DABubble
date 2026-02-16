@@ -16,12 +16,12 @@
             <div *ngFor="let chat of chatList; let i = index; trackBy: trackByChatId" class="chat-day-section"
                 [ngClass]="{'reverse': chat.user === currentUserId}" #chatSection [attr.data-message-id]="chat.id">
 
-                <div *ngIf="i === 0 || !isSameDate(getChatDate(chat), getChatDate(chatList[i-1]))"
+                <!-- <div *ngIf="i === 0 || !isSameDate(getChatDate(chat), getChatDate(chatList[i-1]))"
                     class="chat-date-section">
                     <div class="chat-date">{{ getDisplayDate(chat) }}</div>
-                </div>
+                </div> -->
 
-                <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}"
+                <!-- <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}"
                     [class.edit-mode]="chat.isEditing">
                     <div class="chat-dialogue" [ngClass]="{'reverse': chat.user === currentUserId}">
                         <button (click)="addReaction(i, 'check')" class="add-reaction-btn">
@@ -90,79 +90,7 @@
                                     </div>
                                 </div>
 
-                                <!-- <div class="reactions">
-                                    <div class="reaction-btns">
-                                        <div (click)="toggleReaction(i, reaction.type)"
-                                            *ngFor="let reaction of getMaxReactionsToShow(chat, i)" class="reaction-btn"
-                                            [ngClass]="{'reacted': reaction.currentUserReacted}">
-
-                                            <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
-                                                [alt]="reaction.type">
-                                            <div>{{ reaction.count }}</div>
-                                            <div class="r-btn-hover-display">
-                                                <div class="r-btn-hover-display-content">
-                                                    <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
-                                                        [alt]="reaction.type">
-                                                    <div class="reaction-btn-t-box no-wrap">
-                                                        <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count <= 2"
-                                                            class="font-w-700">
-                                                            {{ reaction.otherUserName }} und Du
-                                                        </div>
-                                                        <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count > 2"
-                                                            class="font-w-700">
-                                                            {{ reaction.otherUserName }}, Du
-                                                        </div>
-                                                        <div *ngIf="!reaction.currentUserReacted && reaction.otherUserName"
-                                                            class="font-w-700">
-                                                            {{ reaction.otherUserName }}
-                                                        </div>
-                                                        <div *ngIf="reaction.currentUserReacted && !reaction.otherUserName"
-                                                            class="font-w-700">
-                                                            Du
-                                                        </div>
-                                                        <span
-                                                            *ngIf="reaction.count === 1 && reaction.currentUserReacted">hast
-                                                            reagiert</span>
-                                                        <span
-                                                            *ngIf="reaction.count === 1 && !reaction.currentUserReacted">hat
-                                                            reagiert</span>
-                                                        <span
-                                                            *ngIf="reaction.count - (reaction.currentUserReacted ? 1 : 0) >= 2"
-                                                            class="font-w-700">und andere</span>
-                                                        <span *ngIf="reaction.count > 1">haben reagiert</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div (click)="showAllReactions[i] = true"
-                                            *ngIf="chat.reactionArray!.length > (isResponsive ? 3 : 7) && !showAllReactions[i]"
-                                            class="reaction-btn more-reactions">
-                                            {{chat.reactionArray!.length - (isResponsive ? 3 : 7)}} weitere
-                                        </div>
-                                        <div (click)="showAllReactions[i] = false" *ngIf="showAllReactions[i]"
-                                            class="reaction-btn more-reactions">
-                                            Weniger anzeigen
-                                        </div>
-                                    </div>
-
-                                    <div class="reactions-display-container-below">
-                                        <div class="add-reaction-dialogue below"
-                                            *ngIf="activeReactionDialogueBelowIndex === i">
-                                            <div *ngFor="let icon of reactionIcons" class="reactions-container">
-                                                <button (click)="addReaction(i, icon)" class="add-reaction-btn">
-                                                    <img class="smiley-img"
-                                                        [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <app-round-btn (click)="openReactionsDialogue(i, true)"
-                                            iconSrc="assets/message-icons/add_reaction.svg"
-                                            iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
-                                            altText="Reaktion hinzufügen">
-                                        </app-round-btn>
-                                    </div>
-                                </div> -->
+                                
 
                                 <app-reactions-display
                                     [chat]="chat"
@@ -202,8 +130,35 @@
                         </div>
                     </ng-template>
 
-                </div>
+                </div> -->
             </div>
+
+            <app-chat-message
+                *ngFor="let chat of chatList; let i = index; trackBy: trackByChatId"
+                [chat]="chat"
+                [index]="i"
+                [prevChatDate]="i > 0 ? getChatDate(chatList[i-1]) : undefined"
+                [currentUserId]="currentUserId"
+                [isResponsive]="isResponsive"
+                [participants]="participants"
+                [filteredChannels]="filteredChannels"
+                [activeReactionDialogueIndex]="activeReactionDialogueIndex"
+                [activeReactionDialogueBelowIndex]="activeReactionDialogueBelowIndex"
+                [showAllReactions]="showAllReactions"
+                [reactionIcons]="reactionIcons"
+                [editCommentDialogueExpanded]="editCommentDialogueExpanded"
+                #chatSection [attr.data-message-id]="chat.id"
+                (openThread)="handleOpenThread(chat.id)"
+                (openProfile)="handleOpenProfile($event)"
+                (addReaction)="addReaction($event)"
+                (toggleReaction)="toggleReaction($event)"
+                (openReactionsDialogue)="openReactionsDialogue($event)"
+                (enableEditChat)="enableEditChat($event)"
+                (cancelEditChat)="cancelEditChat($event)"
+                (saveEditedChat)="saveEditedChat($event)">
+            </app-chat-message>
+
+
         </div>
 
         <!-- <form class="form" (ngSubmit)="submitChatMessage()" #chatForm="ngForm">
