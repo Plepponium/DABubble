@@ -90,7 +90,7 @@
                                     </div>
                                 </div>
 
-                                <div class="reactions">
+                                <!-- <div class="reactions">
                                     <div class="reaction-btns">
                                         <div (click)="toggleReaction(i, reaction.type)"
                                             *ngFor="let reaction of getMaxReactionsToShow(chat, i)" class="reaction-btn"
@@ -162,7 +162,23 @@
                                             altText="Reaktion hinzufügen">
                                         </app-round-btn>
                                     </div>
-                                </div>
+                                </div> -->
+
+                                <app-reactions-display
+                                    [chat]="chat"
+                                    [index]="i"
+                                    [currentUserId]="currentUserId"
+                                    [isResponsive]="isResponsive"
+                                    [reactionIcons]="reactionIcons"
+                                    [activeReactionDialogueIndex]="activeReactionDialogueIndex"
+                                    [activeReactionDialogueBelowIndex]="activeReactionDialogueBelowIndex"
+                                    [showAllReactions]="showAllReactions"
+                                    (addReaction)="addReaction($event.index, $event.type)"
+                                    (toggleReaction)="toggleReaction($event.index, $event.type)"
+                                    (openReactionsDialogue)="openReactionsDialogue($event.index, $event.below)"
+                                    (showAllReactionsChange)="showAllReactions[$event.index] = $event.showAll">
+                                </app-reactions-display>
+
                             </div>
                         </div>
                     </ng-container>

@@ -27,12 +27,13 @@ import { ChatsTextService } from '../../services/chats-text.service';
 import { ChatsUiService } from '../../services/chats-ui.service';
 import { ChannelHeaderComponent } from "../channel-header/channel-header.component";
 import { ChatInputComponent } from "../chat-input/chat-input.component";
+import { ReactionsDisplayComponent } from "../reactions-display/reactions-display.component";
 registerLocaleData(localeDe);
 
 @Component({
   selector: 'app-chats',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MentionsOverlayComponent, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, ChannelHeaderComponent, ChatInputComponent],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MentionsOverlayComponent, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, ChannelHeaderComponent, ChatInputComponent, ReactionsDisplayComponent],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.scss',
 })
@@ -114,13 +115,6 @@ export class ChatsComponent implements OnInit, OnChanges {
       ? chat.reactionArray
       : chat.reactionArray.slice(0, max);
   }
-
-  // scrollToBottom() {
-  //   const chatHistory = document.getElementById('chat-history');
-  //   if (chatHistory) {
-  //     chatHistory.scrollTop = chatHistory.scrollHeight;
-  //   }
-  // }
 
   trackByChatId(chat: any): string {
     return chat.id;

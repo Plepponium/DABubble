@@ -1,0 +1,73 @@
+<div class="reactions">
+    <div class="reaction-btns">
+        <div (click)="onToggleReaction(reaction.type)"
+            *ngFor="let reaction of getMaxReactionsToShow()" class="reaction-btn"
+            [ngClass]="{'reacted': reaction.currentUserReacted}">
+
+            <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
+                [alt]="reaction.type">
+            <div>{{ reaction.count }}</div>
+            <div class="r-btn-hover-display">
+                <div class="r-btn-hover-display-content">
+                    <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
+                        [alt]="reaction.type">
+                    <div class="reaction-btn-t-box no-wrap">
+                        <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count <= 2"
+                            class="font-w-700">
+                            {{ reaction.otherUserName }} und Du
+                        </div>
+                        <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count > 2"
+                            class="font-w-700">
+                            {{ reaction.otherUserName }}, Du
+                        </div>
+                        <div *ngIf="!reaction.currentUserReacted && reaction.otherUserName"
+                            class="font-w-700">
+                            {{ reaction.otherUserName }}
+                        </div>
+                        <div *ngIf="reaction.currentUserReacted && !reaction.otherUserName"
+                            class="font-w-700">
+                            Du
+                        </div>
+                        <span
+                            *ngIf="reaction.count === 1 && reaction.currentUserReacted">hast
+                            reagiert</span>
+                        <span
+                            *ngIf="reaction.count === 1 && !reaction.currentUserReacted">hat
+                            reagiert</span>
+                        <span
+                            *ngIf="reaction.count - (reaction.currentUserReacted ? 1 : 0) >= 2"
+                            class="font-w-700">und andere</span>
+                        <span *ngIf="reaction.count > 1">haben reagiert</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div (click)="showAll()"
+            *ngIf="(chat.reactionArray?.length || 0) > (isResponsive ? 3 : 7) && !showAllReactions[index]"
+            class="reaction-btn more-reactions">
+            {{(chat.reactionArray?.length || 0) - (isResponsive ? 3 : 7)}} weitere
+        </div>
+        <div (click)="showLess()" *ngIf="showAllReactions[index]"
+            class="reaction-btn more-reactions">
+            Weniger anzeigen
+        </div>
+    </div>
+
+    <div class="reactions-display-container-below">
+        <div class="add-reaction-dialogue below"
+            *ngIf="activeReactionDialogueBelowIndex === index">
+            <div *ngFor="let icon of reactionIcons" class="reactions-container">
+                <button (click)="onAddReaction(icon, true)" class="add-reaction-btn">
+                    <img class="smiley-img"
+                        [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                </button>
+            </div>
+        </div>
+        <app-round-btn (click)="onOpenReactionsDialogue(true)"
+            iconSrc="assets/message-icons/add_reaction.svg"
+            iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
+            altText="Reaktion hinzufügen">
+        </app-round-btn>
+    </div>
+</div>
