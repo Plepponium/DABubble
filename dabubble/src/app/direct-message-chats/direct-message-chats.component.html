@@ -141,11 +141,26 @@
                                                 (mentionSelected)="insertMentionInEdit(m, $event)">
                                             </app-mentions-overlay>
 
+                                            <app-smiley-overlay [active]="editSmileyActive[m.id]" [emojis]="allSmileys"
+                                                (selected)="insertSmileyInEdit(m, $event, editTa)"
+                                                (activeChange)="editSmileyActive[m.id] = $event">
+                                            </app-smiley-overlay>
+
                                             <div class="edit-actions">
-                                                <button class="btn cancel"
-                                                    (click)="cancelEditMessage(m)">Abbrechen</button>
-                                                <button class="btn save"
-                                                    (click)="saveEditedMessage(m)">Speichern</button>
+
+                                                <app-round-btn
+                                                    iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
+                                                    iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
+                                                    (click)="toggleEditSmiley(m.id)" class="smiley-edit-btn">
+                                                </app-round-btn>
+
+                                                <div class="btn-wrapper">
+                                                    <button class="btn cancel"
+                                                        (click)="cancelEditMessage(m)">Abbrechen</button>
+                                                    <button class="btn save"
+                                                        (click)="saveEditedMessage(m)">Speichern</button>
+                                                </div>
+
 
                                             </div>
                                         </div>

@@ -42,6 +42,7 @@ export class DirectMessageChatsComponent {
   showAllReactions: Record<number, boolean> = {};
   activeSmiley = false;
   allSmileys = reactionIcons;
+  editSmileyActive: { [messageId: string]: boolean } = {};
   devForceLoading = false;
 
   private authSub?: Subscription;
@@ -78,10 +79,7 @@ export class DirectMessageChatsComponent {
     this.subs.unsubscribe();
   }
 
-  /**
-   * Focuses message input when clicking outside textarea (within input bar).
-   * @param event MouseEvent
-   */
+  /** Focuses message input when clicking outside textarea (within input bar). @param event MouseEvent */
   focusInput(event: MouseEvent): void {
     if (event.target === this.messageInput?.nativeElement ||
       (event.target instanceof HTMLElement && event.target.closest('.input-icon-bar'))) {
@@ -135,10 +133,7 @@ export class DirectMessageChatsComponent {
     this.activeSmiley = !this.activeSmiley;
   }
 
-  /**
-   * Inserts smiley into messageText at cursor position.
-   * @param smiley e.g. 'thumbs-up'
-   */
+  /** Inserts smiley into messageText at cursor position. @param smiley e.g. 'thumbs-up' */
   onSmileySelected(smiley: string): void {
     const textarea = this.messageInput.nativeElement;
     const { start, end } = this.utils.getSelectionRange(textarea);
@@ -147,20 +142,12 @@ export class DirectMessageChatsComponent {
     this.activeSmiley = false;
   }
 
-  /**
-   * Template: Visible reactions (max 7 or all if showAll).
-   * @param message Message object
-   * @param index Index for showAllReactions lookup
-   * @returns Array<{type, count}>
-   */
+  /** Template: Visible reactions (max 7 or all if showAll). @param message Message object @param index Index for showAllReactions lookup */
   getVisibleReactions(message: any, index: number): { type: string; count: number }[] {
     return this.utils.getVisibleReactions(message, index, this.showAllReactions);
   }
 
-  /**
-   * Inserts @mention into messageText at mentionCaretIndex.
-   * @param event {name, type: 'user'|'channel'|'email'}
-   */
+  /** Inserts @mention into messageText at mentionCaretIndex. @param event {name, type: 'user'|'channel'|'email'} */
   insertMention(event: { name: string; type: 'user' | 'channel' | 'email' }): void {
     const trigger = event.type === 'user' ? '@' : '#';
     const pos = this.mentionCaretIndex ?? this.messageText.length;
@@ -183,11 +170,7 @@ export class DirectMessageChatsComponent {
     chat._caretIndex = textarea.selectionStart;
   }
 
-  /**
-   * Inserts mention into edit textarea of a message.
-   * @param message Message being edited
-   * @param event Mention data
-   */
+  /** Inserts mention into edit textarea of a message. @param message Message being edited @param event Mention data */
   insertMentionInEdit(message: any, event: { name: string; type: 'user' | 'channel' | 'email' }): void {
     const trigger = event.type === 'user' ? '@' : '#';
     const pos = message._caretIndex ?? message.editedText.length;
@@ -197,10 +180,7 @@ export class DirectMessageChatsComponent {
     this.utils.focusEditTextarea(message.id, message._caretIndex);
   }
 
-  /**
-   * Inserts character (e.g. '@') at cursor in messageText.
-   * @param character Default: '@'
-   */
+  /** Inserts character (e.g. '@') at cursor in messageText. @param character Default: '@' */
   insertAtCursor(character: string = '@'): void {
     const textarea = this.messageInput.nativeElement;
     const { start, end } = this.utils.getSelectionRange(textarea);
@@ -257,10 +237,7 @@ export class DirectMessageChatsComponent {
     }
   }
 
-  /**
-   * Sends message on Enter (unless overlay active).
-   * @param e KeyboardEvent
-   */
+  /** Sends message on Enter (unless overlay active). @param e KeyboardEvent */
   onEnterPress(e: KeyboardEvent): void {
     if (this.overlayActive) { e.preventDefault(); return; }
     this.sendMessage();
@@ -276,10 +253,7 @@ export class DirectMessageChatsComponent {
     this.utils.scrollToBottom();
   }
 
-  /**
-   * Updates message text server-side.
-   * @param event {messageId, newText}
-   */
+  /** Updates message text server-side. @param event {messageId, newText} */
   async updateMessageText(event: { messageId: string; newText: string }): Promise<void> {
     if (!this.dmId || !event.messageId || !event.newText.trim()) return;
     try {
@@ -289,10 +263,7 @@ export class DirectMessageChatsComponent {
     }
   }
 
-  /**
-   * Adds reaction to message.
-   * @param event {messageId, icon}
-   */
+  /** Adds reaction to message. @param event {messageId, icon} */
   async addReaction(event: { messageId: string; icon: string }): Promise<void> {
     if (!event?.messageId || !this.currentUser || !this.dmId) return;
     try {
@@ -303,20 +274,12 @@ export class DirectMessageChatsComponent {
     }
   }
 
-  /**
-   * TrackBy for *ngFor reactions.
-   * @param _index Index (unused)
-   * @param reaction {type, count}
-   */
+  /** TrackBy for *ngFor reactions. @param _index Index (unused) @param reaction {type, count} */
   trackReaction(_index: number, reaction: { type: string; count: number }): string {
     return reaction.type;
   }
 
-  /**
-   * Toggle reaction for message (add/remove).
-   * @param message Message
-   * @param type Reaction type
-   */
+  /** Toggle reaction for message (add/remove). @param message Message @param type Reaction type */
   async onReactionClick(message: any, type: string): Promise<void> {
     if (!this.dmId || !this.currentUser || !message?.id) return;
     try {
@@ -326,19 +289,12 @@ export class DirectMessageChatsComponent {
     }
   }
 
-  /**
-   * Template: Hover text for reactions (You/Partner reacted).
-   * @param userIds Array of UIDs
-   */
+  /** Template: Hover text for reactions (You/Partner reacted). @param userIds Array of UIDs */
   getReactionHoverText(userIds: string[]): string {
     return this.utils.getReactionHoverText(userIds, this.currentUser?.uid, this.otherUser);
   }
 
-  /**
-   * Toggle reaction dialog for message.
-   * @param messageId Target message ID
-   * @param source 'chat' | 'hover'
-   */
+  /** Toggle reaction dialog for message. @param messageId Target message ID @param source 'chat' | 'hover' */
   toggleReactionDialog(messageId: string, source: 'chat' | 'hover'): void {
     if (this.activeReactionDialog.messageId === messageId && this.activeReactionDialog.source === source) {
       this.activeReactionDialog = { messageId: null, source: null };
@@ -347,10 +303,7 @@ export class DirectMessageChatsComponent {
     }
   }
 
-  /**
-   * Enables edit mode for message (exclusive).
-   * @param message Message to edit
-   */
+  /** Enables edit mode for message (exclusive). @param message Message to edit */
   enableEditMessage(message: any): void {
     this.latestMessages.forEach(m => m.isEditing = false);
     message.isEditing = true;
@@ -358,10 +311,27 @@ export class DirectMessageChatsComponent {
     this.focusAndAutoGrow(message.id);
   }
 
-  /**
-   * Focuses edit textarea + auto-grow + cursor to end.
-   * @param messageId ID of editing message
-   */
+  /** Toggles edit smiley overlay for specific message, closes others. */
+  toggleEditSmiley(messageId: string): void {
+    this.editSmileyActive[messageId] = !this.editSmileyActive[messageId];
+    Object.keys(this.editSmileyActive).forEach(id => {
+      if (id !== messageId) this.editSmileyActive[id] = false;
+    });
+  }
+
+  /** Inserts emoji into edit textarea at cursor, updates caret position. */
+  insertSmileyInEdit(message: any, emoji: string, textarea: HTMLTextAreaElement): void {
+    const caretPos = textarea.selectionStart || 0;
+    message.editedText = message.editedText.slice(0, caretPos) + `:${emoji}:` + message.editedText.slice(caretPos);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = caretPos + emoji.length + 2;
+      this.updateEditCaret(message, textarea);
+    });
+    this.editSmileyActive[message.id] = false;
+  }
+
+  /** Focuses edit textarea + auto-grow + cursor to end. @param messageId ID of editing message */
   focusAndAutoGrow(messageId: string): void {
     setTimeout(() => {
       const ta = document.getElementById(`edit-${messageId}`) as HTMLTextAreaElement | null;
@@ -389,10 +359,7 @@ export class DirectMessageChatsComponent {
     message.isEditing = false;
   }
 
-  /**
-   * Opens sender's profile.
-   * @param senderId UID of sender
-   */
+  /** Opens sender's profile. @param senderId UID of sender */
   onUserNameClick(senderId: string): void {
     const sender = this.otherUser?.uid === senderId ? this.otherUser :
       this.currentUser?.uid === senderId ? this.currentUser : undefined;
@@ -409,51 +376,32 @@ export class DirectMessageChatsComponent {
     return this.otherUser?.uid === this.currentUser?.uid;
   }
 
-  /**
-   * Template: Compares dates for same day.
-   * @param d1 First date
-   * @param d2 Second date
-   */
+  /** Template: Compares dates for same day. @param d1 First date @param d2 Second date */
   isSameDate(d1: Date | undefined, d2: Date | undefined): boolean {
     return this.utils.isSameDate(d1, d2);
   }
 
-  /**
-   * Template: 'Today', 'Yesterday' or long date.
-   * @param date Date to format
-   */
+  /** Template: 'Today', 'Yesterday' or long date. @param date Date to format */
   getDisplayDate(date: Date | undefined): string {
     return this.utils.getDisplayDate(date);
   }
 
-  /**
-   * Template: Array of all reactions with counts.
-   * @param message Message
-   */
+  /** Template: Array of all reactions with counts. @param message Message */
   getReactionArray(message: any): { type: string; count: number }[] {
     return this.utils.getReactionArray(message);
   }
 
-  /**
-   * Template: Auto-resize textarea.
-   * @param el HTMLTextAreaElement
-   */
+  /** Template: Auto-resize textarea. @param el HTMLTextAreaElement */
   autoGrow(el: HTMLTextAreaElement | null): void {
     this.utils.autoGrow(el);
   }
 
-  /**
-   * Template: Render text with emoji images as SafeHtml.
-   * @param text Raw message text
-   */
+  /** Template: Render text with emoji images as SafeHtml. @param text Raw message text */
   renderMessage(text: string): SafeHtml {
     return this.utils.renderMessage(text);
   }
 
-  /**
-   * Template: Smooth-scroll to message.
-   * @param messageId Target ID
-   */
+  /** Template: Smooth-scroll to message. @param messageId Target ID */
   scrollToMessage(messageId: string): void {
     const chatRow = this.chatMessageRows.find(row => row.nativeElement.dataset['messageId'] === messageId)?.nativeElement;
     if (chatRow) chatRow.scrollIntoView({ behavior: 'smooth', block: 'center' });

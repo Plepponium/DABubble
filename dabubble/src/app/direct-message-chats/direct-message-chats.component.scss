@@ -446,8 +446,17 @@
 
   .edit-actions {
     display: flex;
-    justify-content: flex-end;
-    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
+
+    .smiley-edit-btn {
+      flex-shrink: 0; // Icon bleibt klein
+    }
+
+    .btn-wrapper {
+      display: flex;
+      gap: 8px;
+    }
 
     .btn {
       padding: 12px 25px;
