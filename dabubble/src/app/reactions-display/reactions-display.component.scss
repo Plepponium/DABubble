@@ -1,3 +1,64 @@
+.smiley-img {
+  width: 24px;
+  height: 24px;
+}
+
+.reactions-display-container-below {
+  position: relative;
+}
+
+.add-reaction-dialogue {
+  width: fit-content;
+  max-width: 200px;
+  overflow-x: auto;
+  position: absolute;
+  top: 20px;
+  right: 28px;
+  background-color: #ffffff;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  box-sizing: border-box;
+  padding: 10px 20px;
+  box-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.2);
+  font-size: 20px;
+  white-space: nowrap;
+  display: flex;
+  z-index: 1;
+}
+
+.add-reaction-dialogue.below {
+  top: unset;
+  bottom: 20px;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 0px;
+}
+
+.add-reaction-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 20px;
+  border: none;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  &:hover {
+    background-color: #eceefe;
+    .hover-icon {
+      display: none;
+    }
+    .hover-icon-purple {
+      display: block;
+    }
+  }
+}
+
+// .add-reaction-btn.reverse {
+//   display: none;
+// }
+
 .reactions {
   display: flex;
   align-items: center;

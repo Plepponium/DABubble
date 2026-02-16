@@ -109,12 +109,12 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.messageInput?.nativeElement?.focus();
   }
 
-  getMaxReactionsToShow(chat: any, index: number): any[] {
-    const max = this.isResponsive ? 3 : 7;
-    return this.showAllReactions[index]
-      ? chat.reactionArray
-      : chat.reactionArray.slice(0, max);
-  }
+  // getMaxReactionsToShow(chat: any, index: number): any[] {
+  //   const max = this.isResponsive ? 3 : 7;
+  //   return this.showAllReactions[index]
+  //     ? chat.reactionArray
+  //     : chat.reactionArray.slice(0, max);
+  // }
 
   trackByChatId(chat: any): string {
     return chat.id;
