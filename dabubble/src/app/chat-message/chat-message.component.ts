@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ReactionsDisplayComponent } from '../reactions-display/reactions-display.component';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
@@ -8,11 +8,6 @@ import { User } from '../../models/user.class';
 import { SafeHtml } from '@angular/platform-browser';
 import { ChatsUiService } from '../../services/chats-ui.service';
 import { ChatsTextService } from '../../services/chats-text.service';
-import { ChannelService } from '../../services/channel.service';
-import { UserService } from '../../services/user.service';
-import { LogoutService } from '../../services/logout.service';
-import { ChatsDataService } from '../../services/chats-data.service';
-import { ChatsReactionService } from '../../services/chats-reaction.service';
 
 @Component({
   selector: 'app-chat-message',
@@ -21,13 +16,7 @@ import { ChatsReactionService } from '../../services/chats-reaction.service';
   styleUrl: './chat-message.component.scss'
 })
 export class ChatMessageComponent {
-  // channelService = inject(ChannelService);
-  // userService = inject(UserService);
-  // logoutService = inject(LogoutService);
-  
-  // dataService = inject(ChatsDataService);
   textService = inject(ChatsTextService);
-  // reactionService = inject(ChatsReactionService);
   uiService = inject(ChatsUiService);
   
   @Input() chat!: Chat;
@@ -52,11 +41,6 @@ export class ChatMessageComponent {
   @Output() cancelEditChat = new EventEmitter<Chat>();
   @Output() saveEditedChat = new EventEmitter<Chat>();
 
-  // ngOnChanges(changes: SimpleChanges) {
-  //   if (changes['activeReactionDialogueIndex']) {
-  //     console.log('🎯 ChatMessage index:', this.index, 'activeReactionDialogueIndex:', this.activeReactionDialogueIndex);
-  //   }
-  // }
 
   getChatDate(chat: any): Date | undefined {
     return chat.time ? new Date(chat.time * 1000) : undefined;
@@ -102,7 +86,6 @@ export class ChatMessageComponent {
 
   onEnableEditChat(chat: any) {
     this.enableEditChat.emit(chat);
-    // this.editCommentDialogueExpanded = !this.editCommentDialogueExpanded;
     this.editCommentDialogueExpanded = false;
   }
 
@@ -113,28 +96,6 @@ export class ChatMessageComponent {
   onSaveEditedChat(chat: any) {
     this.saveEditedChat.emit(chat);
   }
-
-  // async updateChatMessage(event: { messageId: string; newText: string }) {
-  //   if (!this.channelId || !event.messageId || !event.newText.trim()) return;
-
-  //   try {
-  //     await this.channelService.updateChatMessage(this.channelId, event.messageId, event.newText.trim());
-  //   } catch (err) {
-  //     console.error('Fehler beim Aktualisieren der Nachricht:', err);
-  //   }
-  // }
-
-  // focusAndAutoGrow(messageId: string) {
-  //   setTimeout(() => {
-  //     const ta = document.getElementById(`edit-${messageId}`) as HTMLTextAreaElement | null;
-  //     if (ta) {
-  //       this.autoGrow(ta);
-  //       ta.focus();
-  //       const len = ta.value.length;
-  //       ta.setSelectionRange(len, len);
-  //     }
-  //   }, 0);
-  // }
 
   autoGrow(el: HTMLTextAreaElement | null) {
     if (el) this.textService.autoGrow(el);

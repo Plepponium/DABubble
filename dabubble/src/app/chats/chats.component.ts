@@ -83,10 +83,12 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.uiService.setResponsive(window.innerWidth < 881);
   }
 
+  /** Updates the responsive layout flag based on the current window width. */
   private updateIsResponsive() {
     this.isResponsive = window.innerWidth < 881;
   }
 
+  /** Focuses the message input field if the event target is not an input icon bar. */
   focusInput(event: MouseEvent) {
     if (event.target === this.messageInput?.nativeElement ||
       event.target instanceof HTMLElement &&
@@ -97,11 +99,12 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.messageInput?.nativeElement?.focus();
   }
 
-
+  /** Returns a unique identifier for each chat message. */
   trackByChatId(chat: any): string {
     return chat.id;
   }
 
+  /** Initializes subscriptions and loads initial channel and user data. */
   ngOnInit() {
     this.updateIsResponsive();
     this.dataService.getCurrentUser();
@@ -121,6 +124,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
   }
 
+  /** Reacts to input changes such as channelId and reloads channel data accordingly. */
   ngOnChanges(changes: SimpleChanges) {
     if (changes['channelId']) {
       const newChannelId = changes['channelId'].currentValue;
@@ -141,16 +145,18 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
+  /** Cleans up resources when the component is destroyed. */
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
+  /** Returns the date of a chat message based on its timestamp. */
   getChatDate(chat: any): Date | undefined {
     return chat.time ? new Date(chat.time * 1000) : undefined;
   }
 
-
+  /** Opens the reactions dialogue for a specific chat message. */
   openReactionsDialogue(event: { index: number; below: boolean }) {
     const index = event.index;
     const below = event.below;
@@ -173,6 +179,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
+  /** Adds a reaction if the user hasn't reacted yet. */
   async addReaction(event: { index: number; type: string }) {
     const index = event.index;
     const type = event.type;   
@@ -195,6 +202,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
+  /** Toggles the current user's reaction on a message. */
   async toggleReaction(event: { index: number; type: string }) {
     const index = event.index;  
     const type = event.type;   
@@ -217,7 +225,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     ); 
   }
 
-
+  /** Returns a chat message by its index in the current channel's chat list. */
   private async getChatByIndex(chatIndex: number): Promise<any> {
     if (this.channelChats && this.channelChats.length > chatIndex) {
       return this.channelChats[chatIndex];
@@ -228,7 +236,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     return chats?.[chatIndex];
   }
 
-
+  /** Emits event to open a thread for a message. */
   openAddComment(chat: Chat) {
     if (!this.channelId) return;
 
@@ -238,17 +246,18 @@ export class ChatsComponent implements OnInit, OnChanges {
     });
   }
 
-
+  /** Closes the channel description dialog. */
   closeDialogChannelDescription() {
     this.showChannelDescription = false;
   }
 
-
+  /** Opens the profile dialog for the selected user. */
   openDialogueShowProfile(user: User) {
     this.profileOpen = true;
     this.openProfile.emit(user);
   }
 
+  /** Sends the current message to the active channel. */
   submitChatMessage() {
     if (this.isSubmitting || !this.canSendMessage()) return;
     
@@ -270,12 +279,14 @@ export class ChatsComponent implements OnInit, OnChanges {
       });
   }
 
+  /** Determines whether the current message can be sent based on state and input. */
   private canSendMessage(): boolean {
     if (!this.newMessage?.trim()) return false;
     if (!this.channelId || !this.currentUserId) return false;
     return true;
   }
 
+  /** Builds the payload object for a new chat message. */
   private buildMessagePayload() {
     return {
       message: this.newMessage.trim(),
@@ -284,11 +295,13 @@ export class ChatsComponent implements OnInit, OnChanges {
     };
   }
 
+  /** Opens the thread view for a specific chat message. */
   handleOpenThread(chatId: string) {
     if (!this.channelId) return;
     this.openThread.emit({ channelId: this.channelId, chatId });
   }
 
+  /** Opens the profile dialog for a specific chat message's user. */
   handleOpenProfile(chat: Chat) {
     const user = this.participants.find(u => u.uid === chat.user);
     if (user) {
@@ -296,6 +309,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
+  /** Updates local state when a thread answer is added. */
   handleAnswerAdded(event: { chatId: string; answerTime: number }) {
     this.chatsSubject.next(
       this.chatsSubject.getValue().map(chat =>
@@ -310,7 +324,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     );
   }
 
-
+  /** Enables edit mode for the selected chat message and prepares its edit state. */
   enableEditChat(chat: any) {
     this.chatsSubject.getValue().forEach(c => c.isEditing = false);
     chat.isEditing = true;
@@ -318,11 +332,13 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.focusAndAutoGrow(chat.id);
   }
 
+  /** Cancels edit mode and restores the original message content. */
   cancelEditChat(chat: any) {
     chat.isEditing = false;
     chat.editedText = chat.message;
   }
 
+  /** Saves edited message if content changed. Closes edit mode otherwise. */
   async saveEditedChat(chat: any) {
     const newText = chat.editedText.trim();
     if (!newText || newText === chat.message) {
@@ -334,6 +350,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     chat.isEditing = false;
   }
 
+  /** Updates a message via ChannelService. */
   async updateChatMessage(event: { messageId: string; newText: string }) {
     if (!this.channelId || !event.messageId || !event.newText.trim()) return;
 
@@ -344,6 +361,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
+  /** Focuses the edit textarea and adjusts its height to fit the content. */
   focusAndAutoGrow(messageId: string) {
     setTimeout(() => {
       const ta = document.getElementById(`edit-${messageId}`) as HTMLTextAreaElement | null;
@@ -356,15 +374,18 @@ export class ChatsComponent implements OnInit, OnChanges {
     }, 0);
   }
 
+  /** Automatically adjusts the textarea height to fit its content. */
   autoGrow(el: HTMLTextAreaElement | null) {
     if (el) this.textService.autoGrow(el);
   }
 
+  /** Handles channel deletion by emitting an event and closing related dialogs. */
   handleChannelDeleted() {
     this.channelDeleted.emit();
     this.closeDialogChannelDescription();
   }
 
+  /** Scrolls to a specific message in the list. */
   scrollToMessage(messageId: string) {
     const chatSection = this.chatSections
       .find(section => section.nativeElement.dataset['messageId'] === messageId)
