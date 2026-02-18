@@ -41,11 +41,12 @@ export class ChatMessageComponent {
   @Output() cancelEditChat = new EventEmitter<Chat>();
   @Output() saveEditedChat = new EventEmitter<Chat>();
 
-
+  /** Converts chat timestamp to JavaScript Date object. */
   getChatDate(chat: any): Date | undefined {
     return chat.time ? new Date(chat.time * 1000) : undefined;
   }
 
+  /** Compares two dates to check if they fall on the same day. */
   isSameDate(d1: Date | undefined, d2: Date | undefined): boolean {
     if (!d1 || !d2) return false;
     return d1.getFullYear() === d2.getFullYear() &&
@@ -53,19 +54,23 @@ export class ChatMessageComponent {
       d1.getDate() === d2.getDate();
   }
 
+  /** Formats chat timestamp for display using UI service. */
   getDisplayDate(chat: any): string {
     return this.uiService.getDisplayDate(chat.time);
   }
 
+  /** Toggles edit comment dialogue and closes active reaction dialogues. */
   openEditCommentDialogue() {
     this.activeReactionDialogueIndex = null;
     this.editCommentDialogueExpanded = !this.editCommentDialogueExpanded;
   }
 
+  /** Updates caret position tracking for message editing. */
   updateEditCaret(chat: any, textarea: HTMLTextAreaElement) {
     chat._caretIndex = textarea.selectionStart;
   }
 
+  /** Inserts @mention or #channel reference into edited message at cursor position. */
   insertMentionInEdit(chat: any, event: { name: string; type: 'user' | 'channel' | 'email' }) {
     const trigger = event.type === 'user' ? '@' : '#';
     const mentionText = `${trigger}${event.name} `;
@@ -84,31 +89,38 @@ export class ChatMessageComponent {
     });
   }
 
+  /** Emits event to enable edit mode and closes edit dialogue. */
   onEnableEditChat(chat: any) {
     this.enableEditChat.emit(chat);
     this.editCommentDialogueExpanded = false;
   }
 
+  /** Emits event to cancel message editing. */
   onCancelEditChat(chat: any) {
     this.cancelEditChat.emit(chat);
   }
 
+  /** Emits event to save edited message content. */
   onSaveEditedChat(chat: any) {
     this.saveEditedChat.emit(chat);
   }
 
+  /** Dynamically adjusts textarea height to fit content. */
   autoGrow(el: HTMLTextAreaElement | null) {
     if (el) this.textService.autoGrow(el);
   }
 
+  /** Renders message text with HTML sanitization and formatting. */
   renderMessage(text: string): SafeHtml {
     return this.textService.renderMessage(text);
   }
 
+  /** Emits event to open thread for current chat message. */
   handleOpenThread() {
     this.openThread.emit(this.chat.id);
   }
 
+  /** Emits event to open user profile for message author. */
   handleOpenProfile() {
     this.openProfile.emit(this.chat);
   }
