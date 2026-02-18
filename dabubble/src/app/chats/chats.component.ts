@@ -1,25 +1,17 @@
-import { Component, Output, EventEmitter, Input, inject, OnChanges, SimpleChanges, OnInit, ViewChild, ElementRef, AfterViewInit, HostListener, ViewChildren, QueryList, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, OnChanges, SimpleChanges, OnInit, ViewChild, ElementRef, HostListener, ViewChildren, QueryList, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
-import { RoundBtnComponent } from '../round-btn/round-btn.component';
-import { DialogueOverlayComponent } from '../dialogue-overlay/dialogue-overlay.component';
-import { ChatAddUserOverlayComponent } from '../chat-add-user-overlay/chat-add-user-overlay.component';
-import { ChannelDescriptionOverlayComponent } from '../channel-description-overlay/channel-description-overlay.component';
 import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.class';
 import { Chat } from '../../models/chat.class';
-import { BehaviorSubject, combineLatest, firstValueFrom, forkJoin, map, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable, of, Subject, take, takeUntil } from 'rxjs';
 import { reactionIcons } from '../reaction-icons';
 import localeDe from '@angular/common/locales/de';
-import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.component";
-import { RawReactionsMap, TransformedReaction } from '../../models/reaction.types';
 import { ChatsReactionService } from '../../services/chats-reaction.service';
 import { LogoutService } from '../../services/logout.service';
 import { ChatsDataService } from '../../services/chats-data.service';
@@ -27,14 +19,13 @@ import { ChatsTextService } from '../../services/chats-text.service';
 import { ChatsUiService } from '../../services/chats-ui.service';
 import { ChannelHeaderComponent } from "../channel-header/channel-header.component";
 import { ChatInputComponent } from "../chat-input/chat-input.component";
-import { ReactionsDisplayComponent } from "../reactions-display/reactions-display.component";
 import { ChatMessageComponent } from "../chat-message/chat-message.component";
 registerLocaleData(localeDe);
 
 @Component({
   selector: 'app-chats',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MentionsOverlayComponent, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, ChannelHeaderComponent, ChatInputComponent, ReactionsDisplayComponent, ChatMessageComponent],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, ChannelHeaderComponent, ChatInputComponent, ChatMessageComponent],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.scss',
 })
@@ -51,7 +42,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   value = 'Clear me';
   showChannelDescription = false;
   
-  editCommentDialogueExpanded = false;
   activeReactionDialogueIndex: number | null = null;
   activeReactionDialogueBelowIndex: number | null = null;
   overlayActive = false;
@@ -62,7 +52,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   private isSubmitting = false;
 
   currentUserId: string = '';
-  // channels: any[] = [];
   filteredChannels: any[] = []
   participantIds: string[] = [];
   participants: User[] = [];
@@ -77,7 +66,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   participants$: Observable<User[]> = of([]);
   private chatsSubject = new BehaviorSubject<Chat[]>([]);
   public chats$ = this.chatsSubject.asObservable();
-  // private destroy$ = this.logoutService.logout$;
   private destroy$ = new Subject<void>(); 
   showChannelDescription$ = this.uiService.showChannelDescription$;
   showUserDialogue$ = this.uiService.showUserDialogue$;
@@ -92,7 +80,6 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   @HostListener('window:resize')
   onResize() {
-    // this.updateIsResponsive();
     this.uiService.setResponsive(window.innerWidth < 881);
   }
 
@@ -110,12 +97,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.messageInput?.nativeElement?.focus();
   }
 
-  // getMaxReactionsToShow(chat: any, index: number): any[] {
-  //   const max = this.isResponsive ? 3 : 7;
-  //   return this.showAllReactions[index]
-  //     ? chat.reactionArray
-  //     : chat.reactionArray.slice(0, max);
-  // }
 
   trackByChatId(chat: any): string {
     return chat.id;
@@ -136,7 +117,7 @@ export class ChatsComponent implements OnInit, OnChanges {
       this.filteredChannels = this.dataService.filteredChannels;
     }
     this.uiService.isResponsive$.pipe(takeUntil(this.destroy$)).subscribe(isResponsive => {
-      this.isResponsive = isResponsive;  // Falls noch lokal benötigt
+      this.isResponsive = isResponsive; 
     });
   }
 
@@ -154,7 +135,7 @@ export class ChatsComponent implements OnInit, OnChanges {
         this.channelName$ = this.dataService.channelName$;
         this.participants$ = this.dataService.participants$;
         this.chats$ = this.dataService.chatsSubject.asObservable();
-        // this.participants = this.dataService.participants;
+        this.participants = this.dataService.participants;
         this.filteredChannels = this.dataService.filteredChannels;
       }
     }
@@ -169,21 +150,10 @@ export class ChatsComponent implements OnInit, OnChanges {
     return chat.time ? new Date(chat.time * 1000) : undefined;
   }
 
-  // isSameDate(d1: Date | undefined, d2: Date | undefined): boolean {
-  //   if (!d1 || !d2) return false;
-  //   return d1.getFullYear() === d2.getFullYear() &&
-  //     d1.getMonth() === d2.getMonth() &&
-  //     d1.getDate() === d2.getDate();
-  // }
-  
-  // getDisplayDate(chat: any): string {
-  //   return this.uiService.getDisplayDate(chat.time);
-  // }
 
   openReactionsDialogue(event: { index: number; below: boolean }) {
     const index = event.index;
     const below = event.below;
-  // openReactionsDialogue(index: number, below: boolean) {
     const currentIndex = below
       ? this.activeReactionDialogueBelowIndex
       : this.activeReactionDialogueIndex;
@@ -203,30 +173,10 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  // async addReaction(chatIndex: number, reactionType: string) {
-  //   const chats = this.chatsSubject.getValue();
-  //   const chat = chats[chatIndex];
-  //   if (!chat) return;
-
-  //   this.activeReactionDialogueIndex = null;
-  //   this.activeReactionDialogueBelowIndex = null;
-
-  //   const currentReactionUsers = chat.reactions?.[reactionType] || [];
-  //   if (!currentReactionUsers.includes(this.currentUserId)) {
-  //     const updatedUsers = [...currentReactionUsers, this.currentUserId];
-  //     await this.channelService.setReaction(this.channelId!, chat.id, reactionType, updatedUsers);
-  //     // this.updateLocalReaction(
-  //     this.reactionService.updateLocalReaction(
-  //       chat, reactionType, updatedUsers, chatIndex,
-  //       this.chatsSubject, this.participants, this.currentUserId
-  //     );
-  //   }
-  // }
   async addReaction(event: { index: number; type: string }) {
-    const index = event.index;      // ✅ Extrahiere hier
+    const index = event.index;
     const type = event.type;   
     
-    // const chats = this.chatsSubject.getValue();
     const chats = await firstValueFrom(this.chats$.pipe(take(1)));
     const chat = chats[index];
     if (!chat) return;
@@ -245,36 +195,14 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
-  // async toggleReaction(chatIndex: number, reactionType: string) {
-  //   const chat = await this.getChatByIndex(chatIndex);
-  //   if (!chat) return;
-
-  //   // const currentUsers = this.extractUserIds(chat.reactions || {}, reactionType);
-  //   const currentUsers = this.reactionService.extractUserIds(chat.reactions || {}, reactionType);  // ← Service!
-  //   let updatedUsers: string[];
-  //   if (currentUsers.includes(this.currentUserId)) {
-  //     updatedUsers = currentUsers.filter(uid => uid !== this.currentUserId);
-  //   } else {
-  //     updatedUsers = [...currentUsers, this.currentUserId];
-  //   }
-
-  //   await this.channelService.setReaction(this.channelId!, chat.id, reactionType, updatedUsers);
-  //   // this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
-  //   this.reactionService.updateLocalReaction(
-  //     chat, reactionType, updatedUsers, chatIndex,
-  //     this.chatsSubject, this.participants, this.currentUserId
-  //   ); 
-  // }
   async toggleReaction(event: { index: number; type: string }) {
-  // async toggleReaction(chatIndex: number, reactionType: string) {
-    const index = event.index;      // ✅ Extrahiere hier
+    const index = event.index;  
     const type = event.type;   
 
     const chat = await this.getChatByIndex(index);
     if (!chat) return;
 
-    // const currentUsers = this.extractUserIds(chat.reactions || {}, reactionType);
-    const currentUsers = this.reactionService.extractUserIds(chat.reactions || {}, type);  // ← Service!
+    const currentUsers = this.reactionService.extractUserIds(chat.reactions || {}, type); 
     let updatedUsers: string[];
     if (currentUsers.includes(this.currentUserId)) {
       updatedUsers = currentUsers.filter(uid => uid !== this.currentUserId);
@@ -283,7 +211,6 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
 
     await this.channelService.setReaction(this.channelId!, chat.id, type, updatedUsers);
-    // this.updateLocalReaction(chat, reactionType, updatedUsers, chatIndex);
     this.reactionService.updateLocalReaction(
       chat, type, updatedUsers, index,
       this.chatsSubject, this.participants, this.currentUserId
@@ -310,12 +237,6 @@ export class ChatsComponent implements OnInit, OnChanges {
       chatId: chat.id
     });
   }
-
-  // openEditCommentDialogue() {
-  //   this.activeReactionDialogueIndex = null;
-  //   this.editCommentDialogueExpanded = !this.editCommentDialogueExpanded;
-  // }
-
 
 
   closeDialogChannelDescription() {
@@ -390,66 +311,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
 
-  // für EDIT??????
-  // openSmileyOverlay() {
-  //   this.activeSmiley = !this.activeSmiley;
-  // }
-
-  // onSmileySelected(smiley: string, el: HTMLTextAreaElement) {
-  //   this.textService.insertTextAtCursor(`:${smiley}:`, el, (newText) => {
-  //     this.newMessage = newText;  // ✅ Component setzt selbst!
-  //   });
-  //   this.activeSmiley = false;
-  // }
-
-  // insertMention(event: { name: string; type: 'user' | 'channel' | 'email' }) {
-  //   const trigger = event.type === 'user' ? '@' : '#';
-  //   const mentionText = `${trigger}${event.name} `;
-  //   const pos = this.mentionCaretIndex ?? this.newMessage.length;
-  //   const before = this.newMessage.slice(0, pos);
-  //   const replaced = before.replace(/([@#])([^\s]*)$/, mentionText);
-
-  //   this.newMessage = replaced + this.newMessage.slice(pos);
-  //   this.mentionCaretIndex = replaced.length + 1;
-
-  //   setTimeout(() => {
-  //     const textarea = this.messageInput.nativeElement;
-  //     textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
-  //     textarea.focus();
-  //   });
-  //   this.overlayActive = false;
-  // }
-
-  // updateCaretPosition() {
-  //   const textarea = this.messageInput?.nativeElement;
-  //   if (!textarea) return;
-  //   this.mentionCaretIndex = textarea.selectionStart ?? 0;
-  // }
-
-  // updateEditCaret(chat: any, textarea: HTMLTextAreaElement) {
-  //   chat._caretIndex = textarea.selectionStart;
-  // }
-
-  // insertMentionInEdit(chat: any, event: { name: string; type: 'user' | 'channel' | 'email' }) {
-  //   const trigger = event.type === 'user' ? '@' : '#';
-  //   const mentionText = `${trigger}${event.name} `;
-
-  //   const pos = chat._caretIndex ?? chat.editedText.length;
-  //   const before = chat.editedText.slice(0, pos);
-  //   const replaced = before.replace(/([@#])([^\s]*)$/, mentionText);
-
-  //   chat.editedText = replaced + ' ' + chat.editedText.slice(pos);
-  //   chat._caretIndex = replaced.length + 1;
-
-  //   setTimeout(() => {
-  //     const textarea = document.getElementById(`edit-${chat.id}`) as HTMLTextAreaElement;
-  //     textarea?.focus();
-  //     textarea && (textarea.selectionStart = textarea.selectionEnd = chat._caretIndex);
-  //   });
-  // }
-
   enableEditChat(chat: any) {
-    this.editCommentDialogueExpanded = false;
     this.chatsSubject.getValue().forEach(c => c.isEditing = false);
     chat.isEditing = true;
     chat.editedText = chat.message;
@@ -497,10 +359,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   autoGrow(el: HTMLTextAreaElement | null) {
     if (el) this.textService.autoGrow(el);
   }
-
-  // renderMessage(text: string): SafeHtml {
-  //   return this.textService.renderMessage(text);
-  // }
 
   handleChannelDeleted() {
     this.channelDeleted.emit();

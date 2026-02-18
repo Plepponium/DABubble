@@ -102,6 +102,8 @@ export class ChatMessageComponent {
 
   onEnableEditChat(chat: any) {
     this.enableEditChat.emit(chat);
+    // this.editCommentDialogueExpanded = !this.editCommentDialogueExpanded;
+    this.editCommentDialogueExpanded = false;
   }
 
   onCancelEditChat(chat: any) {
