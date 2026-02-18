@@ -49,9 +49,7 @@ export class ChatMessageComponent {
   /** Compares two dates to check if they fall on the same day. */
   isSameDate(d1: Date | undefined, d2: Date | undefined): boolean {
     if (!d1 || !d2) return false;
-    return d1.getFullYear() === d2.getFullYear() &&
-      d1.getMonth() === d2.getMonth() &&
-      d1.getDate() === d2.getDate();
+    return this.uiService.isSameDate(d1, d2);
   }
 
   /** Formats chat timestamp for display using UI service. */

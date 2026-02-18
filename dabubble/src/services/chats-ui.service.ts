@@ -5,7 +5,6 @@ import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 export class ChatsUiService {
   private destroy$ = new Subject<void>();
 
-  // ✅ UI States als BehaviorSubjects
   private showChannelDescriptionSubject = new BehaviorSubject<boolean>(false);
   public showChannelDescription$ = this.showChannelDescriptionSubject.asObservable();
 
@@ -18,10 +17,12 @@ export class ChatsUiService {
   private isResponsiveSubject = new BehaviorSubject<boolean>(false);
   public isResponsive$ = this.isResponsiveSubject.asObservable();
 
+  /** Sets the responsive layout state based on screen width. */
   setResponsive(isResponsive: boolean) {
     this.isResponsiveSubject.next(isResponsive);
   }
 
+  /** Toggles the show-all-reactions state for a specific message index. */
   toggleShowAllReactions(index: number) {
     const current = this.showAllReactionsSubject.value;
     this.showAllReactionsSubject.next({
@@ -30,7 +31,7 @@ export class ChatsUiService {
     });
   }
 
-  // ✅ Scroll & DOM Utilities
+  /** Instantly scrolls chat history container to the bottom. */
   scrollToBottom() {
     const chatHistory = document.getElementById('chat-history');
     if (chatHistory) {
@@ -38,12 +39,13 @@ export class ChatsUiService {
     }
   }
   
+  /** Smoothly scrolls chat history to the bottom for new messages. */
   scrollToBottomNewMessage() {
     const chatHistory = document.getElementById('chat-history');
     chatHistory?.scrollTo({ top: chatHistory.scrollHeight, behavior: 'smooth' });
   }
 
-  // ✅ Date Formatting (UI-Logik)
+  /** Formats chat timestamp as "Heute", "Gestern", or full weekday/date string. */
   getDisplayDate(chatTime: number | undefined): string {
     if (!chatTime) return '';
     const date = new Date(chatTime * 1000);
@@ -61,12 +63,14 @@ export class ChatsUiService {
     }).format(date);
   }
 
-  private isSameDate(d1: Date, d2: Date): boolean {
+  /** Compares two dates to determine if they fall on the same calendar day. */
+  isSameDate(d1: Date, d2: Date): boolean {
     return d1.getFullYear() === d2.getFullYear() &&
       d1.getMonth() === d2.getMonth() &&
       d1.getDate() === d2.getDate();
   }
 
+  /** Cleans up service subscriptions and completes destroy subject. */
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
