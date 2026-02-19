@@ -19,16 +19,23 @@ import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { RawReactionsMap, TransformedReaction } from '../../models/reaction.types';
 import { LogoutService } from '../../services/logout.service';
+import { ChatInputComponent } from "../chat-input/chat-input.component";
+import { ChatsUiService } from '../../services/chats-ui.service';
 
 @Component({
   selector: 'app-thread',
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, MentionsOverlayComponent, SmileyOverlayComponent],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RoundBtnComponent, MentionsOverlayComponent, SmileyOverlayComponent, ChatInputComponent],
   templateUrl: './thread.component.html',
   styleUrl: './thread.component.scss'
 })
 export class ThreadComponent implements OnInit {
 
   @ViewChild('answerInput', { static: false }) answerInput!: ElementRef<HTMLTextAreaElement>;
+  channelService = inject(ChannelService);
+  userService = inject(UserService);
+  logoutService = inject(LogoutService);
+  uiService = inject(ChatsUiService);
+
   overlayActive: boolean = false;
   editAnswerEditIndex: number | null = null;
   activeReactionDialogueIndex: string | null = null;
@@ -37,6 +44,7 @@ export class ThreadComponent implements OnInit {
   activeReactionDialogueBelowAnswersIndex: number | null = null;
   insertedAtPending = false;
   isResponsive = false;
+  private isSubmitting = false;
 
   currentUserId: string = '';
   participantIds: string[] = [];
@@ -58,10 +66,6 @@ export class ThreadComponent implements OnInit {
 
   private chatsSubject = new BehaviorSubject<ChatWithDetails[]>([]);
   public chats$ = this.chatsSubject.asObservable();
-
-  channelService = inject(ChannelService);
-  userService = inject(UserService);
-  logoutService = inject(LogoutService);
   private destroy$ = this.logoutService.logout$;
 
   activeSmiley = false;
@@ -134,6 +138,11 @@ export class ThreadComponent implements OnInit {
         threadHistory.scrollTop = threadHistory.scrollHeight;
       }
     }, 100); // kleiner Delay, damit DOM aktualisiert ist
+  }
+
+  scrollToBottomNewMessage() {
+    const threadHistory = document.getElementById('thread-history');
+    threadHistory?.scrollTo({ top: threadHistory.scrollHeight, behavior: 'smooth' });
   }
 
   getCurrentUserAndChannels() {
@@ -481,18 +490,48 @@ export class ThreadComponent implements OnInit {
   }
 
   async submitAnswer() {
-    const message = this.newAnswer.trim();
-    if (!message) return;
-    if (!this.channelId || !this.chatId || !this.currentUserId) return;
-    const answer = {
-      message,
+    if (this.isSubmitting || !this.canSendMessage()) return;
+    
+    this.isSubmitting = true; 
+    // const message = this.newAnswer.trim();
+
+    // if (!message) return;
+    // if (!this.channelId || !this.chatId || !this.currentUserId) return;
+    // const answer = {
+    //   message,
+    //   time: Math.floor(Date.now() / 1000),
+    //   user: this.currentUserId
+    // };
+    const answer = this.buildAnswerPayload();
+    try {
+      await this.channelService.addAnswerToChat(this.channelId, this.chatId, answer);
+      this.answerAdded.emit({ chatId: this.chatId!, answerTime: answer.time });
+      this.newAnswer = '';
+      // setTimeout(() => this.scrollToBottom());
+      [0, 50, 150].forEach(delay => 
+        setTimeout(() => this.scrollToBottomNewMessage(), delay)
+      );
+      } catch (err) {
+      console.error('Fehler beim Senden der Antwort:', err);
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  /** Determines whether the current message can be sent based on state and input. */
+  private canSendMessage(): boolean {
+    if (!this.newAnswer?.trim()) return false;
+    if (!this.channelId || !this.chatId || !this.currentUserId) return false;
+    return true;
+  }
+
+  /** Builds the payload object for a new chat message. */
+  private buildAnswerPayload() {
+    return {
+      message: this.newAnswer.trim(),
       time: Math.floor(Date.now() / 1000),
       user: this.currentUserId
     };
-    await this.channelService.addAnswerToChat(this.channelId, this.chatId, answer);
-    this.answerAdded.emit({ chatId: this.chatId!, answerTime: answer.time });
-    this.newAnswer = '';
-    setTimeout(() => this.scrollToBottom());
   }
 
   onEnterPress(e: KeyboardEvent) {
