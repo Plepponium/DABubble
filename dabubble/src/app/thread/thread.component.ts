@@ -21,6 +21,7 @@ import { RawReactionsMap, TransformedReaction } from '../../models/reaction.type
 import { LogoutService } from '../../services/logout.service';
 import { ChatInputComponent } from "../chat-input/chat-input.component";
 import { ChatsUiService } from '../../services/chats-ui.service';
+import { ThreadService } from '../../services/thread.service';
 
 @Component({
   selector: 'app-thread',
@@ -35,6 +36,7 @@ export class ThreadComponent implements OnInit {
   userService = inject(UserService);
   logoutService = inject(LogoutService);
   uiService = inject(ChatsUiService);
+  threadService = inject(ThreadService);
 
   overlayActive: boolean = false;
   editAnswerEditIndex: number | null = null;
@@ -83,18 +85,30 @@ export class ThreadComponent implements OnInit {
     this.updateIsResponsive();
     this.getCurrentUserAndChannels();
     this.loadChannelWithId(this.channelId);
-    this.chat$ = this.getEnrichedChat();
-    this.answers$ = this.getEnrichedAnswers();
-    this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
-      this.scrollToBottom();
-      this.focusAnswerInput()
-    });
+    // this.threadService.loadChannelWithId(this.channelId).subscribe(({ channelName$, participants$ }) => {
+    //   this.channelName$ = channelName$;
+    //   this.participants$ = participants$;
+      
+    //   this.participants$.subscribe(users => this.participants = users);
+      
+    //   this.chat$ = this.threadService.getEnrichedChat(this.channelId, this.chatId, this.participants$, this.currentUserId);
+    //   this.answers$ = this.threadService.getEnrichedAnswers(this.channelId, this.chatId, this.participants$, this.currentUserId);
+    // });
+    // this.chat$ = this.getEnrichedChat();
+    // this.answers$ = this.getEnrichedAnswers();
+    // this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
+    //   this.scrollToBottom();
+    //   this.focusAnswerInput()
+    // });
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['chatId'] && !changes['chatId'].firstChange) {
-      this.chat$ = this.getEnrichedChat();
-      this.answers$ = this.getEnrichedAnswers();
+      // this.chat$ = this.getEnrichedChat();
+      // this.answers$ = this.getEnrichedAnswers();
+      this.chat$ = this.threadService.getEnrichedChat(this.channelId, this.chatId, this.participants$, this.currentUserId);
+      this.answers$ = this.threadService.getEnrichedAnswers(this.channelId, this.chatId, this.participants$, this.currentUserId);
+      
       this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
         this.scrollToBottom();
         this.focusAnswerInput();
@@ -103,15 +117,36 @@ export class ThreadComponent implements OnInit {
     if (changes['channelId'] && !changes['channelId'].firstChange) {
       this.getCurrentUserAndChannels();
       this.loadChannelWithId(this.channelId);
+      // this.threadService.loadChannelWithId(this.channelId).subscribe(({ channelName$, participants$ }) => {
+      //   this.channelName$ = channelName$;
+      //   this.participants$ = participants$;
+
+      //   this.subscribeToParticipants();
+
+      //   this.chat$ = this.threadService.getEnrichedChat(
+      //     this.channelId, this.chatId, this.participants$, this.currentUserId
+      //   );
+      //   this.answers$ = this.threadService.getEnrichedAnswers(
+      //     this.channelId,
+      //     this.chatId,
+      //     this.participants$,
+      //     this.currentUserId
+      //   );
+
+        // this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
+        //   this.scrollToBottom();
+        //   this.focusAnswerInput();
+        // });
+      // });
     }
   }
 
-  @HostListener('window:resize')  // ← NEU!
+  @HostListener('window:resize') 
   onResize() {
     this.updateIsResponsive();
   }
 
-  private updateIsResponsive() {  // ← NEU!
+  updateIsResponsive() { 
     this.isResponsive = window.innerWidth < 881;
   }
 
@@ -137,7 +172,7 @@ export class ThreadComponent implements OnInit {
       if (threadHistory) {
         threadHistory.scrollTop = threadHistory.scrollHeight;
       }
-    }, 100); // kleiner Delay, damit DOM aktualisiert ist
+    }, 100); 
   }
 
   scrollToBottomNewMessage() {
@@ -146,85 +181,120 @@ export class ThreadComponent implements OnInit {
   }
 
   getCurrentUserAndChannels() {
-    this.userService.getCurrentUser().pipe(take(1), takeUntil(this.destroy$)).subscribe(user => {
-      if (user) {
-        this.currentUserId = user.uid;
-        this.channelService.getChannels().pipe(take(1), takeUntil(this.destroy$)).subscribe(channels => {
-          this.filteredChannels = channels.filter(c =>
-            Array.isArray(c.participants) && c.participants.includes(this.currentUserId)
-          );
-        });
-      }
+  //   this.userService.getCurrentUser().pipe(take(1), takeUntil(this.destroy$)).subscribe(user => {
+  //     if (user) {
+  //       this.currentUserId = user.uid;
+  //       this.channelService.getChannels().pipe(take(1), takeUntil(this.destroy$)).subscribe(channels => {
+  //         this.filteredChannels = channels.filter(c =>
+  //           Array.isArray(c.participants) && c.participants.includes(this.currentUserId)
+  //         );
+  //       });
+  //     }
+  //   });
+    this.threadService.getCurrentUserAndChannels().subscribe(result => {
+      this.currentUserId = result.userId;
+      this.filteredChannels = result.channels;
     });
   }
 
   private loadChannelWithId(channelId: string) {
-    // console.log('loadChannelWithId channelId', channelId);
+  //   this.channelService.getChannelById(channelId).pipe(take(1), takeUntil(this.destroy$)).subscribe(channel => {
+  //     if (!channel) return;
+  //     this.channelId = channelId;
+  //     this.channelName$ = of(channel.name);
+  //     this.participants$ = this.userService.getUsersByIds(channel.participants);
+  //     this.subscribeToParticipants();
+  //   });
+    this.threadService.loadChannelWithId(this.channelId).subscribe(({ channelName$, participants$ }) => {
+      this.channelName$ = channelName$;
+      this.participants$ = participants$;
 
-    this.channelService.getChannelById(channelId).pipe(take(1), takeUntil(this.destroy$)).subscribe(channel => {
-      if (!channel) return;
-      // console.log('loadChannelWithId channel participants', channel.participants);
-      this.channelId = channelId;
-      this.channelName$ = of(channel.name);
-      this.participants$ = this.userService.getUsersByIds(channel.participants);
       this.subscribeToParticipants();
+
+      this.chat$ = this.threadService.getEnrichedChat(this.channelId, this.chatId, this.participants$, this.currentUserId);
+      this.answers$ = this.threadService.getEnrichedAnswers(this.channelId, this.chatId, this.participants$, this.currentUserId);
+      
+      this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
+        this.scrollToBottom();
+        this.focusAnswerInput();
+      });
     });
   }
 
-  getEnrichedChat(): Observable<Chat | undefined> {
-    return this.channelService.getChatsForChannel(this.channelId).pipe(
-      switchMap(chats =>
-        this.participants$.pipe(
-          map(users => {
-            const chat = chats.find(c => c.id === this.chatId);
-            if (!chat) return undefined;
-            const user = users.find(u => u.uid === chat.user);
-            const isUserMissing = !user;
-            return {
-              ...chat,
-              userName: isUserMissing ? 'Ehemaliger Nutzer' : user.name,
-              userImg: user?.img ?? 'default-user',
-              isUserMissing,
-              reactionArray: this.transformReactionsToArray(chat.reactions, users, this.currentUserId)
-            };
-          })
-        )
-      )
-    );
-  }
+  // getEnrichedChat(): Observable<Chat | undefined> {
+  //   return this.channelService.getChatsForChannel(this.channelId).pipe(
+  //     switchMap(chats =>
+  //       this.participants$.pipe(
+  //         map(users => {
+  //           const chat = chats.find(c => c.id === this.chatId);
+  //           if (!chat) return undefined;
+  //           const user = users.find(u => u.uid === chat.user);
+  //           const isUserMissing = !user;
+  //           return {
+  //             ...chat,
+  //             userName: isUserMissing ? 'Ehemaliger Nutzer' : user.name,
+  //             userImg: user?.img ?? 'default-user',
+  //             isUserMissing,
+  //             reactionArray: this.transformReactionsToArray(chat.reactions, users, this.currentUserId)
+  //           };
+  //         })
+  //       )
+  //     )
+  //   );
+  // }
 
-  getEnrichedAnswers(): Observable<Answer[]> {
-    return this.channelService.getAnswersForChat(this.channelId, this.chatId).pipe(
-      switchMap(answers =>
-        this.participants$.pipe(
-          map(users =>
-            answers.map(answer => {
-              const user = users.find(u => u.uid === answer.user);
-              const isUserMissing = !user;
+  // getEnrichedAnswers(): Observable<Answer[]> {
+  //   return this.channelService.getAnswersForChat(this.channelId, this.chatId).pipe(
+  //     switchMap(answers =>
+  //       this.participants$.pipe(
+  //         map(users =>
+  //           answers.map(answer => {
+  //             const user = users.find(u => u.uid === answer.user);
+  //             const isUserMissing = !user;
 
-              return {
-                ...answer,
-                userName: isUserMissing ? 'Ehemaliger Nutzer' : user.name,
-                userImg: user?.img ?? 'default-user',
-                isUserMissing,
-                reactionArray: this.transformReactionsToArray(answer.reactions, users, this.currentUserId)
-              };
-            })
-          )
-        )
-      )
-    );
-  }
+  //             return {
+  //               ...answer,
+  //               userName: isUserMissing ? 'Ehemaliger Nutzer' : user.name,
+  //               userImg: user?.img ?? 'default-user',
+  //               isUserMissing,
+  //               reactionArray: this.transformReactionsToArray(answer.reactions, users, this.currentUserId)
+  //             };
+  //           })
+  //         )
+  //       )
+  //     )
+  //   );
+  // }
 
-  async loadChatById(channelId: string) {
-    this.channelService.getChannelById(channelId).pipe(take(1), takeUntil(this.destroy$)).subscribe(async channel => {
-      if (!channel) return;
+  // async loadChatById(channelId: string) {
+  // //   this.channelService.getChannelById(channelId).pipe(take(1), takeUntil(this.destroy$)).subscribe(async channel => {
+  // //     if (!channel) return;
 
-      this.channelId = channelId;
-      this.channelName$ = of(channel.name);
-      this.subscribeToParticipants();
-    });
-  }
+  // //     this.channelId = channelId;
+  // //     this.channelName$ = of(channel.name);
+  // //     this.subscribeToParticipants();
+  // //   });
+  //   this.threadService.loadChatById(this.channelId).subscribe(({ name$, participants$ }) => {
+  //     this.channelName$ = name$;
+  //     this.participants$ = participants$;
+
+  //     this.participants$.subscribe(users => (this.participants = users));
+
+  //     // Danach kannst du z. B. direkt Chat/Answers laden
+  //     this.chat$ = this.threadService.getEnrichedChat(
+  //       this.channelId,
+  //       this.chatId,
+  //       this.participants$,
+  //       this.currentUserId
+  //     );
+  //     this.answers$ = this.threadService.getEnrichedAnswers(
+  //       this.channelId,
+  //       this.chatId,
+  //       this.participants$,
+  //       this.currentUserId
+  //     );
+  //   });
+  // }
 
   subscribeToParticipants() {
     this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => {
@@ -233,34 +303,41 @@ export class ThreadComponent implements OnInit {
     });
   }
 
-  getAnswersForChat() {
-    this.answers$ = this.channelService.getAnswersForChat(this.channelId, this.chatId).pipe(
-      switchMap(answers =>
-        this.userService.getUsersByIds(answers.map((a: any) => a.user)).pipe(
-          switchMap(users => {
-            const answerDetails$ = answers.map(answer =>
-              forkJoin({
-                reactions: this.channelService.getReactionsForAnswer(this.channelId, this.chatId, answer.id).pipe(take(1)),
-                user: of(users.find(u => u.uid === answer.user)),
-              }).pipe(
-                map(({ reactions, user }) => ({
-                  ...answer,
-                  userName: user?.name,
-                  userImg: user?.img,
-                  reactions,
-                  reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
-                }))
-              )
-            );
-            return forkJoin(answerDetails$);
-          })
-        )
-      )
-    );
-    map((enrichedAnswers: Answer[]) =>
-      enrichedAnswers.sort((a, b) => a.time - b.time)
-    );
-  }
+  // getAnswersForChat() {
+  // //   this.answers$ = this.channelService.getAnswersForChat(this.channelId, this.chatId).pipe(
+  // //     switchMap(answers =>
+  // //       this.userService.getUsersByIds(answers.map((a: any) => a.user)).pipe(
+  // //         switchMap(users => {
+  // //           const answerDetails$ = answers.map(answer =>
+  // //             forkJoin({
+  // //               reactions: this.channelService.getReactionsForAnswer(this.channelId, this.chatId, answer.id).pipe(take(1)),
+  // //               user: of(users.find(u => u.uid === answer.user)),
+  // //             }).pipe(
+  // //               map(({ reactions, user }) => ({
+  // //                 ...answer,
+  // //                 userName: user?.name,
+  // //                 userImg: user?.img,
+  // //                 reactions,
+  // //                 reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
+  // //               }))
+  // //             )
+  // //           );
+  // //           return forkJoin(answerDetails$);
+  // //         })
+  // //       )
+  // //     )
+  // //   );
+  // //   map((enrichedAnswers: Answer[]) =>
+  // //     enrichedAnswers.sort((a, b) => a.time - b.time)
+  // //   );
+  //   this.answers$ = this.threadService.getAnswersForChat(
+  //     this.channelId,
+  //     this.chatId,
+  //     this.currentUserId,
+  //     this.userService,
+  //     this.channelService
+  //   );
+  // }
 
   openReactionsDialogue(chatId: string) {
     if (this.activeReactionDialogueIndex === chatId) {
@@ -302,57 +379,42 @@ export class ThreadComponent implements OnInit {
     }
   }
 
-  transformReactionsToArray(
-    // reactionsMap: Record<string, string[] | string> | undefined,
-    reactionsMap: RawReactionsMap | undefined,
-    participants: User[],
-    currentUserId: string
-  ): TransformedReaction[] {
-    if (!reactionsMap) return [];
+  // transformReactionsToArray(
+  //   reactionsMap: RawReactionsMap | undefined,
+  //   participants: User[],
+  //   currentUserId: string
+  // ): TransformedReaction[] {
+  //   if (!reactionsMap) return [];
 
-    // return Object.entries(reactionsMap).map(([type, usersRaw]) => {
-    //   // Fallback: falls single userId als String, dann Array draus machen
-    //   let userIds: string[] = [];
-    //   if (Array.isArray(usersRaw)) userIds = usersRaw;
-    //   else if (typeof usersRaw === 'string') userIds = [usersRaw];
-    //   else userIds = [];
-    //   const currentUserReacted = userIds.includes(currentUserId);
-    //   const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
-    //   const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
-    //   return { type, count: userIds.length, userIds, currentUserReacted, otherUserName, otherUserReacted };
-    // })
-    // .sort((a, b) => a.type.localeCompare(b.type));
+  //   return Object.entries(reactionsMap).map(([type, usersRaw]) => {
+  //       const userIds = this.parseUserIds(Array.isArray(usersRaw) ? usersRaw : [usersRaw]);
+  //       const currentUserReacted = userIds.includes(currentUserId);
+  //       const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
+  //       const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
 
-    return Object.entries(reactionsMap)
-      .map(([type, usersRaw]) => {
-        const userIds = this.parseUserIds(Array.isArray(usersRaw) ? usersRaw : [usersRaw]);
-        const currentUserReacted = userIds.includes(currentUserId);
-        const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
-        const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
+  //       return {
+  //         type,
+  //         count: userIds.length,
+  //         userIds,
+  //         currentUserReacted,
+  //         otherUserName,
+  //         otherUserReacted,
+  //       };
+  //     })
+  //     .sort((a, b) => a.type.localeCompare(b.type));
+  // }
 
-        return {
-          type,
-          count: userIds.length,
-          userIds,
-          currentUserReacted,
-          otherUserName,
-          otherUserReacted,
-        };
-      })
-      .sort((a, b) => a.type.localeCompare(b.type));
-  }
+  // private parseUserIds(users: string[]): string[] {
+  //   return users.flatMap(u =>
+  //     u.includes(',') ? u.split(',').map(id => id.trim()) : [u]
+  //   );
+  // }
 
-  private parseUserIds(users: string[]): string[] {
-    return users.flatMap(u =>
-      u.includes(',') ? u.split(',').map(id => id.trim()) : [u]
-    );
-  }
-
-  private findOtherUserName(userIds: string[], currentUserId: string, participants: User[]): string | undefined {
-    const others = userIds.filter(id => id !== currentUserId);
-    if (others.length === 0) return undefined;
-    return participants.find(u => u.uid === others[0])?.name || 'Unbekannt';
-  }
+  // private findOtherUserName(userIds: string[], currentUserId: string, participants: User[]): string | undefined {
+  //   const others = userIds.filter(id => id !== currentUserId);
+  //   if (others.length === 0) return undefined;
+  //   return participants.find(u => u.uid === others[0])?.name || 'Unbekannt';
+  // }
 
   // private async saveOrDeleteReaction(channelId: string, chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
   //   if (updatedUsers.length === 0) {
@@ -361,178 +423,257 @@ export class ThreadComponent implements OnInit {
   //     await this.channelService.updateReactionForChat(channelId, chatId, reactionType, updatedUsers);
   //   }
   // }
-  private async saveOrDeleteReaction(channelId: string, chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
-    // Methode passt sich an die Map-Struktur an und ruft setReaction auf
-    await this.channelService.setReaction(channelId, chatId, reactionType, updatedUsers);
-  }
+  // private async saveOrDeleteReaction(channelId: string, chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
+  //   // Methode passt sich an die Map-Struktur an und ruft setReaction auf
+  //   await this.channelService.setReaction(channelId, chatId, reactionType, updatedUsers);
+  // }
 
-  private async updateReactionForChat(chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
-    // Hole den aktuellen Chat direkt über das Observable (du hast nur einen Chat im Thread)
-    const chat = await firstValueFrom(this.chat$);
-    if (!chat) return;
+  // private async updateReactionForChat(chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
+  //   // Hole den aktuellen Chat direkt über das Observable (du hast nur einen Chat im Thread)
+  //   const chat = await firstValueFrom(this.chat$);
+  //   if (!chat) return;
 
-    const channelId = this.channelId;
-    const currentUserId = this.currentUserId;
-    if (!channelId || !chatId || !currentUserId) return;
+  //   const channelId = this.channelId;
+  //   const currentUserId = this.currentUserId;
+  //   if (!channelId || !chatId || !currentUserId) return;
 
-    try {
-      // await this.saveOrDeleteReaction(channelId, chatId, reactionType, updatedUsers);
-      this.updateLocalReaction(chat, reactionType, updatedUsers);
-    } catch (error) {
-      console.error('Fehler beim Aktualisieren der Reaction:', error);
-    }
-  }
+  //   try {
+  //     // await this.saveOrDeleteReaction(channelId, chatId, reactionType, updatedUsers);
+  //     this.updateLocalReaction(chat, reactionType, updatedUsers);
+  //   } catch (error) {
+  //     console.error('Fehler beim Aktualisieren der Reaction:', error);
+  //   }
+  // }
 
-  private updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[]): void {
-    chat.reactions = { ...chat.reactions };
-    if (updatedUsers.length === 0) {
-      delete chat.reactions[reactionType];
-    } else {
-      chat.reactions[reactionType] = updatedUsers;
-    }
-    chat.reactionArray = this.transformReactionsToArray(chat.reactions, this.participants, this.currentUserId);
+  // private updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[]): void {
+  //   chat.reactions = { ...chat.reactions };
+  //   if (updatedUsers.length === 0) {
+  //     delete chat.reactions[reactionType];
+  //   } else {
+  //     chat.reactions[reactionType] = updatedUsers;
+  //   }
+  //   chat.reactionArray = this.transformReactionsToArray(chat.reactions, this.participants, this.currentUserId);
 
-    // Für einen einzelnen Chat reicht es, das Observable neu zu setzen (optional: Subject, falls weitere lokale Updates nötig sind)
-    this.chat$ = of({ ...chat });
-  }
+  //   // Für einen einzelnen Chat reicht es, das Observable neu zu setzen (optional: Subject, falls weitere lokale Updates nötig sind)
+  //   this.chat$ = of({ ...chat });
+  // }
 
+  // async addReaction(chatId: string, reactionType: string) {
+  //   console.log('reactionType', reactionType);
+
+  //   const chat = await firstValueFrom(this.chat$);
+  //   if (!chat) return;
+
+  //   this.activeReactionDialogueIndex = null;
+  //   this.activeReactionDialogueBelowIndex = null;
+
+  //   const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
+  //   if (!currentReactionUsers.includes(this.currentUserId)) {
+  //     const updatedUsers = [...currentReactionUsers, this.currentUserId];
+  //     await this.saveOrDeleteReaction(this.channelId, chatId, reactionType, updatedUsers);
+  //     await this.updateReactionForChat(chatId, reactionType, updatedUsers);
+  //   }
+  // }
   async addReaction(chatId: string, reactionType: string) {
-    console.log('reactionType', reactionType);
+    const updatedChat = await this.threadService.addReaction(
+      this.channelId,
+      this.chat$,
+      reactionType,
+      this.currentUserId,
+      this.participants
+    );
 
-    const chat = await firstValueFrom(this.chat$);
-    if (!chat) return;
-
-    this.activeReactionDialogueIndex = null;
-    this.activeReactionDialogueBelowIndex = null;
-
-    const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
-    if (!currentReactionUsers.includes(this.currentUserId)) {
-      const updatedUsers = [...currentReactionUsers, this.currentUserId];
-      await this.saveOrDeleteReaction(this.channelId, chatId, reactionType, updatedUsers);
-      await this.updateReactionForChat(chatId, reactionType, updatedUsers);
+    if (updatedChat) {
+      this.chat$ = of(updatedChat); // UI neu rendern
     }
   }
 
   async addReactionToAnswer(answerId: string, reactionType: string) {
-    const answers = await firstValueFrom(this.answers$);
-    const answer = answers.find(a => a.id === answerId);
-    if (!answer) return;
+  //   const answers = await firstValueFrom(this.answers$);
+  //   const answer = answers.find(a => a.id === answerId);
+  //   if (!answer) return;
 
-    this.activeReactionDialogueAnswersIndex = null;
-    this.activeReactionDialogueBelowAnswersIndex = null;
+  //   this.activeReactionDialogueAnswersIndex = null;
+  //   this.activeReactionDialogueBelowAnswersIndex = null;
 
-    const currentReactionUsers = this.extractUserIds(answer.reactions || {}, reactionType);
-    if (!currentReactionUsers.includes(this.currentUserId)) {
-      const updatedUsers = [...currentReactionUsers, this.currentUserId];
-      // 4. Aktualisiere Reaction-Map in Firestore via ChannelService
-      await this.channelService.setAnswerReaction(this.channelId, this.chatId, answerId, reactionType, updatedUsers);
-      // 5. Lokales Update der Antwort im answers$ Observable (zwingend, damit UI synchron bleibt)
-      answer.reactions = { ...answer.reactions, [reactionType]: updatedUsers };
-      answer.reactionArray = this.transformReactionsToArray(answer.reactions, this.participants, this.currentUserId);
+  //   const currentReactionUsers = this.extractUserIds(answer.reactions || {}, reactionType);
+  //   if (!currentReactionUsers.includes(this.currentUserId)) {
+  //     const updatedUsers = [...currentReactionUsers, this.currentUserId];
+  //     // 4. Aktualisiere Reaction-Map in Firestore via ChannelService
+  //     await this.channelService.setAnswerReaction(this.channelId, this.chatId, answerId, reactionType, updatedUsers);
+  //     // 5. Lokales Update der Antwort im answers$ Observable (zwingend, damit UI synchron bleibt)
+  //     answer.reactions = { ...answer.reactions, [reactionType]: updatedUsers };
+  //     answer.reactionArray = this.transformReactionsToArray(answer.reactions, this.participants, this.currentUserId);
 
-      // Optional: answers$ triggern, damit Template updated wird
-      this.answers$ = of([...answers]);
+  //     // Optional: answers$ triggern, damit Template updated wird
+  //     this.answers$ = of([...answers]);
+  //   }
+    const updatedAnswers = await this.threadService.addReactionToAnswer(
+      this.channelId,
+      this.chatId,
+      this.answers$,
+      answerId,
+      reactionType,
+      this.currentUserId,
+      this.participants
+    );
+
+    if (updatedAnswers) {
+      this.answers$ = of(updatedAnswers); // UI sofort aktualisieren
     }
   }
 
   async toggleReactionForChat(chatId: string, reactionType: string) {
-    const chat = await firstValueFrom(this.chat$);
-    if (!chat) return;
+  //   const chat = await firstValueFrom(this.chat$);
+  //   if (!chat) return;
 
-    const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
-    let updatedUsers: string[];
-    if (currentReactionUsers.includes(this.currentUserId)) {
-      updatedUsers = currentReactionUsers.filter(uid => uid !== this.currentUserId);
-    } else {
-      updatedUsers = [...currentReactionUsers, this.currentUserId];
-    }
+  //   const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
+  //   let updatedUsers: string[];
+  //   if (currentReactionUsers.includes(this.currentUserId)) {
+  //     updatedUsers = currentReactionUsers.filter(uid => uid !== this.currentUserId);
+  //   } else {
+  //     updatedUsers = [...currentReactionUsers, this.currentUserId];
+  //   }
 
-    await this.saveOrDeleteReaction(this.channelId, chatId, reactionType, updatedUsers);
-    await this.updateReactionForChat(chatId, reactionType, updatedUsers);
+  //   await this.saveOrDeleteReaction(this.channelId, chatId, reactionType, updatedUsers);
+  //   await this.updateReactionForChat(chatId, reactionType, updatedUsers);
+    const updatedChat = await this.threadService.toggleReactionForChat(
+      this.channelId,
+      this.chat$,
+      reactionType,
+      this.currentUserId,
+      this.participants
+    );
+
+    if (updatedChat) this.chat$ = of(updatedChat);
   }
 
   async toggleReactionForAnswer(answerId: string, reactionType: string) {
-    // console.log('toggleReactionForAnswer answerId', answerId, 'reactionType', reactionType);
-    const answers = await firstValueFrom(this.answers$);
-    const answer = answers.find(a => a.id === answerId);
-    if (!answer) return;
+  //   // console.log('toggleReactionForAnswer answerId', answerId, 'reactionType', reactionType);
+  //   const answers = await firstValueFrom(this.answers$);
+  //   const answer = answers.find(a => a.id === answerId);
+  //   if (!answer) return;
 
-    const currentReactionUsers = this.extractUserIds(answer.reactions || {}, reactionType);
-    let updatedUsers: string[];
-    if (currentReactionUsers.includes(this.currentUserId)) {
-      updatedUsers = currentReactionUsers.filter(uid => uid !== this.currentUserId);
-    } else {
-      updatedUsers = [...currentReactionUsers, this.currentUserId];
-    }
+  //   const currentReactionUsers = this.extractUserIds(answer.reactions || {}, reactionType);
+  //   let updatedUsers: string[];
+  //   if (currentReactionUsers.includes(this.currentUserId)) {
+  //     updatedUsers = currentReactionUsers.filter(uid => uid !== this.currentUserId);
+  //   } else {
+  //     updatedUsers = [...currentReactionUsers, this.currentUserId];
+  //   }
 
-    await this.channelService.setAnswerReaction(this.channelId, this.chatId, answerId, reactionType, updatedUsers);
+  //   await this.channelService.setAnswerReaction(this.channelId, this.chatId, answerId, reactionType, updatedUsers);
 
-    if (updatedUsers.length === 0) {
-      const { [reactionType]: _, ...rest } = answer.reactions!;
-      answer.reactions = rest;
-    } else {
-      answer.reactions = { ...answer.reactions, [reactionType]: updatedUsers };
-    }
-    answer.reactionArray = this.transformReactionsToArray(answer.reactions, this.participants, this.currentUserId);
+  //   if (updatedUsers.length === 0) {
+  //     const { [reactionType]: _, ...rest } = answer.reactions!;
+  //     answer.reactions = rest;
+  //   } else {
+  //     answer.reactions = { ...answer.reactions, [reactionType]: updatedUsers };
+  //   }
+  //   answer.reactionArray = this.transformReactionsToArray(answer.reactions, this.participants, this.currentUserId);
 
-    this.answers$ = of([...answers]);
-  }
-
-  private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
-    const usersRaw = reactions[reactionType] || [];
-    return usersRaw.flatMap((u: string) =>
-      u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
+  //   this.answers$ = of([...answers]);
+    const updatedAnswers = await this.threadService.toggleReactionForAnswer(
+      this.channelId,
+      this.chatId,
+      this.answers$,
+      answerId,
+      reactionType,
+      this.currentUserId,
+      this.participants
     );
+
+    if (updatedAnswers) {
+      this.answers$ = of(updatedAnswers); // UI sofort updaten
+    }
   }
+
+  // private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
+  //   const usersRaw = reactions[reactionType] || [];
+  //   return usersRaw.flatMap((u: string) =>
+  //     u.includes(',') ? u.split(',').map((x: string) => x.trim()) : [u]
+  //   );
+  // }
 
   handleCloseThread() {
     this.closeThread.emit();
   }
 
-  async submitAnswer() {
-    if (this.isSubmitting || !this.canSendMessage()) return;
+  // async submitAnswer() {
+  //   if (this.isSubmitting || !this.canSendMessage()) return;
     
-    this.isSubmitting = true; 
-    // const message = this.newAnswer.trim();
+  //   this.isSubmitting = true; 
+  //   const answer = this.buildAnswerPayload();
+  //   try {
+  //     await this.channelService.addAnswerToChat(this.channelId, this.chatId, answer);
+  //     this.answerAdded.emit({ chatId: this.chatId!, answerTime: answer.time });
+  //     this.newAnswer = '';
+  //     // setTimeout(() => this.scrollToBottom());
+  //     [0, 50, 150].forEach(delay => 
+  //       setTimeout(() => this.scrollToBottomNewMessage(), delay)
+  //     );
+  //     } catch (err) {
+  //     console.error('Fehler beim Senden der Antwort:', err);
+  //   } finally {
+  //     this.isSubmitting = false;
+  //   }
+  // }
+  // async submitAnswer() {
+  //   if (this.isSubmitting || !this.newAnswer.trim()) return;
+  //   this.isSubmitting = true;
 
-    // if (!message) return;
-    // if (!this.channelId || !this.chatId || !this.currentUserId) return;
-    // const answer = {
-    //   message,
-    //   time: Math.floor(Date.now() / 1000),
-    //   user: this.currentUserId
-    // };
-    const answer = this.buildAnswerPayload();
+  //   const answer = this.threadService.buildAnswerPayload(this.newAnswer, this.currentUserId);
+
+  //   try {
+  //     await this.channelService.addAnswerToChat(this.channelId, this.chatId, answer);
+  //     // await this.threadService.submitAnswer(this.channelId, this.chatId, answer);
+  //     this.answerAdded.emit({ chatId: this.chatId, answerTime: answer.time });
+  //     this.newAnswer = '';
+  //     [0, 50, 150].forEach(d => setTimeout(() => this.threadService.scrollToBottomNewMessage(), d));
+  //   } finally {
+  //     this.isSubmitting = false;
+  //   }
+  // }
+  async submitAnswer() {
+    if (this.isSubmitting || !this.newAnswer.trim()) return;
+    this.isSubmitting = true;
+
     try {
-      await this.channelService.addAnswerToChat(this.channelId, this.chatId, answer);
-      this.answerAdded.emit({ chatId: this.chatId!, answerTime: answer.time });
-      this.newAnswer = '';
-      // setTimeout(() => this.scrollToBottom());
-      [0, 50, 150].forEach(delay => 
-        setTimeout(() => this.scrollToBottomNewMessage(), delay)
+      const result = await this.threadService.submitAnswer(
+        this.channelId,
+        this.chatId,
+        this.newAnswer,
+        this.currentUserId
       );
-      } catch (err) {
-      console.error('Fehler beim Senden der Antwort:', err);
+
+      if (result.success) {
+        this.answerAdded.emit({ chatId: this.chatId, answerTime: result.answerTime! });
+        this.newAnswer = '';
+
+        [0, 50, 150].forEach(delay =>
+          setTimeout(() => this.threadService.scrollToBottomNewMessage(), delay)
+        );
+      }
     } finally {
       this.isSubmitting = false;
     }
   }
 
   /** Determines whether the current message can be sent based on state and input. */
-  private canSendMessage(): boolean {
-    if (!this.newAnswer?.trim()) return false;
-    if (!this.channelId || !this.chatId || !this.currentUserId) return false;
-    return true;
-  }
+  // private canSendMessage(): boolean {
+  //   if (!this.newAnswer?.trim()) return false;
+  //   if (!this.channelId || !this.chatId || !this.currentUserId) return false;
+  //   return true;
+  // }
 
   /** Builds the payload object for a new chat message. */
-  private buildAnswerPayload() {
-    return {
-      message: this.newAnswer.trim(),
-      time: Math.floor(Date.now() / 1000),
-      user: this.currentUserId
-    };
-  }
+  // private buildAnswerPayload() {
+  //   return {
+  //     message: this.newAnswer.trim(),
+  //     time: Math.floor(Date.now() / 1000),
+  //     user: this.currentUserId
+  //   };
+  // }
 
   onEnterPress(e: KeyboardEvent) {
     if (this.overlayActive) {
@@ -654,19 +795,32 @@ export class ThreadComponent implements OnInit {
   }
 
   async saveEditedAnswer(answer: Answer) {
-    const newText = answer.editedText?.trim();
-    if (!newText || newText === answer.message) {
-      answer.isEditing = false;
-      return;
-    }
-    await this.channelService.updateAnswerMessage(
+  //   const newText = answer.editedText?.trim();
+  //   if (!newText || newText === answer.message) {
+  //     answer.isEditing = false;
+  //     return;
+  //   }
+  //   await this.channelService.updateAnswerMessage(
+  //     this.channelId,
+  //     this.chatId,
+  //     answer.id,
+  //     newText
+  //   );
+  //   answer.message = newText;
+  //   answer.isEditing = false;
+    const result = await this.threadService.saveEditedAnswer(
       this.channelId,
       this.chatId,
-      answer.id,
-      newText
+      answer,
+      answer.editedText ?? ''
     );
-    answer.message = newText;
-    answer.isEditing = false;
+
+    if (result) {
+      // Lokales Objekt in answers$ ersetzen
+      const answers = await firstValueFrom(this.answers$);
+      const updatedAnswers = answers.map(a => (a.id === result.id ? result : a));
+      this.answers$ = of(updatedAnswers);
+    }
   }
 
   autoGrow(el: HTMLTextAreaElement | null) {

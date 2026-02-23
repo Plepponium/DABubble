@@ -278,7 +278,7 @@
             </div>
         </div>
 
-        <!-- <form class="form" (ngSubmit)="submitAnswer()" #answerForm="ngForm">
+        <form class="form" (ngSubmit)="submitAnswer()" #answerForm="ngForm">
             <div class="form-field full-width" (click)="focusInput($event)">
                 <textarea #answerInput id="answer-message" class="input" name="answer" [(ngModel)]="newAnswer"
                     (keydown.enter)="onEnterPress($any($event))" type="text" [placeholder]="'Antworten...'"
@@ -312,9 +312,9 @@
                     </app-round-btn>
                 </div>
             </div>
-        </form> -->
+        </form>
 
-        <app-chat-input
+        <!-- <app-chat-input
             placeholder="Antworten..."
             [(text)]="newAnswer"
             [emojis]="allSmileys"
@@ -323,7 +323,7 @@
             [currentUserId]="currentUserId"
             [context]="'Channel'"
             (submit)="submitAnswer()">
-        </app-chat-input>
+        </app-chat-input> -->
 
     </div>
 </div>
