@@ -33,7 +33,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   channelService = inject(ChannelService);
   userService = inject(UserService);
   logoutService = inject(LogoutService);
- 
   dataService = inject(ChatsDataService);
   textService = inject(ChatsTextService);
   reactionService = inject(ChatsReactionService);

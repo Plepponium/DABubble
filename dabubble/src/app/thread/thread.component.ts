@@ -217,13 +217,7 @@ export class ThreadComponent implements OnInit {
   /** Adds a reaction to a specific answer and refreshes the answers list. */
   async addReactionToAnswer(answerId: string, reactionType: string) {
     const updatedAnswers = await this.threadService.addReactionToAnswer(
-      this.channelId,
-      this.chatId,
-      this.answers$,
-      answerId,
-      reactionType,
-      this.currentUserId,
-      this.participants
+      this.channelId, this.chatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants
     );
 
     if (updatedAnswers) {
@@ -234,11 +228,7 @@ export class ThreadComponent implements OnInit {
   /** Toggles the current user's reaction on a chat message. */
   async toggleReactionForChat(chatId: string, reactionType: string) {
     const updatedChat = await this.threadService.toggleReactionForChat(
-      this.channelId,
-      this.chat$,
-      reactionType,
-      this.currentUserId,
-      this.participants
+      this.channelId, this.chat$, reactionType, this.currentUserId, this.participants
     );
 
     if (updatedChat) this.chat$ = of(updatedChat);
@@ -247,13 +237,7 @@ export class ThreadComponent implements OnInit {
   /** Toggles the current user's reaction on an answer. */
   async toggleReactionForAnswer(answerId: string, reactionType: string) {
     const updatedAnswers = await this.threadService.toggleReactionForAnswer(
-      this.channelId,
-      this.chatId,
-      this.answers$,
-      answerId,
-      reactionType,
-      this.currentUserId,
-      this.participants
+      this.channelId, this.chatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants
     );
 
     if (updatedAnswers) {
@@ -410,10 +394,7 @@ export class ThreadComponent implements OnInit {
   /** Reloads enriched answers and scrolls to the bottom. */
   subscribeAnswers() {
     this.answers$ = this.threadService.getEnrichedAnswers(
-      this.channelId,
-      this.chatId,
-      this.participants$,
-      this.currentUserId
+      this.channelId, this.chatId, this.participants$, this.currentUserId
     );
 
     this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {

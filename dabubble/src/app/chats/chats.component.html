@@ -131,32 +131,31 @@
                     </ng-template>
 
                 </div> -->
+            
+
+                <app-chat-message
+                    [chat]="chat"
+                    [index]="i"
+                    [prevChatDate]="i > 0 ? getChatDate(chatList[i-1]) : undefined"
+                    [currentUserId]="currentUserId"
+                    [isResponsive]="isResponsive"
+                    [participants]="participants"
+                    [filteredChannels]="filteredChannels"
+                    [activeReactionDialogueIndex]="activeReactionDialogueIndex"
+                    [activeReactionDialogueBelowIndex]="activeReactionDialogueBelowIndex"
+                    [showAllReactions]="showAllReactions"
+                    [reactionIcons]="reactionIcons"
+                    #chatSection [attr.data-message-id]="chat.id"
+                    (openThread)="handleOpenThread(chat.id)"
+                    (openProfile)="handleOpenProfile($event)"
+                    (addReaction)="addReaction($event)"
+                    (toggleReaction)="toggleReaction($event)"
+                    (openReactionsDialogue)="openReactionsDialogue($event)"
+                    (enableEditChat)="enableEditChat($event)"
+                    (cancelEditChat)="cancelEditChat($event)"
+                    (saveEditedChat)="saveEditedChat($event)">
+                </app-chat-message>
             </div>
-
-            <app-chat-message
-                *ngFor="let chat of chatList; let i = index; trackBy: trackByChatId"
-                [chat]="chat"
-                [index]="i"
-                [prevChatDate]="i > 0 ? getChatDate(chatList[i-1]) : undefined"
-                [currentUserId]="currentUserId"
-                [isResponsive]="isResponsive"
-                [participants]="participants"
-                [filteredChannels]="filteredChannels"
-                [activeReactionDialogueIndex]="activeReactionDialogueIndex"
-                [activeReactionDialogueBelowIndex]="activeReactionDialogueBelowIndex"
-                [showAllReactions]="showAllReactions"
-                [reactionIcons]="reactionIcons"
-                #chatSection [attr.data-message-id]="chat.id"
-                (openThread)="handleOpenThread(chat.id)"
-                (openProfile)="handleOpenProfile($event)"
-                (addReaction)="addReaction($event)"
-                (toggleReaction)="toggleReaction($event)"
-                (openReactionsDialogue)="openReactionsDialogue($event)"
-                (enableEditChat)="enableEditChat($event)"
-                (cancelEditChat)="cancelEditChat($event)"
-                (saveEditedChat)="saveEditedChat($event)">
-            </app-chat-message>
-
 
         </div>
 
