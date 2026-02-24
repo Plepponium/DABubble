@@ -80,6 +80,7 @@ export class ThreadComponent implements OnInit {
   /** Initializes the component, sets responsive state, and loads initial channel and user data. */
   ngOnInit() {
     this.updateIsResponsive();
+    this.subscribeToParticipants();
     this.getCurrentUserAndChannels();
     this.loadChannelWithId();
   }
