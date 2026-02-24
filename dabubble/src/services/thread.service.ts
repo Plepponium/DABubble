@@ -1,45 +1,34 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, firstValueFrom, forkJoin, map, Observable, of, switchMap, take, takeUntil } from 'rxjs';
-// import { BehaviorSubject, Observable, forkJoin, map, of, switchMap, take, takeUntil } from 'rxjs';
+import { firstValueFrom, map, Observable, of, switchMap, take } from 'rxjs';
 import { ChannelService } from './channel.service';
 import { UserService } from './user.service';
 import { User } from '../models/user.class';
 import { Chat } from '../models/chat.class';
 import { Answer } from '../models/answer.class';
 import { RawReactionsMap, TransformedReaction } from '../models/reaction.types';
-// import { reactionIcons } from '../app/reaction-icons';
-import { LogoutService } from './logout.service';
 
 @Injectable({ providedIn: 'root' })
 export class ThreadService {
     private channelService = inject(ChannelService);
     private userService = inject(UserService);
-    private logoutService = inject(LogoutService);
-    private destroy$ = this.logoutService.logout$;
 
-    // scrollToBottom() {
-    //     setTimeout(() => {
-    //         const threadHistory = document.getElementById('thread-history');
-    //         if (threadHistory) {
-    //             threadHistory.scrollTop = threadHistory.scrollHeight;
-    //         }
-    //     }, 100); 
-    // }
+    /** Scrolls the thread history container to the bottom after a short delay. */
+    scrollToBottom() {
+        setTimeout(() => {
+            const threadHistory = document.getElementById('thread-history');
+            if (threadHistory) {
+                threadHistory.scrollTop = threadHistory.scrollHeight;
+            }
+        }, 100); 
+    }
 
+    /** Smoothly scrolls the thread history container to the bottom. */
     scrollToBottomNewMessage() {
         const threadHistory = document.getElementById('thread-history');
         threadHistory?.scrollTo({ top: threadHistory.scrollHeight, behavior: 'smooth' });
     }
 
-    // getCurrentUserAndChannels(callback: (userId: string, channels: any[]) => void) {
-    //     this.userService.getCurrentUser().pipe(take(1), takeUntil(this.destroy$)).subscribe(user => {
-    //         if (!user) return;
-    //         this.channelService.getChannels().pipe(take(1), takeUntil(this.destroy$)).subscribe(channels => {
-    //             const filtered = channels.filter(c => Array.isArray(c.participants) && c.participants.includes(user.uid));
-    //             callback(user.uid, filtered);
-    //         });
-    //     });
-    // }
+    /** Retrieves the current user ID and filters channels where the user is a participant. */
     getCurrentUserAndChannels(): Observable<{ userId: string; channels: any[] }> {
         return this.userService.getCurrentUser().pipe(
             take(1),
@@ -58,6 +47,7 @@ export class ThreadService {
         );
     }
 
+    /** Loads a channel by ID and returns observables for its name and participants. */
     loadChannelWithId(channelId: string): Observable<{ channelName$: Observable<string>; participants$: Observable<User[]> }> {
         return this.channelService.getChannelById(channelId).pipe(
             take(1),
@@ -70,7 +60,7 @@ export class ThreadService {
         );
     }
 
-    /** Lädt anreicherte Chat-Daten (inkl. Userinfos, Reaktionen) */
+    /** Retrieves a chat enriched with user metadata and transformed reactions. */
     getEnrichedChat(channelId: string, chatId: string, participants$: Observable<User[]>, currentUserId: string): Observable<Chat | undefined> {
         return this.channelService.getChatsForChannel(channelId).pipe(
             switchMap(chats =>
@@ -94,7 +84,7 @@ export class ThreadService {
         );
     }
 
-    /** Lädt Antworten mit Userinfos und Reaktionsarrays */
+    /** Retrieves all answers for a chat enriched with user metadata and reactions. */
     getEnrichedAnswers(channelId: string, chatId: string, participants$: Observable<User[]>, currentUserId: string): Observable<Answer[]> {
         return this.channelService.getAnswersForChat(channelId, chatId).pipe(
             switchMap(answers =>
@@ -117,99 +107,7 @@ export class ThreadService {
         );
     }
 
-    // async loadChatById(channelId: string) {
-    //     this.channelService.getChannelById(channelId).pipe(take(1), takeUntil(this.destroy$)).subscribe(async channel => {
-    //         if (!channel) return;
-
-    //         this.channelId = channelId;
-    //         this.channelName$ = of(channel.name);
-    //         this.subscribeToParticipants();
-    //     });
-    // }
-    // loadChatById(channelId: string): Observable<{ name$: Observable<string>; participants$: Observable<User[]> }> {
-    //     return this.channelService.getChannelById(channelId).pipe(
-    //         take(1),
-    //         switchMap(channel => {
-    //             if (!channel) return of({ name$: of('Unbekannter Kanal'), participants$: of([]) });
-
-    //             const name$ = of(channel.name);
-    //             const participants$ = this.userService.getUsersByIds(channel.participants);
-
-    //             return of({ name$, participants$ });
-    //         })
-    //     );
-    // }
-
-    // subscribeToParticipants() {
-    //     this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => {
-    //     this.participants = users;
-    //     // console.log('participants', this.participants)
-    //     });
-    // }
-
-    // getAnswersForChat() {
-    //     this.answers$ = this.channelService.getAnswersForChat(this.channelId, this.chatId).pipe(
-    //         switchMap(answers =>
-    //             this.userService.getUsersByIds(answers.map((a: any) => a.user)).pipe(
-    //                 switchMap(users => {
-    //                     const answerDetails$ = answers.map(answer =>
-    //                         forkJoin({
-    //                             reactions: this.channelService.getReactionsForAnswer(this.channelId, this.chatId, answer.id).pipe(take(1)),
-    //                             user: of(users.find(u => u.uid === answer.user)),
-    //                         }).pipe(
-    //                             map(({ reactions, user }) => ({
-    //                                 ...answer,
-    //                                 userName: user?.name,
-    //                                 userImg: user?.img,
-    //                                 reactions,
-    //                                 reactionArray: this.transformReactionsToArray(reactions, users, this.currentUserId)
-    //                             }))
-    //                         )
-    //                     );
-    //                     return forkJoin(answerDetails$);
-    //                 })
-    //             )
-    //         )
-    //     );
-    //     map((enrichedAnswers: Answer[]) =>
-    //         enrichedAnswers.sort((a, b) => a.time - b.time)
-    //     );
-    // }
-    // getAnswersForChat(
-    //     channelId: string,
-    //     chatId: string,
-    //     currentUserId: string,
-    //     userService: UserService,
-    //     channelService: ChannelService
-    // ): Observable<Answer[]> {
-    //     return channelService.getAnswersForChat(channelId, chatId).pipe(
-    //         switchMap(answers =>
-    //             userService.getUsersByIds(answers.map(a => a.user)).pipe(
-    //                 switchMap(users => {
-    //                     const answerDetails$ = answers.map(answer =>
-    //                         forkJoin({
-    //                             reactions: channelService.getReactionsForAnswer(channelId, chatId, answer.id).pipe(take(1)),
-    //                             user: of(users.find(u => u.uid === answer.user)),
-    //                         }).pipe(
-    //                             map(({ reactions, user }) => ({
-    //                                 ...answer,
-    //                                 userName: user?.name ?? 'Ehemaliger Nutzer',
-    //                                 userImg: user?.img ?? 'default-user',
-    //                                 reactions,
-    //                                 isUserMissing: !user,
-    //                                 reactionArray: this.transformReactionsToArray(reactions, users, currentUserId)
-    //                             }))
-    //                         )
-    //                     );
-    //                     return forkJoin(answerDetails$);
-    //                 })
-    //             )
-    //         ),
-    //         map((enrichedAnswers: Answer[]) => enrichedAnswers.sort((a, b) => a.time - b.time))
-    //     );
-    // }
-
-    
+    /** Converts a raw reactions map into a sorted array with metadata and user context. */
     transformReactionsToArray(reactionsMap: RawReactionsMap | undefined, participants: User[], currentUserId: string): TransformedReaction[] {
         if (!reactionsMap) return [];
         return Object.entries(reactionsMap).map(([type, usersRaw]) => {
@@ -222,39 +120,21 @@ export class ThreadService {
         .sort((a, b) => a.type.localeCompare(b.type));
     }
 
+    /** Parses and normalizes user IDs from reaction entries. */
     private parseUserIds(users: string[]): string[] {
         return users.flatMap(u =>
             u.includes(',') ? u.split(',').map(id => id.trim()) : [u]
         );
     }
 
+    /** Finds the name of another reacting user excluding the current user. */
     private findOtherUserName(userIds: string[], currentUserId: string, participants: User[]): string | undefined {
         const others = userIds.filter(id => id !== currentUserId);
         if (others.length === 0) return undefined;
         return participants.find(u => u.uid === others[0])?.name || 'Unbekannt';
     }
 
-    // private async saveOrDeleteReaction(channelId: string, chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
-    //     // Methode passt sich an die Map-Struktur an und ruft setReaction auf
-    //     await this.channelService.setReaction(channelId, chatId, reactionType, updatedUsers);
-    // }
-
-    // private async updateReactionForChat(chatId: string, reactionType: string, updatedUsers: string[]): Promise<void> {
-    //     // Hole den aktuellen Chat direkt über das Observable (du hast nur einen Chat im Thread)
-    //     const chat = await firstValueFrom(this.chat$);
-    //     if (!chat) return;
-
-    //     const channelId = this.channelId;
-    //     const currentUserId = this.currentUserId;
-    //     if (!channelId || !chatId || !currentUserId) return;
-
-    //     try {
-    //     // await this.saveOrDeleteReaction(channelId, chatId, reactionType, updatedUsers);
-    //         this.updateLocalReaction(chat, reactionType, updatedUsers);
-    //     } catch (error) {
-    //         console.error('Fehler beim Aktualisieren der Reaction:', error);
-    //     }
-    // }
+    /** Updates reaction data for a chat and returns an updated chat object. */
     async updateReactionForChat(
         chat$: Observable<Chat | undefined>,
         participants: User[],
@@ -265,7 +145,6 @@ export class ThreadService {
         try {
             const chat = await firstValueFrom(chat$);
             if (!chat) return undefined;
-
             const newReactions = { ...chat.reactions };
             if (updatedUsers.length === 0) {
                 delete newReactions[reactionType];
@@ -274,12 +153,7 @@ export class ThreadService {
             }
 
             const newReactionArray = this.transformReactionsToArray(newReactions, participants, currentUserId);
-
-            const updatedChat: Chat = {
-                ...chat,
-                reactions: newReactions,
-                reactionArray: newReactionArray
-            };
+            const updatedChat: Chat = { ...chat, reactions: newReactions, reactionArray: newReactionArray };
 
             return updatedChat;
         } catch (error) {
@@ -288,18 +162,7 @@ export class ThreadService {
         }
     }
 
-    // updateLocalReaction(chat: any, reactionType: string, updatedUsers: string[]): void {
-    //     chat.reactions = { ...chat.reactions };
-    //     if (updatedUsers.length === 0) {
-    //     delete chat.reactions[reactionType];
-    //     } else {
-    //     chat.reactions[reactionType] = updatedUsers;
-    //     }
-    //     chat.reactionArray = this.transformReactionsToArray(chat.reactions, this.participants, this.currentUserId);
-
-    //     // Für einen einzelnen Chat reicht es, das Observable neu zu setzen (optional: Subject, falls weitere lokale Updates nötig sind)
-    //     this.chat$ = of({ ...chat });
-    // }
+    /** Updates reaction data locally for a chat without persisting changes. */
     updateLocalReaction(
         chat: Chat,
         reactionType: string,
@@ -316,17 +179,12 @@ export class ThreadService {
         }
 
         const newReactionArray = this.transformReactionsToArray(newReactions, participants, currentUserId);
-
-        const updatedChat: Chat = {
-            ...chat,
-            reactions: newReactions,
-            reactionArray: newReactionArray
-        };
+        const updatedChat: Chat = { ...chat, reactions: newReactions, reactionArray: newReactionArray };
 
         return updatedChat;
     }
 
-    
+    /** Adds a reaction to a chat if the current user has not already reacted. */
     async addReaction(
         channelId: string, 
         chat$: Observable<Chat | undefined>,
@@ -342,7 +200,6 @@ export class ThreadService {
             const updatedUsers = [...currentReactionUsers, currentUserId];
             await this.channelService.setReaction(channelId, chat.id, reactionType, updatedUsers);
 
-            // lokales Update zurückgeben, damit die Component UI aktualisieren kann
             chat.reactions = { ...chat.reactions, [reactionType]: updatedUsers };
             chat.reactionArray = this.transformReactionsToArray(chat.reactions, participants, currentUserId);
             return chat;
@@ -351,50 +208,7 @@ export class ThreadService {
         return chat;
     }
 
-    // async addReactionToAnswer(answerId: string, reactionType: string) {
-    //     const answers = await firstValueFrom(this.answers$);
-    //     const answer = answers.find(a => a.id === answerId);
-    //     if (!answer) return;
-
-    //     this.activeReactionDialogueAnswersIndex = null;
-    //     this.activeReactionDialogueBelowAnswersIndex = null;
-
-    //     const currentReactionUsers = this.extractUserIds(answer.reactions || {}, reactionType);
-    //     if (!currentReactionUsers.includes(this.currentUserId)) {
-    //         const updatedUsers = [...currentReactionUsers, this.currentUserId];
-    //         // 4. Aktualisiere Reaction-Map in Firestore via ChannelService
-    //         await this.channelService.setAnswerReaction(this.channelId, this.chatId, answerId, reactionType, updatedUsers);
-    //         // 5. Lokales Update der Antwort im answers$ Observable (zwingend, damit UI synchron bleibt)
-    //         answer.reactions = { ...answer.reactions, [reactionType]: updatedUsers };
-    //         answer.reactionArray = this.transformReactionsToArray(answer.reactions, this.participants, this.currentUserId);
-
-    //         // Optional: answers$ triggern, damit Template updated wird
-    //         // this.answers$ = of([...answers]);
-    //         return of([...answers]);
-    //     }
-    // }
-    // async toggleReactionForAnswer(channelId: string, chatId: string, answers$: Observable<Answer[]>, answerId: string, reactionType: string, currentUserId: string, participants: User[]): Promise<Observable<Answer[]>> {
-    //     const answers = await firstValueFrom(answers$);
-    //     const answer = answers.find(a => a.id === answerId);
-    //     if (!answer) return answers$;
-
-    //     const currentReactionUsers = this.extractUserIds(answer.reactions || {}, reactionType);
-    //     const updatedUsers = currentReactionUsers.includes(currentUserId)
-    //         ? currentReactionUsers.filter(u => u !== currentUserId)
-    //         : [...currentReactionUsers, currentUserId];
-
-    //     await this.channelService.setAnswerReaction(channelId, chatId, answerId, reactionType, updatedUsers);
-
-    //     if (updatedUsers.length === 0) {
-    //         const { [reactionType]: _, ...rest } = answer.reactions!;
-    //         answer.reactions = rest;
-    //     } else {
-    //         answer.reactions = { ...answer.reactions, [reactionType]: updatedUsers };
-    //     }
-    //     answer.reactionArray = this.transformReactionsToArray(answer.reactions, participants, currentUserId);
-
-    //     return of([...answers]);
-    // }
+    /** Adds a reaction to an answer and returns the updated answers array. */
     async addReactionToAnswer(
         channelId: string,
         chatId: string,
@@ -410,7 +224,6 @@ export class ThreadService {
 
         const currentUsers = this.extractUserIds(answer.reactions || {}, reactionType);
 
-        // Benutzer hinzufügen, falls noch nicht reagiert
         if (!currentUsers.includes(currentUserId)) {
             const updatedUsers = [...currentUsers, currentUserId];
 
@@ -418,12 +231,7 @@ export class ThreadService {
 
             const newReactions = { ...answer.reactions, [reactionType]: updatedUsers };
             const newReactionArray = this.transformReactionsToArray(newReactions, participants, currentUserId);
-
-            const updatedAnswer: Answer = {
-                ...answer,
-                reactions: newReactions,
-                reactionArray: newReactionArray
-            };
+            const updatedAnswer: Answer = { ...answer, reactions: newReactions, reactionArray: newReactionArray };
 
             return answers.map(a => (a.id === answerId ? updatedAnswer : a));
         }
@@ -431,21 +239,7 @@ export class ThreadService {
         return answers;
     }
 
-    // async toggleReactionForChat(chatId: string, reactionType: string) {
-    //     const chat = await firstValueFrom(this.chat$);
-    //     if (!chat) return;
-
-    //     const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
-    //     let updatedUsers: string[];
-    //     if (currentReactionUsers.includes(this.currentUserId)) {
-    //         updatedUsers = currentReactionUsers.filter(uid => uid !== this.currentUserId);
-    //     } else {
-    //         updatedUsers = [...currentReactionUsers, this.currentUserId];
-    //     }
-
-    //     await this.saveOrDeleteReaction(this.channelId, chatId, reactionType, updatedUsers);
-    //     await this.updateReactionForChat(chatId, reactionType, updatedUsers);
-    // }
+    /** Toggles the current user's reaction on a chat and returns the updated chat. */
     async toggleReactionForChat(
         channelId: string,
         chat$: Observable<Chat | undefined>,
@@ -456,56 +250,18 @@ export class ThreadService {
         const chat = await firstValueFrom(chat$);
         if (!chat) return undefined;
 
-        // Nutzer, die bereits reagiert haben
         const currentUsers = this.extractUserIds(chat.reactions || {}, reactionType);
-
-        // Nutzer hinzufügen oder entfernen
         const updatedUsers = currentUsers.includes(currentUserId)
             ? currentUsers.filter(u => u !== currentUserId)
             : [...currentUsers, currentUserId];
 
-        // Speichern in Firestore
         await this.channelService.setReaction(channelId, chat.id, reactionType, updatedUsers);
-
-        // Lokales Update spiegeln
-        const updatedChat = await this.updateReactionForChat(
-            of(chat),          // wir reichen das aktuelle Chat-Observable
-            participants,
-            currentUserId,
-            reactionType,
-            updatedUsers
-        );
+        const updatedChat = await this.updateReactionForChat( of(chat), participants, currentUserId, reactionType, updatedUsers );
 
         return updatedChat;
     }
 
-    // async toggleReactionForAnswer(answerId: string, reactionType: string) {
-    //     // console.log('toggleReactionForAnswer answerId', answerId, 'reactionType', reactionType);
-    //     const answers = await firstValueFrom(this.answers$);
-    //     const answer = answers.find(a => a.id === answerId);
-    //     if (!answer) return;
-
-    //     const currentReactionUsers = this.extractUserIds(answer.reactions || {}, reactionType);
-    //     let updatedUsers: string[];
-    //     if (currentReactionUsers.includes(this.currentUserId)) {
-    //         updatedUsers = currentReactionUsers.filter(uid => uid !== this.currentUserId);
-    //     } else {
-    //      updatedUsers = [...currentReactionUsers, this.currentUserId];
-    //     }
-
-    //     await this.channelService.setAnswerReaction(this.channelId, this.chatId, answerId, reactionType, updatedUsers);
-
-    //     if (updatedUsers.length === 0) {
-    //         const { [reactionType]: _, ...rest } = answer.reactions!;
-    //         answer.reactions = rest;
-    //     } else {
-    //         answer.reactions = { ...answer.reactions, [reactionType]: updatedUsers };
-    //     }
-    //     answer.reactionArray = this.transformReactionsToArray(answer.reactions, this.participants, this.currentUserId);
-
-    //     // this.answers$ = of([...answers]);
-    //     return of([...answers]);
-    // }
+    /** Toggles the current user's reaction on an answer and returns updated answers. */
     async toggleReactionForAnswer(
         channelId: string,
         chatId: string,
@@ -532,17 +288,12 @@ export class ThreadService {
             : { ...answer.reactions, [reactionType]: updatedUsers };
 
         const newReactionArray = this.transformReactionsToArray(newReactions, participants, currentUserId);
+        const updatedAnswer: Answer = { ...answer, reactions: newReactions, reactionArray: newReactionArray };
 
-        const updatedAnswer: Answer = {
-            ...answer,
-            reactions: newReactions,
-            reactionArray: newReactionArray
-        };
-
-        // aktualisiertes Answer‑Array zurückgeben
         return answers.map(a => (a.id === answerId ? updatedAnswer : a));
     }
 
+    /** Extracts and normalizes user IDs for a specific reaction type. */
     private extractUserIds(reactions: Record<string, any>, reactionType: string): string[] {
         const usersRaw = reactions[reactionType] || [];
         return usersRaw.flatMap((u: string) =>
@@ -550,41 +301,7 @@ export class ThreadService {
         );
     }
 
-    // async submitAnswer() {
-    //     if (this.isSubmitting || !this.canSendMessage()) return;
-        
-    //     this.isSubmitting = true; 
-    //     const answer = this.buildAnswerPayload();
-    //     try {
-    //         await this.channelService.addAnswerToChat(this.channelId, this.chatId, answer);
-    //         this.answerAdded.emit({ chatId: this.chatId!, answerTime: answer.time });
-    //         this.newAnswer = '';
-    //         // setTimeout(() => this.scrollToBottom());
-    //         [0, 50, 150].forEach(delay => 
-    //             setTimeout(() => this.scrollToBottomNewMessage(), delay)
-    //         );
-    //     } catch (err) {
-    //         console.error('Fehler beim Senden der Antwort:', err);
-    //     } finally {
-    //         this.isSubmitting = false;
-    //     }
-    // }
-    // async submitAnswer() {
-    //     if (this.isSubmitting || !this.newAnswer.trim()) return;
-    //     this.isSubmitting = true;
-
-    //     const answer = this.buildAnswerPayload(this.newAnswer, this.currentUserId);
-
-    //     try {
-    //         await this.channelService.addAnswerToChat(this.channelId, this.chatId, answer);
-    //         // await this.threadService.submitAnswer(this.channelId, this.chatId, answer);
-    //         this.answerAdded.emit({ chatId: this.chatId, answerTime: answer.time });
-    //         this.newAnswer = '';
-    //         [0, 50, 150].forEach(d => setTimeout(() => this.scrollToBottomNewMessage(), d));
-    //     } finally {
-    //         this.isSubmitting = false;
-    //     }
-    // }
+    /** Submits a new answer to a chat and returns submission status and timestamp. */
     async submitAnswer(
         channelId: string,
         chatId: string,
@@ -609,7 +326,7 @@ export class ThreadService {
         }
     }
     
-    /** Baut die Datenstruktur für eine neue Antwort auf */
+    /** Builds a payload object for creating a new answer. */
     buildAnswerPayload(text: string, currentUserId: string) {
         return {
         message: text.trim(),
@@ -618,21 +335,7 @@ export class ThreadService {
         };
     }
 
-    // async saveEditedAnswer(answer: Answer) {
-    //     const newText = answer.editedText?.trim();
-    //     if (!newText || newText === answer.message) {
-    //         answer.isEditing = false;
-    //         return;
-    //     }
-    //     await this.channelService.updateAnswerMessage(
-    //         this.channelId,
-    //         this.chatId,
-    //         answer.id,
-    //         newText
-    //     );
-    //     answer.message = newText;
-    //     answer.isEditing = false;
-    // }
+    /** Saves an edited answer message and returns the updated answer object. */
     async saveEditedAnswer(
         channelId: string,
         chatId: string,
@@ -646,11 +349,7 @@ export class ThreadService {
 
         try {
             await this.channelService.updateAnswerMessage(channelId, chatId, answer.id, trimmed);
-            return {
-            ...answer,
-            message: trimmed,
-            isEditing: false
-            };
+            return { ...answer, message: trimmed, isEditing: false };
         } catch (error) {
             console.error('Fehler beim Speichern der bearbeiteten Antwort:', error);
             return undefined;

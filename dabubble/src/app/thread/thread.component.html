@@ -131,8 +131,8 @@
             <div *ngFor="let answer of answers; let i = index" class="chat-day-section"
                 [ngClass]="{'reverse': answer.user === currentUserId}">
 
-                <div *ngIf="shouldShowDateForAnswer(answers, i, chat)" class="chat-date-section">
-                    <div class="chat-date">{{ getDisplayDate(getChatDate(answer)) }}</div>
+                <div *ngIf="threadHelpService.shouldShowDateForAnswer(answers, i, chat)" class="chat-date-section">
+                    <div class="chat-date">{{ threadHelpService.getDisplayDate(threadHelpService.getChatDate(answer)) }}</div>
                 </div>
 
                 <div class="chat-section" [ngClass]="{'reverse': answer.user === currentUserId, 'editing': answer.isEditing}">
@@ -256,7 +256,7 @@
                         <ng-template #editMode>
                             <div class="chat-edit-wrapper">
                                 <textarea #editTa id="edit-{{answer.id}}" class="edit-textarea"
-                                    (input)="updateEditCaret(answer, editTa); autoGrow(editTa)"
+                                    (input)="updateEditCaret(answer, editTa); threadHelpService.autoGrow(editTa)"
                                     (keyup)="updateEditCaret(answer, editTa)" [(ngModel)]="answer.editedText"
                                     [placeholder]="answer.message"></textarea>
 
@@ -282,7 +282,7 @@
             <div class="form-field full-width" (click)="focusInput($event)">
                 <textarea #answerInput id="answer-message" class="input" name="answer" [(ngModel)]="newAnswer"
                     (keydown.enter)="onEnterPress($any($event))" type="text" [placeholder]="'Antworten...'"
-                    (input)="updateCaretPosition(); autoGrow(answerInput)"
+                    (input)="updateCaretPosition(); threadHelpService.autoGrow(answerInput)"
                     (keyup)="updateCaretPosition()"></textarea>
 
                 <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
