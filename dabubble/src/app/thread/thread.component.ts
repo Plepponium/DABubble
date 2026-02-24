@@ -82,8 +82,7 @@ export class ThreadComponent implements OnInit {
     this.updateIsResponsive();
     this.getCurrentUserAndChannels();
     setTimeout(() =>
-      (console.log('onInit', this.currentUserId),
-      this.loadChannelWithId()), 100
+      this.loadChannelWithId(), 100
     );
     
   }
@@ -100,7 +99,9 @@ export class ThreadComponent implements OnInit {
     }
     if (changes['channelId'] && !changes['channelId'].firstChange) {
       this.getCurrentUserAndChannels();
-      this.loadChannelWithId();
+      setTimeout(() =>
+        this.loadChannelWithId(), 100
+      );
     }
   }
 
