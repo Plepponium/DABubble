@@ -6,24 +6,7 @@ import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 export class ThreadHelpService {
     sanitizer = inject(DomSanitizer);
 
-    // onSmileySelected(smiley: string) {
-    //     const textarea = this.answerInput.nativeElement;
-    //     const start = textarea.selectionStart ?? 0;
-    //     const end = textarea.selectionEnd ?? 0;
-    //     const before = this.newAnswer.slice(0, start);
-    //     const after = this.newAnswer.slice(end);
-
-    //     this.newAnswer = before + `:${smiley}:` + after;
-    //     const caret = start + smiley.length + 2;
-
-    //     setTimeout(() => {
-    //     textarea.selectionStart = textarea.selectionEnd = caret;
-    //     textarea.focus();
-    //     });
-
-    //     this.activeSmiley = false;
-    // }
-    // Für Smiley-Insertion
+    /** Inserts a smiley shortcode at the current cursor position and restores the caret. */
     insertSmiley(textarea: HTMLTextAreaElement, currentText: string, smiley: string): void {
         const result = this.insertTextAtPosition(textarea, `:${smiley}:`, currentText);
         textarea.value = result.newText;
@@ -35,7 +18,7 @@ export class ThreadHelpService {
         });
     }
 
-    // Gemeinsame Logik: Text an Cursor-Position einfügen
+    /** Inserts text at the textarea cursor position and returns the updated text and caret position. */
     insertTextAtPosition(
         textarea: HTMLTextAreaElement, 
         textToInsert: string, 
@@ -53,23 +36,7 @@ export class ThreadHelpService {
         return { newText, newCaretPosition: newCaret };
     }
 
-    // insertMention(event: { name: string; type: 'user' | 'channel' | 'email' }) {
-    //     const trigger = event.type === 'user' ? '@' : '#';
-    //     const pos = this.mentionCaretIndex ?? this.newAnswer.length;
-    //     const before = this.newAnswer.slice(0, pos);
-    //     const after = this.newAnswer.slice(pos);
-    //     const replaced = before.replace(/([@#])([^\s]*)$/, `${trigger}${event.name}`);
-
-    //     this.newAnswer = replaced + ' ' + after;
-    //     this.mentionCaretIndex = replaced.length + 1;
-
-    //     setTimeout(() => {
-    //     const textarea = this.answerInput.nativeElement;
-    //     textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
-    //     textarea.focus();
-    //     });
-    //     this.overlayActive = false;
-    // }
+    /** Inserts or replaces a mention trigger (@ or #) with the selected entity and updates caret position. */
     insertMention(
         currentText: string, 
         mentionEvent: { name: string; type: 'user' | 'channel' | 'email' },
@@ -89,7 +56,7 @@ export class ThreadHelpService {
         };
     }
 
-    // Für Edit-Mentions
+    /** Inserts or replaces a mention in edit mode and returns the updated text and caret position. */
     insertMentionInEdit(
         editedText: string,
         caretIndex: number | null,
@@ -109,13 +76,7 @@ export class ThreadHelpService {
         };
     }
 
-    // Cursor-Position aktualisieren
-    // updateCaretPosition(textarea: HTMLTextAreaElement | null): number | null {
-    //     if (!textarea) return null;
-    //     return textarea.selectionStart ?? 0;
-    // }
-
-    // Textarea auto-grow
+    /** Automatically adjusts the textarea height to fit its content. */
     autoGrow(el: HTMLTextAreaElement | null): void {
         if (!el) return;
         el.style.height = 'auto';
@@ -155,6 +116,7 @@ export class ThreadHelpService {
         }
     }
 
+    /** Converts smiley shortcodes in text into sanitized HTML image elements. */
     renderMessage(text: string): SafeHtml {
         if (!text) return '';
 
