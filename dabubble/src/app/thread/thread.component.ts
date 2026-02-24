@@ -82,7 +82,11 @@ export class ThreadComponent implements OnInit {
     this.updateIsResponsive();
     this.getCurrentUserAndChannels();
     setTimeout(() =>
-      this.loadChannelWithId(), 100
+      this.loadChannelWithId(), 100,
+      this.threadService.scrollToBottom(),
+      // setTimeout(() =>
+      //   this.threadService.scrollToBottom(), 100
+      // ),
     );
   }
 
@@ -99,8 +103,8 @@ export class ThreadComponent implements OnInit {
     if (changes['channelId'] && !changes['channelId'].firstChange) {
       this.getCurrentUserAndChannels();
       setTimeout(() =>
-        (this.loadChannelWithId(), 
-        this.threadService.scrollToBottom()), 100
+        this.loadChannelWithId(), 100,
+        this.threadService.scrollToBottomNewMessage(), 
       );
     }
   }
@@ -148,7 +152,7 @@ export class ThreadComponent implements OnInit {
       this.answers$ = this.threadService.getEnrichedAnswers(this.channelId, this.chatId, this.participants$, this.currentUserId);
       
       this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
-        this.threadService.scrollToBottom();
+        // this.threadService.scrollToBottom();
       });
     });
   }
