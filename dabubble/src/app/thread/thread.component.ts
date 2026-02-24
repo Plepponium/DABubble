@@ -202,11 +202,7 @@ export class ThreadComponent implements OnInit {
   /** Adds a reaction to the current chat and updates the observable if successful. */
   async addReaction(chatId: string, reactionType: string) {
     const updatedChat = await this.threadService.addReaction(
-      this.channelId,
-      this.chat$,
-      reactionType,
-      this.currentUserId,
-      this.participants
+      this.channelId, this.chat$, reactionType, this.currentUserId, this.participants
     );
 
     if (updatedChat) {
