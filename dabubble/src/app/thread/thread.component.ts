@@ -84,7 +84,6 @@ export class ThreadComponent implements OnInit {
     setTimeout(() =>
       this.loadChannelWithId(), 100
     );
-    
   }
 
   /** Handles input changes and reloads chat and answers when channelId or chatId changes. */
@@ -100,7 +99,8 @@ export class ThreadComponent implements OnInit {
     if (changes['channelId'] && !changes['channelId'].firstChange) {
       this.getCurrentUserAndChannels();
       setTimeout(() =>
-        this.loadChannelWithId(), 100
+        (this.loadChannelWithId(), 
+        this.threadService.scrollToBottom()), 100
       );
     }
   }
@@ -132,7 +132,6 @@ export class ThreadComponent implements OnInit {
   getCurrentUserAndChannels() {
     this.threadService.getCurrentUserAndChannels().subscribe(result => {
       this.currentUserId = result.userId;
-      console.log('Current User ID:', this.currentUserId);
       this.filteredChannels = result.channels;
     });
   }
