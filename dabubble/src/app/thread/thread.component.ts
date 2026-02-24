@@ -80,9 +80,8 @@ export class ThreadComponent implements OnInit {
   /** Initializes the component, sets responsive state, and loads initial channel and user data. */
   ngOnInit() {
     this.updateIsResponsive();
-    this.subscribeToParticipants();
-    this.getCurrentUserAndChannels();
     this.loadChannelWithId();
+    this.getCurrentUserAndChannels();
   }
 
   /** Handles input changes and reloads chat and answers when channelId or chatId changes. */
@@ -96,8 +95,8 @@ export class ThreadComponent implements OnInit {
       });
     }
     if (changes['channelId'] && !changes['channelId'].firstChange) {
-      this.getCurrentUserAndChannels();
       this.loadChannelWithId();
+      this.getCurrentUserAndChannels();
     }
   }
 
