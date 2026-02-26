@@ -83,11 +83,12 @@ export class ThreadComponent implements OnInit {
     this.getCurrentUserAndChannels();
     setTimeout(() =>
       this.loadChannelWithId(), 100,
-      this.threadService.scrollToBottom(),
+      // this.threadService.scrollToBottom(),
       // setTimeout(() =>
       //   this.threadService.scrollToBottom(), 100
       // ),
     );
+    // this.threadService.scrollToBottom();
   }
 
   /** Handles input changes and reloads chat and answers when channelId or chatId changes. */
@@ -104,7 +105,7 @@ export class ThreadComponent implements OnInit {
       this.getCurrentUserAndChannels();
       setTimeout(() =>
         this.loadChannelWithId(), 100,
-        this.threadService.scrollToBottomNewMessage(), 
+        // this.threadService.scrollToBottomNewMessage(), 
       );
     }
   }
@@ -152,7 +153,7 @@ export class ThreadComponent implements OnInit {
       this.answers$ = this.threadService.getEnrichedAnswers(this.channelId, this.chatId, this.participants$, this.currentUserId);
       
       this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
-        // this.threadService.scrollToBottom();
+        this.threadService.scrollToBottom();
       });
     });
   }
