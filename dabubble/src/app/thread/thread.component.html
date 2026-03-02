@@ -23,7 +23,8 @@
                         <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === chat.id">
                             <div *ngFor="let icon of reactionIcons" class="reactions-container">
                                 <button (click)="addReaction(chat.id, icon)" class="add-reaction-btn">
-                                    <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                    <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'"
+                                        [alt]="icon">
                                 </button>
                             </div>
                         </div>
@@ -51,8 +52,8 @@
                         <div class="reactions">
                             <div class="reaction-btns">
                                 <div (click)="toggleReactionForChat(chat.id, reaction.type)"
-                                    *ngFor="let reaction of (showAllReactionsForChat[chat.id] ? chat.reactionArray : (chat.reactionArray | slice:0:(isResponsive ? 3 : 7)))" class="reaction-btn"
-                                    [ngClass]="{'reacted': reaction.currentUserReacted}">
+                                    *ngFor="let reaction of (showAllReactionsForChat[chat.id] ? chat.reactionArray : (chat.reactionArray | slice:0:(isResponsive ? 3 : 7)))"
+                                    class="reaction-btn" [ngClass]="{'reacted': reaction.currentUserReacted}">
                                     <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
                                         [alt]="reaction.type">
                                     <div>{{ reaction.count }}</div>
@@ -91,10 +92,14 @@
                                     </div>
                                 </div>
 
-                                <div (click)="showAllReactionsForChat[chat.id] = true" *ngIf="chat.reactionArray!.length > (isResponsive ? 3 : 7) && !showAllReactionsForChat[chat.id]" class="reaction-btn more-reactions">
+                                <div (click)="showAllReactionsForChat[chat.id] = true"
+                                    *ngIf="chat.reactionArray!.length > (isResponsive ? 3 : 7) && !showAllReactionsForChat[chat.id]"
+                                    class="reaction-btn more-reactions">
                                     {{chat.reactionArray!.length - (isResponsive ? 3 : 7)}} weitere
                                 </div>
-                                <div (click)="showAllReactionsForChat[chat.id] = false" *ngIf="showAllReactionsForChat[chat.id]" class="reaction-btn more-reactions no-wrap">
+                                <div (click)="showAllReactionsForChat[chat.id] = false"
+                                    *ngIf="showAllReactionsForChat[chat.id]"
+                                    class="reaction-btn more-reactions no-wrap">
                                     Weniger anzeigen
                                 </div>
                             </div>
@@ -104,7 +109,8 @@
                                     *ngIf="activeReactionDialogueBelowIndex === chat.id">
                                     <div *ngFor="let icon of reactionIcons" class="reactions-container">
                                         <button (click)="addReaction(chat.id, icon)" class="add-reaction-btn">
-                                            <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                            <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'"
+                                                [alt]="icon">
                                         </button>
                                     </div>
                                 </div>
@@ -132,16 +138,19 @@
                 [ngClass]="{'reverse': answer.user === currentUserId}">
 
                 <div *ngIf="threadHelpService.shouldShowDateForAnswer(answers, i, chat)" class="chat-date-section">
-                    <div class="chat-date">{{ threadHelpService.getDisplayDate(threadHelpService.getChatDate(answer)) }}</div>
+                    <div class="chat-date">{{ threadHelpService.getDisplayDate(threadHelpService.getChatDate(answer)) }}
+                    </div>
                 </div>
 
-                <div class="chat-section" [ngClass]="{'reverse': answer.user === currentUserId, 'editing': answer.isEditing}">
+                <div class="chat-section"
+                    [ngClass]="{'reverse': answer.user === currentUserId, 'editing': answer.isEditing}">
                     <div class="chat-dialogue" [ngClass]="{'reverse': answer.user === currentUserId}">
                         <div class="reactions-display-container">
                             <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueAnswersIndex === i">
                                 <div *ngFor="let icon of reactionIcons" class="reactions-container">
                                     <button (click)="addReactionToAnswer(answer.id, icon)" class="add-reaction-btn">
-                                        <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                        <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'"
+                                            [alt]="icon">
                                     </button>
                                 </div>
                             </div>
@@ -174,8 +183,7 @@
                                     {{ answer.userName}}</div>
                                 <div class="font-14 t-gray">{{ answer.time * 1000 | date: 'HH:mm' }} Uhr</div>
                             </div>
-                            <div class="chat-message"
-                                [ngClass]="{'left bg-light-purple': answer.user !== currentUserId, 
+                            <div class="chat-message" [ngClass]="{'left bg-light-purple': answer.user !== currentUserId, 
                                 'right': answer.user === currentUserId}" [innerHTML]="renderMessage(answer.message)">
                             </div>
                             <div class="chat-answered" [ngClass]="{'right': answer.user === currentUserId}">
@@ -183,8 +191,8 @@
                                 <div class="reactions">
                                     <div class="reaction-btns">
                                         <div (click)="toggleReactionForAnswer(answer.id, reaction.type)"
-                                            *ngFor="let reaction of (showAllReactionsForAnswer[answer.id] ? answer.reactionArray : (answer.reactionArray | slice:0:(isResponsive ? 3 : 7)))" class="reaction-btn"
-                                            [ngClass]="{'reacted': reaction.currentUserReacted}">
+                                            *ngFor="let reaction of (showAllReactionsForAnswer[answer.id] ? answer.reactionArray : (answer.reactionArray | slice:0:(isResponsive ? 3 : 7)))"
+                                            class="reaction-btn" [ngClass]="{'reacted': reaction.currentUserReacted}">
                                             <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
                                                 [alt]="reaction.type">
                                             <div>{{ reaction.count }}</div>
@@ -224,11 +232,15 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
-                                        <div (click)="showAllReactionsForAnswer[answer.id] = true" *ngIf="answer.reactionArray!.length > (isResponsive ? 3 : 7) && !showAllReactionsForAnswer[answer.id]" class="reaction-btn more-reactions">
+
+                                        <div (click)="showAllReactionsForAnswer[answer.id] = true"
+                                            *ngIf="answer.reactionArray!.length > (isResponsive ? 3 : 7) && !showAllReactionsForAnswer[answer.id]"
+                                            class="reaction-btn more-reactions">
                                             {{answer.reactionArray!.length - (isResponsive ? 3 : 7)}} weitere
                                         </div>
-                                        <div (click)="showAllReactionsForAnswer[answer.id] = false" *ngIf="showAllReactionsForAnswer[answer.id]" class="reaction-btn more-reactions no-wrap">
+                                        <div (click)="showAllReactionsForAnswer[answer.id] = false"
+                                            *ngIf="showAllReactionsForAnswer[answer.id]"
+                                            class="reaction-btn more-reactions no-wrap">
                                             Weniger anzeigen
                                         </div>
                                     </div>
@@ -239,7 +251,8 @@
                                             <div *ngFor="let icon of reactionIcons" class="reactions-container">
                                                 <button (click)="addReactionToAnswer(answer.id, icon)"
                                                     class="add-reaction-btn">
-                                                    <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                                    <img class="smiley-img"
+                                                        [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
                                                 </button>
                                             </div>
                                         </div>
@@ -266,9 +279,22 @@
                                     (mentionSelected)="insertMentionInEdit(answer, $event)">
                                 </app-mentions-overlay>
 
+                                <app-smiley-overlay [active]="editSmileyActive[answer.id]" [emojis]="allSmileys"
+                                    (selected)="insertSmileyInEdit(answer, $event, editTa)"
+                                    (activeChange)="editSmileyActive[answer.id] = $event">
+                                </app-smiley-overlay>
+
                                 <div class="edit-actions">
-                                    <button class="btn cancel" (click)="cancelEditAnswer(answer)">Abbrechen</button>
-                                    <button class="btn save" (click)="saveEditedAnswer(answer)">Speichern</button>
+
+                                    <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
+                                        iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
+                                        (click)="toggleEditSmiley(answer.id)" class="smiley-edit-btn">
+                                    </app-round-btn>
+
+                                    <div class="btn-wrapper">
+                                        <button class="btn cancel" (click)="cancelEditAnswer(answer)">Abbrechen</button>
+                                        <button class="btn save" (click)="saveEditedAnswer(answer)">Speichern</button>
+                                    </div>
                                 </div>
                             </div>
                         </ng-template>
@@ -285,8 +311,7 @@
                     (input)="updateCaretPosition(); threadHelpService.autoGrow(answerInput)"
                     (keyup)="updateCaretPosition()"></textarea>
 
-                <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
-                    (selected)="onSmileySelected($event)"
+                <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys" (selected)="onSmileySelected($event)"
                     (activeChange)="activeSmiley = $event">
                 </app-smiley-overlay>
                 <app-mentions-overlay [text]="newAnswer" [caretIndex]="mentionCaretIndex"

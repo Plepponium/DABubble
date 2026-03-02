@@ -616,8 +616,13 @@
 
   .edit-actions {
     display: flex;
-    justify-content: flex-end;
-    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
+
+    .btn-wrapper {
+      display: flex;
+      gap: 8px;
+    }
 
     .btn {
       padding: 6px 12px;
@@ -651,7 +656,7 @@
   }
 }
 
-@media(max-width: 880px) {
+@media (max-width: 880px) {
   .thread {
     height: calc(100vh - 80px) !important;
     border-radius: 0 !important;

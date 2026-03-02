@@ -70,6 +70,7 @@ export class ThreadComponent implements OnInit {
 
   activeSmiley = false;
   allSmileys = reactionIcons;
+  editSmileyActive: { [messageId: string]: boolean } = {};
 
   @Input() channelId!: string;
   @Input() chatId!: string;
@@ -96,10 +97,7 @@ export class ThreadComponent implements OnInit {
     if (changes['chatId'] && !changes['chatId'].firstChange) {
       this.chat$ = this.threadService.getEnrichedChat(this.channelId, this.chatId, this.participants$, this.currentUserId);
       this.answers$ = this.threadService.getEnrichedAnswers(this.channelId, this.chatId, this.participants$, this.currentUserId);
-      
-      this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
-        this.threadService.scrollToBottom();
-      });
+      this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => { this.threadService.scrollToBottom(); });
     }
     if (changes['channelId'] && !changes['channelId'].firstChange) {
       this.getCurrentUserAndChannels();
@@ -110,26 +108,25 @@ export class ThreadComponent implements OnInit {
     }
   }
 
-  @HostListener('window:resize') 
+  @HostListener('window:resize')
   /** Updates responsive state when the window is resized. */
   onResize() {
     this.updateIsResponsive();
   }
 
   /** Sets the responsive flag based on the current window width. */
-  updateIsResponsive() { 
+  updateIsResponsive() {
     this.isResponsive = window.innerWidth < 881;
   }
 
-  
-/** Focuses the answer input unless clicking directly on input or icon bar elements. */
+
+  /** Focuses the answer input unless clicking directly on input or icon bar elements. */
   focusInput(event: MouseEvent) {
     if (event.target === this.answerInput?.nativeElement ||
       event.target instanceof HTMLElement &&
       event.target.closest('.input-icon-bar')) {
       return;
     }
-
     this.answerInput?.nativeElement?.focus();
   }
 
@@ -146,12 +143,9 @@ export class ThreadComponent implements OnInit {
     this.threadService.loadChannelWithId(this.channelId).subscribe(({ channelName$, participants$ }) => {
       this.channelName$ = channelName$;
       this.participants$ = participants$;
-
       this.subscribeToParticipants();
-
       this.chat$ = this.threadService.getEnrichedChat(this.channelId, this.chatId, this.participants$, this.currentUserId);
       this.answers$ = this.threadService.getEnrichedAnswers(this.channelId, this.chatId, this.participants$, this.currentUserId);
-      
       this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
         this.threadService.scrollToBottom();
       });
@@ -160,9 +154,7 @@ export class ThreadComponent implements OnInit {
 
   /** Subscribes to participant updates and stores them locally. */
   subscribeToParticipants() {
-    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => {
-      this.participants = users;
-    });
+    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => { this.participants = users; });
   }
 
   /** Toggles the reactions dialog visibility for a specific chat message. */
@@ -211,21 +203,15 @@ export class ThreadComponent implements OnInit {
 
   /** Adds a reaction to the current chat and updates the observable if successful. */
   async addReaction(chatId: string, reactionType: string) {
-    const updatedChat = await this.threadService.addReaction(
-      this.channelId, this.chat$, reactionType, this.currentUserId, this.participants
-    );
-
+    const updatedChat = await this.threadService.addReaction(this.channelId, this.chat$, reactionType, this.currentUserId, this.participants);
     if (updatedChat) {
-      this.chat$ = of(updatedChat); 
+      this.chat$ = of(updatedChat);
     }
   }
 
   /** Adds a reaction to a specific answer and refreshes the answers list. */
   async addReactionToAnswer(answerId: string, reactionType: string) {
-    const updatedAnswers = await this.threadService.addReactionToAnswer(
-      this.channelId, this.chatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants
-    );
-
+    const updatedAnswers = await this.threadService.addReactionToAnswer(this.channelId, this.chatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants);
     if (updatedAnswers) {
       this.subscribeAnswers();
     }
@@ -233,19 +219,13 @@ export class ThreadComponent implements OnInit {
 
   /** Toggles the current user's reaction on a chat message. */
   async toggleReactionForChat(chatId: string, reactionType: string) {
-    const updatedChat = await this.threadService.toggleReactionForChat(
-      this.channelId, this.chat$, reactionType, this.currentUserId, this.participants
-    );
-
+    const updatedChat = await this.threadService.toggleReactionForChat(this.channelId, this.chat$, reactionType, this.currentUserId, this.participants);
     if (updatedChat) this.chat$ = of(updatedChat);
   }
 
   /** Toggles the current user's reaction on an answer. */
   async toggleReactionForAnswer(answerId: string, reactionType: string) {
-    const updatedAnswers = await this.threadService.toggleReactionForAnswer(
-      this.channelId, this.chatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants
-    );
-
+    const updatedAnswers = await this.threadService.toggleReactionForAnswer(this.channelId, this.chatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants);
     if (updatedAnswers) {
       this.subscribeAnswers();
     }
@@ -255,19 +235,16 @@ export class ThreadComponent implements OnInit {
   handleCloseThread() {
     this.closeThread.emit();
   }
- 
+
   /** Submits a new answer to the thread and scrolls to the latest message. */
   async submitAnswer() {
     if (this.isSubmitting || !this.newAnswer.trim()) return;
     this.isSubmitting = true;
-
     try {
       const result = await this.threadService.submitAnswer(this.channelId, this.chatId, this.newAnswer, this.currentUserId);
-
       if (result.success) {
         this.answerAdded.emit({ chatId: this.chatId, answerTime: result.answerTime! });
         this.newAnswer = '';
-
         [0, 50, 150].forEach(delay =>
           setTimeout(() => this.threadService.scrollToBottomNewMessage(), delay)
         );
@@ -283,7 +260,6 @@ export class ThreadComponent implements OnInit {
       e.preventDefault();
       return;
     }
-
     this.submitAnswer();
     e.preventDefault();
   }
@@ -305,11 +281,7 @@ export class ThreadComponent implements OnInit {
 
   /** Inserts selected smiley into the answer input and closes the overlay. */
   onSmileySelected(smiley: string) {
-    this.threadHelpService.insertSmiley(
-      this.answerInput.nativeElement,
-      this.newAnswer,
-      smiley
-    );
+    this.threadHelpService.insertSmiley(this.answerInput.nativeElement, this.newAnswer, smiley);
     this.newAnswer = this.answerInput.nativeElement.value; // Sync
     this.activeSmiley = false;
   }
@@ -319,7 +291,6 @@ export class ThreadComponent implements OnInit {
     const result = this.threadHelpService.insertMention(this.newAnswer, event, this.mentionCaretIndex);
     this.newAnswer = result.newText;
     this.mentionCaretIndex = result.newCaretIndex;
-    
     setTimeout(() => {
       const textarea = this.answerInput.nativeElement;
       textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
@@ -358,12 +329,31 @@ export class ThreadComponent implements OnInit {
     answer.editedText = answer.message;
   }
 
+  /** Toggles edit smiley overlay for specific message, closes others. */
+  toggleEditSmiley(messageId: string): void {
+    this.editSmileyActive[messageId] = !this.editSmileyActive[messageId];
+    Object.keys(this.editSmileyActive).forEach(id => {
+      if (id !== messageId) this.editSmileyActive[id] = false;
+    });
+  }
+
+  /** Inserts emoji into edit textarea at cursor, updates caret position. */
+  insertSmileyInEdit(message: any, emoji: string, textarea: HTMLTextAreaElement): void {
+    const caretPos = textarea.selectionStart || 0;
+    message.editedText = message.editedText.slice(0, caretPos) + `:${emoji}:` + message.editedText.slice(caretPos);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = caretPos + emoji.length + 2;
+      this.updateEditCaret(message, textarea);
+    });
+    this.editSmileyActive[message.id] = false;
+  }
+
   /** Inserts a mention into the edited answer and restores caret position. */
   insertMentionInEdit(answer: any, event: { name: string; type: 'user' | 'channel' | 'email' }) {
     const result = this.threadHelpService.insertMentionInEdit(answer.editedText, answer._caretIndex, event);
     answer.editedText = result.newText;
     answer._caretIndex = result.newCaretIndex;
-    
     setTimeout(() => {
       const textarea = document.getElementById(`edit-${answer.id}`) as HTMLTextAreaElement;
       if (textarea) {
@@ -391,7 +381,6 @@ export class ThreadComponent implements OnInit {
   /** Saves the edited answer and refreshes the answers list if successful. */
   async saveEditedAnswer(answer: Answer) {
     const result = await this.threadService.saveEditedAnswer(this.channelId, this.chatId, answer, answer.editedText ?? '');
-
     if (result) {
       this.subscribeAnswers();
     }
@@ -399,13 +388,8 @@ export class ThreadComponent implements OnInit {
 
   /** Reloads enriched answers and scrolls to the bottom. */
   subscribeAnswers() {
-    this.answers$ = this.threadService.getEnrichedAnswers(
-      this.channelId, this.chatId, this.participants$, this.currentUserId
-    );
-
-    this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
-      this.threadService.scrollToBottom();
-    });
+    this.answers$ = this.threadService.getEnrichedAnswers(this.channelId, this.chatId, this.participants$, this.currentUserId);
+    this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => { this.threadService.scrollToBottom(); });
   }
 
   /** Renders formatted message text safely for display. */
