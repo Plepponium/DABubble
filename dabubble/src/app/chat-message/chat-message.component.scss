@@ -315,8 +315,12 @@
 
   .edit-actions {
     display: flex;
-    justify-content: flex-end;
-    gap: 8px;
+    justify-content: space-between;
+
+    .btn-wrapper {
+      display: flex;
+      gap: 8px;
+    }
 
     .btn {
       padding: 12px 25px;
@@ -351,7 +355,8 @@
 }
 
 @media (max-width: 880px) {
-  .hover-icon, .hover-icon-purple {
+  .hover-icon,
+  .hover-icon-purple {
     width: 27px;
   }
 
@@ -383,7 +388,7 @@
   }
 }
 
-@media(max-width: 380px) {
+@media (max-width: 380px) {
   .hide-small {
     display: none;
   }

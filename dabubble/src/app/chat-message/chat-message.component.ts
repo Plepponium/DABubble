@@ -8,17 +8,22 @@ import { User } from '../../models/user.class';
 import { SafeHtml } from '@angular/platform-browser';
 import { ChatsUiService } from '../../services/chats-ui.service';
 import { ChatsTextService } from '../../services/chats-text.service';
+import { SmileyOverlayComponent } from '../shared/smiley-overlay/smiley-overlay.component';
+import { RoundBtnComponent } from '../round-btn/round-btn.component';
+import { reactionIcons } from '../reaction-icons';
 
 @Component({
   selector: 'app-chat-message',
-  imports: [CommonModule, FormsModule, ReactionsDisplayComponent, MentionsOverlayComponent],
+  imports: [CommonModule, FormsModule, ReactionsDisplayComponent, MentionsOverlayComponent, SmileyOverlayComponent, RoundBtnComponent],
   templateUrl: './chat-message.component.html',
   styleUrl: './chat-message.component.scss'
 })
 export class ChatMessageComponent {
   textService = inject(ChatsTextService);
   uiService = inject(ChatsUiService);
-  
+  editSmileyActive: { [key: string]: boolean } = {};
+  allSmileys = reactionIcons;
+
   @Input() chat!: Chat;
   @Input() index!: number;
   @Input() currentUserId!: string;
@@ -101,6 +106,26 @@ export class ChatMessageComponent {
   /** Emits event to save edited message content. */
   onSaveEditedChat(chat: any) {
     this.saveEditedChat.emit(chat);
+  }
+
+  /** Toggles smiley overlay for chat, closing others. */
+  toggleEditSmiley(chatId: string): void {
+    this.editSmileyActive[chatId] = !this.editSmileyActive[chatId];
+    Object.keys(this.editSmileyActive).forEach(id => {
+      if (id !== chatId) this.editSmileyActive[id] = false;
+    });
+  }
+
+  /** Inserts emoji at textarea cursor position and closes overlay. */
+  insertSmileyInEdit(chat: any, emoji: string, textarea: HTMLTextAreaElement): void {
+    const caretPos = textarea.selectionStart || 0;
+    chat.editedText = chat.editedText.slice(0, caretPos) + `:${emoji}:` + chat.editedText.slice(caretPos);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = caretPos + emoji.length + 2;
+      this.updateEditCaret(chat, textarea);
+    });
+    this.editSmileyActive[chat.id] = false;
   }
 
   /** Dynamically adjusts textarea height to fit content. */

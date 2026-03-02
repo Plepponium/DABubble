@@ -2,86 +2,82 @@
     [ngClass]="{'reverse': chat.user === currentUserId}" 
     #chatSection [attr.data-message-id]="chat.id"> -->
 
-    <!-- <div *ngIf="index === 0 || !isSameDate(getChatDate(chat), getChatDate(chatList[index-1]))"
+<!-- <div *ngIf="index === 0 || !isSameDate(getChatDate(chat), getChatDate(chatList[index-1]))"
         class="chat-date-section">
         <div class="chat-date">{{ getDisplayDate(chat) }}</div>
     </div> -->
-    <div *ngIf="!prevChatDate || !isSameDate(getChatDate(chat), prevChatDate)"
-        class="chat-date-section">
-        <div class="chat-date">{{ getDisplayDate(chat) }}</div>
-    </div>
+<div *ngIf="!prevChatDate || !isSameDate(getChatDate(chat), prevChatDate)" class="chat-date-section">
+    <div class="chat-date">{{ getDisplayDate(chat) }}</div>
+</div>
 
-    <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}"
-        [class.edit-mode]="chat.isEditing">
-        <div class="chat-dialogue" [ngClass]="{'reverse': chat.user === currentUserId}">
-            <button (click)="addReaction.emit({index: index, type: 'check'})" class="add-reaction-btn">
-                <img class="smiley-img" src="assets/reaction-icons/check.svg" alt="">
-            </button>
+<div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}" [class.edit-mode]="chat.isEditing">
+    <div class="chat-dialogue" [ngClass]="{'reverse': chat.user === currentUserId}">
+        <button (click)="addReaction.emit({index: index, type: 'check'})" class="add-reaction-btn">
+            <img class="smiley-img" src="assets/reaction-icons/check.svg" alt="">
+        </button>
 
-            <button (click)="addReaction.emit({index: index, type: 'thumb'})" class="add-reaction-btn">
-                <img class="smiley-img" src="assets/reaction-icons/thumb.svg" alt="">
-            </button>
+        <button (click)="addReaction.emit({index: index, type: 'thumb'})" class="add-reaction-btn">
+            <img class="smiley-img" src="assets/reaction-icons/thumb.svg" alt="">
+        </button>
 
-            <div class="reactions-display-container">
-                <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === index">
-                    <div *ngFor="let icon of reactionIcons" class="reactions-container">
-                        <button (click)="addReaction.emit({index: index, type: icon})" class="add-reaction-btn">
-                            <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'"
-                                [alt]="icon">
-                        </button>
-                    </div>
+        <div class="reactions-display-container">
+            <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === index">
+                <div *ngFor="let icon of reactionIcons" class="reactions-container">
+                    <button (click)="addReaction.emit({index: index, type: icon})" class="add-reaction-btn">
+                        <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                    </button>
                 </div>
-                <button (click)="openReactionsDialogue.emit({index: index, below: false})" class="add-reaction-btn">
-                    <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
-                    <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg"
-                        alt="">
-                </button>
             </div>
-
-            <button (click)="openThread.emit(chat.id)" class="add-reaction-btn">
-                <img class="hover-icon" src="assets/icons/comment.svg" alt="">
-                <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="">
+            <button (click)="openReactionsDialogue.emit({index: index, below: false})" class="add-reaction-btn">
+                <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
+                <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg" alt="">
             </button>
-
-            <div class="edit-comment-container">
-                <div class="edit-comment-dialogue" *ngIf="editCommentDialogueExpanded">
-                    <div class="edit-comment" (click)="onEnableEditChat(chat)">Nachricht bearbeiten</div>
-                </div>
-                <button (click)="openEditCommentDialogue()" class="add-reaction-btn reverse">
-                    <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="">
-                    <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg" alt="">
-                </button>
-            </div>
         </div>
 
-        <img class="chat-user-img" [src]="'assets/user-icons/' + chat.userImg + '.svg'"
-            [alt]="chat.userName" [ngClass]="{'grayscale': chat.isUserMissing}">
+        <button (click)="openThread.emit(chat.id)" class="add-reaction-btn">
+            <img class="hover-icon" src="assets/icons/comment.svg" alt="">
+            <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="">
+        </button>
 
-        <ng-container *ngIf="!chat.isEditing; else editMode">
-            <div class="chat-info-container" [ngClass]="{'reverse': chat.user === currentUserId}">
-                <div class="chat-start" [ngClass]="{'reverse': chat.user === currentUserId}">
-                    <div class="font-w-700 user-name" [ngClass]="{'missing': chat.isUserMissing}"
-                        (click)="handleOpenProfile()">
-                        {{ chat.userName }}
-                    </div>
-                    <div class="font-14 t-gray">{{ chat.time * 1000 | date: 'HH:mm' }} Uhr</div>
+        <div class="edit-comment-container">
+            <div class="edit-comment-dialogue" *ngIf="editCommentDialogueExpanded">
+                <div class="edit-comment" (click)="onEnableEditChat(chat)">Nachricht bearbeiten</div>
+            </div>
+            <button (click)="openEditCommentDialogue()" class="add-reaction-btn reverse">
+                <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="">
+                <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg" alt="">
+            </button>
+        </div>
+    </div>
+
+    <img class="chat-user-img" [src]="'assets/user-icons/' + chat.userImg + '.svg'" [alt]="chat.userName"
+        [ngClass]="{'grayscale': chat.isUserMissing}">
+
+    <ng-container *ngIf="!chat.isEditing; else editMode">
+        <div class="chat-info-container" [ngClass]="{'reverse': chat.user === currentUserId}">
+            <div class="chat-start" [ngClass]="{'reverse': chat.user === currentUserId}">
+                <div class="font-w-700 user-name" [ngClass]="{'missing': chat.isUserMissing}"
+                    (click)="handleOpenProfile()">
+                    {{ chat.userName }}
                 </div>
-                <div class="chat-message" [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 
+                <div class="font-14 t-gray">{{ chat.time * 1000 | date: 'HH:mm' }} Uhr</div>
+            </div>
+            <div class="chat-message" [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 
                     'right': chat.user === currentUserId}" [innerHTML]="renderMessage(chat.message)">
-                </div>
-                <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}"
-                    [ngClass]="{'has-answers': chat.answersCount && chat.answersCount > 0}">
+            </div>
+            <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}"
+                [ngClass]="{'has-answers': chat.answersCount && chat.answersCount > 0}">
 
-                    <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0">
-                        <div (click)="handleOpenThread()" class="answer t-purple">
-                            {{ chat.answersCount }} Antworten 
-                        </div>
-                        <div class="last-answer font-14 t-gray hide-small">
-                            Letzte Antwort {{ chat.lastAnswerTime ? (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}
-                        </div>
+                <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0">
+                    <div (click)="handleOpenThread()" class="answer t-purple">
+                        {{ chat.answersCount }} Antworten
                     </div>
+                    <div class="last-answer font-14 t-gray hide-small">
+                        Letzte Antwort {{ chat.lastAnswerTime ? (chat.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}
+                    </div>
+                </div>
 
-                    <!-- <div class="reactions">
+                <!-- <div class="reactions">
                         <div class="reaction-btns">
                             <div (click)="toggleReaction(i, reaction.type)"
                                 *ngFor="let reaction of getMaxReactionsToShow(chat, i)" class="reaction-btn"
@@ -155,43 +151,49 @@
                         </div>
                     </div> -->
 
-                    <app-reactions-display
-                        [chat]="chat"
-                        [index]="index"
-                        [currentUserId]="currentUserId"
-                        [isResponsive]="isResponsive"
-                        [reactionIcons]="reactionIcons"
-                        [activeReactionDialogueIndex]="activeReactionDialogueIndex"
-                        [activeReactionDialogueBelowIndex]="activeReactionDialogueBelowIndex"
-                        [showAllReactions]="showAllReactions"
-                        (addReaction)="addReaction.emit($event)"
-                        (toggleReaction)="toggleReaction.emit($event)"
-                        (openReactionsDialogue)="openReactionsDialogue.emit($event)"
-                        (showAllReactionsChange)="showAllReactions[$event.index] = $event.showAll">
-                    </app-reactions-display>
+                <app-reactions-display [chat]="chat" [index]="index" [currentUserId]="currentUserId"
+                    [isResponsive]="isResponsive" [reactionIcons]="reactionIcons"
+                    [activeReactionDialogueIndex]="activeReactionDialogueIndex"
+                    [activeReactionDialogueBelowIndex]="activeReactionDialogueBelowIndex"
+                    [showAllReactions]="showAllReactions" (addReaction)="addReaction.emit($event)"
+                    (toggleReaction)="toggleReaction.emit($event)"
+                    (openReactionsDialogue)="openReactionsDialogue.emit($event)"
+                    (showAllReactionsChange)="showAllReactions[$event.index] = $event.showAll">
+                </app-reactions-display>
 
-                </div>
             </div>
-        </ng-container>
+        </div>
+    </ng-container>
 
-        <ng-template #editMode>
-            <div class="chat-edit-wrapper">
-                <textarea #editTa id="edit-{{chat.id}}" class="edit-textarea"
-                    (input)="updateEditCaret(chat, editTa); autoGrow(editTa)"
-                    (keyup)="updateEditCaret(chat, editTa)" [(ngModel)]="chat.editedText"
-                    [placeholder]="chat.message"></textarea>
+    <ng-template #editMode>
+        <div class="chat-edit-wrapper">
+            <textarea #editTa id="edit-{{chat.id}}" class="edit-textarea"
+                (input)="updateEditCaret(chat, editTa); autoGrow(editTa)" (keyup)="updateEditCaret(chat, editTa)"
+                [(ngModel)]="chat.editedText" [placeholder]="chat.message"></textarea>
 
-                <app-mentions-overlay [text]="chat.editedText" [caretIndex]="chat._caretIndex"
-                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="participants"
-                    [channels]="filteredChannels" (mentionSelected)="insertMentionInEdit(chat, $event)">
-                </app-mentions-overlay>
+            <app-mentions-overlay [text]="chat.editedText" [caretIndex]="chat._caretIndex"
+                [currentUserId]="currentUserId" [context]="'Channel'" [users]="participants"
+                [channels]="filteredChannels" (mentionSelected)="insertMentionInEdit(chat, $event)">
+            </app-mentions-overlay>
 
-                <div class="edit-actions">
+            <app-smiley-overlay [active]="editSmileyActive[chat.id]" [emojis]="allSmileys"
+                (selected)="insertSmileyInEdit(chat, $event, editTa)"
+                (activeChange)="editSmileyActive[chat.id] = $event">
+            </app-smiley-overlay>
+
+            <div class="edit-actions">
+                <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
+                    iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
+                    (click)="toggleEditSmiley(chat.id)" class="smiley-edit-btn">
+                </app-round-btn>
+
+                <div class="btn-wrapper">
                     <button class="btn cancel" (click)="onCancelEditChat(chat)">Abbrechen</button>
                     <button class="btn save" (click)="onSaveEditedChat(chat)">Speichern</button>
                 </div>
             </div>
-        </ng-template>
+        </div>
+    </ng-template>
 
-    </div>
+</div>
 <!-- </div> -->
