@@ -16,33 +16,28 @@ export class ReactionsDisplayComponent {
   @Input() currentUserId!: string;
   @Input() isResponsive: boolean = false;
   @Input() reactionIcons: string[] = reactionIcons;
-
-  // State, der vorher in ChatsComponent lag:
   @Input() activeReactionDialogueIndex: number | null = null;
   @Input() activeReactionDialogueBelowIndex: number | null = null;
   @Input() showAllReactions: { [index: number]: boolean } = {};
-
   @Output() addReaction = new EventEmitter<{ index: number; type: string }>();
   @Output() toggleReaction = new EventEmitter<{ index: number; type: string }>();
   @Output() openReactionsDialogue = new EventEmitter<{ index: number; below: boolean }>();
   @Output() showAllReactionsChange = new EventEmitter<{ index: number; showAll: boolean }>();
 
+  // Check if the current user is the author of the message
   get isOwnMessage(): boolean {
     return this.chat.user === this.currentUserId;
   }
 
-  // getMaxReactionsToShow(): any[] {
-  //   const max = this.isResponsive ? 3 : 7;
-  //   const showAll = this.showAllReactions[this.index];
-  //   return showAll ? this.chat.reactionArray : this.chat.reactionArray.slice(0, max);
-  // }
+  /** Returns reactions to display based on responsive state. */
   getMaxReactionsToShow(): any[] {
-    const reactionArray = this.chat.reactionArray ?? [];  // ✅ Fallback
+    const reactionArray = this.chat.reactionArray ?? [];
     const max = this.isResponsive ? 3 : 7;
     const showAll = this.showAllReactions[this.index];
     return showAll ? reactionArray : reactionArray.slice(0, max);
   }
 
+  /** Emits add reaction event and optionally opens dialogue. */
   onAddReaction(type: string, below: boolean | null = null) {
     this.addReaction.emit({ index: this.index, type });
     if (below !== null) {
@@ -50,18 +45,22 @@ export class ReactionsDisplayComponent {
     }
   }
 
+  /** Emits toggle reaction event for given type. */
   onToggleReaction(type: string) {
     this.toggleReaction.emit({ index: this.index, type });
   }
 
+  /** Emits open reactions dialogue event. */
   onOpenReactionsDialogue(below: boolean) {
     this.openReactionsDialogue.emit({ index: this.index, below });
   }
 
+  /** Emits event to show all reactions. */
   showAll() {
     this.showAllReactionsChange.emit({ index: this.index, showAll: true });
   }
 
+  /** Emits event to show fewer reactions. */
   showLess() {
     this.showAllReactionsChange.emit({ index: this.index, showAll: false });
   }

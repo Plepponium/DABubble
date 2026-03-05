@@ -13,40 +13,38 @@ import { CommonModule } from '@angular/common';
   styleUrl: './channel-header.component.scss'
 })
 export class ChannelHeaderComponent {
-  showChannelDescription = false;
-  showUserDialogue = false;
-  usersDisplayActive = false;
-  showAddDialogue = false;
-  showAddDialogueResponsive = false;
-
-  // currentUserId: string = '';
-  // participants: User[] = [];
-
-  // channelName$: Observable<string> = of('');
-  // participants$: Observable<User[]> = of([]);
-
-  @Input() currentUserId!: string; 
-  @Input() participants!: User[];   
-  @Input() channelName$!: Observable<string>; 
+  @Input() currentUserId!: string;
+  @Input() participants!: User[];
+  @Input() channelName$!: Observable<string>;
   @Input() participants$!: Observable<User[]>;
   @Input() channelId?: string;
   @Input() profileOpen = false;
   @Output() openProfile = new EventEmitter<User>();
   @Output() channelDeleted = new EventEmitter<void>();
 
+  showChannelDescription = false;
+  showUserDialogue = false;
+  usersDisplayActive = false;
+  showAddDialogue = false;
+  showAddDialogueResponsive = false;
+
+  /** Opens the channel description dialog. */
   openDialogChannelDescription() {
     this.showChannelDescription = true;
   };
 
+  /** Closes the channel description dialog. */
   closeDialogChannelDescription() {
     this.showChannelDescription = false;
   }
 
+  /** Opens the user dialogue panel. */
   openDialogueShowUser() {
     this.showUserDialogue = true;
     this.usersDisplayActive = true;
   }
 
+  /** Closes the user dialogue panel. */
   closeDialogueShowUser() {
     this.showUserDialogue = false;
     if (this.showAddDialogue = false) {
@@ -54,6 +52,7 @@ export class ChannelHeaderComponent {
     }
   }
 
+  /** Chooses which dialogue to open based on window width. */
   chooseOpenDialogue() {
     if (window.innerWidth <= 1010) {
       this.openDialogueShowUser();
@@ -62,31 +61,32 @@ export class ChannelHeaderComponent {
     }
   }
 
+  /** Opens the add user dialogue. */
   openDialogueAddUser() {
     this.showAddDialogue = true;
     this.showAddDialogueResponsive = false;
     this.showUserDialogue = false;
   }
 
+  /** Opens the responsive add user dialogue. */
   openDialogueAddUserResponsive() {
     this.showAddDialogue = true;
     this.showAddDialogueResponsive = true;
   }
 
+  /** Closes the add user dialogue. */
   closeDialogueAddUser() {
     this.showAddDialogue = false;
     this.showAddDialogueResponsive = false;
     this.usersDisplayActive = false;
   }
 
-  // openDialogueShowProfile(user: User) {
-  //   this.profileOpen = true;
-  //   this.openProfile.emit(user);
-  // }
+  /** Emits event to open a user profile. */
   openDialogueShowProfile(user: User) {
-    this.openProfile.emit(user); // ✅ Parent managed profileOpen
+    this.openProfile.emit(user);
   }
 
+  /** Emits event when the channel is deleted. */
   handleChannelDeleted() {
     this.channelDeleted.emit();
     this.closeDialogChannelDescription();

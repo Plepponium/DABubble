@@ -15,36 +15,19 @@ import { User } from '../../models/user.class';
 export class ChatInputComponent {
   @Input() placeholder: string = '';
   @Input() text: string = '';
-  @Output() textChange = new EventEmitter<string>();
-
   @Input() emojis: string[] = [];
   @Input() users: User[] = [];
   @Input() channels: any[] = [];
   @Input() currentUserId: string = '';
   @Input() context: 'Channel' = 'Channel';
-
+  @Output() textChange = new EventEmitter<string>();
   @Output() submit = new EventEmitter<void>();
-
-  // @ViewChild('inputRef') inputRef!: ElementRef<HTMLTextAreaElement>;
 
   activeSmiley = false;
   overlayActive = false;
   mentionCaretIndex: number | null = null;
 
-  // onFormSubmit(form: NgForm) {
-  //   console.log('onFormSubmit');
-  //   if (!this.text?.trim()) return;
-  //   this.submit.emit();
-  // }
-  // onFormSubmit(form: NgForm) {
-  //   console.log('onFormSubmit');
-  //   if (this.overlayActive) {
-  //     // z.B. Mention-Liste offen → nicht senden
-  //     return;
-  //   }
-  //   if (!this.text?.trim()) return;
-  //   this.submit.emit();
-  // }
+  /** Submits form if valid and no overlay active. */
   onFormSubmit() {
     if (this.overlayActive || !this.text?.trim()) {
       return;
@@ -52,6 +35,7 @@ export class ChatInputComponent {
     this.submit.emit();
   }
 
+  /** Handles enter key press for submission. */
   onEnterPress(e: KeyboardEvent) {
     if (this.overlayActive) {
       e.preventDefault();
@@ -61,54 +45,51 @@ export class ChatInputComponent {
     e.preventDefault();
   }
 
+  /** Toggles smiley overlay visibility. */
   openSmileyOverlay() {
     this.activeSmiley = !this.activeSmiley;
   }
 
-  // onSmileySelected(smiley: string, textarea: HTMLTextAreaElement) {
-  //   this.insertAtCursor(`:${smiley}:`, textarea);
-  //   this.activeSmiley = false;
-  // }
+  /** Inserts selected smiley at cursor position. */
   onSmileySelected(smiley: string) {
-  const textarea = document.getElementById('chat-input') as HTMLTextAreaElement;
-  if (textarea) {
-    this.insertAtCursor(`:${smiley}:`, textarea);
+    const textarea = document.getElementById('chat-input') as HTMLTextAreaElement;
+    if (textarea) {
+      this.insertAtCursor(`:${smiley}:`, textarea);
+    }
+    this.activeSmiley = false;
   }
-  this.activeSmiley = false;
-}
 
+  /** Inserts mention (user/channel) at caret position. */
   insertMention(event: { name: string; type: 'user' | 'channel' | 'email' }) {
+    const textarea = document.getElementById('chat-input') as HTMLTextAreaElement;
+    if (!textarea) return;
     const trigger = event.type === 'user' ? '@' : '#';
     const mentionText = `${trigger}${event.name} `;
     const pos = this.mentionCaretIndex ?? this.text.length;
     const before = this.text.slice(0, pos);
     const replaced = before.replace(/([@#])([^\s]*)$/, mentionText);
-
     const newText = replaced + this.text.slice(pos);
     this.text = newText;
     this.textChange.emit(this.text);
-
     this.mentionCaretIndex = replaced.length + 1;
-
-    setTimeout(() => {
-      const textarea = document.getElementById('chat-input') as HTMLTextAreaElement;
-      if (textarea) {
-        textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
-        textarea.focus();
-      }
-    });
+    this.setCursorPosition(textarea, newText.length);
     this.overlayActive = false;
   }
 
-  // updateCaretPosition() {
-  //   const textarea = this.inputRef?.nativeElement;
-  //   if (!textarea) return;
-  //   this.mentionCaretIndex = textarea.selectionStart ?? 0;
-  // }
+  // Helper to set cursor position after inserting mention
+  private setCursorPosition(textarea: HTMLTextAreaElement, position: number) {
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = position;
+      textarea.focus();
+    });
+  }
+
+  /** Updates textarea caret position. */
   updateCaretPosition(textarea: HTMLTextAreaElement) {
     this.mentionCaretIndex = textarea.selectionStart ?? 0;
   }
 
+  /** Focuses textarea unless clicking icons. */
   focusInput(event: MouseEvent) {
     const target = event.target as HTMLElement;
     if (target.closest('.input-icon-bar') || target.tagName === 'TEXTAREA') {
@@ -118,6 +99,7 @@ export class ChatInputComponent {
     textarea?.focus();
   }
 
+  /** Inserts text at current cursor position. */
   insertAtCursor(character: string, textarea: HTMLTextAreaElement) {
     const start = textarea.selectionStart ?? 0;
     const end = textarea.selectionEnd ?? 0;
@@ -125,7 +107,6 @@ export class ChatInputComponent {
     const after = this.text.slice(end);
     this.text = before + character + after;
     this.textChange.emit(this.text);
-
     const newPos = start + character.length;
     setTimeout(() => {
       textarea.focus();
@@ -133,6 +114,7 @@ export class ChatInputComponent {
     });
   }
 
+  /** Updates overlay active state. */
   onOverlayStateChange(active: boolean) {
     this.overlayActive = active;
   }
