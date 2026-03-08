@@ -245,11 +245,7 @@ export class ThreadComponent implements OnInit {
     try {
       const result = await this.threadService.submitAnswer(this.channelId, this.chatId, this.newAnswer, this.currentUserId);
       if (result.success) {
-        console.log('🟢 Thread emit:', { chatId: this.chatId, answerTime: result.answerTime });
-
-        // ✅ NUR Service – kein emit mehr!
         this.dataService.notifyAnswerAdded({ chatId: this.chatId, answerTime: result.answerTime! });
-
         this.newAnswer = '';
         [0, 50, 150].forEach(delay =>
           setTimeout(() => this.threadService.scrollToBottomNewMessage(), delay)

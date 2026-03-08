@@ -97,7 +97,6 @@ export class ChatsComponent implements OnInit, OnChanges {
       this.isResponsive = isResponsive;
     });
     this.dataService.answerAdded$.pipe(takeUntil(this.destroy$)).subscribe(event => {
-      console.log('🟡 ChatsComponent handleAnswerAdded:', event);
       this.handleAnswerAdded(event);
     });
   }
@@ -316,7 +315,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   /** Updates local state when a thread answer is added. */
   handleAnswerAdded(event: { chatId: string; answerTime: number }) {
     let chats = this.dataService.chatsSubject.getValue();
-    console.log('Chats vor Update:', chats.length);
     const chat = chats.find(c => c.id === event.chatId);
     if (!chat) {
       console.warn('Chat nicht gefunden, lade neu...');
@@ -327,8 +325,6 @@ export class ChatsComponent implements OnInit, OnChanges {
         ? { ...c, answersCount: (c.answersCount || 0) + 1, lastAnswerTime: event.answerTime }
         : c
     );
-
-    console.log('Chats nach Update:', chats.length);
     this.dataService.chatsSubject.next(chats);
   }
 

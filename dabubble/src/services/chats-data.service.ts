@@ -179,7 +179,6 @@ export class ChatsDataService {
 
   // Public method to be called when an answer is added, notifying subscribers of the new answer.
   notifyAnswerAdded(event: { chatId: string; answerTime: number }) {
-    console.log('🔵 Service notifyAnswerAdded:', event);
     this.answerAddedSubject.next(event);
   }
 }
