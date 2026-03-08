@@ -30,6 +30,14 @@ registerLocaleData(localeDe);
   styleUrl: './chats.component.scss',
 })
 export class ChatsComponent implements OnInit, OnChanges {
+  @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
+  @ViewChildren('chatSection') chatSections!: QueryList<ElementRef>;
+  @Input() channelId?: string;
+  @Input() profileOpen = false;
+  @Output() openThread = new EventEmitter<{ channelId: string; chatId: string }>();
+  @Output() openProfile = new EventEmitter<User>();
+  @Output() channelDeleted = new EventEmitter<void>();
+
   channelService = inject(ChannelService);
   userService = inject(UserService);
   logoutService = inject(LogoutService);
@@ -40,7 +48,6 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   value = 'Clear me';
   showChannelDescription = false;
-  
   activeReactionDialogueIndex: number | null = null;
   activeReactionDialogueBelowIndex: number | null = null;
   overlayActive = false;
@@ -65,17 +72,60 @@ export class ChatsComponent implements OnInit, OnChanges {
   participants$: Observable<User[]> = of([]);
   private chatsSubject = new BehaviorSubject<Chat[]>([]);
   public chats$ = this.chatsSubject.asObservable();
-  private destroy$ = new Subject<void>(); 
+  private destroy$ = new Subject<void>();
   showChannelDescription$ = this.uiService.showChannelDescription$;
   showUserDialogue$ = this.uiService.showUserDialogue$;
 
-  @Input() channelId?: string;
-  @Input() profileOpen = false;
-  @Output() openThread = new EventEmitter<{ channelId: string; chatId: string }>();
-  @Output() openProfile = new EventEmitter<User>();
-  @Output() channelDeleted = new EventEmitter<void>();
-  @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
-  @ViewChildren('chatSection') chatSections!: QueryList<ElementRef<HTMLElement>>;
+
+
+  /** Initializes subscriptions and loads initial channel and user data. */
+  ngOnInit() {
+    this.updateIsResponsive();
+    this.dataService.getCurrentUser();
+    this.dataService.loadChannels();
+
+    this.participants$ = this.dataService.participants$;
+    this.dataService.currentUserId$.pipe(takeUntil(this.destroy$)).subscribe(id => this.currentUserId = id);
+    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(p => this.participants = p);
+
+    if ((this.dataService as any).filteredChannels$) {
+      (this.dataService as any).filteredChannels$.pipe(takeUntil(this.destroy$)).subscribe((fc: any[]) => this.filteredChannels = fc);
+    } else {
+      this.filteredChannels = this.dataService.filteredChannels;
+    }
+    this.uiService.isResponsive$.pipe(takeUntil(this.destroy$)).subscribe(isResponsive => {
+      this.isResponsive = isResponsive;
+    });
+    this.dataService.answerAdded$.pipe(takeUntil(this.destroy$)).subscribe(event => {
+      console.log('🟡 ChatsComponent handleAnswerAdded:', event);
+      this.handleAnswerAdded(event);
+    });
+  }
+
+  /** Reacts to input changes such as channelId and reloads channel data accordingly. */
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['channelId']) {
+      const newChannelId = changes['channelId'].currentValue;
+      if (newChannelId) {
+        this.pendingScroll = true;
+        this.dataService.channelId = newChannelId;
+        this.dataService.pendingScroll = true;
+        this.dataService.currentUserId = this.currentUserId;
+        this.dataService.loadChannelWithId(newChannelId);
+        this.channelName$ = this.dataService.channelName$;
+        this.participants$ = this.dataService.participants$;
+        this.chats$ = this.dataService.chatsSubject.asObservable();
+        this.participants = this.dataService.participants;
+        this.filteredChannels = this.dataService.filteredChannels;
+      }
+    }
+  }
+
+  /** Cleans up resources when the component is destroyed. */
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   @HostListener('window:resize')
   onResize() {
@@ -103,52 +153,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     return chat.id;
   }
 
-  /** Initializes subscriptions and loads initial channel and user data. */
-  ngOnInit() {
-    this.updateIsResponsive();
-    this.dataService.getCurrentUser();
-    this.dataService.loadChannels();
 
-    this.participants$ = this.dataService.participants$;
-    this.dataService.currentUserId$.pipe(takeUntil(this.destroy$)).subscribe(id => this.currentUserId = id);
-    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(p => this.participants = p);
-
-    if ((this.dataService as any).filteredChannels$) {
-      (this.dataService as any).filteredChannels$.pipe(takeUntil(this.destroy$)).subscribe((fc: any[]) => this.filteredChannels = fc);
-    } else {
-      this.filteredChannels = this.dataService.filteredChannels;
-    }
-    this.uiService.isResponsive$.pipe(takeUntil(this.destroy$)).subscribe(isResponsive => {
-      this.isResponsive = isResponsive; 
-    });
-  }
-
-  /** Reacts to input changes such as channelId and reloads channel data accordingly. */
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['channelId']) {
-      const newChannelId = changes['channelId'].currentValue;
-      if (newChannelId) {
-        this.pendingScroll = true;
-        this.dataService.channelId = newChannelId;
-        this.dataService.pendingScroll = true;
-        this.dataService.currentUserId = this.currentUserId;
-
-        this.dataService.loadChannelWithId(newChannelId);
-
-        this.channelName$ = this.dataService.channelName$;
-        this.participants$ = this.dataService.participants$;
-        this.chats$ = this.dataService.chatsSubject.asObservable();
-        this.participants = this.dataService.participants;
-        this.filteredChannels = this.dataService.filteredChannels;
-      }
-    }
-  }
-
-  /** Cleans up resources when the component is destroyed. */
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 
   /** Returns the date of a chat message based on its timestamp. */
   getChatDate(chat: any): Date | undefined {
@@ -181,8 +186,8 @@ export class ChatsComponent implements OnInit, OnChanges {
   /** Adds a reaction if the user hasn't reacted yet. */
   async addReaction(event: { index: number; type: string }) {
     const index = event.index;
-    const type = event.type;   
-    
+    const type = event.type;
+
     const chats = await firstValueFrom(this.chats$.pipe(take(1)));
     const chat = chats[index];
     if (!chat) return;
@@ -203,13 +208,13 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   /** Toggles the current user's reaction on a message. */
   async toggleReaction(event: { index: number; type: string }) {
-    const index = event.index;  
-    const type = event.type;   
+    const index = event.index;
+    const type = event.type;
 
     const chat = await this.getChatByIndex(index);
     if (!chat) return;
 
-    const currentUsers = this.reactionService.extractUserIds(chat.reactions || {}, type); 
+    const currentUsers = this.reactionService.extractUserIds(chat.reactions || {}, type);
     let updatedUsers: string[];
     if (currentUsers.includes(this.currentUserId)) {
       updatedUsers = currentUsers.filter(uid => uid !== this.currentUserId);
@@ -221,7 +226,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     this.reactionService.updateLocalReaction(
       chat, type, updatedUsers, index,
       this.chatsSubject, this.participants, this.currentUserId
-    ); 
+    );
   }
 
   /** Returns a chat message by its index in the current channel's chat list. */
@@ -259,14 +264,14 @@ export class ChatsComponent implements OnInit, OnChanges {
   /** Sends the current message to the active channel. */
   submitChatMessage() {
     if (this.isSubmitting || !this.canSendMessage()) return;
-    
-    this.isSubmitting = true; 
+
+    this.isSubmitting = true;
     const messagePayload = this.buildMessagePayload();
 
     this.channelService.addChatToChannel(this.channelId!, messagePayload)
       .then(() => {
         this.newMessage = '';
-        [0, 50, 150].forEach(delay => 
+        [0, 50, 150].forEach(delay =>
           setTimeout(() => this.uiService.scrollToBottomNewMessage(), delay)
         );
       })
@@ -310,17 +315,21 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   /** Updates local state when a thread answer is added. */
   handleAnswerAdded(event: { chatId: string; answerTime: number }) {
-    this.chatsSubject.next(
-      this.chatsSubject.getValue().map(chat =>
-        chat.id === event.chatId
-          ? {
-            ...chat,
-            answersCount: (chat.answersCount || 0) + 1,
-            lastAnswerTime: event.answerTime
-          }
-          : chat
-      )
+    let chats = this.dataService.chatsSubject.getValue();
+    console.log('Chats vor Update:', chats.length);
+    const chat = chats.find(c => c.id === event.chatId);
+    if (!chat) {
+      console.warn('Chat nicht gefunden, lade neu...');
+      return;
+    }
+    chats = chats.map(c =>
+      c.id === event.chatId
+        ? { ...c, answersCount: (c.answersCount || 0) + 1, lastAnswerTime: event.answerTime }
+        : c
     );
+
+    console.log('Chats nach Update:', chats.length);
+    this.dataService.chatsSubject.next(chats);
   }
 
   /** Enables edit mode for the selected chat message and prepares its edit state. */
@@ -386,16 +395,13 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   /** Scrolls to a specific message in the list. */
   scrollToMessage(messageId: string) {
-    const chatSection = this.chatSections
-      .find(section => section.nativeElement.dataset['messageId'] === messageId)
-      ?.nativeElement;
-
-    if (chatSection) {
-      chatSection.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'nearest'
-      });
+    const element = document.querySelector(`[data-message-id="${messageId}"]`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      setTimeout(() => this.scrollToMessage(messageId), 200);
     }
   }
+
+
 }

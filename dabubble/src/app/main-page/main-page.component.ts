@@ -31,7 +31,7 @@ import { LogoutService } from '../../services/logout.service';
   styleUrl: './main-page.component.scss',
 })
 export class MainPageComponent {
-  @ViewChild('chats') chatsComponent!: ChatsComponent;
+  @ViewChild('chats', { static: false }) chatsComponent!: ChatsComponent;
   @ViewChild('dmChats') dmChatsComponent!: DirectMessageChatsComponent;
 
   // State flags
@@ -239,6 +239,9 @@ export class MainPageComponent {
     setTimeout(() => this.chatsComponent?.scrollToMessage(item.id), 200);
   }
 
+
+
+
   /** Handles DM message navigation. */
   private handleDmMessage(item: any) {
     const otherUid = item.participants.find((p: string) => p !== this.currentUser?.uid) || item.participants[0];
@@ -271,13 +274,15 @@ export class MainPageComponent {
 
   /** Opens thread chat. */
   openThread(event: { channelId: string; chatId: string }) {
-    this.threadOpen = true;
-    this.threadChatId = event.chatId;
     this.currentChannelId = event.channelId;
-    if (this.isSmallScreen) {
-      this.channelOpen = false;
-    }
+    this.channelOpen = true;
+    setTimeout(() => {
+      this.threadOpen = true;
+      this.threadChatId = event.chatId;
+      if (this.isSmallScreen) this.channelOpen = false;
+    }, 300);
   }
+
 
   /** Handles thread close event. */
   onThreadClosed() {
@@ -375,11 +380,6 @@ export class MainPageComponent {
     this.channelOpen = false;
     this.newMessageOpen = true;
     this.currentChannelId = undefined;
-  }
-
-  /** Handles answer added event. */
-  onAnswerAdded(event: { chatId: string; answerTime: number }) {
-    this.chatsComponent.handleAnswerAdded(event);
   }
 
   /** Calls logout on user service and navigates to login page on success. */

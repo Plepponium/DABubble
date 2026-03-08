@@ -21,6 +21,7 @@ import { LogoutService } from '../../services/logout.service';
 import { ChatsUiService } from '../../services/chats-ui.service';
 import { ThreadService } from '../../services/thread.service';
 import { ThreadHelpService } from '../../services/thread-help.service';
+import { ChatsDataService } from '../../services/chats-data.service';
 
 @Component({
   selector: 'app-thread',
@@ -34,6 +35,7 @@ export class ThreadComponent implements OnInit {
   userService = inject(UserService);
   logoutService = inject(LogoutService);
   uiService = inject(ChatsUiService);
+  dataService = inject(ChatsDataService);
   threadService = inject(ThreadService);
   threadHelpService = inject(ThreadHelpService);
 
@@ -243,7 +245,11 @@ export class ThreadComponent implements OnInit {
     try {
       const result = await this.threadService.submitAnswer(this.channelId, this.chatId, this.newAnswer, this.currentUserId);
       if (result.success) {
-        this.answerAdded.emit({ chatId: this.chatId, answerTime: result.answerTime! });
+        console.log('🟢 Thread emit:', { chatId: this.chatId, answerTime: result.answerTime });
+
+        // ✅ NUR Service – kein emit mehr!
+        this.dataService.notifyAnswerAdded({ chatId: this.chatId, answerTime: result.answerTime! });
+
         this.newAnswer = '';
         [0, 50, 150].forEach(delay =>
           setTimeout(() => this.threadService.scrollToBottomNewMessage(), delay)
@@ -253,6 +259,7 @@ export class ThreadComponent implements OnInit {
       this.isSubmitting = false;
     }
   }
+
 
   /** Handles Enter key press to submit answer unless overlay is active. */
   onEnterPress(e: KeyboardEvent) {

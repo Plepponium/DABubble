@@ -19,29 +19,30 @@ export class ChatsDataService {
   currentUserId: string = '';
   channels: any[] = [];
   filteredChannels: any[] = []
-  private filteredChannelsSubject = new BehaviorSubject<any[]>([]);
-  public filteredChannels$ = this.filteredChannelsSubject.asObservable();
   participants: User[] = [];
-  
   channelId: string = '';
-  channelName$ = of(''); 
-  participants$ = of<User[]>([]); 
+  channelName$ = of('');
+  participants$ = of<User[]>([]);
   chatsSubject = new BehaviorSubject<Chat[]>([]);
   pendingScroll = false;
 
   private currentUserIdSubject = new BehaviorSubject<string>('');
   public currentUserId$ = this.currentUserIdSubject.asObservable();
+  private answerAddedSubject = new Subject<{ chatId: string; answerTime: number }>();
+  public answerAdded$ = this.answerAddedSubject.asObservable();
+  private filteredChannelsSubject = new BehaviorSubject<any[]>([]);
+  public filteredChannels$ = this.filteredChannelsSubject.asObservable();
 
   /** Fetches the current user and initializes user-dependent state and filters. */
   getCurrentUser() {
     this.userService.getCurrentUser().pipe(
-    take(1)
-      ).subscribe(user => {
+      take(1)
+    ).subscribe(user => {
       if (user) {
-          this.currentUserId = user.uid;
-          this.filterChannelsForCurrentUser();
+        this.currentUserId = user.uid;
+        this.filterChannelsForCurrentUser();
 
-          this.currentUserIdSubject.next(user.uid); 
+        this.currentUserIdSubject.next(user.uid);
       }
     });
   }
@@ -174,5 +175,11 @@ export class ChatsDataService {
         this.pendingScroll = false;
       }, 0);
     }
+  }
+
+  // Public method to be called when an answer is added, notifying subscribers of the new answer.
+  notifyAnswerAdded(event: { chatId: string; answerTime: number }) {
+    console.log('🔵 Service notifyAnswerAdded:', event);
+    this.answerAddedSubject.next(event);
   }
 }

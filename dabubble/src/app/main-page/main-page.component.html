@@ -1,8 +1,8 @@
 <div class="main-page-container">
     <div class="main-page">
-        <app-header class="header" (selectedItem)="openChatFromSearchbar($event)" (openLogoutOverlay)="openLogoutOverlay()"
-            (openUserProfile)="openUserProfile()" [menuOpen]="menuOpen" (openMenu)="openMenu()" [currentUser]="currentUser"
-            [users]="allUsers" [channels]="allChannels">
+        <app-header class="header" (selectedItem)="openChatFromSearchbar($event)"
+            (openLogoutOverlay)="openLogoutOverlay()" (openUserProfile)="openUserProfile()" [menuOpen]="menuOpen"
+            (openMenu)="openMenu()" [currentUser]="currentUser" [users]="allUsers" [channels]="allChannels">
         </app-header>
 
         <button class="toggle-menu-btn hide-responsive" type="button" (click)="toggleMenu()">
@@ -25,8 +25,9 @@
             <div #drawer class="sidenav" *ngIf="dataReady" [class.closed]="!menuOpen" mode="side">
                 <app-menu (selectedItem)="openChatFromSearchbar($event)" (openNewMessage)="openNewMessage()"
                     (openAddChannel)="openAddChannel()" (openChannel)="openChannel($event)"
-                    (openUserChat)="openUserChat($event)" [activeChannelId]="currentChannelId" [activeUserId]="activeUserId"
-                    [channels]="allChannels" [users]="allUsers" [currentUser]="currentUser">
+                    (openUserChat)="openUserChat($event)" [activeChannelId]="currentChannelId"
+                    [activeUserId]="activeUserId" [channels]="allChannels" [users]="allUsers"
+                    [currentUser]="currentUser">
                 </app-menu>
             </div>
 
@@ -35,13 +36,14 @@
 
                 <app-chats #chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId"
                     (openThread)="openThread($event)" (openProfile)="openProfileOverlay($event)"
-                    (channelDeleted)="onChannelDeleted()" [profileOpen]="showProfileBackdrop"></app-chats>
+                    (channelDeleted)="onChannelDeleted()" [profileOpen]="showProfileBackdrop">
+                </app-chats>
 
                 <app-thread id="thread" class="thread" *ngIf="threadChatId && currentChannelId" [chatId]="threadChatId"
                     [channelId]="currentChannelId" [class.open]="threadOpen" [class.closed]="!threadOpen"
                     (closeThread)="onThreadClosed()" (openProfile)="openProfileOverlay($event)"
-                    (answerAdded)="onAnswerAdded($event)" [class.fullwidth]="!channelOpen"
-                    [class.fullwidth-without-menu]="!menuOpen && !channelOpen"></app-thread>
+                    [class.fullwidth]="!channelOpen" [class.fullwidth-without-menu]="!menuOpen && !channelOpen">
+                </app-thread>
 
                 <app-direct-message-chats #dmChats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
                     (openProfile)="openProfileOverlay($event)"></app-direct-message-chats>
