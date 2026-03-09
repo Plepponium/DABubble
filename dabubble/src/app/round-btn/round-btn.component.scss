@@ -3,14 +3,12 @@ button {
   height: 40px;
   border-radius: 20px;
   border: none;
-  // background-color: #ffffff;
   background-color: var(--btn-bg, #ffffff);
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   &:hover {
-    // background-color: #eceefe;
     background-color: var(--btn-bg-hover, #eceefe);
     .hover-icon {
       display: none;
@@ -24,15 +22,3 @@ button {
 .hover-icon-purple {
   display: none;
 }
-
-// @media(max-width: 880px) {
-//   button {
-//     width: 34px;
-//     height: 34px;
-//   }
-
-//   .btn-img {
-//     width: 18px;
-//     height: 18px;
-//   }
-// }

@@ -17,7 +17,6 @@
         </div>
     </div>
 
-
     <div class="img-picker" *ngIf="showImgPicker">
         <img *ngFor="let icon of availableIcons" [src]="'assets/user-icons/' + icon + '.svg'" (click)="selectImg(icon)"
             class="img-option" />
@@ -33,7 +32,6 @@
             <input class="input" type="text" [(ngModel)]="editedName" [placeholder]="user.name">
         </div>
     </div>
-
 
     <div class="btn-container">
         <button (click)="handleClose()" class="btn cancel-btn">

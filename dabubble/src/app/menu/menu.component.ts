@@ -327,4 +327,3 @@ export class MenuComponent implements OnInit {
   }
 
 }
-

@@ -28,7 +28,6 @@
             </div>
         </ng-container>
 
-
         <ng-container *ngIf="context === 'Searchbar' && !activeTrigger">
             <div class="mention-item search-result" *ngFor="let item of filteredItems; let i = index" #mentionItem
                 [class.active]="i === activeIndex" (click)="onItemClick(item)">
@@ -45,7 +44,6 @@
                 </div>
             </div>
         </ng-container>
-
     </div>
 
 </div>

@@ -86,12 +86,7 @@ export class ThreadComponent implements OnInit {
     this.getCurrentUserAndChannels();
     setTimeout(() =>
       this.loadChannelWithId(), 100,
-      // this.threadService.scrollToBottom(),
-      // setTimeout(() =>
-      //   this.threadService.scrollToBottom(), 100
-      // ),
     );
-    // this.threadService.scrollToBottom();
   }
 
   /** Handles input changes and reloads chat and answers when channelId or chatId changes. */
@@ -105,7 +100,6 @@ export class ThreadComponent implements OnInit {
       this.getCurrentUserAndChannels();
       setTimeout(() =>
         this.loadChannelWithId(), 100,
-        // this.threadService.scrollToBottomNewMessage(), 
       );
     }
   }
@@ -255,7 +249,6 @@ export class ThreadComponent implements OnInit {
       this.isSubmitting = false;
     }
   }
-
 
   /** Handles Enter key press to submit answer unless overlay is active. */
   onEnterPress(e: KeyboardEvent) {

@@ -17,7 +17,7 @@ import { ProfileOverlayComponent } from '../profile-overlay/profile-overlay.comp
 import { LogoutOverlayComponent } from '../logout-overlay/logout-overlay.component';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
-import { combineLatest, firstValueFrom, of, Subscription, switchMap, takeUntil } from 'rxjs';
+import { takeUntil } from 'rxjs';
 import { NewMessageComponent } from '../new-message/new-message.component';
 import { AddChannelMembersOverlayComponent } from '../add-channel-members-overlay/add-channel-members-overlay.component';
 import { InputMissingOverlayComponent } from "../input-missing-overlay/input-missing-overlay.component";
@@ -139,7 +139,6 @@ export class MainPageComponent {
     this.logoutService.triggerLogout();
   }
 
-
   /** Toggles menu open state. */
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
@@ -239,9 +238,6 @@ export class MainPageComponent {
     setTimeout(() => this.chatsComponent?.scrollToMessage(item.id), 200);
   }
 
-
-
-
   /** Handles DM message navigation. */
   private handleDmMessage(item: any) {
     const otherUid = item.participants.find((p: string) => p !== this.currentUser?.uid) || item.participants[0];
@@ -282,7 +278,6 @@ export class MainPageComponent {
       if (this.isSmallScreen) this.channelOpen = false;
     }, 300);
   }
-
 
   /** Handles thread close event. */
   onThreadClosed() {

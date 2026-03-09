@@ -138,21 +138,21 @@
 
 .dialogue-backdrop {
   position: fixed;
-  inset: 0; /* top, right, bottom, left: 0 */
-  background-color: rgba(0, 0, 0, 0.5); /* Abdunklung */
+  inset: 0; 
+  background-color: rgba(0, 0, 0, 0.5); 
   display: flex;
-  justify-content: flex-end; /* Panel rechts andocken */
-  align-items: flex-start; /* oben ausrichten */
+  justify-content: flex-end; 
+  align-items: flex-start; 
   z-index: 5;
 }
 
 .dialogue-backdrop2 {
   position: fixed;
-  inset: 0; /* top, right, bottom, left: 0 */
-  background-color: rgba(0, 0, 0, 0.5); /* Abdunklung */
+  inset: 0; 
+  background-color: rgba(0, 0, 0, 0.5); 
   display: flex;
-  justify-content: flex-end; /* Panel rechts andocken */
-  align-items: flex-start; /* oben ausrichten */
+  justify-content: flex-end; 
+  align-items: flex-start; 
   z-index: 7;
 }
 

@@ -57,19 +57,8 @@
   transition: transform 0.3s ease-out;
 }
 
-// .dialogue-overlay-responsive,
-// .dialogue-overlay-responsive * {
-//   overflow: hidden !important;
-//   -ms-overflow-style: none;  /* IE/Edge */
-//   scrollbar-width: none;     /* Firefox */
-// }
-
-// .dialogue-overlay-responsive::-webkit-scrollbar {
-//   display: none;             /* Chrome/Safari */
-// }
-
 .dialogue-overlay-responsive.open {
-  transform: translate(-50%, 0); /* Ziel: sichtbar */
+  transform: translate(-50%, 0); 
 }
 
 .line-container {
@@ -108,10 +97,9 @@
 }
 
 .responsive-btn.active {
-  // &:hover{
   background-color: #eceefe;
   color: #535af1;
-  // }
+  
   .non-active-icon {
     display: none;
   }

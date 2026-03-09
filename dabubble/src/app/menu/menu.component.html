@@ -11,7 +11,6 @@
             </app-round-btn>
         </mat-toolbar>
 
-
         <div class="search-header" *ngIf="showSearchHeader">
             <span class="title">Search</span>
             <app-round-btn (click)="clearSearch()" iconSrc="assets/icons/close.svg"
@@ -19,7 +18,6 @@
             </app-round-btn>
             <div class="separator"></div>
         </div>
-
 
         <div class="searchbar-wrapper show-responsive">
             <div class="searchbar-container">
@@ -60,7 +58,6 @@
                 </button>
             </div>
 
-
             <div class="channel-section" *ngIf="channelsExpanded">
                 <div class="channel-list">
                     <div (click)="handleOpenChannel(channel)" class="channel" *ngFor="let channel of relevantChannels"
@@ -81,6 +78,7 @@
                 </div>
             </div>
         </div>
+
         <div class="menu-section">
             <div class="list-header-container">
                 <div (click)="toggleUsers()" class="list-header font-20">
@@ -95,6 +93,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="user-list" *ngIf="usersExpanded">
                 <div (click)="handleOpenUserChat(user)" class="user"
                     *ngFor="let user of sortedUsers$ | async; trackBy: trackByUserId"
