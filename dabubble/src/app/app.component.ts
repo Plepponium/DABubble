@@ -12,13 +12,13 @@ import { RouterOutlet } from '@angular/router';
 export class AppComponent {
   title = 'dabubble';
 
-  private auth = inject(Auth);
-  loading = true;  // ← STARTET mit Loading = true
+  // private auth = inject(Auth);
+  // loading = true;  // ← STARTET mit Loading = true
   
-  ngOnInit() {
-    // Warte bis Firebase Auth geladen hat
-    onAuthStateChanged(this.auth, () => {
-      this.loading = false;
-    });
-  }
+  // ngOnInit() {
+  //   // Warte bis Firebase Auth geladen hat
+  //   onAuthStateChanged(this.auth, () => {
+  //     this.loading = false;
+  //   });
+  // }
 }
