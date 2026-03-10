@@ -23,7 +23,6 @@ import { AddChannelMembersOverlayComponent } from '../add-channel-members-overla
 import { InputMissingOverlayComponent } from "../input-missing-overlay/input-missing-overlay.component";
 import { ChannelService } from '../../services/channel.service';
 import { LogoutService } from '../../services/logout.service';
-import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-main-page',
@@ -44,7 +43,6 @@ export class MainPageComponent {
   contentOpen = false;
   dataReady = false;
   menuBtnClose = true;
-  loading = true;
 
   // Overlay states
   showLogoutOverlay = false;
@@ -106,9 +104,6 @@ export class MainPageComponent {
   ngOnInit() {
     this.onResize();
     this.initUserData();
-    // setTimeout(() => {
-    //   this.initUserData();
-    // }, 100);
   }
 
   /** Initializes user data subscriptions. */
@@ -123,7 +118,6 @@ export class MainPageComponent {
       this.subscribeToChannels();
       this.dataReady = true;
     });
-    this.loading = false;
   }
 
   /** Subscribes to users list. */
