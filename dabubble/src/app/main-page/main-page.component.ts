@@ -79,7 +79,6 @@ export class MainPageComponent {
   private router = inject(Router);
   private logoutService = inject(LogoutService);
   private destroy$ = this.logoutService.logout$;
-  private auth = inject(Auth);
 
   /** Checks if profile backdrop should show. */
   get showProfileBackdrop(): boolean {
@@ -106,10 +105,10 @@ export class MainPageComponent {
   /** Initializes component on init. */
   ngOnInit() {
     this.onResize();
-    // this.initUserData();
-    setTimeout(() => {
-      this.initUserData();
-    }, 100);
+    this.initUserData();
+    // setTimeout(() => {
+    //   this.initUserData();
+    // }, 100);
   }
 
   /** Initializes user data subscriptions. */
