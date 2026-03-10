@@ -1,2 +1,11 @@
 
-<router-outlet />
+<!-- <router-outlet></router-outlet> -->
+<!-- Ladebildschirm während Auth lädt -->
+<div *ngIf="loading" class="loading-overlay">
+  <div class="loading-content">
+    <p>Lade DABubble...</p>
+  </div>
+</div>
+
+<!-- Normale App wenn fertig -->
+<router-outlet *ngIf="!loading"></router-outlet>

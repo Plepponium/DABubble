@@ -17,12 +17,13 @@ import { ProfileOverlayComponent } from '../profile-overlay/profile-overlay.comp
 import { LogoutOverlayComponent } from '../logout-overlay/logout-overlay.component';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
-import { takeUntil } from 'rxjs';
+import { take, takeUntil } from 'rxjs';
 import { NewMessageComponent } from '../new-message/new-message.component';
 import { AddChannelMembersOverlayComponent } from '../add-channel-members-overlay/add-channel-members-overlay.component';
 import { InputMissingOverlayComponent } from "../input-missing-overlay/input-missing-overlay.component";
 import { ChannelService } from '../../services/channel.service';
 import { LogoutService } from '../../services/logout.service';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-main-page',
@@ -43,6 +44,7 @@ export class MainPageComponent {
   contentOpen = false;
   dataReady = false;
   menuBtnClose = true;
+  loading = true;
 
   // Overlay states
   showLogoutOverlay = false;
@@ -77,6 +79,7 @@ export class MainPageComponent {
   private router = inject(Router);
   private logoutService = inject(LogoutService);
   private destroy$ = this.logoutService.logout$;
+  private auth = inject(Auth);
 
   /** Checks if profile backdrop should show. */
   get showProfileBackdrop(): boolean {
@@ -103,7 +106,10 @@ export class MainPageComponent {
   /** Initializes component on init. */
   ngOnInit() {
     this.onResize();
-    this.initUserData();
+    // this.initUserData();
+    setTimeout(() => {
+      this.initUserData();
+    }, 100);
   }
 
   /** Initializes user data subscriptions. */
@@ -118,6 +124,7 @@ export class MainPageComponent {
       this.subscribeToChannels();
       this.dataReady = true;
     });
+    this.loading = false;
   }
 
   /** Subscribes to users list. */
