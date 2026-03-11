@@ -1,21 +1,54 @@
 @use "../../styles/variables" as *;
 @use "../../styles/shared-classes";
 
+.login.default {
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.login-card {
+  // height: fit-content;
+  // height: calc(100vh - 100px);
+  height: 600px !important;
+  // overflow-y: auto;
+}
+
+// .app-auth-layout {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 32px;
+// }
+
+// .scroll-container {
+//   overflow-y: auto;
+// }
+
 .arrow-back {
   position: unset;
   justify-content: flex-start;
   width: 40px;
 }
 
+// .login-card.imprint {
+//   height: fit-content;
+//   max-height: calc(100vh - 100px);
+// }
+
 .login-header {
   margin-top: 16px;
   text-align: left;
+}
+
+.login-header.imprint {
+  margin-bottom: 10px;
 }
 
 .imprint-contact {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-top: 20px;
+
   h2 {
     color: $purple1;
     font-size: 32px;
