@@ -42,7 +42,7 @@ export class SignupComponent {
   private initSignupForm(): void {
     this.signupForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(/^[A-Za-zÄÖÜäöüß'-]+\s+[A-Za-zÄÖÜäöüß'-]+$/),]],
-      email: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9ÄÖÜäöüß._%+-]+@[A-Za-z0-9ÄÖÜäöüß.-]+\.[A-Za-z]{2,}$/)]],
+      email: ['', [Validators.required, Validators.email, Validators.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       agree: [false, Validators.requiredTrue],
     });
