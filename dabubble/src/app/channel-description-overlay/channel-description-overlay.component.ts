@@ -29,6 +29,7 @@ export class ChannelDescriptionOverlayComponent {
   isScreenUnder1010 = false;
   editedName = '';
   editedDescription = '';
+  private initialChannelNames: string[] = [];
 
   channelService = inject(ChannelService);
   private logoutService = inject(LogoutService);
@@ -44,11 +45,25 @@ export class ChannelDescriptionOverlayComponent {
     this.isScreenUnder1010 = window.innerWidth < 1010;
   }
 
-  /**
-  * Initializes the component by loading the channel data.
-  * Fetches the channel by ID and initializes edit fields with current values.
-  */
+  /** Initializes the component by loading channel data and initial channel names. */
   ngOnInit() {
+    this.loadInitialChannelNames();
+    this.loadChannelWithId();
+  }
+
+  /** Loads the initial channel names for validation purposes. */
+  private loadInitialChannelNames(): void {
+    this.channelService.getChannels().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(channels => {
+      this.initialChannelNames = channels.map(channel =>
+        channel.name.trim().toLowerCase()
+      );
+    });
+  }
+
+  /** Loads the channel with the specified ID. */
+  private loadChannelWithId(): void {
     if (this.channelId) {
       this.channelService.getChannelById(this.channelId).pipe(
         takeUntil(this.destroy$)
@@ -60,11 +75,11 @@ export class ChannelDescriptionOverlayComponent {
     }
   }
 
-  /**
-  * Closes the overlay by emitting the close event.
-  */
-  handleClose() {
-    this.close.emit();
+  /** Checks if a channel name already exists. */
+  get nameExistsError(): boolean {
+    const normalizedName = this.editedName.trim().toLowerCase();
+    const currentName = this.channel?.name?.trim().toLowerCase() || '';
+    return this.initialChannelNames.includes(normalizedName) && normalizedName !== currentName;
   }
 
   /**
@@ -73,10 +88,12 @@ export class ChannelDescriptionOverlayComponent {
   */
   toggleEditName() {
     if (this.isEditingName && this.channel) {
+      if (this.nameExistsError) return;
       if (this.editedName && this.editedName !== this.channel.name) {
         this.channelService.updateChannel(this.channel.id, { name: this.editedName })
           .then(() => {
             this.channel!.name = this.editedName;
+            this.loadInitialChannelNames();
           });
       }
     }
@@ -134,6 +151,11 @@ export class ChannelDescriptionOverlayComponent {
     await this.channelService.deleteChannel(this.channel.id);
     this.channelDeleted.emit();
     this.handleClose();
+  }
+
+  /** Closes the overlay by emitting the close event. */
+  handleClose() {
+    this.close.emit();
   }
 
   /**

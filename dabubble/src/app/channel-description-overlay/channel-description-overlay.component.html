@@ -13,17 +13,29 @@
         <div class="overlay-title-container container-box" [class.editing]="isEditingName">
             <div class="box-header">
                 <span class="font-18 font-w-700">Channel-Name</span>
-                <span class="font-w-600 t-purple edit hide-responsive" (click)="toggleEditName()">
+
+
+                <span class="font-w-600 edit hide-responsive" [class.disabled]="isEditingName && nameExistsError"
+                    [class.t-purple]="!(isEditingName && nameExistsError)"
+                    (click)="!nameExistsError && toggleEditName()">
                     {{ isEditingName ? 'Speichern' : 'Bearbeiten' }}
                 </span>
-                <div (click)="toggleEditName(); toggleEditDescription()" *ngIf="!isEditingName" class="show-responsive">
-                    <img src="assets/icons/edit.svg" alt="bearbeiten">
-                </div>
-                <div (click)="toggleEditName(); toggleEditDescription()" *ngIf="isEditingName" class="show-responsive">
-                    <img src="assets/icons/check_circle.svg" alt="speichern">
+
+
+
+                <div class="show-responsive btn-responsive" [class.disabled]="isEditingName && nameExistsError"
+                    (click)="!(isEditingName && nameExistsError) && toggleEditName()">
+                    <img *ngIf="!isEditingName" src="assets/icons/edit.svg" alt="bearbeiten">
+                    <img *ngIf="isEditingName" src="assets/icons/check_circle.svg" alt="speichern">
                 </div>
             </div>
-            <div class="title-content" [class.editing]="isEditingName">
+
+            <div class="error-container" *ngIf="isEditingName && editedName.trim() && nameExistsError">
+                <span class="error-msg">Ein Channel mit diesem Namen existiert bereits.</span>
+            </div>
+
+            <div class="title-content" [class.editing]="isEditingName"
+                [class.error]="isEditingName && editedName.trim() && nameExistsError">
                 <img src="assets/icons/tag.svg">
                 <ng-container *ngIf="!isEditingName">
                     <span>{{ channel.name }}</span>
@@ -34,16 +46,19 @@
             </div>
         </div>
 
+
+
+
         <div class="overlay-content-container container-box" [class.editing]="isEditingDescription">
             <div class="box-header">
                 <span class="font-18 font-w-700">Beschreibung</span>
                 <span class="font-w-600 t-purple edit hide-responsive" (click)="toggleEditDescription()">
                     {{ isEditingDescription ? 'Speichern' : 'Bearbeiten' }}
                 </span>
-                <div (click)="toggleEditName(); toggleEditDescription()" *ngIf="!isEditingDescription" class="show-responsive">
+                <div (click)="toggleEditDescription()" *ngIf="!isEditingDescription" class="show-responsive">
                     <img src="assets/icons/edit.svg" alt="bearbeiten">
                 </div>
-                <div (click)="toggleEditName(); toggleEditDescription()" *ngIf="isEditingDescription" class="show-responsive">
+                <div (click)="toggleEditDescription()" *ngIf="isEditingDescription" class="show-responsive">
                     <img src="assets/icons/check_circle.svg" alt="speichern">
                 </div>
             </div>
