@@ -18,7 +18,7 @@
 
     <div class="searchbar-wrapper hide-responsive">
         <div class="searchbar-container">
-            <input #searchInput class="searchbar t-gray font-24" type="text" placeholder="Devspace durchsuchen"
+            <input #searchInput class="searchbar t-gray" type="text" placeholder="Devspace durchsuchen"
                 [(ngModel)]="searchText" (input)="updateCaret(searchInput)" (keyup)="updateCaret(searchInput)"
                 (focus)="onSearchFocus()" (blur)="onSearchBlur()">
             <button mat-icon-button aria-label="Example icon-button with share icon">
