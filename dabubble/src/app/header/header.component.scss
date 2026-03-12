@@ -21,7 +21,7 @@
   box-sizing: border-box;
   padding: 25px 45px 0 45px;
   display: flex;
-  // justify-content: space-between;
+  justify-content: space-between;
   align-items: center;
   gap: 50px;
   position: relative;
@@ -96,6 +96,13 @@
   gap: 20px;
   cursor: pointer;
 
+  .user-name {
+    max-width: 200px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
   &:hover {
     .user-name {
       color: #535af1;
@@ -141,21 +148,21 @@
 
 .dialogue-backdrop {
   position: fixed;
-  inset: 0; 
-  background-color: rgba(0, 0, 0, 0.5); 
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: flex-end; 
-  align-items: flex-start; 
+  justify-content: flex-end;
+  align-items: flex-start;
   z-index: 5;
 }
 
 .dialogue-backdrop2 {
   position: fixed;
-  inset: 0; 
-  background-color: rgba(0, 0, 0, 0.5); 
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: flex-end; 
-  align-items: flex-start; 
+  justify-content: flex-end;
+  align-items: flex-start;
   z-index: 7;
 }
 
@@ -228,7 +235,7 @@
     display: flex;
   }
 
-  .responsive-logo img{
+  .responsive-logo img {
     height: 45px;
     // position: absolute;
     // top: 15px;

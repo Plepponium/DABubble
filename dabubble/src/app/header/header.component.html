@@ -34,7 +34,9 @@
     </div>
 
     <div (click)="openDialogueLogout()" class="user" *ngIf="currentUser as user">
-        <div id="user-name" class="user-name font-32 font-w-700 hide-responsive">{{ user.name }}</div>
+        <div id="user-name" class="user-name font-32 font-w-700 hide-responsive" [title]="user.name">
+            {{ user.name }}
+        </div>
         <div class="img-container">
             <img class="user-img" [src]="'assets/user-icons/' + getAvatarImg(user) + '.svg'" alt="Avatar">
             <div class="hide-responsive" [class]="'online-signal-header ' + user.presence"></div>
