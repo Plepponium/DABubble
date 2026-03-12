@@ -21,8 +21,9 @@
   box-sizing: border-box;
   padding: 25px 45px 0 45px;
   display: flex;
-  justify-content: space-between;
+  // justify-content: space-between;
   align-items: center;
+  gap: 50px;
   position: relative;
 }
 
@@ -163,8 +164,30 @@
 }
 
 @media (max-width: 1150px) {
+  .logo {
+    width: 240px;
+    // display: flex;
+    // align-items: center;
+    // gap: 16px;
+    // font-size: 24px;
+
+    // img {
+    //   height: 70px;
+    // }
+  }
+
+  .searchbar-wrapper {
+    // position: relative;
+    // display: flex;
+    width: calc(100vw - 700px);
+  }
+
+  // .searchbar-container {
+  //   width: 100%;
+  // }
+
   .searchbar {
-    font-size: 16px !important;
+    font-size: 18px !important;
   }
 }
 
