@@ -7,6 +7,7 @@ import { User } from '../../models/user.class';
 
 import { Auth, createUserWithEmailAndPassword, UserCredential } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
+import { ChannelService } from '../../services/channel.service';
 
 @Component({
   selector: 'app-signup-avatar',
@@ -22,10 +23,14 @@ export class SignupAvatarComponent implements OnInit {
   overlayVariant: 'login' | 'created' | 'sent' = 'created';
   draftUser!: User;
 
+  private readonly WILLKOMMEN_CHANNEL_ID = 'djC38aGPYUOPJqqUEc4B';
+
   private router = inject(Router);
   private draftService = inject(SignupDraftService);
   private firestore = inject(Firestore);
   private auth = inject(Auth);
+  private channelService = inject(ChannelService);
+
 
   /**
   * Loads draft user from service; redirects if missing or invalid.
@@ -102,6 +107,7 @@ export class SignupAvatarComponent implements OnInit {
     try {
       const cred: UserCredential = await this.createAuthUser();
       await this.saveUserToFirestore(cred.user.uid);
+      await this.channelService.addParticipants(this.WILLKOMMEN_CHANNEL_ID, [cred.user.uid]);
     } catch (err) {
       this.showOverlay = false;
       console.error('Fehler beim Registrieren:', err);
