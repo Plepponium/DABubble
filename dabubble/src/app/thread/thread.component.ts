@@ -202,6 +202,9 @@ export class ThreadComponent implements OnInit {
     const updatedChat = await this.threadService.addReaction(this.channelId, this.chat$, reactionType, this.currentUserId, this.participants);
     if (updatedChat) {
       this.chat$ = of(updatedChat);
+      
+      this.activeReactionDialogueIndex = null;
+      this.activeReactionDialogueBelowIndex = null;
     }
   }
 
@@ -210,6 +213,9 @@ export class ThreadComponent implements OnInit {
     const updatedAnswers = await this.threadService.addReactionToAnswer(this.channelId, this.chatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants);
     if (updatedAnswers) {
       this.subscribeAnswers();
+
+      this.activeReactionDialogueAnswersIndex = null;
+      this.activeReactionDialogueBelowAnswersIndex = null;
     }
   }
 
@@ -280,6 +286,7 @@ export class ThreadComponent implements OnInit {
     this.threadHelpService.insertSmiley(this.answerInput.nativeElement, this.newAnswer, smiley);
     this.newAnswer = this.answerInput.nativeElement.value; // Sync
     this.activeSmiley = false;
+    console.log('activeSmiley:', this.activeSmiley);
   }
 
   /** Inserts a mention into the answer input and restores caret position. */
