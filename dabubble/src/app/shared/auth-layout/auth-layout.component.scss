@@ -249,18 +249,26 @@
 
 .login-card.privacy {
   padding: 48px 56px;
-  align-items: center;
-  width: unset;
-  min-width: unset;
-  width: 152px;
-  height: 136px;
+  // align-items: center;
+  // width: unset;
+  // min-width: unset;
+  // width: 152px;
+  width: 676px;
+  min-height: 469px;
+  max-height: calc(100vh - 200px);
+  height: auto;
+  // height: 136px;
+  display: flex;
 }
 
 .login-card.imprint {
   padding: 48px 56px;
   padding-bottom: 64px;
   width: 676px;
-  height: 469px;
+  min-height: 469px;
+  max-height: calc(100vh - 200px);
+  height: auto;
+  display: flex;
 }
 
 .legal-links {
@@ -421,6 +429,9 @@
 }
 
 @media (max-width: 500px) {
+  .login-card.privacy, .login-card.imprint {
+    width: calc(100vw - 30px);
+  }
   .login-card {
     position: static;
     padding: 24px 16px;
