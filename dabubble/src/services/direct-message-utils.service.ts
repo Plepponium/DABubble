@@ -221,25 +221,25 @@ export class DirectMessageUtilsService {
     }
 
 
-    /**  */
+    /** Renders message text by replacing smileys, mentions, and channel references with HTML. */
     renderMessage(text: string, users: Record<string, User>, channels: Channel[] = []): SafeHtml {
         if (!text) return '';
         let replaced = text;
         replaced = this.replaceSmileys(replaced);
         replaced = this.replaceSpecialMention(replaced, users);
         replaced = this.replaceGeneralMentions(replaced, users);
-        replaced = this.replaceChannelMentions(replaced, channels);  // ← NEU!
+        replaced = this.replaceChannelMentions(replaced, channels);
         return this.sanitizer.bypassSecurityTrustHtml(replaced);
     }
 
-    /**  */
+    /**  Replaces :smiley: style smiley codes with corresponding <img> tags. */
     private replaceSmileys(text: string): string {
         return text.replace(/:([a-zA-Z0-9_+-]+):/g, (match, name) =>
             `<img src="assets/reaction-icons/${name}.svg" alt="${name}" class="inline-smiley">`
         );
     }
 
-    /**  */
+    /**  Replaces special mention patterns with corresponding HTML tags. */
     private replaceSpecialMention(text: string, users: Record<string, User>): string {
         return text.replace(/@Gastnutzer(?=\s|$|[^\w\s])/g, (match) => {
             const user = this.findUserByNormalizedName(users, 'gastnutzer');
@@ -247,7 +247,7 @@ export class DirectMessageUtilsService {
         });
     }
 
-    /**  */
+    /**  Replaces general @mentions with corresponding HTML tags if user exists, otherwise leaves as is. */
     private replaceGeneralMentions(text: string, users: Record<string, User>): string {
         return text.replace(/@([A-Za-zÄÖÜäöüß]+(?:\s+[A-Za-zÄÖÜäöüß]+)?)(?=\s|$|[^\w\s])/g, (match, capturedName) => {
             if (capturedName.toLowerCase() === 'gastnutzer') {
@@ -258,6 +258,7 @@ export class DirectMessageUtilsService {
         });
     }
 
+    /** Replaces #channel references with corresponding HTML tags if channel exists, otherwise leaves as is. */
     private replaceChannelMentions(text: string, channels: Channel[]): string {
         return text.replace(/#([A-Za-zÄÖÜäöüß0-9_-]+)(?=\s|$|[^\w\s])/g, (match, capturedName) => {
             const channel = channels.find(c =>
@@ -270,14 +271,14 @@ export class DirectMessageUtilsService {
         });
     }
 
-    /** */
+    /** Finds user by normalized name (trimmed, lowercased) in users map. */
     private findUserByNormalizedName(users: Record<string, User>, normalizedName: string): User | undefined {
         return Object.values(users).find(u =>
             u.name.trim().toLowerCase() === normalizedName
         );
     }
 
-    /** */
+    /** Creates HTML span tag for user mention with embedded user data for tooltip and interaction. */
     private createMentionTag(displayText: string, user: User): string {
         const userData = JSON.stringify({
             id: user.uid,
@@ -287,11 +288,10 @@ export class DirectMessageUtilsService {
         return `<span class="mention-tag" data-user='${userData}'>${displayText}</span>`;
     }
 
+    /** Creates HTML span tag for channel mention with embedded channel data for tooltip and interaction. */
     private createChannelMentionTag(displayText: string, channelId: string): string {
         return `<span class="mention-tag channel-mention" data-channel-id="${channelId}">${displayText}</span>`;
     }
-
-
 
     // === USER HELPERS ===
     /**
