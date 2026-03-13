@@ -82,11 +82,22 @@ export class ChannelDescriptionOverlayComponent {
     return this.initialChannelNames.includes(normalizedName) && normalizedName !== currentName;
   }
 
+  /** Checks if the channel is a "Willkommen" channel based on its name. */
+  get isWillkommenChannel(): boolean {
+    return this.channel?.name?.trim().toLowerCase() === 'willkommen';
+  }
+
+  /** Determines if the channel name edit should be disabled based on the channel type. */
+  get isNameEditDisabled(): boolean {
+    return this.isWillkommenChannel;
+  }
+
   /**
   * Toggles the channel name edit mode.
   * Saves changes if exiting edit mode with a new valid name.
   */
   toggleEditName() {
+    if (this.isNameEditDisabled) return;
     if (this.isEditingName && this.channel) {
       if (this.nameExistsError) return;
       if (this.editedName && this.editedName !== this.channel.name) {

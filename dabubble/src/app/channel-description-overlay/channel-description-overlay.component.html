@@ -15,7 +15,8 @@
                 <span class="font-18 font-w-700">Channel-Name</span>
 
 
-                <span class="font-w-600 edit hide-responsive" [class.disabled]="isEditingName && nameExistsError"
+                <span class="font-w-600 edit hide-responsive"
+                    [class.disabled]="isEditingName && nameExistsError || isNameEditDisabled"
                     [class.t-purple]="!(isEditingName && nameExistsError)"
                     (click)="!nameExistsError && toggleEditName()">
                     {{ isEditingName ? 'Speichern' : 'Bearbeiten' }}
@@ -23,7 +24,8 @@
 
 
 
-                <div class="show-responsive btn-responsive" [class.disabled]="isEditingName && nameExistsError"
+                <div class="show-responsive btn-responsive"
+                    [class.disabled]="isEditingName && nameExistsError || isNameEditDisabled"
                     (click)="!(isEditingName && nameExistsError) && toggleEditName()">
                     <img *ngIf="!isEditingName" src="assets/icons/edit.svg" alt="bearbeiten">
                     <img *ngIf="isEditingName" src="assets/icons/check_circle.svg" alt="speichern">
