@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { User } from '../models/user.class';
+import { Channel } from '../models/channel.class';
 
 /**
  * Utility service for Direct Message chat functionality.
@@ -220,20 +221,77 @@ export class DirectMessageUtilsService {
     }
 
 
-    // === RENDERING ===
-    /**
-     * Converts text content to SafeHtml with emoji icon replacements.
-     * Replaces :emoji: with <img> tags.
-     * @param text Raw message text
-     * @returns Sanitized HTML string with replaced emojis
-     */
-    renderMessage(text: string): SafeHtml {
+    /**  */
+    renderMessage(text: string, users: Record<string, User>, channels: Channel[] = []): SafeHtml {
         if (!text) return '';
-        const replaced = text.replace(/:([a-zA-Z0-9_+-]+):/g, (match, name) =>
-            `<img src="assets/reaction-icons/${name}.svg" alt="${name}" class="inline-smiley">`
-        );
+        let replaced = text;
+        replaced = this.replaceSmileys(replaced);
+        replaced = this.replaceSpecialMention(replaced, users);
+        replaced = this.replaceGeneralMentions(replaced, users);
+        replaced = this.replaceChannelMentions(replaced, channels);  // ← NEU!
         return this.sanitizer.bypassSecurityTrustHtml(replaced);
     }
+
+    /**  */
+    private replaceSmileys(text: string): string {
+        return text.replace(/:([a-zA-Z0-9_+-]+):/g, (match, name) =>
+            `<img src="assets/reaction-icons/${name}.svg" alt="${name}" class="inline-smiley">`
+        );
+    }
+
+    /**  */
+    private replaceSpecialMention(text: string, users: Record<string, User>): string {
+        return text.replace(/@Gastnutzer(?=\s|$|[^\w\s])/g, (match) => {
+            const user = this.findUserByNormalizedName(users, 'gastnutzer');
+            return user ? this.createMentionTag(match, user) : match;
+        });
+    }
+
+    /**  */
+    private replaceGeneralMentions(text: string, users: Record<string, User>): string {
+        return text.replace(/@([A-Za-zÄÖÜäöüß]+(?:\s+[A-Za-zÄÖÜäöüß]+)?)(?=\s|$|[^\w\s])/g, (match, capturedName) => {
+            if (capturedName.toLowerCase() === 'gastnutzer') {
+                return match;
+            }
+            const user = this.findUserByNormalizedName(users, capturedName.trim().toLowerCase());
+            return user ? this.createMentionTag(`@${capturedName}`, user) : match;
+        });
+    }
+
+    private replaceChannelMentions(text: string, channels: Channel[]): string {
+        return text.replace(/#([A-Za-zÄÖÜäöüß0-9_-]+)(?=\s|$|[^\w\s])/g, (match, capturedName) => {
+            const channel = channels.find(c =>
+                c.name.trim().toLowerCase() === capturedName.toLowerCase()
+            );
+            if (channel) {
+                return this.createChannelMentionTag(`#${capturedName}`, channel.id);
+            }
+            return match;
+        });
+    }
+
+    /** */
+    private findUserByNormalizedName(users: Record<string, User>, normalizedName: string): User | undefined {
+        return Object.values(users).find(u =>
+            u.name.trim().toLowerCase() === normalizedName
+        );
+    }
+
+    /** */
+    private createMentionTag(displayText: string, user: User): string {
+        const userData = JSON.stringify({
+            id: user.uid,
+            name: user.name,
+            img: user.img || 'default-user'
+        });
+        return `<span class="mention-tag" data-user='${userData}'>${displayText}</span>`;
+    }
+
+    private createChannelMentionTag(displayText: string, channelId: string): string {
+        return `<span class="mention-tag channel-mention" data-channel-id="${channelId}">${displayText}</span>`;
+    }
+
+
 
     // === USER HELPERS ===
     /**

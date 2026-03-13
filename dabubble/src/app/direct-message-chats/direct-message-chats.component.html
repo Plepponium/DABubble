@@ -68,11 +68,8 @@
                                                 </span>
                                             </div>
 
-                                            <div class="chat-text font-18" [innerHTML]="renderMessage(m.text)">
-                                                <!-- {{ m.text }} -->
+                                            <div class="chat-text font-18" [innerHTML]="renderMessage(m.text, users)">
                                             </div>
-
-
 
                                             <div class="reactions">
                                                 <div class="reaction-btns">
@@ -137,7 +134,7 @@
 
                                             <app-mentions-overlay [text]="m.editedText"
                                                 [currentUserId]="currentUser?.uid" [context]="'DM'"
-                                                [users]="mentionUsers"
+                                                [users]="mentionUsers" [channels]="mentionChannels"
                                                 (mentionSelected)="insertMentionInEdit(m, $event)">
                                             </app-mentions-overlay>
 
@@ -197,7 +194,7 @@
                         (selected)="onSmileySelected($event)" (activeChange)="activeSmiley = $event">
                     </app-smiley-overlay>
                     <app-mentions-overlay [text]="messageText" [currentUserId]="currentUser?.uid" [context]="'DM'"
-                        [users]="mentionUsers" (mentionSelected)="insertMention($event)"
+                        [users]="mentionUsers" [channels]="mentionChannels" (mentionSelected)="insertMention($event)"
                         (overlayStateChange)="overlayActive = $event">
                     </app-mentions-overlay>
 

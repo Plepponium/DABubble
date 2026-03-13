@@ -14,6 +14,7 @@ import { SmileyOverlayComponent } from "../shared/smiley-overlay/smiley-overlay.
 import { DirectMessageUtilsService } from '../../services/direct-message-utils.service';
 import { SafeHtml } from '@angular/platform-browser';
 import { LogoutService } from '../../services/logout.service';
+import { Channel } from '../../models/channel.class';
 
 @Component({
   selector: 'app-direct-message-chats',
@@ -25,6 +26,7 @@ export class DirectMessageChatsComponent {
   @ViewChildren('chatMessageRow') chatMessageRows!: QueryList<ElementRef>;
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
   @Input() userId!: string;
+  @Input() participantChannels: Channel[] = [];
   @Output() openProfile = new EventEmitter<User>();
 
   dmId?: string;
@@ -77,6 +79,10 @@ export class DirectMessageChatsComponent {
   ngOnDestroy(): void {
     this.authSub?.unsubscribe();
     this.subs.unsubscribe();
+  }
+
+  get mentionChannels() {
+    return this.participantChannels;
   }
 
   /** Focuses message input when clicking outside textarea (within input bar). @param event MouseEvent */
@@ -397,8 +403,8 @@ export class DirectMessageChatsComponent {
   }
 
   /** Template: Render text with emoji images as SafeHtml. @param text Raw message text */
-  renderMessage(text: string): SafeHtml {
-    return this.utils.renderMessage(text);
+  renderMessage(text: string, users: Record<string, User>): SafeHtml {
+    return this.utils.renderMessage(text, users, this.participantChannels);
   }
 
   /** Template: Smooth-scroll to message. @param messageId Target ID */

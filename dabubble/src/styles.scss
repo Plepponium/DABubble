@@ -53,6 +53,32 @@ body.intro-active {
   top: -2px;
 }
 
+.mention-tag {
+  background: #f0f8ff;
+  color: #1e40af;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.95em;
+  margin: 0 1px;
+  display: inline-block;
+  vertical-align: baseline;
+
+  &:hover {
+    background: #e0f0ff;
+  }
+
+  &.channel-mention {
+    background: #fffbf7;
+    color: #ebb16b;
+
+    &:hover {
+      background: #fff1e8;
+    }
+  }
+}
+
 .font-32 {
   font-size: 32px;
 }

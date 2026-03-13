@@ -23,6 +23,7 @@ import { AddChannelMembersOverlayComponent } from '../add-channel-members-overla
 import { InputMissingOverlayComponent } from "../input-missing-overlay/input-missing-overlay.component";
 import { ChannelService } from '../../services/channel.service';
 import { LogoutService } from '../../services/logout.service';
+import { Channel } from '../../models/channel.class';
 
 @Component({
   selector: 'app-main-page',
@@ -132,6 +133,12 @@ export class MainPageComponent {
     this.channelService.getChannels().pipe(takeUntil(this.destroy$)).subscribe(c => {
       this.allChannels = c;
     });
+  }
+
+  get participantChannels(): Channel[] {
+    return this.allChannels.filter(c =>
+      c.participants?.includes(this.currentUser?.uid || '')
+    );
   }
 
   /** Triggers logout on destroy. */
