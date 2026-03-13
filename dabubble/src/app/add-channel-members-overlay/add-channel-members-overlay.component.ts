@@ -37,18 +37,13 @@ export class AddChannelMembersOverlayComponent {
   /** Initializes responsive state, loads users and first user channel. */
   ngOnInit(): void {
     this.isResponsive = window.innerWidth < 880;
-    this.userService.getUsers().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(users => {
+    this.userService.getUsers().pipe(takeUntil(this.destroy$)).subscribe(users => {
       this.allUsers = users;
     });
-    this.channelService.getChannels().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(channels => {
+    this.channelService.getChannels().pipe(takeUntil(this.destroy$)).subscribe(channels => {
       const userChannels = channels.filter(ch => ch.participants.includes(this.currentUser!.uid));
-      if (userChannels.length > 0) {
-        this.firstUserChannel = userChannels[0];
-      }
+      const willkommenChannel = userChannels.find(ch => ch.name.toLowerCase() === 'willkommen' || ch.name.toLowerCase().includes('willkommen'));
+      this.firstUserChannel = willkommenChannel || userChannels[0] || null;
     });
   }
 
