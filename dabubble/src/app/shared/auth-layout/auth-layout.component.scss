@@ -429,12 +429,27 @@
 }
 
 @media (max-width: 500px) {
-  .login-card.privacy, .login-card.imprint {
-    width: calc(100vw - 30px);
+  .mat-mdc-card {
+    box-shadow: none;
   }
+  .login.privacy {
+    width: 100%;
+    gap: 0;
+  }
+
   .login-card {
     position: static;
     padding: 24px 16px;
+  }
+
+  .login-card.imprint {
+    width: calc(100vw - 30px);
+  }
+
+  .login-card.privacy {
+    width: 100%;
+    max-height: calc(100vh - 100px);
+    padding: 30px 16px;
   }
 
   .login-card.default {

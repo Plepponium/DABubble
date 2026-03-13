@@ -1,9 +1,12 @@
 @use "../../styles/variables" as *;
 @use "../../styles/shared-classes";
 
+* {
+  overflow-wrap: break-word;
+}
+
 h1, h2, h3, h4 {
   margin: 16px 0 8px 0;
-  overflow-wrap: break-word;
   color: #444df2;
 }
 .app-auth-layout {
