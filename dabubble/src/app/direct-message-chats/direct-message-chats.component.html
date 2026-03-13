@@ -68,7 +68,8 @@
                                                 </span>
                                             </div>
 
-                                            <div class="chat-text font-18" [innerHTML]="renderMessage(m.text, users)">
+                                            <div class="chat-text font-18" [innerHTML]="renderMessage(m.text, users)"
+                                                (click)="onMentionClick($event)">
                                             </div>
 
                                             <div class="reactions">

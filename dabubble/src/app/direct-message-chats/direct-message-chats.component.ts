@@ -28,6 +28,9 @@ export class DirectMessageChatsComponent {
   @Input() userId!: string;
   @Input() participantChannels: Channel[] = [];
   @Output() openProfile = new EventEmitter<User>();
+  @Output() openUserChat = new EventEmitter<User>();
+  @Output() openChannel = new EventEmitter<string>();
+
 
   dmId?: string;
   currentUser?: User;
@@ -70,9 +73,7 @@ export class DirectMessageChatsComponent {
 
   /** Reacts to changes of @Input userId */
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['userId'] && !changes['userId'].firstChange) {
-      this.ensureInitialized();
-    }
+    if (changes['userId'] && !changes['userId'].firstChange) { this.ensureInitialized() }
   }
 
   /** Cleans up all subscriptions */
@@ -81,6 +82,7 @@ export class DirectMessageChatsComponent {
     this.subs.unsubscribe();
   }
 
+  /** Returns the list of channels for mentions */
   get mentionChannels() {
     return this.participantChannels;
   }
@@ -88,9 +90,7 @@ export class DirectMessageChatsComponent {
   /** Focuses message input when clicking outside textarea (within input bar). @param event MouseEvent */
   focusInput(event: MouseEvent): void {
     if (event.target === this.messageInput?.nativeElement ||
-      (event.target instanceof HTMLElement && event.target.closest('.input-icon-bar'))) {
-      return;
-    }
+      (event.target instanceof HTMLElement && event.target.closest('.input-icon-bar'))) { return }
     this.messageInput?.nativeElement?.focus();
   }
 
@@ -122,10 +122,7 @@ export class DirectMessageChatsComponent {
 
   /** Creates users$ observable with user map for mentions */
   private setupUsersObservable(): void {
-    this.users$ = this.userService.getUsers().pipe(
-      map(users => this.processUsers(users)),
-      shareReplay(1)
-    );
+    this.users$ = this.userService.getUsers().pipe(map(users => this.processUsers(users)), shareReplay(1));
   }
 
   /** Processes users: Sets mentionUsers + creates UID map */
@@ -199,34 +196,25 @@ export class DirectMessageChatsComponent {
   private setupMessagesObservable(): void {
     if (!this.dmId || !this.users$) return;
     const rawMessages$ = this.dmService.getMessages(this.dmId);
-    this.messages$ = combineLatest([rawMessages$, this.users$]).pipe(
-      map(([messages, users]) => this.enrichMessages(messages, users))
-    );
+    this.messages$ = combineLatest([rawMessages$, this.users$]).pipe(map(([messages, users]) => this.enrichMessages(messages, users)));
     this.subscribeToMessages();
   }
 
   /** Subscription to otherUser updates */
   private subscribeToOtherUser(): void {
-    const s = this.userService.getSingleUserById(this.userId).pipe(
-      takeUntil(this.destroy$)).subscribe(u => this.otherUser = u);
+    const s = this.userService.getSingleUserById(this.userId).pipe(takeUntil(this.destroy$)).subscribe(u => this.otherUser = u);
     this.subs.add(s);
   }
 
   /** Enriches messages with senderName, senderImg, reactions */
   private enrichMessages(messages: any[], users: Record<string, User>): any[] {
-    return messages.map(m => ({
-      ...m,
-      senderName: users[m.senderId]?.name || 'Unknown',
-      senderImg: users[m.senderId]?.img || 'default-user',
-      reactions: m.reactions || {}
-    }));
+    return messages.map(m => ({ ...m, senderName: users[m.senderId]?.name || 'Unknown', senderImg: users[m.senderId]?.img || 'default-user', reactions: m.reactions || {} }));
   }
 
   /** Subscription to messages$ for latestMessages + scroll */
   private subscribeToMessages(): void {
     if (!this.messages$) return;
-    const s = this.messages$.pipe(
-      takeUntil(this.destroy$)).subscribe(msgs => this.handleNewMessages(msgs));
+    const s = this.messages$.pipe(takeUntil(this.destroy$)).subscribe(msgs => this.handleNewMessages(msgs));
     this.subs.add(s);
   }
 
@@ -367,8 +355,7 @@ export class DirectMessageChatsComponent {
 
   /** Opens sender's profile. @param senderId UID of sender */
   onUserNameClick(senderId: string): void {
-    const sender = this.otherUser?.uid === senderId ? this.otherUser :
-      this.currentUser?.uid === senderId ? this.currentUser : undefined;
+    const sender = this.otherUser?.uid === senderId ? this.otherUser : this.currentUser?.uid === senderId ? this.currentUser : undefined;
     if (sender) this.openProfile.emit(sender);
   }
 
@@ -405,6 +392,17 @@ export class DirectMessageChatsComponent {
   /** Template: Render text with emoji images as SafeHtml. @param text Raw message text */
   renderMessage(text: string, users: Record<string, User>): SafeHtml {
     return this.utils.renderMessage(text, users, this.participantChannels);
+  }
+
+  /** Template: Handle clicks on mentions, emit appropriate events. @param event MouseEvent */
+  onMentionClick(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const target = event.target as HTMLElement;
+    this.utils.handleMentionClick(target,
+      (user) => this.openUserChat.emit(user),
+      (channelId) => this.openChannel.emit(channelId)
+    );
   }
 
   /** Template: Smooth-scroll to message. @param messageId Target ID */

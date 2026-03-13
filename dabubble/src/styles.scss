@@ -64,6 +64,8 @@ body.intro-active {
   margin: 0 1px;
   display: inline-block;
   vertical-align: baseline;
+  pointer-events: auto;
+  user-select: none;
 
   &:hover {
     background: #e0f0ff;

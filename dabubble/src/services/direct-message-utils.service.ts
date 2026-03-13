@@ -285,12 +285,36 @@ export class DirectMessageUtilsService {
             name: user.name,
             img: user.img || 'default-user'
         });
-        return `<span class="mention-tag" data-user='${userData}'>${displayText}</span>`;
+        return `<span class="mention-tag" data-user='${userData}' data-action="openUserChat" title="Doppelklick zum Öffnen des Benutzerchats">${displayText}</span>`;
     }
 
     /** Creates HTML span tag for channel mention with embedded channel data for tooltip and interaction. */
     private createChannelMentionTag(displayText: string, channelId: string): string {
-        return `<span class="mention-tag channel-mention" data-channel-id="${channelId}">${displayText}</span>`;
+        return `<span class="mention-tag channel-mention" data-channel-id="${channelId}" data-action="openChannel" title="Doppelklick zum Öffnen des Kanalchats">${displayText}</span>`;
+    }
+
+    /** Handles click events on mention tags to open user chats or channels based on embedded data attributes. */
+    handleMentionClick(target: HTMLElement, openUserChat: (user: User) => void, openChannel: (channelId: string) => void): void {
+        if (!target.classList.contains('mention-tag') || !target.dataset['action']) return;
+        const action = target.dataset['action']!;
+        switch (action) {
+            case 'openChannel':
+                const channelId = target.dataset['channelId'];
+                if (channelId) openChannel(channelId);
+                break;
+            case 'openUserChat':
+                const userJson = target.dataset['user'];
+                if (userJson) {
+                    try {
+                        const userData = JSON.parse(userJson) as { id: string, name: string, img: string };
+                        const user: Partial<User> = { uid: userData.id, name: userData.name, img: userData.img };
+                        openUserChat(user as User);
+                    } catch (e) {
+                        console.error('Invalid user data in mention');
+                    }
+                }
+                break;
+        }
     }
 
     // === USER HELPERS ===
