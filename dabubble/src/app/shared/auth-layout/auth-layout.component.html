@@ -1,52 +1,56 @@
-<div *ngIf="showIntro" class="intro-container">
-  <div class="logo-wrapper">
-    <img src="assets/img/login-logo.svg" alt="Logo" />
-    <div class="intro-text">DABubble</div>
-  </div>
-</div>
-
-<div class="overlay-root" *ngIf="showOverlay">
-  <div class="overlay-backdrop"></div>
-
-  <div class="overlay-panel">
-    <ng-container [ngSwitch]="overlayVariant">
-      <div *ngSwitchCase="'login'">
-        <h2>Anmelden</h2>
+<div class="background">
+  <div class="wrapper-wide-screen">
+    <div *ngIf="showIntro" class="intro-container">
+      <div class="logo-wrapper">
+        <img src="assets/img/login-logo.svg" alt="Logo" />
+        <div class="intro-text">DABubble</div>
       </div>
-      <div *ngSwitchCase="'created'">
-        <h2>Konto erfolgreich erstellt!</h2>
+    </div>
+
+    <div class="overlay-root" *ngIf="showOverlay">
+      <div class="overlay-backdrop"></div>
+
+      <div class="overlay-panel">
+        <ng-container [ngSwitch]="overlayVariant">
+          <div *ngSwitchCase="'login'">
+            <h2>Anmelden</h2>
+          </div>
+          <div *ngSwitchCase="'created'">
+            <h2>Konto erfolgreich erstellt!</h2>
+          </div>
+          <div *ngSwitchCase="'changed'">
+            <h2>Passwort geändert</h2>
+          </div>
+          <div *ngSwitchCase="'sent'">
+            <img src="assets/icons/mail-sent.svg">
+            <h2>E-Mail gesendet</h2>
+          </div>
+        </ng-container>
       </div>
-      <div *ngSwitchCase="'changed'">
-        <h2>Passwort geändert</h2>
+    </div>
+
+    <div class="login" [ngClass]="variant">
+      <div class="logo-header-mobile" *ngIf="variant === 'privacy' || variant === 'imprint'">
+        <img src="assets/img/login-logo-small.svg" class="logo" (click)="onLogoClick()" />
       </div>
-      <div *ngSwitchCase="'sent'">
-        <img src="assets/icons/mail-sent.svg">
-        <h2>E-Mail gesendet</h2>
+
+      <img src="assets/img/login-logo-small.svg" class="logo hide-mobile" (click)="onLogoClick()" />
+
+      <mat-card class="login-card" [ngClass]="variant">
+        <ng-content></ng-content>
+      </mat-card>
+
+      <div class="register" *ngIf="showRegister">
+        <span>Neu bei DABubble?</span>
+        <button [routerLink]="['/signup']">Konto erstellen</button>
       </div>
-    </ng-container>
+
+      <div class="legal-links" *ngIf="!hideLegalLinks">
+        <a routerLink="/imprint">Impressum</a>
+        <a routerLink="/privacy">Datenschutz</a>
+      </div>
+
+      <!-- <span class="text font-32 font-w-700" *ngIf="variant === 'privacy'">In construction</span> -->
+    </div>
   </div>
-</div>
-
-<div class="login" [ngClass]="variant">
-  <div class="logo-header-mobile" *ngIf="variant === 'privacy' || variant === 'imprint'">
-    <img src="assets/img/login-logo-small.svg" class="logo" (click)="onLogoClick()" />
-  </div>
-
-  <img src="assets/img/login-logo-small.svg" class="logo hide-mobile" (click)="onLogoClick()" />
-
-  <mat-card class="login-card" [ngClass]="variant">
-    <ng-content></ng-content>
-  </mat-card>
-
-  <div class="register" *ngIf="showRegister">
-    <span>Neu bei DABubble?</span>
-    <button [routerLink]="['/signup']">Konto erstellen</button>
-  </div>
-
-  <div class="legal-links" *ngIf="!hideLegalLinks">
-    <a routerLink="/imprint">Impressum</a>
-    <a routerLink="/privacy">Datenschutz</a>
-  </div>
-
-  <!-- <span class="text font-32 font-w-700" *ngIf="variant === 'privacy'">In construction</span> -->
 </div>
