@@ -34,7 +34,7 @@
             <div *ngIf="!isResponsiveScreen || !menuOpen" class="content" [class.fullwidth]="!menuOpen"
                 [class.dm-open]="isDmOpen" [class.nm-open]="isNmOpen" [class.thread-open]="threadOpen">
 
-                <app-chats #chats id="chats" class="chats" *ngIf="channelOpen" [channelId]="currentChannelId"
+                <app-chats #chats id="chats" class="chats" *ngIf="channelOpen && !(isSmallScreen && threadOpen)" [channelId]="currentChannelId"
                     (openThread)="openThread($event)" (openProfile)="openProfileOverlay($event)"
                     (channelDeleted)="onChannelDeleted()" [profileOpen]="showProfileBackdrop">
                 </app-chats>

@@ -97,8 +97,18 @@ export class MainPageComponent {
   /** Handles window resize events. */
   @HostListener('window:resize', [])
   onResize() {
+    const previousIsSmall = this.isSmallScreen;
+
     this.isSmallScreen = window.innerWidth < 1512;
     this.isResponsiveScreen = window.innerWidth <= 880;
+
+    if (!previousIsSmall && this.isSmallScreen && this.threadOpen) {
+      this.channelOpen = false; 
+    }
+
+    if (previousIsSmall && !this.isSmallScreen && this.threadOpen) {
+      this.channelOpen = true;  
+    }
   }
 
   /** Initializes component on init. */
