@@ -84,9 +84,8 @@ export class ThreadComponent implements OnInit {
   ngOnInit() {
     this.updateIsResponsive();
     this.getCurrentUserAndChannels();
-    setTimeout(() =>
-      this.loadChannelWithId(), 100,
-    );
+    setTimeout(() => this.focusInputOnStart(), 200);
+    setTimeout(() => this.loadChannelWithId(), 100);
   }
 
   /** Handles input changes and reloads chat and answers when channelId or chatId changes. */
@@ -115,6 +114,12 @@ export class ThreadComponent implements OnInit {
     this.isResponsive = window.innerWidth < 881;
   }
 
+  /** Focuses the answer input field when the component is initialized. */
+  private focusInputOnStart() {
+    setTimeout(() => {
+      this.answerInput?.nativeElement?.focus();
+    }, 0);
+  }
 
   /** Focuses the answer input unless clicking directly on input or icon bar elements. */
   focusInput(event: MouseEvent) {

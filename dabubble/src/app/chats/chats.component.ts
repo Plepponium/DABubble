@@ -31,7 +31,9 @@ registerLocaleData(localeDe);
 })
 export class ChatsComponent implements OnInit, OnChanges {
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('chatInputRef') chatInputRef!: ChatInputComponent;
   @ViewChildren('chatSection') chatSections!: QueryList<ElementRef>;
+
   @Input() channelId?: string;
   @Input() profileOpen = false;
   @Output() openThread = new EventEmitter<{ channelId: string; chatId: string }>();

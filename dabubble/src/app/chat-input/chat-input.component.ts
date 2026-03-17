@@ -13,6 +13,7 @@ import { User } from '../../models/user.class';
   styleUrl: './chat-input.component.scss'
 })
 export class ChatInputComponent {
+  @ViewChild('messageInput', { static: false }) messageInput!: ElementRef<HTMLTextAreaElement>;
   @Input() placeholder: string = '';
   @Input() text: string = '';
   @Input() emojis: string[] = [];
@@ -26,6 +27,18 @@ export class ChatInputComponent {
   activeSmiley = false;
   overlayActive = false;
   mentionCaretIndex: number | null = null;
+
+  /** Focuses the input field when the component initializes. */
+  ngOnInit() {
+    this.focusInputOnStart();
+  }
+
+  /** Focuses the textarea input on component load. */
+  focusInputOnStart() {  
+    setTimeout(() => {
+      this.messageInput?.nativeElement?.focus();
+    }, 0);
+  }
 
   /** Submits form if valid and no overlay active. */
   onFormSubmit() {

@@ -56,6 +56,14 @@ export class NewMessageComponent {
   /** Initializes component data when the component is created. */
   ngOnInit() {
     this.loadInitialData();
+    setTimeout(() => this.focusInputOnStart(), 100);
+  }
+
+  /** Focuses the message input field when the component is initialized. */
+  private focusInputOnStart() {
+    setTimeout(() => {
+      this.newMessageInput?.nativeElement?.focus();
+    }, 0);
   }
 
   /** Loads current user, channels and participants. */
