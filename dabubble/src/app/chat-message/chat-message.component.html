@@ -55,11 +55,11 @@
                 <div class="font-14 t-gray">{{ chat.time * 1000 | date: 'HH:mm' }} Uhr</div>
             </div>
             <div class="chat-message" [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 
-                    'right': chat.user === currentUserId}" [innerHTML]="renderMessage(chat.message)">
+                    'right': chat.user === currentUserId}" [innerHTML]="renderMessage(chat.message)"
+                (click)="onMentionClick($event)">
             </div>
             <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}"
                 [ngClass]="{'has-answers': chat.answersCount && chat.answersCount > 0}">
-
                 <div class="answers" *ngIf="chat.answersCount && chat.answersCount > 0">
                     <div (click)="handleOpenThread()" class="answer t-purple">
                         {{ chat.answersCount }} Antworten

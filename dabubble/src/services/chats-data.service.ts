@@ -32,6 +32,22 @@ export class ChatsDataService {
   public answerAdded$ = this.answerAddedSubject.asObservable();
   private filteredChannelsSubject = new BehaviorSubject<any[]>([]);
   public filteredChannels$ = this.filteredChannelsSubject.asObservable();
+  private allUsersSubject = new BehaviorSubject<Record<string, User>>({});
+  public readonly allUsers$ = this.allUsersSubject.asObservable();
+
+  /** Loads all users and stores them in a map for quick lookup. */
+  loadAllUsers(): void {
+    if (Object.keys(this.allUsersSubject.value).length > 0) {
+      return;
+    }
+    this.userService.getUsers().pipe(take(1), takeUntilDestroyed(this.destroyRef)).subscribe(users => {
+      const userMap: Record<string, User> = {};
+      users.forEach(user => {
+        userMap[user.uid] = user;
+      });
+      this.allUsersSubject.next(userMap);
+    });
+  }
 
   /** Fetches the current user and initializes user-dependent state and filters. */
   getCurrentUser() {

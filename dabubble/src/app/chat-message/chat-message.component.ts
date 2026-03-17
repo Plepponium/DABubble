@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ReactionsDisplayComponent } from '../reactions-display/reactions-display.component';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
@@ -11,6 +11,10 @@ import { ChatsTextService } from '../../services/chats-text.service';
 import { SmileyOverlayComponent } from '../shared/smiley-overlay/smiley-overlay.component';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { reactionIcons } from '../reaction-icons';
+import { takeUntil } from 'rxjs/internal/operators/takeUntil';
+import { take } from 'rxjs/internal/operators/take';
+import { ChatsDataService } from '../../services/chats-data.service';
+import { Subject } from 'rxjs/internal/Subject';
 
 @Component({
   selector: 'app-chat-message',
@@ -19,11 +23,6 @@ import { reactionIcons } from '../reaction-icons';
   styleUrl: './chat-message.component.scss'
 })
 export class ChatMessageComponent {
-  textService = inject(ChatsTextService);
-  uiService = inject(ChatsUiService);
-  editSmileyActive: { [key: string]: boolean } = {};
-  allSmileys = reactionIcons;
-
   @Input() chat!: Chat;
   @Input() index!: number;
   @Input() currentUserId!: string;
@@ -36,15 +35,43 @@ export class ChatMessageComponent {
   @Input() editCommentDialogueExpanded!: boolean;
   @Input() reactionIcons: string[] = [];
   @Input() prevChatDate?: Date;
-
   @Output() openThread = new EventEmitter<string>();
   @Output() openProfile = new EventEmitter<Chat>();
+  @Output() openUserChat = new EventEmitter<User>();
+  @Output() openChannel = new EventEmitter<string>();
   @Output() addReaction = new EventEmitter<{ index: number; type: string }>();
   @Output() toggleReaction = new EventEmitter<{ index: number; type: string }>();
   @Output() openReactionsDialogue = new EventEmitter<{ index: number; below: boolean }>();
   @Output() enableEditChat = new EventEmitter<Chat>();
   @Output() cancelEditChat = new EventEmitter<Chat>();
   @Output() saveEditedChat = new EventEmitter<Chat>();
+
+  textService = inject(ChatsTextService);
+  uiService = inject(ChatsUiService);
+  dataService = inject(ChatsDataService);
+  cdr = inject(ChangeDetectorRef);
+
+  editSmileyActive: { [key: string]: boolean } = {};
+  allSmileys = reactionIcons;
+  private allUsers: Record<string, User> = {};
+  private destroy$ = new Subject<void>();
+
+  /** Initializes the component and loads all users. */
+  ngOnInit() {
+    this.dataService.allUsers$.pipe(
+      take(1),
+      takeUntil(this.destroy$)
+    ).subscribe(usersMap => {
+      this.allUsers = usersMap;
+      this.cdr.markForCheck();
+    });
+  }
+
+  /** Cleans up subscriptions on component destruction. */
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   /** Converts chat timestamp to JavaScript Date object. */
   getChatDate(chat: any): Date | undefined {
@@ -133,10 +160,20 @@ export class ChatMessageComponent {
     if (el) this.textService.autoGrow(el);
   }
 
-  /** Renders message text with HTML sanitization and formatting. */
+  /** Renders message text with emojis and mentions using text service. */
   renderMessage(text: string): SafeHtml {
-    return this.textService.renderMessage(text);
+    return this.textService.renderMessage(text, this.allUsers, this.filteredChannels);
   }
+
+
+  onMentionClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    this.textService.handleMentionClick(target,
+      (user) => this.openUserChat.emit(user),
+      (channelId) => this.openChannel.emit(channelId)
+    );
+  }
+
 
   /** Emits event to open thread for current chat message. */
   handleOpenThread() {

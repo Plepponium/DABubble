@@ -17,7 +17,8 @@
                     [activeReactionDialogueBelowIndex]="activeReactionDialogueBelowIndex"
                     [showAllReactions]="showAllReactions" [reactionIcons]="reactionIcons" #chatSection
                     [attr.data-message-id]="chat.id" (openThread)="handleOpenThread(chat.id)"
-                    (openProfile)="handleOpenProfile($event)" (addReaction)="addReaction($event)"
+                    (openProfile)="handleOpenProfile($event)" (openUserChat)="handleOpenUserChat($event)"
+                    (openChannel)="handleOpenChannel($event)" (addReaction)="addReaction($event)"
                     (toggleReaction)="toggleReaction($event)" (openReactionsDialogue)="openReactionsDialogue($event)"
                     (enableEditChat)="enableEditChat($event)" (cancelEditChat)="cancelEditChat($event)"
                     (saveEditedChat)="saveEditedChat($event)">

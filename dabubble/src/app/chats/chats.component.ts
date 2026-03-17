@@ -38,6 +38,8 @@ export class ChatsComponent implements OnInit, OnChanges {
   @Input() profileOpen = false;
   @Output() openThread = new EventEmitter<{ channelId: string; chatId: string }>();
   @Output() openProfile = new EventEmitter<User>();
+  @Output() openUserChat = new EventEmitter<User>();
+  @Output() openChannel = new EventEmitter<string>();
   @Output() channelDeleted = new EventEmitter<void>();
 
   channelService = inject(ChannelService);
@@ -78,18 +80,15 @@ export class ChatsComponent implements OnInit, OnChanges {
   showChannelDescription$ = this.uiService.showChannelDescription$;
   showUserDialogue$ = this.uiService.showUserDialogue$;
 
-
-
-  /** Initializes subscriptions and loads initial channel and user data. */
+  /** Initializes the component, sets up responsive layout, loads necessary data, and subscribes to observables. */
   ngOnInit() {
     this.updateIsResponsive();
+    this.dataService.loadAllUsers();
     this.dataService.getCurrentUser();
     this.dataService.loadChannels();
-
     this.participants$ = this.dataService.participants$;
     this.dataService.currentUserId$.pipe(takeUntil(this.destroy$)).subscribe(id => this.currentUserId = id);
     this.participants$.pipe(takeUntil(this.destroy$)).subscribe(p => this.participants = p);
-
     if ((this.dataService as any).filteredChannels$) {
       (this.dataService as any).filteredChannels$.pipe(takeUntil(this.destroy$)).subscribe((fc: any[]) => this.filteredChannels = fc);
     } else {
@@ -140,12 +139,9 @@ export class ChatsComponent implements OnInit, OnChanges {
 
   /** Focuses the message input field if the event target is not an input icon bar. */
   focusInput(event: MouseEvent) {
-    if (event.target === this.messageInput?.nativeElement ||
-      event.target instanceof HTMLElement &&
-      event.target.closest('.input-icon-bar')) {
+    if (event.target === this.messageInput?.nativeElement || event.target instanceof HTMLElement && event.target.closest('.input-icon-bar')) {
       return;
     }
-
     this.messageInput?.nativeElement?.focus();
   }
 
@@ -153,8 +149,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   trackByChatId(chat: any): string {
     return chat.id;
   }
-
-
 
   /** Returns the date of a chat message based on its timestamp. */
   getChatDate(chat: any): Date | undefined {
@@ -165,12 +159,8 @@ export class ChatsComponent implements OnInit, OnChanges {
   openReactionsDialogue(event: { index: number; below: boolean }) {
     const index = event.index;
     const below = event.below;
-    const currentIndex = below
-      ? this.activeReactionDialogueBelowIndex
-      : this.activeReactionDialogueIndex;
-
+    const currentIndex = below ? this.activeReactionDialogueBelowIndex : this.activeReactionDialogueIndex;
     const newIndex = currentIndex === index ? null : index;
-
     if (below) {
       this.activeReactionDialogueBelowIndex = newIndex;
       if (newIndex !== null) {
@@ -188,22 +178,16 @@ export class ChatsComponent implements OnInit, OnChanges {
   async addReaction(event: { index: number; type: string }) {
     const index = event.index;
     const type = event.type;
-
     const chats = await firstValueFrom(this.chats$.pipe(take(1)));
     const chat = chats[index];
     if (!chat) return;
-
     this.activeReactionDialogueIndex = null;
     this.activeReactionDialogueBelowIndex = null;
-
     const currentReactionUsers = chat.reactions?.[type] || [];
     if (!currentReactionUsers.includes(this.currentUserId)) {
       const updatedUsers = [...currentReactionUsers, this.currentUserId];
       await this.channelService.setReaction(this.channelId!, chat.id, type, updatedUsers);
-      this.reactionService.updateLocalReaction(
-        chat, type, updatedUsers, index,
-        this.chatsSubject, this.participants, this.currentUserId
-      );
+      this.reactionService.updateLocalReaction(chat, type, updatedUsers, index, this.chatsSubject, this.participants, this.currentUserId);
     }
   }
 
@@ -211,10 +195,8 @@ export class ChatsComponent implements OnInit, OnChanges {
   async toggleReaction(event: { index: number; type: string }) {
     const index = event.index;
     const type = event.type;
-
     const chat = await this.getChatByIndex(index);
     if (!chat) return;
-
     const currentUsers = this.reactionService.extractUserIds(chat.reactions || {}, type);
     let updatedUsers: string[];
     if (currentUsers.includes(this.currentUserId)) {
@@ -222,12 +204,8 @@ export class ChatsComponent implements OnInit, OnChanges {
     } else {
       updatedUsers = [...currentUsers, this.currentUserId];
     }
-
     await this.channelService.setReaction(this.channelId!, chat.id, type, updatedUsers);
-    this.reactionService.updateLocalReaction(
-      chat, type, updatedUsers, index,
-      this.chatsSubject, this.participants, this.currentUserId
-    );
+    this.reactionService.updateLocalReaction(chat, type, updatedUsers, index, this.chatsSubject, this.participants, this.currentUserId);
   }
 
   /** Returns a chat message by its index in the current channel's chat list. */
@@ -244,11 +222,7 @@ export class ChatsComponent implements OnInit, OnChanges {
   /** Emits event to open a thread for a message. */
   openAddComment(chat: Chat) {
     if (!this.channelId) return;
-
-    this.openThread.emit({
-      channelId: this.channelId,
-      chatId: chat.id
-    });
+    this.openThread.emit({ channelId: this.channelId, chatId: chat.id });
   }
 
   /** Closes the channel description dialog. */
@@ -265,17 +239,14 @@ export class ChatsComponent implements OnInit, OnChanges {
   /** Sends the current message to the active channel. */
   submitChatMessage() {
     if (this.isSubmitting || !this.canSendMessage()) return;
-
     this.isSubmitting = true;
     const messagePayload = this.buildMessagePayload();
-
-    this.channelService.addChatToChannel(this.channelId!, messagePayload)
-      .then(() => {
-        this.newMessage = '';
-        [0, 50, 150].forEach(delay =>
-          setTimeout(() => this.uiService.scrollToBottomNewMessage(), delay)
-        );
-      })
+    this.channelService.addChatToChannel(this.channelId!, messagePayload).then(() => {
+      this.newMessage = '';
+      [0, 50, 150].forEach(delay =>
+        setTimeout(() => this.uiService.scrollToBottomNewMessage(), delay)
+      );
+    })
       .catch(err => {
         console.error('Fehler beim Senden:', err);
       })
@@ -314,6 +285,16 @@ export class ChatsComponent implements OnInit, OnChanges {
     }
   }
 
+  /** Emits event to open a chat with a specific user. */
+  handleOpenUserChat(user: User): void {
+    this.openUserChat.emit(user);
+  }
+
+  /** Emits event to open a specific channel. */
+  handleOpenChannel(channelId: string): void {
+    this.openChannel.emit(channelId);
+  }
+
   /** Updates local state when a thread answer is added. */
   handleAnswerAdded(event: { chatId: string; answerTime: number }) {
     let chats = this.dataService.chatsSubject.getValue();
@@ -322,11 +303,7 @@ export class ChatsComponent implements OnInit, OnChanges {
       console.warn('Chat nicht gefunden, lade neu...');
       return;
     }
-    chats = chats.map(c =>
-      c.id === event.chatId
-        ? { ...c, answersCount: (c.answersCount || 0) + 1, lastAnswerTime: event.answerTime }
-        : c
-    );
+    chats = chats.map(c => c.id === event.chatId ? { ...c, answersCount: (c.answersCount || 0) + 1, lastAnswerTime: event.answerTime } : c);
     this.dataService.chatsSubject.next(chats);
   }
 
@@ -351,7 +328,6 @@ export class ChatsComponent implements OnInit, OnChanges {
       chat.isEditing = false;
       return;
     }
-
     this.updateChatMessage({ messageId: chat.id, newText });
     chat.isEditing = false;
   }
@@ -359,7 +335,6 @@ export class ChatsComponent implements OnInit, OnChanges {
   /** Updates a message via ChannelService. */
   async updateChatMessage(event: { messageId: string; newText: string }) {
     if (!this.channelId || !event.messageId || !event.newText.trim()) return;
-
     try {
       await this.channelService.updateChatMessage(this.channelId, event.messageId, event.newText.trim());
     } catch (err) {
@@ -400,6 +375,4 @@ export class ChatsComponent implements OnInit, OnChanges {
       setTimeout(() => this.scrollToMessage(messageId), 200);
     }
   }
-
-
 }
