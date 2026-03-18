@@ -17,7 +17,7 @@
 
     <div *ngIf="(chat$ | async) as chat" class="chat-content">
         <div class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
-            <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}">
+            <div class="chat-section  chat-section-message" [ngClass]="{'reverse': chat.user === currentUserId}">
                 <div class="chat-dialogue top" [ngClass]="{'reverse': chat.user === currentUserId}">
                     <div class="reactions-display-container">
                         <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === chat.id">
@@ -310,8 +310,7 @@
             <div class="form-field full-width" (click)="focusInput($event)">
                 <textarea #answerInput id="answer-message" class="input" name="answer" [(ngModel)]="newAnswer"
                     (keydown.enter)="onEnterPress($any($event))" type="text" [placeholder]="'Antworten...'"
-                    (input)="updateCaretPosition(); threadHelpService.autoGrow(answerInput)"
-                    (keyup)="updateCaretPosition()"></textarea>
+                    (input)="updateCaretPosition()" (keyup)="updateCaretPosition()"></textarea>
 
                 <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys" (selected)="onSmileySelected($event)"
                     (activeChange)="activeSmiley = $event">

@@ -638,6 +638,10 @@
     padding: 10px 50px 10px 16px;
   }
 
+  .chat-section-message {
+    max-height: 120px;
+  }
+
   .chat-section.reverse {
     flex-direction: row-reverse;
     padding: 10px 16px 10px 50px;
