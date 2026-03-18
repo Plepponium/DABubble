@@ -136,6 +136,9 @@
   gap: 30px;
   padding: 10px 45px;
   position: relative;
+  max-height: 250px;
+  overflow: auto;
+
   &:hover {
     background-color: #eceefe;
     .chat-message.left {
