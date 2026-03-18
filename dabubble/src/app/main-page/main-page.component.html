@@ -44,6 +44,7 @@
                 <app-thread id="thread" class="thread" *ngIf="threadChatId && currentChannelId" [chatId]="threadChatId"
                     [channelId]="currentChannelId" [class.open]="threadOpen" [class.closed]="!threadOpen"
                     (closeThread)="onThreadClosed()" (openProfile)="openProfileOverlay($event)"
+                    (openUserChat)="openUserChat($event)" (openChannel)="openChannel($event)"
                     [class.fullwidth]="!channelOpen" [class.fullwidth-without-menu]="!menuOpen && !channelOpen">
                 </app-thread>
 
@@ -52,10 +53,11 @@
                     (openChannel)="openChannel($event)" [participantChannels]="participantChannels">
                 </app-direct-message-chats>
 
-                <app-dm-thread id="dm-thread" class="thread" *ngIf="dmThreadChatId && currentChannelId" [chatId]="dmThreadChatId"
-                    [channelId]="currentChannelId" [class.open]="dmThreadOpen" [class.closed]="!dmThreadOpen"
-                    (closeThread)="onThreadClosed()" (openProfile)="openProfileOverlay($event)"
-                    [class.fullwidth]="!channelOpen" [class.fullwidth-without-menu]="!menuOpen && !channelOpen">
+                <app-dm-thread id="dm-thread" class="thread" *ngIf="dmThreadChatId && currentChannelId"
+                    [chatId]="dmThreadChatId" [channelId]="currentChannelId" [class.open]="dmThreadOpen"
+                    [class.closed]="!dmThreadOpen" (closeThread)="onThreadClosed()"
+                    (openProfile)="openProfileOverlay($event)" [class.fullwidth]="!channelOpen"
+                    [class.fullwidth-without-menu]="!menuOpen && !channelOpen">
                 </app-dm-thread>
 
                 <app-new-message class="new-message" *ngIf="newMessageOpen" (openChannel)="openChannel($event)"

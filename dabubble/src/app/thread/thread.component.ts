@@ -22,6 +22,7 @@ import { ChatsUiService } from '../../services/chats-ui.service';
 import { ThreadService } from '../../services/thread.service';
 import { ThreadHelpService } from '../../services/thread-help.service';
 import { ChatsDataService } from '../../services/chats-data.service';
+import { ChatsTextService } from '../../services/chats-text.service';
 
 @Component({
   selector: 'app-thread',
@@ -31,11 +32,20 @@ import { ChatsDataService } from '../../services/chats-data.service';
 })
 export class ThreadComponent implements OnInit {
   @ViewChild('answerInput', { static: false }) answerInput!: ElementRef<HTMLTextAreaElement>;
+  @Input() channelId!: string;
+  @Input() chatId!: string;
+  @Output() closeThread = new EventEmitter<void>();
+  @Output() openProfile = new EventEmitter<User>();
+  @Output() openUserChat = new EventEmitter<User>();
+  @Output() openChannel = new EventEmitter<string>();
+  @Output() answerAdded = new EventEmitter<{ chatId: string, answerTime: number }>();
+
   channelService = inject(ChannelService);
   userService = inject(UserService);
   logoutService = inject(LogoutService);
   uiService = inject(ChatsUiService);
   dataService = inject(ChatsDataService);
+  chatsTextService = inject(ChatsTextService);
   threadService = inject(ThreadService);
   threadHelpService = inject(ThreadHelpService);
 
@@ -48,7 +58,6 @@ export class ThreadComponent implements OnInit {
   insertedAtPending = false;
   isResponsive = false;
   private isSubmitting = false;
-
   currentUserId: string = '';
   participantIds: string[] = [];
   participants: User[] = [];
@@ -60,25 +69,19 @@ export class ThreadComponent implements OnInit {
   cursorPos: number = 0;
   showAllReactionsForChat: { [chatId: string]: boolean } = {};
   showAllReactionsForAnswer: { [answerId: string]: boolean } = {};
+  activeSmiley = false;
+  allSmileys = reactionIcons;
+  editSmileyActive: { [messageId: string]: boolean } = {};
 
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
   chat$!: Observable<Chat | undefined>;
   answers$!: Observable<Answer[]>;
-
+  allUsersMap: Record<string, User> = {};
+  allUsers$ = this.dataService.allUsers$;
   private chatsSubject = new BehaviorSubject<ChatWithDetails[]>([]);
   public chats$ = this.chatsSubject.asObservable();
   private destroy$ = this.logoutService.logout$;
-
-  activeSmiley = false;
-  allSmileys = reactionIcons;
-  editSmileyActive: { [messageId: string]: boolean } = {};
-
-  @Input() channelId!: string;
-  @Input() chatId!: string;
-  @Output() closeThread = new EventEmitter<void>();
-  @Output() openProfile = new EventEmitter<User>();
-  @Output() answerAdded = new EventEmitter<{ chatId: string, answerTime: number }>();
 
   /** Initializes the component, sets responsive state, and loads initial channel and user data. */
   ngOnInit() {
@@ -86,6 +89,8 @@ export class ThreadComponent implements OnInit {
     this.getCurrentUserAndChannels();
     setTimeout(() => this.focusInputOnStart(), 200);
     setTimeout(() => this.loadChannelWithId(), 100);
+    this.dataService.loadAllUsers();
+    this.allUsers$.pipe(takeUntil(this.destroy$)).subscribe(map => { this.allUsersMap = map; });
   }
 
   /** Handles input changes and reloads chat and answers when channelId or chatId changes. */
@@ -97,9 +102,7 @@ export class ThreadComponent implements OnInit {
     }
     if (changes['channelId'] && !changes['channelId'].firstChange) {
       this.getCurrentUserAndChannels();
-      setTimeout(() =>
-        this.loadChannelWithId(), 100,
-      );
+      setTimeout(() => this.loadChannelWithId(), 100,);
     }
   }
 
@@ -116,27 +119,18 @@ export class ThreadComponent implements OnInit {
 
   /** Focuses the answer input field when the component is initialized. */
   private focusInputOnStart() {
-    setTimeout(() => {
-      this.answerInput?.nativeElement?.focus();
-    }, 0);
+    setTimeout(() => { this.answerInput?.nativeElement?.focus(); }, 0);
   }
 
   /** Focuses the answer input unless clicking directly on input or icon bar elements. */
   focusInput(event: MouseEvent) {
-    if (event.target === this.answerInput?.nativeElement ||
-      event.target instanceof HTMLElement &&
-      event.target.closest('.input-icon-bar')) {
-      return;
-    }
+    if (event.target === this.answerInput?.nativeElement || event.target instanceof HTMLElement && event.target.closest('.input-icon-bar')) { return; }
     this.answerInput?.nativeElement?.focus();
   }
 
   /** Retrieves the current user ID and available channels from the service. */
   getCurrentUserAndChannels() {
-    this.threadService.getCurrentUserAndChannels().subscribe(result => {
-      this.currentUserId = result.userId;
-      this.filteredChannels = result.channels;
-    });
+    this.threadService.getCurrentUserAndChannels().subscribe(result => { this.currentUserId = result.userId; this.filteredChannels = result.channels; });
   }
 
   /** Loads channel details, participants, chat, and answers for the current channelId. */
@@ -147,9 +141,7 @@ export class ThreadComponent implements OnInit {
       this.subscribeToParticipants();
       this.chat$ = this.threadService.getEnrichedChat(this.channelId, this.chatId, this.participants$, this.currentUserId);
       this.answers$ = this.threadService.getEnrichedAnswers(this.channelId, this.chatId, this.participants$, this.currentUserId);
-      this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
-        this.threadService.scrollToBottom();
-      });
+      this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => { this.threadService.scrollToBottom(); });
     });
   }
 
@@ -207,7 +199,6 @@ export class ThreadComponent implements OnInit {
     const updatedChat = await this.threadService.addReaction(this.channelId, this.chat$, reactionType, this.currentUserId, this.participants);
     if (updatedChat) {
       this.chat$ = of(updatedChat);
-      
       this.activeReactionDialogueIndex = null;
       this.activeReactionDialogueBelowIndex = null;
     }
@@ -218,7 +209,6 @@ export class ThreadComponent implements OnInit {
     const updatedAnswers = await this.threadService.addReactionToAnswer(this.channelId, this.chatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants);
     if (updatedAnswers) {
       this.subscribeAnswers();
-
       this.activeReactionDialogueAnswersIndex = null;
       this.activeReactionDialogueBelowAnswersIndex = null;
     }
@@ -233,9 +223,7 @@ export class ThreadComponent implements OnInit {
   /** Toggles the current user's reaction on an answer. */
   async toggleReactionForAnswer(answerId: string, reactionType: string) {
     const updatedAnswers = await this.threadService.toggleReactionForAnswer(this.channelId, this.chatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants);
-    if (updatedAnswers) {
-      this.subscribeAnswers();
-    }
+    if (updatedAnswers) { this.subscribeAnswers(); }
   }
 
   /** Emits an event to close the thread view. */
@@ -252,9 +240,7 @@ export class ThreadComponent implements OnInit {
       if (result.success) {
         this.dataService.notifyAnswerAdded({ chatId: this.chatId, answerTime: result.answerTime! });
         this.newAnswer = '';
-        [0, 50, 150].forEach(delay =>
-          setTimeout(() => this.threadService.scrollToBottomNewMessage(), delay)
-        );
+        [0, 50, 150].forEach(delay => setTimeout(() => this.threadService.scrollToBottomNewMessage(), delay));
       }
     } finally {
       this.isSubmitting = false;
@@ -263,10 +249,7 @@ export class ThreadComponent implements OnInit {
 
   /** Handles Enter key press to submit answer unless overlay is active. */
   onEnterPress(e: KeyboardEvent) {
-    if (this.overlayActive) {
-      e.preventDefault();
-      return;
-    }
+    if (this.overlayActive) { e.preventDefault(); return; }
     this.submitAnswer();
     e.preventDefault();
   }
@@ -364,10 +347,7 @@ export class ThreadComponent implements OnInit {
     answer._caretIndex = result.newCaretIndex;
     setTimeout(() => {
       const textarea = document.getElementById(`edit-${answer.id}`) as HTMLTextAreaElement;
-      if (textarea) {
-        textarea.selectionStart = textarea.selectionEnd = answer._caretIndex;
-        textarea.focus();
-      }
+      if (textarea) { textarea.selectionStart = textarea.selectionEnd = answer._caretIndex; textarea.focus(); }
     });
   }
 
@@ -380,18 +360,13 @@ export class ThreadComponent implements OnInit {
     const after = this.newAnswer.slice(end);
     this.newAnswer = before + character + after;
     this.mentionCaretIndex = start + character.length;
-    setTimeout(() => {
-      textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!;
-      textarea.focus();
-    }); 0
+    setTimeout(() => { textarea.selectionStart = textarea.selectionEnd = this.mentionCaretIndex!; textarea.focus(); }); 0
   }
 
   /** Saves the edited answer and refreshes the answers list if successful. */
   async saveEditedAnswer(answer: Answer) {
     const result = await this.threadService.saveEditedAnswer(this.channelId, this.chatId, answer, answer.editedText ?? '');
-    if (result) {
-      this.subscribeAnswers();
-    }
+    if (result) { this.subscribeAnswers(); }
   }
 
   /** Reloads enriched answers and scrolls to the bottom. */
@@ -400,8 +375,14 @@ export class ThreadComponent implements OnInit {
     this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => { this.threadService.scrollToBottom(); });
   }
 
-  /** Renders formatted message text safely for display. */
+  /** Renders message with full mentions & smileys using ChatsTextService. */
   renderMessage(text: string): SafeHtml {
-    return this.threadHelpService.renderMessage(text);
+    return this.chatsTextService.renderMessage(text, this.allUsersMap, this.filteredChannels);
+  }
+
+  /** Handles clicks on rendered mention tags in thread messages. */
+  onMentionClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    this.chatsTextService.handleMentionClick(target, (user) => this.openUserChat.emit(user), (channelId) => this.openChannel.emit(channelId));
   }
 }
