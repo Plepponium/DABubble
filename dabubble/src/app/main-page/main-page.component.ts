@@ -24,10 +24,11 @@ import { InputMissingOverlayComponent } from "../input-missing-overlay/input-mis
 import { ChannelService } from '../../services/channel.service';
 import { LogoutService } from '../../services/logout.service';
 import { Channel } from '../../models/channel.class';
+import { DmThreadComponent } from "../dm-thread/dm-thread.component";
 
 @Component({
   selector: 'app-main-page',
-  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, DirectMessageChatsComponent, NewMessageComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent, AddChannelMembersOverlayComponent, UserProfileComponent, EditUserComponent, ProfileOverlayComponent, LogoutOverlayComponent, InputMissingOverlayComponent],
+  imports: [CommonModule, HeaderComponent, MenuComponent, ChatsComponent, ThreadComponent, DirectMessageChatsComponent, NewMessageComponent, MatIconModule, MatSidenavModule, MatButtonModule, MatToolbarModule, AddChannelOverlayComponent, AddChannelMembersOverlayComponent, UserProfileComponent, EditUserComponent, ProfileOverlayComponent, LogoutOverlayComponent, InputMissingOverlayComponent, DmThreadComponent],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss',
 })
@@ -44,6 +45,7 @@ export class MainPageComponent {
   contentOpen = false;
   dataReady = false;
   menuBtnClose = true;
+  dmThreadOpen = false;
 
   // Overlay states
   showLogoutOverlay = false;
@@ -67,6 +69,7 @@ export class MainPageComponent {
   currentChannelId?: string;
   activeUserId?: string;
   threadChatId?: string;
+  dmThreadChatId?: string;
 
   // Screen sizes
   isSmallScreen = false;
