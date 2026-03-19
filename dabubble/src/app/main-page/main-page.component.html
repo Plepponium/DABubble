@@ -54,7 +54,7 @@
                 </app-direct-message-chats>
 
                 <app-dm-thread id="dm-thread" class="thread" *ngIf="dmThreadChatId && currentChannelId"
-                    [chatId]="dmThreadChatId" [channelId]="currentChannelId" [class.open]="dmThreadOpen"
+                    [chatId]="dmThreadChatId" [class.open]="dmThreadOpen"
                     [class.closed]="!dmThreadOpen" (closeThread)="onThreadClosed()"
                     (openProfile)="openProfileOverlay($event)" [class.fullwidth]="!channelOpen"
                     [class.fullwidth-without-menu]="!menuOpen && !channelOpen">

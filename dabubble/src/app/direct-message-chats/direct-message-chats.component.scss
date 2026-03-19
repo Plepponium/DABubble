@@ -284,6 +284,33 @@
   pointer-events: none;
 }
 
+.chat-answered {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  column-gap: 20px;
+  row-gap: 6px;
+}
+
+.answers {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.answer {
+  white-space: nowrap;
+  cursor: pointer;
+  &:hover {
+    font-weight: 600;
+  }
+}
+
+.last-answer {
+  white-space: nowrap;
+}
+
 .chat-reactions {
   display: flex;
   gap: 0.25rem;

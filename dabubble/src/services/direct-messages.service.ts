@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Firestore, collectionData, collection, doc, docData } from '@angular/fire/firestore';
-import { query, where, getDocs, addDoc, serverTimestamp, orderBy, arrayUnion, updateDoc, arrayRemove, getDoc, deleteField } from 'firebase/firestore';
-import { Observable } from 'rxjs';
+import { query, where, getDocs, addDoc, serverTimestamp, orderBy, arrayUnion, updateDoc, arrayRemove, getDoc, deleteField, increment } from 'firebase/firestore';
+import { forkJoin, from, map, Observable, switchMap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class DirectMessageService {
@@ -113,5 +113,90 @@ export class DirectMessageService {
         const q = query(dmCol as any, where('participants', 'array-contains', uid));
         const snap = await getDocs(q);
         return snap.docs.map(d => d.id);
+    }
+
+    // getMessagesWithThreads(dmId: string): Observable<any[]> {
+    //     return collectionData(
+    //         query(collection(this.firestore, `directMessages/${dmId}/messages`))
+    //     ).pipe(
+    //         switchMap(messages => 
+    //             forkJoin(
+    //                 messages.map((msg: any) => 
+    //                     from(
+    //                         // ← Moderne getDocs() Methode
+    //                         collection(this.firestore, `directMessages/${dmId}/threads/${msg.id}/answers`)
+    //                         .ref.get()
+    //                         .then(snapshot => ({
+    //                             ...msg,
+    //                             answersCount: snapshot.size,
+    //                             lastAnswerTime: snapshot.docs[snapshot.docs.length - 1]?.data()?.time
+    //                         }))
+    //                     )
+    //                 )
+    //             )
+    //         )
+    //     );
+    // }
+    // getMessagesWithThreads(dmId: string): Observable<any[]> {
+    //     const messages$ = collectionData(
+    //         query(collection(this.firestore, `directMessages/${dmId}/messages`))
+    //     );
+
+    //     return messages$.pipe(
+    //         switchMap(messages => {
+    //         const answerCounts$ = messages.map(msg =>
+    //             collectionData(
+    //                 query(collection(this.firestore, `directMessages/${dmId}/threads/${msg.id}/answers`))
+    //                 ).pipe(
+    //                 map(answers => ({
+    //                     ...msg,
+    //                     answersCount: answers.length,
+    //                     lastAnswerTime: answers[answers.length - 1]?.time
+    //                 }))
+    //             )
+    //         );
+            
+    //         return forkJoin(answerCounts$);
+    //         })
+    //     );
+    // }
+    // getMessagesWithThreads(dmId: string): Observable<any[]> {
+    //     const messages$ = collectionData(
+    //         query(collection(this.firestore, `directMessages/${dmId}/messages`))
+    //     );
+
+    //     return messages$.pipe(
+    //         map(messages => 
+    //             messages.map(msg => ({
+    //                 ...msg,
+    //                 // ← Fallback: Server-seitig speichern oder später laden
+    //                 answersCount: msg.answersCount || 0, 
+    //                 lastAnswerTime: msg.lastAnswerTime || 0
+    //             }))
+    //         )
+    //     );
+    // }
+
+    // Beim Hinzufügen einer Answer → Message aktualisieren
+    async addAnswerToMessage(dmId: string, msgId: string, answer: any) {
+        // 1. Answer hinzufügen
+        await addDoc(collection(this.firestore, `directMessages/${dmId}/messages/${msgId}/answers`), answer);
+        
+        // 2. Message-Counter erhöhen
+        const messageRef = doc(this.firestore, `directMessages/${dmId}/messages/${msgId}`);
+        await updateDoc(messageRef, {
+            answersCount: increment(1),
+            lastAnswerTime: answer.time
+        });
+    }
+
+    getMessagesWithThreads(dmId: string): Observable<any[]> {
+        return collectionData(
+            query(
+                collection(this.firestore, `directMessages/${dmId}/messages`),
+                orderBy('sentAt', 'asc')
+            ),
+            { idField: 'id' }
+        );
     }
 }

@@ -22,7 +22,8 @@ import { Chat } from '../../models/chat.class';
 import { Answer } from '../../models/answer.class';
 import { ChatWithDetails } from '../../models/chat-with-details.class';
 import { SafeHtml } from '@angular/platform-browser';
-
+import { DirectMessageService } from '../../services/direct-messages.service';
+// import { DmThreadService } from '../../services/dm-thread.service';
 
 @Component({
   selector: 'app-dm-thread',
@@ -39,6 +40,8 @@ export class DmThreadComponent {
   dataService = inject(ChatsDataService);
   threadService = inject(ThreadService);
   threadHelpService = inject(ThreadHelpService);
+  dmService = inject(DirectMessageService);
+  // dmThreadService = inject(DmThreadService);
 
   overlayActive: boolean = false;
   editAnswerEditIndex: number | null = null;
@@ -76,7 +79,9 @@ export class DmThreadComponent {
   editSmileyActive: { [messageId: string]: boolean } = {};
 
   @Input() channelId!: string;
+  @Input() dmId!: string; 
   @Input() chatId!: string;
+  @Input() otherUser?: User;
   @Output() closeThread = new EventEmitter<void>();
   @Output() openProfile = new EventEmitter<User>();
   @Output() answerAdded = new EventEmitter<{ chatId: string, answerTime: number }>();
@@ -103,6 +108,18 @@ export class DmThreadComponent {
       );
     }
   }
+  // ngOnChanges() {
+  //   if (this.chatId && this.dmId) {
+  //     // ← DM-spezifische Daten laden
+  //     this.chat$ = this.dmThreadService.getEnrichedChat(this.dmId, this.chatId);
+  //     this.answers$ = this.dmThreadService.getEnrichedAnswers(this.dmId, this.chatId);
+      
+  //     // Scroll wie bei thread
+  //     this.answers$.pipe(take(1)).subscribe(() => {
+  //       this.dmThreadService.scrollToBottom();
+  //     });
+  //   }
+  // }
 
   @HostListener('window:resize')
   /** Updates responsive state when the window is resized. */

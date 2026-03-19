@@ -208,7 +208,10 @@ export class DirectMessageChatsComponent {
 
   /** Enriches messages with senderName, senderImg, reactions */
   private enrichMessages(messages: any[], users: Record<string, User>): any[] {
-    return messages.map(m => ({ ...m, senderName: users[m.senderId]?.name || 'Unknown', senderImg: users[m.senderId]?.img || 'default-user', reactions: m.reactions || {} }));
+    return messages.map(m => ({ ...m, senderName: users[m.senderId]?.name || 'Unknown', senderImg: users[m.senderId]?.img || 'default-user', reactions: m.reactions || {}, answersCount: m.answersCount || 0,
+      lastAnswerTime: m.lastAnswerTime || 0,
+      isEditing: m.isEditing || false,
+      editedText: m.text }));
   }
 
   /** Subscription to messages$ for latestMessages + scroll */
@@ -403,6 +406,17 @@ export class DirectMessageChatsComponent {
       (user) => this.openUserChat.emit(user),
       (channelId) => this.openChannel.emit(channelId)
     );
+  }
+
+  trackByMessageId(index: number, message: any): string {
+    return message.id;
+  }
+
+  handleOpenThread(chatId: string) {
+    // if (!this.channelId) return;
+    // this.openThread.emit({ channelId: this.channelId, chatId });
+    // this.openDmThread.emit({ channelId: this.channelId, chatId });
+    // this.openDmThread.emit({ dmId: this.dmId!, chatId });
   }
 
   /** Template: Smooth-scroll to message. @param messageId Target ID */

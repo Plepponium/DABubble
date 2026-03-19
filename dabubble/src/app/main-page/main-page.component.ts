@@ -45,6 +45,7 @@ export class MainPageComponent {
   contentOpen = false;
   dataReady = false;
   menuBtnClose = true;
+  dmOpen = false;
   dmThreadOpen = false;
 
   // Overlay states
@@ -69,6 +70,7 @@ export class MainPageComponent {
   currentChannelId?: string;
   activeUserId?: string;
   threadChatId?: string;
+  dmChatId?: string;
   dmThreadChatId?: string;
 
   // Screen sizes
@@ -306,6 +308,16 @@ export class MainPageComponent {
     if (this.isSmallScreen) {
       this.channelOpen = true;
     }
+  }
+
+  openDmThread(event: { dmId: string, chatId: string }) {
+    this.dmChatId = event.chatId;
+    this.dmOpen = true;
+    setTimeout(() => {
+      this.dmThreadOpen = true;
+      this.dmThreadChatId = event.dmId;
+      if (this.isSmallScreen) this.dmOpen = false;
+    }, 300);
   }
 
   /** Opens logout overlay. */
