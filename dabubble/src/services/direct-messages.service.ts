@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Firestore, collectionData, collection, doc, docData } from '@angular/fire/firestore';
 import { query, where, getDocs, addDoc, serverTimestamp, orderBy, arrayUnion, updateDoc, arrayRemove, getDoc, deleteField, increment } from 'firebase/firestore';
-import { forkJoin, from, map, Observable, switchMap } from 'rxjs';
+import { forkJoin, from, map, Observable, of, switchMap, take } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class DirectMessageService {
@@ -115,88 +115,124 @@ export class DirectMessageService {
         return snap.docs.map(d => d.id);
     }
 
-    // getMessagesWithThreads(dmId: string): Observable<any[]> {
-    //     return collectionData(
-    //         query(collection(this.firestore, `directMessages/${dmId}/messages`))
-    //     ).pipe(
-    //         switchMap(messages => 
-    //             forkJoin(
-    //                 messages.map((msg: any) => 
-    //                     from(
-    //                         // ← Moderne getDocs() Methode
-    //                         collection(this.firestore, `directMessages/${dmId}/threads/${msg.id}/answers`)
-    //                         .ref.get()
-    //                         .then(snapshot => ({
-    //                             ...msg,
-    //                             answersCount: snapshot.size,
-    //                             lastAnswerTime: snapshot.docs[snapshot.docs.length - 1]?.data()?.time
-    //                         }))
-    //                     )
-    //                 )
-    //             )
-    //         )
-    //     );
-    // }
-    // getMessagesWithThreads(dmId: string): Observable<any[]> {
-    //     const messages$ = collectionData(
-    //         query(collection(this.firestore, `directMessages/${dmId}/messages`))
-    //     );
 
-    //     return messages$.pipe(
-    //         switchMap(messages => {
-    //         const answerCounts$ = messages.map(msg =>
-    //             collectionData(
-    //                 query(collection(this.firestore, `directMessages/${dmId}/threads/${msg.id}/answers`))
-    //                 ).pipe(
-    //                 map(answers => ({
-    //                     ...msg,
-    //                     answersCount: answers.length,
-    //                     lastAnswerTime: answers[answers.length - 1]?.time
-    //                 }))
-    //             )
-    //         );
-            
-    //         return forkJoin(answerCounts$);
-    //         })
-    //     );
-    // }
-    // getMessagesWithThreads(dmId: string): Observable<any[]> {
-    //     const messages$ = collectionData(
-    //         query(collection(this.firestore, `directMessages/${dmId}/messages`))
-    //     );
 
-    //     return messages$.pipe(
-    //         map(messages => 
-    //             messages.map(msg => ({
-    //                 ...msg,
-    //                 // ← Fallback: Server-seitig speichern oder später laden
-    //                 answersCount: msg.answersCount || 0, 
-    //                 lastAnswerTime: msg.lastAnswerTime || 0
-    //             }))
-    //         )
-    //     );
-    // }
+    async addAnswerToMessage(dmId: string, msgId: string, answer: { text: string; time: number; senderId: string }) {
+        // 1. Answer in Subcollection schreiben
+        await addDoc(
+            collection(this.firestore, `dmChats/${dmId}/messages/${msgId}/answers`),
+            answer
+        );
 
-    // Beim Hinzufügen einer Answer → Message aktualisieren
-    async addAnswerToMessage(dmId: string, msgId: string, answer: any) {
-        // 1. Answer hinzufügen
-        await addDoc(collection(this.firestore, `directMessages/${dmId}/messages/${msgId}/answers`), answer);
-        
-        // 2. Message-Counter erhöhen
-        const messageRef = doc(this.firestore, `directMessages/${dmId}/messages/${msgId}`);
-        await updateDoc(messageRef, {
+        // 2. Message Counter + lastAnswerTime im Message-Dokument aktualisieren
+        const messageRef = doc(this.firestore, `dmChats/${dmId}/messages/${msgId}`);
+        await updateDoc(messageRef as any, {
             answersCount: increment(1),
             lastAnswerTime: answer.time
         });
     }
 
+    getAnswersForMessage(dmId: string, msgId: string): Observable<any[]> {
+        const answersCol = collection(this.firestore, `dmChats/${dmId}/messages/${msgId}/answers`);
+        const q = query(answersCol as any, orderBy('time', 'asc'));
+        return collectionData(q as any, { idField: 'id' }) as Observable<any[]>;
+    }
+
+    // getMessagesWithThreads(dmId: string): Observable<any[]> {
+    //     return collectionData(
+    //         query(
+    //             collection(this.firestore, `directMessages/${dmId}/messages`),
+    //             orderBy('sentAt', 'asc')
+    //         ),
+    //         { idField: 'id' }
+    //     );
+    // }
+    // getMessagesWithThreads(dmId: string): Observable<any[]> {
+    //     return collectionData(
+    //         query(
+    //             collection(this.firestore, `dmChats/${dmId}/messages`) as any,
+    //             orderBy('sentAt', 'asc')
+    //         ),
+    //         { idField: 'id' }
+    //     ) as Observable<any[]>;
+    // }
+    // getMessagesWithThreads(dmId: string): Observable<any[]> {
+    //     const messages$ = collectionData(
+    //         query(
+    //         collection(this.firestore, `dmChats/${dmId}/messages`) as any,
+    //         orderBy('sentAt', 'asc')
+    //         ),
+    //         { idField: 'id' }
+    //     ) as Observable<any[]>;
+
+    //     return messages$.pipe(
+    //         switchMap(messages => {
+    //         if (!messages.length) return of([] as any[]);
+
+    //         // 2. Für JEDEN Message die Answers-Subcollection laden
+    //         const messageWithCounts$ = messages.map(msg => 
+    //             collectionData(
+    //             query(
+    //                 collection(this.firestore, `dmChats/${dmId}/messages/${msg.id}/answers`) as any,
+    //                 orderBy('time', 'asc')
+    //             )
+    //             ).pipe(
+    //             map((answers: any[]) => {
+    //                 // console.log(`🔍 ${msg.id}: ${answers.length} answers gefunden!`);
+    //                 return {
+    //                     ...msg,
+    //                     answersCount: answers.length,
+    //                     lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null
+    //                 };
+    //             })
+    //             )
+    //         );
+
+    //         return forkJoin(messageWithCounts$);
+    //         })
+    //     );
+    // }
     getMessagesWithThreads(dmId: string): Observable<any[]> {
-        return collectionData(
+        const messages$ = collectionData(
             query(
-                collection(this.firestore, `directMessages/${dmId}/messages`),
+                collection(this.firestore, `dmChats/${dmId}/messages`) as any,
                 orderBy('sentAt', 'asc')
             ),
             { idField: 'id' }
+        ) as Observable<any[]>;
+
+        return messages$.pipe(
+            switchMap(messages => {
+                if (!messages.length) return of([] as any[]);
+
+                const messageWithCounts$ = messages.map(msg => 
+                    collectionData(
+                        query(
+                            collection(this.firestore, `dmChats/${dmId}/messages/${msg.id}/answers`) as any,
+                            orderBy('time', 'asc')
+                        ),
+                        // { idField: 'id' }
+                    ).pipe(
+                        take(1),  // ← EINMALIGER SNAPSHOT, dann complete!
+                        map((answers: any[]) => {
+                            // console.log(`🔍 ${msg.id}: ${answers.length} answers gefunden!`);
+                            const answersCount = answers.length;
+                            const lastAnswerTime = answers.length > 0 
+                            ? (answers[answers.length - 1] as any).time 
+                            : null;
+                            
+                            return {
+                            ...msg,
+                            answersCount,
+                            lastAnswerTime
+                            };
+                        })
+                    )
+                );
+
+                return forkJoin(messageWithCounts$);
+            })
         );
     }
+
 }

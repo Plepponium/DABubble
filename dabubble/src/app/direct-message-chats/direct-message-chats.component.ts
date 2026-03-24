@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild, inject, Input, SimpleChanges, Output, EventEmitter, ViewChildren, QueryList } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { combineLatest, map, Observable, shareReplay, Subscription, takeUntil } from 'rxjs';
+import { combineLatest, map, Observable, shareReplay, Subscription, takeUntil, tap } from 'rxjs';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { User } from '../../models/user.class';
 import { UserService } from '../../services/user.service';
@@ -30,7 +30,7 @@ export class DirectMessageChatsComponent {
   @Output() openProfile = new EventEmitter<User>();
   @Output() openUserChat = new EventEmitter<User>();
   @Output() openChannel = new EventEmitter<string>();
-
+  @Output() openThread = new EventEmitter<{ dmId: string; chatId: string }>();
 
   dmId?: string;
   currentUser?: User;
@@ -193,10 +193,22 @@ export class DirectMessageChatsComponent {
   }
 
   /** Setup messages$ with enrichMessages pipe */
+  // private setupMessagesObservable(): void {
+  //   if (!this.dmId || !this.users$) return;
+  //   const rawMessages$ = this.dmService.getMessages(this.dmId);
+  //   this.messages$ = combineLatest([rawMessages$, this.users$]).pipe(map(([messages, users]) => this.enrichMessages(messages, users)));
+  //   this.subscribeToMessages();
+  // }
   private setupMessagesObservable(): void {
     if (!this.dmId || !this.users$) return;
-    const rawMessages$ = this.dmService.getMessages(this.dmId);
-    this.messages$ = combineLatest([rawMessages$, this.users$]).pipe(map(([messages, users]) => this.enrichMessages(messages, users)));
+    const rawMessages$ = this.dmService.getMessagesWithThreads(this.dmId);
+    // this.messages$ = combineLatest([rawMessages$, this.users$]).pipe(
+    //   map(([messages, users]) => this.enrichMessages(messages, users))
+    // );
+    this.messages$ = combineLatest([rawMessages$, this.users$]).pipe(
+      map(([messages, users]) => this.enrichMessages(messages, users)),
+      // tap(final => console.log('🔍 messages$ emit:', final.map(m => ({id: m.id, answersCount: m.answersCount}))))
+    );
     this.subscribeToMessages();
   }
 
@@ -207,11 +219,35 @@ export class DirectMessageChatsComponent {
   }
 
   /** Enriches messages with senderName, senderImg, reactions */
+  // private enrichMessages(messages: any[], users: Record<string, User>): any[] {
+  //   return messages.map(m => ({ ...m, senderName: users[m.senderId]?.name || 'Unknown', senderImg: users[m.senderId]?.img || 'default-user', reactions: m.reactions || {}, answersCount: m.answersCount || 0,
+  //     lastAnswerTime: m.lastAnswerTime || 0,
+  //     isEditing: m.isEditing || false,
+  //     editedText: m.text }));
+  // }
+  // private enrichMessages(messages: any[], users: Record<string, User>): any[] {
+  //   return messages.map(m => ({
+  //     ...m,
+  //     senderName: users[m.senderId]?.name || 'Unknown',
+  //     senderImg: users[m.senderId]?.img || 'default-user',
+  //     reactions: m.reactions || {},
+  //     answersCount: m.answersCount || 0,
+  //     lastAnswerTime: m.lastAnswerTime || null
+  //   }));
+  // }
   private enrichMessages(messages: any[], users: Record<string, User>): any[] {
-    return messages.map(m => ({ ...m, senderName: users[m.senderId]?.name || 'Unknown', senderImg: users[m.senderId]?.img || 'default-user', reactions: m.reactions || {}, answersCount: m.answersCount || 0,
-      lastAnswerTime: m.lastAnswerTime || 0,
-      isEditing: m.isEditing || false,
-      editedText: m.text }));
+    const enriched = messages.map(m => {
+      const result = {
+        ...m,
+        senderName: users[m.senderId]?.name || 'Unknown',
+        answersCount: m.answersCount || 0,  // ← Hier sollte der Wert stehen
+        lastAnswerTime: m.lastAnswerTime || null
+      };
+      // console.log(`🔍 enrich ${m.id}: raw=${m.answersCount}, enriched=${result.answersCount}`);
+      return result;
+    });
+    // console.log('🔍 Final enriched:', enriched.map(m => ({id: m.id, answersCount: m.answersCount})));
+    return enriched;
   }
 
   /** Subscription to messages$ for latestMessages + scroll */
@@ -412,11 +448,16 @@ export class DirectMessageChatsComponent {
     return message.id;
   }
 
-  handleOpenThread(chatId: string) {
-    // if (!this.channelId) return;
-    // this.openThread.emit({ channelId: this.channelId, chatId });
-    // this.openDmThread.emit({ channelId: this.channelId, chatId });
-    // this.openDmThread.emit({ dmId: this.dmId!, chatId });
+  // handleOpenThread(chatId: string) {
+  //   // if (!this.channelId) return;
+  //   // this.openThread.emit({ channelId: this.channelId, chatId });
+  //   // this.openDmThread.emit({ channelId: this.channelId, chatId });
+  //   // this.openDmThread.emit({ dmId: this.dmId!, chatId });
+  // }
+  handleOpenThread(messageId: string): void {
+    console.log(`🔍 Open thread for messageId: ${messageId}, dmId: ${this.dmId}`);
+    if (!this.dmId) return;
+    this.openThread.emit({ dmId: this.dmId, chatId: messageId });
   }
 
   /** Template: Smooth-scroll to message. @param messageId Target ID */

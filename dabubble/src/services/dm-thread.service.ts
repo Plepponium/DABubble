@@ -6,11 +6,13 @@ import { User } from '../models/user.class';
 import { Chat } from '../models/chat.class';
 import { Answer } from '../models/answer.class';
 import { RawReactionsMap, TransformedReaction } from '../models/reaction.types';
+import { DirectMessageService } from './direct-messages.service';
 
 @Injectable({ providedIn: 'root' })
 export class ThreadService {
     private channelService = inject(ChannelService);
     private userService = inject(UserService);
+    private dmService = inject(DirectMessageService);
 
     /** Scrolls the thread history container to the bottom after a short delay. */
     scrollToBottom() {
@@ -61,44 +63,88 @@ export class ThreadService {
     }
 
     /** Retrieves a chat enriched with user metadata and transformed reactions. */
-    getEnrichedChat(channelId: string, chatId: string, participants$: Observable<User[]>, currentUserId: string): Observable<Chat | undefined> {
-        return this.channelService.getChatsForChannel(channelId).pipe(
-            switchMap(chats =>
-                participants$.pipe(
-                    map(users => {
-                        const chat = chats.find(c => c.id === chatId);
-                        if (!chat) return undefined;
-                        const user = users.find(u => u.uid === chat.user);
-                        const isUserMissing = !user;
+    // getEnrichedChat(channelId: string, chatId: string, participants$: Observable<User[]>, currentUserId: string): Observable<Chat | undefined> {
+    //     return this.channelService.getChatsForChannel(channelId).pipe(
+    //         switchMap(chats =>
+    //             participants$.pipe(
+    //                 map(users => {
+    //                     const chat = chats.find(c => c.id === chatId);
+    //                     if (!chat) return undefined;
+    //                     const user = users.find(u => u.uid === chat.user);
+    //                     const isUserMissing = !user;
 
+    //                     return {
+    //                         ...chat,
+    //                         userName: isUserMissing ? 'Ehemaliger Nutzer' : user.name,
+    //                         userImg: user?.img ?? 'default-user',
+    //                         isUserMissing,
+    //                         reactionArray: this.transformReactionsToArray(chat.reactions, users, currentUserId)
+    //                     };
+    //                 })
+    //             )
+    //         )
+    //     );
+    // }
+    getEnrichedChat(dmId: string, msgId: string, users$: Observable<Record<string, User>>, currentUserId: string): Observable<any | undefined> {
+        return this.dmService.getMessages(dmId).pipe(
+            switchMap(messages =>
+                users$.pipe(
+                    map(usersMap => {
+                        const msg = messages.find(m => m.id === msgId);
+                        if (!msg) return undefined;
+                        const user = usersMap[msg.senderId];
+                        const isMissing = !user;
                         return {
-                            ...chat,
-                            userName: isUserMissing ? 'Ehemaliger Nutzer' : user.name,
+                            ...msg,
+                            userName: isMissing ? 'Ehemaliger Nutzer' : user.name,
                             userImg: user?.img ?? 'default-user',
-                            isUserMissing,
-                            reactionArray: this.transformReactionsToArray(chat.reactions, users, currentUserId)
+                            isUserMissing: isMissing,
+                            // optional: reactionArray analog zu ThreadService
                         };
                     })
                 )
             )
         );
     }
+    
 
     /** Retrieves all answers for a chat enriched with user metadata and reactions. */
-    getEnrichedAnswers(channelId: string, chatId: string, participants$: Observable<User[]>, currentUserId: string): Observable<Answer[]> {
-        return this.channelService.getAnswersForChat(channelId, chatId).pipe(
+    // getEnrichedAnswers(channelId: string, chatId: string, participants$: Observable<User[]>, currentUserId: string): Observable<Answer[]> {
+    //     return this.channelService.getAnswersForChat(channelId, chatId).pipe(
+    //         switchMap(answers =>
+    //             participants$.pipe(
+    //                 map(users =>
+    //                     answers.map(answer => {
+    //                         const user = users.find(u => u.uid === answer.user);
+    //                         const isUserMissing = !user;
+    //                         return {
+    //                             ...answer,
+    //                             userName: isUserMissing ? 'Ehemaliger Nutzer' : user.name,
+    //                             userImg: user?.img ?? 'default-user',
+    //                             isUserMissing,
+    //                             reactionArray: this.transformReactionsToArray(answer.reactions, users, currentUserId)
+    //                         };
+    //                     })
+    //                 )
+    //             )
+    //         )
+    //     );
+    // }
+    getEnrichedAnswers(dmId: string, msgId: string, users$: Observable<Record<string, User>>, currentUserId: string): Observable<any[]> {
+        return this.dmService.getAnswersForMessage(dmId, msgId).pipe(
             switchMap(answers =>
-                participants$.pipe(
-                    map(users =>
+                users$.pipe(
+                    map(usersMap =>
                         answers.map(answer => {
-                            const user = users.find(u => u.uid === answer.user);
-                            const isUserMissing = !user;
+                            const user = usersMap[answer.senderId];
+                            const isMissing = !user;
                             return {
                                 ...answer,
-                                userName: isUserMissing ? 'Ehemaliger Nutzer' : user.name,
+                                userName: isMissing ? 'Ehemaliger Nutzer' : user.name,
                                 userImg: user?.img ?? 'default-user',
-                                isUserMissing,
-                                reactionArray: this.transformReactionsToArray(answer.reactions, users, currentUserId)
+                                isUserMissing: isMissing,
+                                // optional: reactionArray für Answer
+                                // reactionArray: this.transformReactionsToArray(answer.reactions, users, currentUserId)
                             };
                         })
                     )
@@ -106,6 +152,7 @@ export class ThreadService {
             )
         );
     }
+
 
     /** Converts a raw reactions map into a sorted array with metadata and user context. */
     transformReactionsToArray(reactionsMap: RawReactionsMap | undefined, participants: User[], currentUserId: string): TransformedReaction[] {
@@ -302,26 +349,44 @@ export class ThreadService {
     }
 
     /** Submits a new answer to a chat and returns submission status and timestamp. */
+    // async submitAnswer(
+    //     channelId: string,
+    //     chatId: string,
+    //     messageText: string,
+    //     currentUserId: string
+    // ): Promise<{ success: boolean; answerTime?: number }> {
+    //     const trimmed = messageText.trim();
+    //     if (!trimmed) return { success: false };
+
+    //     const answer = {
+    //         message: trimmed,
+    //         time: Math.floor(Date.now() / 1000),
+    //         user: currentUserId
+    //     };
+
+    //     try {
+    //         await this.channelService.addAnswerToChat(channelId, chatId, answer);
+    //         return { success: true, answerTime: answer.time };
+    //     } catch (error) {
+    //         console.error('Fehler beim Senden der Antwort:', error);
+    //         return { success: false };
+    //     }
+    // }
     async submitAnswer(
-        channelId: string,
-        chatId: string,
-        messageText: string,
+        dmId: string,
+        msgId: string,
+        text: string,
         currentUserId: string
     ): Promise<{ success: boolean; answerTime?: number }> {
-        const trimmed = messageText.trim();
+        const trimmed = text.trim();
         if (!trimmed) return { success: false };
-
-        const answer = {
-            message: trimmed,
-            time: Math.floor(Date.now() / 1000),
-            user: currentUserId
-        };
-
+        const time = Math.floor(Date.now() / 1000);
+        const answer = { text: trimmed, time, senderId: currentUserId };
         try {
-            await this.channelService.addAnswerToChat(channelId, chatId, answer);
-            return { success: true, answerTime: answer.time };
-        } catch (error) {
-            console.error('Fehler beim Senden der Antwort:', error);
+            await this.dmService.addAnswerToMessage(dmId, msgId, answer);
+            return { success: true, answerTime: time };
+        } catch (e) {
+            console.error('Fehler beim Senden der DM-Antwort:', e);
             return { success: false };
         }
     }

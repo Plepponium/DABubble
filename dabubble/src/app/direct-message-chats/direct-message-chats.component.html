@@ -72,10 +72,15 @@
                                                 (click)="onMentionClick($event)">
                                             </div>
 
+                                            <!-- <div style="background: yellow; padding: 4px; font-size: 12px; margin: 2px 0;">
+                                                DEBUG {{ m.id }}: answersCount={{ m.answersCount | json }} | 
+                                                type={{ m.answersCount === undefined ? 'undefined' : typeof m.answersCount }} | 
+                                                >0={{ m.answersCount > 0 }}
+                                            </div> -->
                                             <div class="chat-answered" [ngClass]="{'right': m.senderId === currentUser?.uid}"
                                                 [ngClass]="{'has-answers': m.answersCount && m.answersCount > 0}">
                                                 
-                                                <div class="answers" *ngIf="m.answersCount && m.answersCount > 0">
+                                                <div class="answers" *ngIf="m.answersCount && m.answersCount >= 0">
                                                     <div (click)="handleOpenThread(m.id)" class="answer t-purple">
                                                         {{ m.answersCount }} {{ m.answersCount === 1 ? 'Antwort' : 'Antworten' }}
                                                     </div>
@@ -83,7 +88,7 @@
                                                         Letzte Antwort {{ m.lastAnswerTime ? (m.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}
                                                     </div>
                                                 </div>
-
+                                                
                                                 <div class="reactions">
                                                     <div class="reaction-btns">
                                                         <div class="reaction-btn"
