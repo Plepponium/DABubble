@@ -49,15 +49,16 @@
                 </app-thread>
 
                 <app-direct-message-chats #dmChats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
+                    [dmChannelId]="currentDmChannelId" (openDmThread)="openDmThread($event)"
                     (openProfile)="openProfileOverlay($event)" (openUserChat)="openUserChat($event)"
                     (openChannel)="openChannel($event)" [participantChannels]="participantChannels">
                 </app-direct-message-chats>
 
-                <app-dm-thread id="dm-thread" class="thread" *ngIf="dmThreadChatId && currentChannelId"
-                    [chatId]="dmThreadChatId" [class.open]="dmThreadOpen"
-                    [class.closed]="!dmThreadOpen" (closeThread)="onThreadClosed()"
-                    (openProfile)="openProfileOverlay($event)" [class.fullwidth]="!channelOpen"
-                    [class.fullwidth-without-menu]="!menuOpen && !channelOpen">
+                <app-dm-thread id="dm-thread" class="thread" *ngIf="dmThreadChatId && currentDmChannelId"
+                    [dmChannelId]="currentDmChannelId" [class.open]="dmThreadOpen"
+                    [class.closed]="!dmThreadOpen" (closeDmThread)="onDmThreadClosed()"
+                    (openProfile)="openProfileOverlay($event)" [class.fullwidth]="!dmChannelOpen"
+                    [class.fullwidth-without-menu]="!menuOpen && !dmChannelOpen">
                 </app-dm-thread>
 
                 <app-new-message class="new-message" *ngIf="newMessageOpen" (openChannel)="openChannel($event)"

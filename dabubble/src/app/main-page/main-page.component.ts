@@ -45,7 +45,7 @@ export class MainPageComponent {
   contentOpen = false;
   dataReady = false;
   menuBtnClose = true;
-  dmOpen = false;
+  dmChannelOpen = false;
   dmThreadOpen = false;
 
   // Overlay states
@@ -70,7 +70,8 @@ export class MainPageComponent {
   currentChannelId?: string;
   activeUserId?: string;
   threadChatId?: string;
-  dmChatId?: string;
+  currentDmChannelId?: string;
+  // dmChatId?: string;
   dmThreadChatId?: string;
 
   // Screen sizes
@@ -186,6 +187,7 @@ export class MainPageComponent {
     this.threadOpen = false;
     this.newMessageOpen = false;
     this.currentChannelId = undefined;
+    // this.this.currentChannelId = undefined;
     this.activeUserId = undefined;
   }
 
@@ -311,13 +313,23 @@ export class MainPageComponent {
   }
 
   openDmThread(event: { dmId: string, chatId: string }) {
-    this.dmChatId = event.chatId;
-    this.dmOpen = true;
+    console.log('🔍 openDmThread event:', event);
+    this.currentDmChannelId = event.dmId;
+    this.dmChannelOpen = true;
     setTimeout(() => {
       this.dmThreadOpen = true;
-      this.dmThreadChatId = event.dmId;
-      if (this.isSmallScreen) this.dmOpen = false;
+      this.dmThreadChatId = event.chatId;
+      if (this.isSmallScreen) this.dmChannelOpen = false;
     }, 300);
+  }
+
+  /** Handles thread close event. */
+  onDmThreadClosed() {
+    this.dmThreadOpen = false;
+
+    if (this.isSmallScreen) {
+      this.dmChannelOpen = true;
+    }
   }
 
   /** Opens logout overlay. */

@@ -33,7 +33,7 @@ import { DirectMessageService } from '../../services/direct-messages.service';
 })
 export class DmThreadComponent {
   @ViewChild('answerInput', { static: false }) answerInput!: ElementRef<HTMLTextAreaElement>;
-  channelService = inject(ChannelService);
+  // channelService = inject(ChannelService);
   userService = inject(UserService);
   logoutService = inject(LogoutService);
   uiService = inject(ChatsUiService);
@@ -79,10 +79,10 @@ export class DmThreadComponent {
   editSmileyActive: { [messageId: string]: boolean } = {};
 
   @Input() channelId!: string;
-  @Input() dmId!: string; 
+  @Input() dmChannelId!: string; 
   @Input() chatId!: string;
   @Input() otherUser?: User;
-  @Output() closeThread = new EventEmitter<void>();
+  @Output() closeDmThread = new EventEmitter<void>();
   @Output() openProfile = new EventEmitter<User>();
   @Output() answerAdded = new EventEmitter<{ chatId: string, answerTime: number }>();
 
@@ -258,7 +258,7 @@ export class DmThreadComponent {
 
   /** Emits an event to close the thread view. */
   handleCloseThread() {
-    this.closeThread.emit();
+    this.closeDmThread.emit();
   }
 
   /** Submits a new answer to the thread and scrolls to the latest message. */

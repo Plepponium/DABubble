@@ -81,7 +81,7 @@
                                                 [ngClass]="{'has-answers': m.answersCount && m.answersCount > 0}">
                                                 
                                                 <div class="answers" *ngIf="m.answersCount && m.answersCount >= 0">
-                                                    <div (click)="handleOpenThread(m.id)" class="answer t-purple">
+                                                    <div (click)="handleOpenDmThread(m.id)" class="answer t-purple">
                                                         {{ m.answersCount }} {{ m.answersCount === 1 ? 'Antwort' : 'Antworten' }}
                                                     </div>
                                                     <div class="last-answer font-14 t-gray hide-small">

@@ -27,12 +27,12 @@ export class DirectMessageChatsComponent {
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
   @Input() userId!: string;
   @Input() participantChannels: Channel[] = [];
+  @Input() dmChannelId?: string;
   @Output() openProfile = new EventEmitter<User>();
   @Output() openUserChat = new EventEmitter<User>();
   @Output() openChannel = new EventEmitter<string>();
-  @Output() openThread = new EventEmitter<{ dmId: string; chatId: string }>();
+  @Output() openDmThread = new EventEmitter<{ dmId: string; chatId: string }>();
 
-  dmId?: string;
   currentUser?: User;
   otherUser?: User;
   messages$?: Observable<any[]>;
@@ -117,7 +117,7 @@ export class DirectMessageChatsComponent {
   /** Fetches/creates DM-ID for currentUser + partner */
   private async initializeDmId(): Promise<void> {
     if (!this.currentUser) return;
-    this.dmId = await this.dmService.getOrCreateDmId(this.currentUser!.uid, this.userId);
+    this.dmChannelId = await this.dmService.getOrCreateDmId(this.currentUser!.uid, this.userId);
   }
 
   /** Creates users$ observable with user map for mentions */
@@ -200,8 +200,8 @@ export class DirectMessageChatsComponent {
   //   this.subscribeToMessages();
   // }
   private setupMessagesObservable(): void {
-    if (!this.dmId || !this.users$) return;
-    const rawMessages$ = this.dmService.getMessagesWithThreads(this.dmId);
+    if (!this.dmChannelId || !this.users$) return;
+    const rawMessages$ = this.dmService.getMessagesWithThreads(this.dmChannelId);
     // this.messages$ = combineLatest([rawMessages$, this.users$]).pipe(
     //   map(([messages, users]) => this.enrichMessages(messages, users))
     // );
@@ -280,17 +280,17 @@ export class DirectMessageChatsComponent {
   /** Sends messageText, clears input, scrolls */
   async sendMessage(): Promise<void> {
     const text = (this.messageText || '').trim();
-    if (!text || !this.dmId || !this.currentUser) return;
-    await this.dmService.sendMessage(this.dmId, { senderId: this.currentUser!.uid, text });
+    if (!text || !this.dmChannelId || !this.currentUser) return;
+    await this.dmService.sendMessage(this.dmChannelId, { senderId: this.currentUser!.uid, text });
     this.messageText = '';
     this.utils.scrollToBottom();
   }
 
   /** Updates message text server-side. @param event {messageId, newText} */
   async updateMessageText(event: { messageId: string; newText: string }): Promise<void> {
-    if (!this.dmId || !event.messageId || !event.newText.trim()) return;
+    if (!this.dmChannelId || !event.messageId || !event.newText.trim()) return;
     try {
-      await this.dmService.updateMessageText(this.dmId, event.messageId, event.newText.trim());
+      await this.dmService.updateMessageText(this.dmChannelId, event.messageId, event.newText.trim());
     } catch (err) {
       console.error('Error updating message:', err);
     }
@@ -298,9 +298,9 @@ export class DirectMessageChatsComponent {
 
   /** Adds reaction to message. @param event {messageId, icon} */
   async addReaction(event: { messageId: string; icon: string }): Promise<void> {
-    if (!event?.messageId || !this.currentUser || !this.dmId) return;
+    if (!event?.messageId || !this.currentUser || !this.dmChannelId) return;
     try {
-      await this.dmService.addReactionToMessage(this.dmId, event.messageId, event.icon, this.currentUser.uid);
+      await this.dmService.addReactionToMessage(this.dmChannelId, event.messageId, event.icon, this.currentUser.uid);
       this.activeReactionDialog = { messageId: null, source: null };
     } catch (err) {
       console.error('Error adding reaction:', err);
@@ -314,9 +314,9 @@ export class DirectMessageChatsComponent {
 
   /** Toggle reaction for message (add/remove). @param message Message @param type Reaction type */
   async onReactionClick(message: any, type: string): Promise<void> {
-    if (!this.dmId || !this.currentUser || !message?.id) return;
+    if (!this.dmChannelId || !this.currentUser || !message?.id) return;
     try {
-      await this.dmService.reactToMessageToggle(this.dmId, message.id, type, this.currentUser.uid);
+      await this.dmService.reactToMessageToggle(this.dmChannelId, message.id, type, this.currentUser.uid);
     } catch (err) {
       console.error('Reaction error:', err);
     }
@@ -454,10 +454,10 @@ export class DirectMessageChatsComponent {
   //   // this.openDmThread.emit({ channelId: this.channelId, chatId });
   //   // this.openDmThread.emit({ dmId: this.dmId!, chatId });
   // }
-  handleOpenThread(messageId: string): void {
-    console.log(`🔍 Open thread for messageId: ${messageId}, dmId: ${this.dmId}`);
-    if (!this.dmId) return;
-    this.openThread.emit({ dmId: this.dmId, chatId: messageId });
+  handleOpenDmThread(messageId: string): void {
+    // console.log(`🔍 Open thread for messageId: ${messageId}, dmId: ${this.dmId}`);
+    if (!this.dmChannelId) return;
+    this.openDmThread.emit({ dmId: this.dmChannelId, chatId: messageId });
   }
 
   /** Template: Smooth-scroll to message. @param messageId Target ID */
