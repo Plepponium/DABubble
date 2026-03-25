@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { firstValueFrom, map, Observable, of, switchMap, take } from 'rxjs';
+import { firstValueFrom, map, Observable, of, Subject, switchMap, take } from 'rxjs';
 import { ChannelService } from './channel.service';
 import { UserService } from './user.service';
 import { User } from '../models/user.class';
@@ -9,10 +9,12 @@ import { RawReactionsMap, TransformedReaction } from '../models/reaction.types';
 import { DirectMessageService } from './direct-messages.service';
 
 @Injectable({ providedIn: 'root' })
-export class ThreadService {
+export class DmThreadService {
     private channelService = inject(ChannelService);
     private userService = inject(UserService);
     private dmService = inject(DirectMessageService);
+
+    private answerAddedSubject = new Subject<{ dmChatId: string; answerTime: number }>();
 
     /** Scrolls the thread history container to the bottom after a short delay. */
     scrollToBottom() {
@@ -419,5 +421,10 @@ export class ThreadService {
             console.error('Fehler beim Speichern der bearbeiteten Antwort:', error);
             return undefined;
         }
+    }
+
+    /** Loads and enriches a chat with user data, reactions, and answers. */
+    notifyAnswerAdded(event: { dmChatId: string; answerTime: number }) {
+        this.answerAddedSubject.next(event);
     }
 }   

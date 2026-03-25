@@ -71,7 +71,6 @@ export class MainPageComponent {
   activeUserId?: string;
   threadChatId?: string;
   currentDmChannelId?: string;
-  // dmChatId?: string;
   dmThreadChatId?: string;
 
   // Screen sizes
@@ -151,6 +150,7 @@ export class MainPageComponent {
     });
   }
 
+  /* Gets channels where current user is a participant. */
   get participantChannels(): Channel[] {
     return this.allChannels.filter(c =>
       c.participants?.includes(this.currentUser?.uid || '')
@@ -185,9 +185,10 @@ export class MainPageComponent {
     this.channelOpen = false;
     this.userChatOpen = false;
     this.threadOpen = false;
+    this.dmThreadOpen = false;
     this.newMessageOpen = false;
     this.currentChannelId = undefined;
-    // this.this.currentChannelId = undefined;
+    this.currentDmChannelId = undefined;
     this.activeUserId = undefined;
   }
 
@@ -312,6 +313,7 @@ export class MainPageComponent {
     }
   }
 
+  /** Opens DM thread chat. */
   openDmThread(event: { dmId: string, chatId: string }) {
     console.log('🔍 openDmThread event:', event);
     this.currentDmChannelId = event.dmId;

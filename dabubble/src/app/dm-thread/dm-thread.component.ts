@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
 import { SmileyOverlayComponent } from '../shared/smiley-overlay/smiley-overlay.component';
-import { ChannelService } from '../../services/channel.service';
+// import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 import { LogoutService } from '../../services/logout.service';
 import { ChatsUiService } from '../../services/chats-ui.service';
@@ -23,7 +23,7 @@ import { Answer } from '../../models/answer.class';
 import { ChatWithDetails } from '../../models/chat-with-details.class';
 import { SafeHtml } from '@angular/platform-browser';
 import { DirectMessageService } from '../../services/direct-messages.service';
-// import { DmThreadService } from '../../services/dm-thread.service';
+import { DmThreadService } from '../../services/dm-thread.service';
 
 @Component({
   selector: 'app-dm-thread',
@@ -41,7 +41,7 @@ export class DmThreadComponent {
   threadService = inject(ThreadService);
   threadHelpService = inject(ThreadHelpService);
   dmService = inject(DirectMessageService);
-  // dmThreadService = inject(DmThreadService);
+  dmThreadService = inject(DmThreadService);
 
   overlayActive: boolean = false;
   editAnswerEditIndex: number | null = null;
@@ -62,7 +62,7 @@ export class DmThreadComponent {
   newAnswer: string = '';
   mentionCaretIndex: number | null = null;
   cursorPos: number = 0;
-  showAllReactionsForChat: { [chatId: string]: boolean } = {};
+  showAllReactionsForChat: { [dmChatId: string]: boolean } = {};
   showAllReactionsForAnswer: { [answerId: string]: boolean } = {};
 
   channelName$: Observable<string> = of('');
@@ -78,13 +78,14 @@ export class DmThreadComponent {
   allSmileys = reactionIcons;
   editSmileyActive: { [messageId: string]: boolean } = {};
 
-  @Input() channelId!: string;
+  // @Input() channelId!: string;
   @Input() dmChannelId!: string; 
-  @Input() chatId!: string;
+  // @Input() chatId!: string;
+  @Input() dmChatId!: string;
   @Input() otherUser?: User;
   @Output() closeDmThread = new EventEmitter<void>();
   @Output() openProfile = new EventEmitter<User>();
-  @Output() answerAdded = new EventEmitter<{ chatId: string, answerTime: number }>();
+  @Output() answerAdded = new EventEmitter<{ dmChatId: string, answerTime: number }>();
 
   /** Initializes the component, sets responsive state, and loads initial channel and user data. */
   ngOnInit() {
@@ -94,14 +95,14 @@ export class DmThreadComponent {
     setTimeout(() => this.loadChannelWithId(), 100);
   }
 
-  /** Handles input changes and reloads chat and answers when channelId or chatId changes. */
+  /** Handles input changes and reloads chat and answers when dmChannelId or chatId changes. */
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['chatId'] && !changes['chatId'].firstChange) {
-      this.chat$ = this.threadService.getEnrichedChat(this.channelId, this.chatId, this.participants$, this.currentUserId);
-      this.answers$ = this.threadService.getEnrichedAnswers(this.channelId, this.chatId, this.participants$, this.currentUserId);
+    if (changes['dmChatId'] && !changes['dmChatId'].firstChange) {
+      this.chat$ = this.threadService.getEnrichedChat(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
+      this.answers$ = this.threadService.getEnrichedAnswers(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
       this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => { this.threadService.scrollToBottom(); });
     }
-    if (changes['channelId'] && !changes['channelId'].firstChange) {
+    if (changes['dmChannelId'] && !changes['dmChannelId'].firstChange) {
       this.getCurrentUserAndChannels();
       setTimeout(() =>
         this.loadChannelWithId(), 100,
@@ -157,14 +158,14 @@ export class DmThreadComponent {
     });
   }
 
-  /** Loads channel details, participants, chat, and answers for the current channelId. */
+  /** Loads channel details, participants, chat, and answers for the current dmChannelId. */
   private loadChannelWithId() {
-    this.threadService.loadChannelWithId(this.channelId).subscribe(({ channelName$, participants$ }) => {
+    this.threadService.loadChannelWithId(this.dmChannelId).subscribe(({ channelName$, participants$ }) => {
       this.channelName$ = channelName$;
       this.participants$ = participants$;
       this.subscribeToParticipants();
-      this.chat$ = this.threadService.getEnrichedChat(this.channelId, this.chatId, this.participants$, this.currentUserId);
-      this.answers$ = this.threadService.getEnrichedAnswers(this.channelId, this.chatId, this.participants$, this.currentUserId);
+      this.chat$ = this.threadService.getEnrichedChat(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
+      this.answers$ = this.threadService.getEnrichedAnswers(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
       this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
         this.threadService.scrollToBottom();
       });
@@ -177,12 +178,12 @@ export class DmThreadComponent {
   }
 
   /** Toggles the reactions dialog visibility for a specific chat message. */
-  openReactionsDialogue(chatId: string) {
-    if (this.activeReactionDialogueIndex === chatId) {
+  openReactionsDialogue(dmChatId: string) {
+    if (this.activeReactionDialogueIndex === dmChatId) {
       this.activeReactionDialogueIndex = null;
     } else {
       this.editAnswerEditIndex = null;
-      this.activeReactionDialogueIndex = chatId;
+      this.activeReactionDialogueIndex = dmChatId;
       this.activeReactionDialogueBelowIndex = null;
     }
   }
@@ -199,12 +200,12 @@ export class DmThreadComponent {
   }
 
   /** Toggles the lower reactions dialog visibility for a specific chat message. */
-  openReactionsDialogueBelow(chatId: string) {
-    if (this.activeReactionDialogueBelowIndex === chatId) {
+  openReactionsDialogueBelow(dmChatId: string) {
+    if (this.activeReactionDialogueBelowIndex === dmChatId) {
       this.activeReactionDialogueBelowIndex = null;
     } else {
       this.editAnswerEditIndex = null;
-      this.activeReactionDialogueBelowIndex = chatId;
+      this.activeReactionDialogueBelowIndex = dmChatId;
       this.activeReactionDialogueIndex = null;
     }
   }
@@ -221,8 +222,8 @@ export class DmThreadComponent {
   }
 
   /** Adds a reaction to the current chat and updates the observable if successful. */
-  async addReaction(chatId: string, reactionType: string) {
-    const updatedChat = await this.threadService.addReaction(this.channelId, this.chat$, reactionType, this.currentUserId, this.participants);
+  async addReaction(dmChatId: string, reactionType: string) {
+    const updatedChat = await this.threadService.addReaction(this.dmChannelId, this.chat$, reactionType, this.currentUserId, this.participants);
     if (updatedChat) {
       this.chat$ = of(updatedChat);
       
@@ -233,7 +234,7 @@ export class DmThreadComponent {
 
   /** Adds a reaction to a specific answer and refreshes the answers list. */
   async addReactionToAnswer(answerId: string, reactionType: string) {
-    const updatedAnswers = await this.threadService.addReactionToAnswer(this.channelId, this.chatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants);
+    const updatedAnswers = await this.threadService.addReactionToAnswer(this.dmChannelId, this.dmChatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants);
     if (updatedAnswers) {
       this.subscribeAnswers();
 
@@ -243,14 +244,14 @@ export class DmThreadComponent {
   }
 
   /** Toggles the current user's reaction on a chat message. */
-  async toggleReactionForChat(chatId: string, reactionType: string) {
-    const updatedChat = await this.threadService.toggleReactionForChat(this.channelId, this.chat$, reactionType, this.currentUserId, this.participants);
+  async toggleReactionForChat(dmChatId: string, reactionType: string) {
+    const updatedChat = await this.threadService.toggleReactionForChat(this.dmChannelId, this.chat$, reactionType, this.currentUserId, this.participants);
     if (updatedChat) this.chat$ = of(updatedChat);
   }
 
   /** Toggles the current user's reaction on an answer. */
   async toggleReactionForAnswer(answerId: string, reactionType: string) {
-    const updatedAnswers = await this.threadService.toggleReactionForAnswer(this.channelId, this.chatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants);
+    const updatedAnswers = await this.threadService.toggleReactionForAnswer(this.dmChannelId, this.dmChatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants);
     if (updatedAnswers) {
       this.subscribeAnswers();
     }
@@ -266,9 +267,9 @@ export class DmThreadComponent {
     if (this.isSubmitting || !this.newAnswer.trim()) return;
     this.isSubmitting = true;
     try {
-      const result = await this.threadService.submitAnswer(this.channelId, this.chatId, this.newAnswer, this.currentUserId);
+      const result = await this.threadService.submitAnswer(this.dmChannelId, this.dmChatId, this.newAnswer, this.currentUserId);
       if (result.success) {
-        this.dataService.notifyAnswerAdded({ chatId: this.chatId, answerTime: result.answerTime! });
+        this.dmThreadService.notifyAnswerAdded({ dmChatId: this.dmChatId, answerTime: result.answerTime! });
         this.newAnswer = '';
         [0, 50, 150].forEach(delay =>
           setTimeout(() => this.threadService.scrollToBottomNewMessage(), delay)
@@ -406,7 +407,7 @@ export class DmThreadComponent {
 
   /** Saves the edited answer and refreshes the answers list if successful. */
   async saveEditedAnswer(answer: Answer) {
-    const result = await this.threadService.saveEditedAnswer(this.channelId, this.chatId, answer, answer.editedText ?? '');
+    const result = await this.threadService.saveEditedAnswer(this.dmChannelId, this.dmChatId, answer, answer.editedText ?? '');
     if (result) {
       this.subscribeAnswers();
     }
@@ -414,7 +415,7 @@ export class DmThreadComponent {
 
   /** Reloads enriched answers and scrolls to the bottom. */
   subscribeAnswers() {
-    this.answers$ = this.threadService.getEnrichedAnswers(this.channelId, this.chatId, this.participants$, this.currentUserId);
+    this.answers$ = this.threadService.getEnrichedAnswers(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
     this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => { this.threadService.scrollToBottom(); });
   }
 
