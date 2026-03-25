@@ -32,7 +32,8 @@
             </div>
 
             <div *ngIf="!isResponsiveScreen || !menuOpen" class="content" [class.fullwidth]="!menuOpen"
-                [class.dm-open]="isDmOpen" [class.nm-open]="isNmOpen" [class.thread-open]="threadOpen">
+                [class.dm-open]="isDmOpen" [class.nm-open]="isNmOpen" [class.thread-open]="threadOpen" 
+                [class.dm-thread-open]="dmThreadOpen">
 
                 <app-chats #chats id="chats" class="chats" *ngIf="channelOpen && !(isSmallScreen && threadOpen)"
                     [channelId]="currentChannelId" (openThread)="openThread($event)"
@@ -48,13 +49,13 @@
                     [class.fullwidth]="!channelOpen" [class.fullwidth-without-menu]="!menuOpen && !channelOpen">
                 </app-thread>
 
-                <app-direct-message-chats #dmChats *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
+                <app-direct-message-chats #dmChats class="direct-message" *ngIf="userChatOpen && activeUserId" [userId]="activeUserId"
                     [dmChannelId]="currentDmChannelId" (openDmThread)="openDmThread($event)"
                     (openProfile)="openProfileOverlay($event)" (openUserChat)="openUserChat($event)"
                     (openChannel)="openChannel($event)" [participantChannels]="participantChannels">
                 </app-direct-message-chats>
 
-                <app-dm-thread id="dm-thread" class="thread" *ngIf="dmThreadChatId && currentDmChannelId"
+                <app-dm-thread id="dm-thread" class="dm-thread" *ngIf="dmThreadChatId && currentDmChannelId"
                     [dmChannelId]="currentDmChannelId" [class.open]="dmThreadOpen"
                     [class.closed]="!dmThreadOpen" (closeDmThread)="onDmThreadClosed()"
                     (openProfile)="openProfileOverlay($event)" [class.fullwidth]="!dmChannelOpen"

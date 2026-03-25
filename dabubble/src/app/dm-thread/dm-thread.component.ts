@@ -257,7 +257,7 @@ export class DmThreadComponent {
   }
 
   /** Emits an event to close the thread view. */
-  handleCloseThread() {
+  handleCloseDmThread() {
     this.closeDmThread.emit();
   }
 
