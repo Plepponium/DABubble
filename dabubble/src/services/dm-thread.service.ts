@@ -13,7 +13,6 @@ export class DmThreadService {
     private channelService = inject(ChannelService);
     private userService = inject(UserService);
     private dmService = inject(DirectMessageService);
-
     private answerAddedSubject = new Subject<{ dmChatId: string; answerTime: number }>();
 
     /** Scrolls the thread history container to the bottom after a short delay. */
@@ -23,7 +22,7 @@ export class DmThreadService {
             if (threadHistory) {
                 threadHistory.scrollTop = threadHistory.scrollHeight;
             }
-        }, 100); 
+        }, 100);
     }
 
     /** Smoothly scrolls the thread history container to the bottom. */
@@ -87,23 +86,26 @@ export class DmThreadService {
     //         )
     //     );
     // }
-    getEnrichedDmChat(dmChannelId: string, dmChatId: string, participants$: Observable<User[]>, currentUserId: string): Observable<Chat | undefined> {
-        return this.channelService.getChatsForChannel(dmChannelId).pipe(
+    getEnrichedDmChat(dmChannelId: string, dmChatId: string, participants$: Observable<User[]>, currentUserId: string) {
+        return this.dmService.getMessages(dmChannelId).pipe(
             switchMap(chats =>
                 participants$.pipe(
                     map(users => {
-                        const chat = chats.find(c => c.id === dmChatId);
-                        if (!chat) return undefined;
-                        const user = users.find(u => u.uid === chat.user);
+                        const rawChat = chats.find(c => c.id === dmChatId);
+                        if (!rawChat) return undefined;
+                        const user = users.find(u => u.uid === rawChat.senderId);
                         const isUserMissing = !user;
-
                         return {
-                            ...chat,
-                            userName: isUserMissing ? 'Ehemaliger Nutzer' : user.name,
+                            id: rawChat.id,
+                            message: rawChat.text,
+                            time: rawChat.sentAt?.seconds || 0,
+                            user: rawChat.senderId,
+                            userName: user ? user.name : 'Ehemaliger Nutzer',
                             userImg: user?.img ?? 'default-user',
                             isUserMissing,
-                            reactionArray: this.transformReactionsToArray(chat.reactions, users, currentUserId)
-                        };
+                            reactions: rawChat.reactions || {},
+                            reactionArray: this.transformReactionsToArray(rawChat.reactions || {}, users, currentUserId)
+                        } as Chat;
                     })
                 )
             )
@@ -130,7 +132,7 @@ export class DmThreadService {
     //         )
     //     );
     // }
-    
+
 
     /** Retrieves all answers for a chat enriched with user metadata and reactions. */
     // getEnrichedAnswers(channelId: string, chatId: string, participants$: Observable<User[]>, currentUserId: string): Observable<Answer[]> {
@@ -209,7 +211,7 @@ export class DmThreadService {
             const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
             return { type, count: userIds.length, userIds, currentUserReacted, otherUserName, otherUserReacted };
         })
-        .sort((a, b) => a.type.localeCompare(b.type));
+            .sort((a, b) => a.type.localeCompare(b.type));
     }
 
     /** Parses and normalizes user IDs from reaction entries. */
@@ -278,10 +280,10 @@ export class DmThreadService {
 
     /** Adds a reaction to a chat if the current user has not already reacted. */
     async addReaction(
-        dmChannelId: string, 
+        dmChannelId: string,
         dmChat$: Observable<Chat | undefined>,
-        reactionType: string, 
-        currentUserId: string, 
+        reactionType: string,
+        currentUserId: string,
         participants: User[]
     ): Promise<Chat | undefined> {
         const chat = await firstValueFrom(dmChat$);
@@ -348,7 +350,7 @@ export class DmThreadService {
             : [...currentUsers, currentUserId];
 
         await this.channelService.setReaction(dmChannelId, chat.id, reactionType, updatedUsers);
-        const updatedChat = await this.updateReactionForChat( of(chat), participants, currentUserId, reactionType, updatedUsers );
+        const updatedChat = await this.updateReactionForChat(of(chat), participants, currentUserId, reactionType, updatedUsers);
 
         return updatedChat;
     }
@@ -376,8 +378,8 @@ export class DmThreadService {
         await this.channelService.setAnswerReaction(dmChannelId, dmChatId, answerId, reactionType, updatedUsers);
         const newReactions =
             updatedUsers.length === 0
-            ? Object.fromEntries(Object.entries(answer.reactions || {}).filter(([key]) => key !== reactionType))
-            : { ...answer.reactions, [reactionType]: updatedUsers };
+                ? Object.fromEntries(Object.entries(answer.reactions || {}).filter(([key]) => key !== reactionType))
+                : { ...answer.reactions, [reactionType]: updatedUsers };
 
         const newReactionArray = this.transformReactionsToArray(newReactions, participants, currentUserId);
         const updatedAnswer: Answer = { ...answer, reactions: newReactions, reactionArray: newReactionArray };
@@ -435,13 +437,13 @@ export class DmThreadService {
             return { success: false };
         }
     }
-    
+
     /** Builds a payload object for creating a new answer. */
     buildAnswerPayload(text: string, currentUserId: string) {
         return {
-        message: text.trim(),
-        time: Math.floor(Date.now() / 1000),
-        user: currentUserId
+            message: text.trim(),
+            time: Math.floor(Date.now() / 1000),
+            user: currentUserId
         };
     }
 

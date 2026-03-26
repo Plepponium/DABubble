@@ -31,7 +31,7 @@ export class DirectMessageChatsComponent {
   @Output() openProfile = new EventEmitter<User>();
   @Output() openUserChat = new EventEmitter<User>();
   @Output() openChannel = new EventEmitter<string>();
-  @Output() openDmThread = new EventEmitter<{ dmId: string; chatId: string }>();
+  @Output() openDmThread = new EventEmitter<{ dmId: string; chatId: string; otherUser: User | undefined }>();
 
   currentUser?: User;
   otherUser?: User;
@@ -455,9 +455,12 @@ export class DirectMessageChatsComponent {
   //   // this.openDmThread.emit({ dmId: this.dmId!, chatId });
   // }
   handleOpenDmThread(messageId: string): void {
-    // console.log(`🔍 Open thread for messageId: ${messageId}, dmId: ${this.dmId}`);
     if (!this.dmChannelId) return;
-    this.openDmThread.emit({ dmId: this.dmChannelId, chatId: messageId });
+    this.openDmThread.emit({
+      dmId: this.dmChannelId,
+      chatId: messageId,
+      otherUser: this.otherUser
+    });
   }
 
   /** Template: Smooth-scroll to message. @param messageId Target ID */

@@ -32,7 +32,7 @@
             </div>
 
             <div *ngIf="!isResponsiveScreen || !menuOpen" class="content" [class.fullwidth]="!menuOpen"
-                [class.dm-open]="isDmOpen" [class.nm-open]="isNmOpen" [class.thread-open]="threadOpen" 
+                [class.dm-open]="isDmOpen" [class.nm-open]="isNmOpen" [class.thread-open]="threadOpen"
                 [class.dm-thread-open]="dmThreadOpen">
 
                 <app-chats #chats id="chats" class="chats" *ngIf="channelOpen && !(isSmallScreen && threadOpen)"
@@ -49,17 +49,18 @@
                     [class.fullwidth]="!channelOpen" [class.fullwidth-without-menu]="!menuOpen && !channelOpen">
                 </app-thread>
 
-                <app-direct-message-chats #dmChats class="direct-message" *ngIf="userChatOpen && activeUserId && !(isSmallScreen && dmThreadOpen)" 
-                    [userId]="activeUserId" [dmChannelId]="currentDmChannelId" (openDmThread)="openDmThread($event)"
+                <app-direct-message-chats #dmChats class="direct-message"
+                    *ngIf="userChatOpen && activeUserId && !(isSmallScreen && dmThreadOpen)" [userId]="activeUserId"
+                    [dmChannelId]="currentDmChannelId" (openDmThread)="openDmThread($event)"
                     (openProfile)="openProfileOverlay($event)" (openUserChat)="openUserChat($event)"
                     (openChannel)="openChannel($event)" [participantChannels]="participantChannels">
                 </app-direct-message-chats>
 
-                <app-dm-thread id="dm-thread" class="dm-thread" *ngIf="dmThreadChatId && currentDmChannelId" [dmChatId]="dmThreadChatId"
-                    [dmChannelId]="currentDmChannelId" [class.open]="dmThreadOpen" [class.closed]="!dmThreadOpen" 
-                    (closeDmThread)="onDmThreadClosed()" (openProfile)="openProfileOverlay($event)"  
-                    
-                    [class.fullwidth]="!dmChannelOpen" [class.fullwidth-without-menu]="!menuOpen && !dmChannelOpen">
+                <app-dm-thread id="dm-thread" class="dm-thread" *ngIf="dmThreadChatId && currentDmChannelId"
+                    [dmChatId]="dmThreadChatId" [dmChannelId]="currentDmChannelId" [otherUser]="threadOtherUser"
+                    [class.open]="dmThreadOpen" [class.closed]="!dmThreadOpen" (closeDmThread)="onDmThreadClosed()"
+                    (openProfile)="openProfileOverlay($event)" [class.fullwidth]="!dmChannelOpen"
+                    [class.fullwidth-without-menu]="!menuOpen && !dmChannelOpen">
                 </app-dm-thread>
 
                 <app-new-message class="new-message" *ngIf="newMessageOpen" (openChannel)="openChannel($event)"

@@ -5,7 +5,7 @@
             <div class="channel-name-container">
                 <img src="assets/icons/tag-small-purple.svg" alt="">
                 <!-- <ng-container *ngIf="channelName$ | async as channelName"> -->
-                    <div class="channel-name font-14 t-middle-purple">{{ otherUser?.name || 'Direktnachricht' }}</div>
+                <div class="channel-name font-14 t-middle-purple">{{ otherUser?.name || 'Direktnachricht' }}</div>
                 <!-- </ng-container> -->
             </div>
         </div>
@@ -34,7 +34,7 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <img class="chat-user-img" [src]="'assets/user-icons/' + chat.userImg + '.svg'" [alt]="chat.userName"
                     [ngClass]="{'grayscale': chat.isUserMissing}">
                 <div class="chat-info-container" [ngClass]="{'reverse': chat.user === currentUserId}">
@@ -338,6 +338,6 @@
                 </div>
             </div>
         </form>
-        
+
     </div>
 </div>

@@ -72,6 +72,7 @@ export class MainPageComponent {
   threadChatId?: string;
   currentDmChannelId?: string;
   dmThreadChatId?: string;
+  threadOtherUser?: User | undefined;
 
   // Screen sizes
   isSmallScreen = false;
@@ -108,11 +109,11 @@ export class MainPageComponent {
     this.isResponsiveScreen = window.innerWidth <= 880;
 
     if (!previousIsSmall && this.isSmallScreen && this.threadOpen) {
-      this.channelOpen = false; 
+      this.channelOpen = false;
     }
 
     if (previousIsSmall && !this.isSmallScreen && this.threadOpen) {
-      this.channelOpen = true;  
+      this.channelOpen = true;
     }
   }
 
@@ -314,16 +315,18 @@ export class MainPageComponent {
   }
 
   /** Opens DM thread chat. */
-  openDmThread(event: { dmId: string, chatId: string }) {
-    console.log('🔍 openDmThread event:', event);
+  openDmThread(event: { dmId: string, chatId: string, otherUser: User | undefined }) {
     this.currentDmChannelId = event.dmId;
     this.dmChannelOpen = true;
     setTimeout(() => {
       this.dmThreadOpen = true;
       this.dmThreadChatId = event.chatId;
+      this.threadOtherUser = event.otherUser;
       if (this.isSmallScreen) this.dmChannelOpen = false;
     }, 300);
   }
+
+
 
   /** Handles thread close event. */
   onDmThreadClosed() {

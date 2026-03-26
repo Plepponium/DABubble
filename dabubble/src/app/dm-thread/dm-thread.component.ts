@@ -17,7 +17,7 @@ import { ThreadService } from '../../services/thread.service';
 import { ThreadHelpService } from '../../services/thread-help.service';
 import { User } from '../../models/user.class';
 import { reactionIcons } from '../reaction-icons';
-import { BehaviorSubject, Observable, of, take, takeUntil } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, take, takeUntil } from 'rxjs';
 import { Chat } from '../../models/chat.class';
 import { Answer } from '../../models/answer.class';
 import { ChatWithDetails } from '../../models/chat-with-details.class';
@@ -78,9 +78,7 @@ export class DmThreadComponent {
   allSmileys = reactionIcons;
   editSmileyActive: { [messageId: string]: boolean } = {};
 
-  // @Input() channelId!: string;
-  @Input() dmChannelId!: string; 
-  // @Input() chatId!: string;
+  @Input() dmChannelId!: string;
   @Input() dmChatId!: string;
   @Input() otherUser?: User;
   @Output() closeDmThread = new EventEmitter<void>();
@@ -90,11 +88,8 @@ export class DmThreadComponent {
   /** Initializes the component, sets responsive state, and loads initial channel and user data. */
   ngOnInit() {
     this.updateIsResponsive();
-    // this.getCurrentUserAndChannels();
     this.initCurrentUser();
-    this.initDmData();
     setTimeout(() => this.focusInputOnStart(), 200);
-    // setTimeout(() => this.loadChannelWithId(), 100);
   }
 
   /** Handles input changes and reloads chat and answers when dmChannelId or chatId changes. */
@@ -145,43 +140,29 @@ export class DmThreadComponent {
 
 
   private initCurrentUser() {
-    this.threadService.getCurrentUserAndChannels().subscribe(result => {
-      this.currentUserId = result.userId;
-      // channels brauchst du hier für DM meist nicht, du kannst filteredChannels leer lassen
-      this.filteredChannels = []; 
+    this.userService.getCurrentUser().pipe(
+      take(1),
+      map(currentUser => currentUser ?? { uid: '', name: 'Unbekannt' } as User)
+    ).subscribe(currentUser => {
+      this.currentUserId = currentUser.uid;
+      const allUsers: User[] = [];
+      if (this.otherUser) allUsers.push(this.otherUser);
+      allUsers.push(currentUser);
+      this.participants$ = of(allUsers);
+      console.log('👥 ALLE Users:', allUsers.map(u => ({ uid: u.uid, name: u.name })));
+      this.initDmData();
     });
   }
 
   private initDmData() {
-    if (!this.dmChannelId || !this.dmChatId) return;
-
-    // Teilnehmer des DM (du + otherUser)
-    this.participants$ = of(
-      this.otherUser
-        ? [this.otherUser].filter(Boolean) as User[]
-        : []
-    );
-
+    if (!this.dmChannelId || !this.dmChatId || !this.currentUserId) return;
     this.subscribeToParticipants();
-
-    // Hier brauchst du DM-spezifische Methoden, nicht channel-basierte:
     this.chat$ = this.dmThreadService.getEnrichedDmChat(
-      this.dmChannelId,
-      this.dmChatId,
-      this.participants$,
-      this.currentUserId
+      this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId
     );
-
     this.answers$ = this.dmThreadService.getEnrichedDmAnswers(
-      this.dmChannelId,
-      this.dmChatId,
-      this.participants$,
-      this.currentUserId
+      this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId
     );
-
-    this.answers$
-      .pipe(take(1), takeUntil(this.destroy$))
-      .subscribe(() => this.threadService.scrollToBottom());
   }
 
 
@@ -209,7 +190,11 @@ export class DmThreadComponent {
 
   /** Subscribes to participant updates and stores them locally. */
   subscribeToParticipants() {
-    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => { this.participants = users; });
+    console.log('🔗 subscribeToParticipants...');
+    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => {
+      console.log('👥 participants lokal:', users);
+      this.participants = users;
+    });
   }
 
   /** Toggles the reactions dialog visibility for a specific chat message. */
@@ -261,7 +246,7 @@ export class DmThreadComponent {
     const updatedChat = await this.threadService.addReaction(this.dmChannelId, this.chat$, reactionType, this.currentUserId, this.participants);
     if (updatedChat) {
       this.chat$ = of(updatedChat);
-      
+
       this.activeReactionDialogueIndex = null;
       this.activeReactionDialogueBelowIndex = null;
     }
