@@ -87,27 +87,49 @@ export class DmThreadService {
     //         )
     //     );
     // }
-    getEnrichedChat(dmId: string, msgId: string, users$: Observable<Record<string, User>>, currentUserId: string): Observable<any | undefined> {
-        return this.dmService.getMessages(dmId).pipe(
-            switchMap(messages =>
-                users$.pipe(
-                    map(usersMap => {
-                        const msg = messages.find(m => m.id === msgId);
-                        if (!msg) return undefined;
-                        const user = usersMap[msg.senderId];
-                        const isMissing = !user;
+    getEnrichedDmChat(dmChannelId: string, dmChatId: string, participants$: Observable<User[]>, currentUserId: string): Observable<Chat | undefined> {
+        return this.channelService.getChatsForChannel(dmChannelId).pipe(
+            switchMap(chats =>
+                participants$.pipe(
+                    map(users => {
+                        const chat = chats.find(c => c.id === dmChatId);
+                        if (!chat) return undefined;
+                        const user = users.find(u => u.uid === chat.user);
+                        const isUserMissing = !user;
+
                         return {
-                            ...msg,
-                            userName: isMissing ? 'Ehemaliger Nutzer' : user.name,
+                            ...chat,
+                            userName: isUserMissing ? 'Ehemaliger Nutzer' : user.name,
                             userImg: user?.img ?? 'default-user',
-                            isUserMissing: isMissing,
-                            // optional: reactionArray analog zu ThreadService
+                            isUserMissing,
+                            reactionArray: this.transformReactionsToArray(chat.reactions, users, currentUserId)
                         };
                     })
                 )
             )
         );
     }
+    // getEnrichedDmChat(dmId: string, msgId: string, users$: Observable<Record<string, User>>, currentUserId: string): Observable<any | undefined> {
+    //     return this.dmService.getMessages(dmId).pipe(
+    //         switchMap(messages =>
+    //             users$.pipe(
+    //                 map(usersMap => {
+    //                     const msg = messages.find(m => m.id === msgId);
+    //                     if (!msg) return undefined;
+    //                     const user = usersMap[msg.senderId];
+    //                     const isMissing = !user;
+    //                     return {
+    //                         ...msg,
+    //                         userName: isMissing ? 'Ehemaliger Nutzer' : user.name,
+    //                         userImg: user?.img ?? 'default-user',
+    //                         isUserMissing: isMissing,
+    //                         // optional: reactionArray analog zu ThreadService
+    //                     };
+    //                 })
+    //             )
+    //         )
+    //     );
+    // }
     
 
     /** Retrieves all answers for a chat enriched with user metadata and reactions. */
@@ -132,21 +154,20 @@ export class DmThreadService {
     //         )
     //     );
     // }
-    getEnrichedAnswers(dmId: string, msgId: string, users$: Observable<Record<string, User>>, currentUserId: string): Observable<any[]> {
-        return this.dmService.getAnswersForMessage(dmId, msgId).pipe(
+    getEnrichedDmAnswers(dmChannelId: string, dmChatId: string, participants$: Observable<User[]>, currentUserId: string): Observable<Answer[]> {
+        return this.channelService.getAnswersForChat(dmChannelId, dmChatId).pipe(
             switchMap(answers =>
-                users$.pipe(
-                    map(usersMap =>
+                participants$.pipe(
+                    map(users =>
                         answers.map(answer => {
-                            const user = usersMap[answer.senderId];
-                            const isMissing = !user;
+                            const user = users.find(u => u.uid === answer.user);
+                            const isUserMissing = !user;
                             return {
                                 ...answer,
-                                userName: isMissing ? 'Ehemaliger Nutzer' : user.name,
+                                userName: isUserMissing ? 'Ehemaliger Nutzer' : user.name,
                                 userImg: user?.img ?? 'default-user',
-                                isUserMissing: isMissing,
-                                // optional: reactionArray für Answer
-                                // reactionArray: this.transformReactionsToArray(answer.reactions, users, currentUserId)
+                                isUserMissing,
+                                reactionArray: this.transformReactionsToArray(answer.reactions, users, currentUserId)
                             };
                         })
                     )
@@ -154,6 +175,28 @@ export class DmThreadService {
             )
         );
     }
+    // getEnrichedDmAnswers(dmId: string, msgId: string, users$: Observable<Record<string, User>>, currentUserId: string): Observable<any[]> {
+    //     return this.dmService.getAnswersForMessage(dmId, msgId).pipe(
+    //         switchMap(answers =>
+    //             users$.pipe(
+    //                 map(usersMap =>
+    //                     answers.map(answer => {
+    //                         const user = usersMap[answer.senderId];
+    //                         const isMissing = !user;
+    //                         return {
+    //                             ...answer,
+    //                             userName: isMissing ? 'Ehemaliger Nutzer' : user.name,
+    //                             userImg: user?.img ?? 'default-user',
+    //                             isUserMissing: isMissing,
+    //                             // optional: reactionArray für Answer
+    //                             // reactionArray: this.transformReactionsToArray(answer.reactions, users, currentUserId)
+    //                         };
+    //                     })
+    //                 )
+    //             )
+    //         )
+    //     );
+    // }
 
 
     /** Converts a raw reactions map into a sorted array with metadata and user context. */
@@ -185,14 +228,14 @@ export class DmThreadService {
 
     /** Updates reaction data for a chat and returns an updated chat object. */
     async updateReactionForChat(
-        chat$: Observable<Chat | undefined>,
+        dmChat$: Observable<Chat | undefined>,
         participants: User[],
         currentUserId: string,
         reactionType: string,
         updatedUsers: string[]
     ): Promise<Chat | undefined> {
         try {
-            const chat = await firstValueFrom(chat$);
+            const chat = await firstValueFrom(dmChat$);
             if (!chat) return undefined;
             const newReactions = { ...chat.reactions };
             if (updatedUsers.length === 0) {
@@ -213,13 +256,13 @@ export class DmThreadService {
 
     /** Updates reaction data locally for a chat without persisting changes. */
     updateLocalReaction(
-        chat: Chat,
+        dmChat: Chat,
         reactionType: string,
         updatedUsers: string[],
         participants: User[],
         currentUserId: string
     ): Chat {
-        const newReactions = { ...chat.reactions };
+        const newReactions = { ...dmChat.reactions };
 
         if (updatedUsers.length === 0) {
             delete newReactions[reactionType];
@@ -228,26 +271,26 @@ export class DmThreadService {
         }
 
         const newReactionArray = this.transformReactionsToArray(newReactions, participants, currentUserId);
-        const updatedChat: Chat = { ...chat, reactions: newReactions, reactionArray: newReactionArray };
+        const updatedChat: Chat = { ...dmChat, reactions: newReactions, reactionArray: newReactionArray };
 
         return updatedChat;
     }
 
     /** Adds a reaction to a chat if the current user has not already reacted. */
     async addReaction(
-        channelId: string, 
-        chat$: Observable<Chat | undefined>,
+        dmChannelId: string, 
+        dmChat$: Observable<Chat | undefined>,
         reactionType: string, 
         currentUserId: string, 
         participants: User[]
     ): Promise<Chat | undefined> {
-        const chat = await firstValueFrom(chat$);
+        const chat = await firstValueFrom(dmChat$);
         if (!chat) return;
 
         const currentReactionUsers = this.extractUserIds(chat.reactions || {}, reactionType);
         if (!currentReactionUsers.includes(currentUserId)) {
             const updatedUsers = [...currentReactionUsers, currentUserId];
-            await this.channelService.setReaction(channelId, chat.id, reactionType, updatedUsers);
+            await this.channelService.setReaction(dmChannelId, chat.id, reactionType, updatedUsers);
 
             chat.reactions = { ...chat.reactions, [reactionType]: updatedUsers };
             chat.reactionArray = this.transformReactionsToArray(chat.reactions, participants, currentUserId);
@@ -259,8 +302,8 @@ export class DmThreadService {
 
     /** Adds a reaction to an answer and returns the updated answers array. */
     async addReactionToAnswer(
-        channelId: string,
-        chatId: string,
+        dmChannelId: string,
+        dmChatId: string,
         answers$: Observable<Answer[]>,
         answerId: string,
         reactionType: string,
@@ -276,7 +319,7 @@ export class DmThreadService {
         if (!currentUsers.includes(currentUserId)) {
             const updatedUsers = [...currentUsers, currentUserId];
 
-            await this.channelService.setAnswerReaction(channelId, chatId, answerId, reactionType, updatedUsers);
+            await this.channelService.setAnswerReaction(dmChannelId, dmChatId, answerId, reactionType, updatedUsers);
 
             const newReactions = { ...answer.reactions, [reactionType]: updatedUsers };
             const newReactionArray = this.transformReactionsToArray(newReactions, participants, currentUserId);
@@ -290,13 +333,13 @@ export class DmThreadService {
 
     /** Toggles the current user's reaction on a chat and returns the updated chat. */
     async toggleReactionForChat(
-        channelId: string,
-        chat$: Observable<Chat | undefined>,
+        dmChannelId: string,
+        dmChat$: Observable<Chat | undefined>,
         reactionType: string,
         currentUserId: string,
         participants: User[]
     ): Promise<Chat | undefined> {
-        const chat = await firstValueFrom(chat$);
+        const chat = await firstValueFrom(dmChat$);
         if (!chat) return undefined;
 
         const currentUsers = this.extractUserIds(chat.reactions || {}, reactionType);
@@ -304,7 +347,7 @@ export class DmThreadService {
             ? currentUsers.filter(u => u !== currentUserId)
             : [...currentUsers, currentUserId];
 
-        await this.channelService.setReaction(channelId, chat.id, reactionType, updatedUsers);
+        await this.channelService.setReaction(dmChannelId, chat.id, reactionType, updatedUsers);
         const updatedChat = await this.updateReactionForChat( of(chat), participants, currentUserId, reactionType, updatedUsers );
 
         return updatedChat;
@@ -312,8 +355,8 @@ export class DmThreadService {
 
     /** Toggles the current user's reaction on an answer and returns updated answers. */
     async toggleReactionForAnswer(
-        channelId: string,
-        chatId: string,
+        dmChannelId: string,
+        dmChatId: string,
         answers$: Observable<Answer[]>,
         answerId: string,
         reactionType: string,
@@ -330,7 +373,7 @@ export class DmThreadService {
             ? currentUsers.filter(u => u !== currentUserId)
             : [...currentUsers, currentUserId];
 
-        await this.channelService.setAnswerReaction(channelId, chatId, answerId, reactionType, updatedUsers);
+        await this.channelService.setAnswerReaction(dmChannelId, dmChatId, answerId, reactionType, updatedUsers);
         const newReactions =
             updatedUsers.length === 0
             ? Object.fromEntries(Object.entries(answer.reactions || {}).filter(([key]) => key !== reactionType))

@@ -90,37 +90,30 @@ export class DmThreadComponent {
   /** Initializes the component, sets responsive state, and loads initial channel and user data. */
   ngOnInit() {
     this.updateIsResponsive();
-    this.getCurrentUserAndChannels();
+    // this.getCurrentUserAndChannels();
+    this.initCurrentUser();
+    this.initDmData();
     setTimeout(() => this.focusInputOnStart(), 200);
-    setTimeout(() => this.loadChannelWithId(), 100);
+    // setTimeout(() => this.loadChannelWithId(), 100);
   }
 
   /** Handles input changes and reloads chat and answers when dmChannelId or chatId changes. */
   ngOnChanges(changes: SimpleChanges) {
     if (changes['dmChatId'] && !changes['dmChatId'].firstChange) {
-      this.chat$ = this.threadService.getEnrichedChat(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
-      this.answers$ = this.threadService.getEnrichedAnswers(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
-      this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => { this.threadService.scrollToBottom(); });
+      // this.chat$ = this.threadService.getEnrichedChat(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
+      // this.answers$ = this.threadService.getEnrichedAnswers(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
+      // this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => { this.threadService.scrollToBottom(); });
+      this.initDmData();
     }
     if (changes['dmChannelId'] && !changes['dmChannelId'].firstChange) {
-      this.getCurrentUserAndChannels();
-      setTimeout(() =>
-        this.loadChannelWithId(), 100,
-      );
+      // this.getCurrentUserAndChannels();
+      // setTimeout(() =>
+      //   this.loadChannelWithId(), 100,
+      // );
+
+      this.initDmData();
     }
   }
-  // ngOnChanges() {
-  //   if (this.chatId && this.dmId) {
-  //     // ← DM-spezifische Daten laden
-  //     this.chat$ = this.dmThreadService.getEnrichedChat(this.dmId, this.chatId);
-  //     this.answers$ = this.dmThreadService.getEnrichedAnswers(this.dmId, this.chatId);
-      
-  //     // Scroll wie bei thread
-  //     this.answers$.pipe(take(1)).subscribe(() => {
-  //       this.dmThreadService.scrollToBottom();
-  //     });
-  //   }
-  // }
 
   @HostListener('window:resize')
   /** Updates responsive state when the window is resized. */
@@ -150,13 +143,55 @@ export class DmThreadComponent {
     this.answerInput?.nativeElement?.focus();
   }
 
-  /** Retrieves the current user ID and available channels from the service. */
-  getCurrentUserAndChannels() {
+
+  private initCurrentUser() {
     this.threadService.getCurrentUserAndChannels().subscribe(result => {
       this.currentUserId = result.userId;
-      this.filteredChannels = result.channels;
+      // channels brauchst du hier für DM meist nicht, du kannst filteredChannels leer lassen
+      this.filteredChannels = []; 
     });
   }
+
+  private initDmData() {
+    if (!this.dmChannelId || !this.dmChatId) return;
+
+    // Teilnehmer des DM (du + otherUser)
+    this.participants$ = of(
+      this.otherUser
+        ? [this.otherUser].filter(Boolean) as User[]
+        : []
+    );
+
+    this.subscribeToParticipants();
+
+    // Hier brauchst du DM-spezifische Methoden, nicht channel-basierte:
+    this.chat$ = this.dmThreadService.getEnrichedDmChat(
+      this.dmChannelId,
+      this.dmChatId,
+      this.participants$,
+      this.currentUserId
+    );
+
+    this.answers$ = this.dmThreadService.getEnrichedDmAnswers(
+      this.dmChannelId,
+      this.dmChatId,
+      this.participants$,
+      this.currentUserId
+    );
+
+    this.answers$
+      .pipe(take(1), takeUntil(this.destroy$))
+      .subscribe(() => this.threadService.scrollToBottom());
+  }
+
+
+  /** Retrieves the current user ID and available channels from the service. */
+  // getCurrentUserAndChannels() {
+  //   this.threadService.getCurrentUserAndChannels().subscribe(result => {
+  //     this.currentUserId = result.userId;
+  //     this.filteredChannels = result.channels;
+  //   });
+  // }
 
   /** Loads channel details, participants, chat, and answers for the current dmChannelId. */
   private loadChannelWithId() {
