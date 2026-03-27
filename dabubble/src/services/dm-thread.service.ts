@@ -51,8 +51,19 @@ export class DmThreadService {
     }
 
     /** Loads a channel by ID and returns observables for its name and participants. */
-    loadChannelWithId(channelId: string): Observable<{ channelName$: Observable<string>; participants$: Observable<User[]> }> {
-        return this.channelService.getChannelById(channelId).pipe(
+    // loadChannelWithId(channelId: string): Observable<{ channelName$: Observable<string>; participants$: Observable<User[]> }> {
+    //     return this.channelService.getChannelById(channelId).pipe(
+    //         take(1),
+    //         map(channel => {
+    //             if (!channel) throw new Error('Channel not found');
+    //             const channelName$ = of(channel.name);
+    //             const participants$ = this.userService.getUsersByIds(channel.participants);
+    //             return { channelName$, participants$ };
+    //         })
+    //     );
+    // }
+    loadDmChannelWithId(dmChannelId: string): Observable<{ channelName$: Observable<string>; participants$: Observable<User[]> }> {
+        return this.channelService.getChannelById(dmChannelId).pipe(
             take(1),
             map(channel => {
                 if (!channel) throw new Error('Channel not found');

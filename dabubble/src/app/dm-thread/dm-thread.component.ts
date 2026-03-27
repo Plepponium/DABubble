@@ -187,6 +187,13 @@ export class DmThreadComponent {
       });
     });
   }
+  loadDmChannelWithId() {
+    this.dmThreadService.loadDmChannelWithId(this.dmChannelId).subscribe(({ channelName$, participants$ }) => {
+      this.channelName$ = channelName$;
+      this.participants$ = participants$;
+    });
+  }
+
 
   /** Subscribes to participant updates and stores them locally. */
   subscribeToParticipants() {
