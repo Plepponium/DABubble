@@ -15,7 +15,7 @@
         </app-round-btn>
     </div>
 
-    <div *ngIf="(chat$ | async) as chat" class="chat-content">
+    <div *ngIf="(dmChat$ | async) as chat" class="chat-content">
         <div class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
             <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                 <div class="chat-dialogue top" [ngClass]="{'reverse': chat.user === currentUserId}">
@@ -126,14 +126,21 @@
             </div>
 
             <div class="hidden-answers-line">
+                <div style="background: red; color: white; padding: 4px; font-weight: bold;">
+                    DEBUG: {{ (dmAnswers$ | async)?.length ?? 'NULL' }} 
+                    | RAW: {{ (dmAnswers$ | async) | json }}
+                    | {{ (dmChat$ | async) | json }}
+                </div>
                 <div class="hidden-answers t-light-purple">
-                    {{ (answers$ | async)?.length }} Antworten
+                    
+                    {{ (dmAnswers$ | async)?.length }} 
+                    Antworten
                 </div>
                 <div class="line"></div>
             </div>
         </div>
 
-        <div *ngIf="answers$ | async as answers" id="thread-history" class="chat-history">
+        <div *ngIf="dmAnswers$ | async as answers" id="thread-history" class="chat-history">
             <div *ngFor="let answer of answers; let i = index" class="chat-day-section"
                 [ngClass]="{'reverse': answer.user === currentUserId}">
 

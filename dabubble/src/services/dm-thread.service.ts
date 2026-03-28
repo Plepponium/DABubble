@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { firstValueFrom, map, Observable, of, Subject, switchMap, take } from 'rxjs';
+import { combineLatest, firstValueFrom, map, Observable, of, Subject, switchMap, take } from 'rxjs';
 import { ChannelService } from './channel.service';
 import { UserService } from './user.service';
 import { User } from '../models/user.class';
@@ -7,6 +7,7 @@ import { Chat } from '../models/chat.class';
 import { Answer } from '../models/answer.class';
 import { RawReactionsMap, TransformedReaction } from '../models/reaction.types';
 import { DirectMessageService } from './direct-messages.service';
+import { collection, collectionData, Firestore } from '@angular/fire/firestore';
 
 @Injectable({ providedIn: 'root' })
 export class DmThreadService {
@@ -14,6 +15,7 @@ export class DmThreadService {
     private userService = inject(UserService);
     private dmService = inject(DirectMessageService);
     private answerAddedSubject = new Subject<{ dmChatId: string; answerTime: number }>();
+    // private firestore = inject(Firestore);
 
     /** Scrolls the thread history container to the bottom after a short delay. */
     scrollToBottom() {
@@ -32,23 +34,41 @@ export class DmThreadService {
     }
 
     /** Retrieves the current user ID and filters channels where the user is a participant. */
-    getCurrentUserAndChannels(): Observable<{ userId: string; channels: any[] }> {
-        return this.userService.getCurrentUser().pipe(
-            take(1),
-            switchMap(user => {
-                if (!user) return of({ userId: '', channels: [] }); // kein User angemeldet
-                return this.channelService.getChannels().pipe(
-                    take(1),
-                    map(channels => ({
-                        userId: user.uid,
-                        channels: channels.filter(
-                            c => Array.isArray(c.participants) && c.participants.includes(user.uid)
-                        )
-                    }))
-                );
-            })
-        );
-    }
+    // getCurrentUserAndChannels(): Observable<{ userId: string; channels: any[] }> {
+    //     return this.userService.getCurrentUser().pipe(
+    //         take(1),
+    //         switchMap(user => {
+    //             if (!user) return of({ userId: '', channels: [] }); // kein User angemeldet
+    //             return this.channelService.getChannels().pipe(
+    //                 take(1),
+    //                 map(channels => ({
+    //                     userId: user.uid,
+    //                     channels: channels.filter(
+    //                         c => Array.isArray(c.participants) && c.participants.includes(user.uid)
+    //                     )
+    //                 }))
+    //             );
+    //         })
+    //     );
+    // }
+    // getCurrentUserAndDmChannels(): Observable<{ userId: string; dmChannels: any[] }> {
+    //     return this.userService.getCurrentUser().pipe(
+    //         take(1),
+    //         switchMap(user => {
+    //             if (!user) return of({ userId: '', dmChannels: [] }); // kein User angemeldet
+    //             return this.dmService.getDmChannels().pipe(
+    //                 take(1),
+    //                 map(channels => ({
+    //                     userId: user.uid,
+    //                     dmChannels: channels.filter(
+    //                         c => Array.isArray(c.participants) && c.participants.includes(user.uid)
+    //                     )
+    //                 }))
+    //             );
+    //         })
+    //     );
+    // }
+
 
     /** Loads a channel by ID and returns observables for its name and participants. */
     // loadChannelWithId(channelId: string): Observable<{ channelName$: Observable<string>; participants$: Observable<User[]> }> {
@@ -188,25 +208,42 @@ export class DmThreadService {
             )
         );
     }
-    // getEnrichedDmAnswers(dmId: string, msgId: string, users$: Observable<Record<string, User>>, currentUserId: string): Observable<any[]> {
-    //     return this.dmService.getAnswersForMessage(dmId, msgId).pipe(
-    //         switchMap(answers =>
-    //             users$.pipe(
-    //                 map(usersMap =>
-    //                     answers.map(answer => {
-    //                         const user = usersMap[answer.senderId];
-    //                         const isMissing = !user;
-    //                         return {
-    //                             ...answer,
-    //                             userName: isMissing ? 'Ehemaliger Nutzer' : user.name,
-    //                             userImg: user?.img ?? 'default-user',
-    //                             isUserMissing: isMissing,
-    //                             // optional: reactionArray für Answer
-    //                             // reactionArray: this.transformReactionsToArray(answer.reactions, users, currentUserId)
-    //                         };
-    //                     })
-    //                 )
-    //             )
+    // getEnrichedDmAnswers(
+    //     dmChannelId: string, 
+    //     dmChatId: string, 
+    //     participants$: Observable<User[]>, 
+    //     currentUserId: string
+    // ): Observable<Answer[]> {
+    //     // 🔥 GENAU DERSELBE PFAD wie in DirectMessageService!
+    //     const answersPath = `dmChats/${dmChannelId}/messages/${dmChatId}/answers`;
+    //     console.log('🔍 THREAD ANSWERS:', answersPath);
+        
+    //     const answersCollection = collection(this.firestore, answersPath);
+        
+    //     return collectionData(answersCollection, { idField: 'id' }).pipe(
+    //         switchMap(rawAnswers => 
+    //             combineLatest([participants$, of(rawAnswers)])
+    //         ),
+    //         map(([users, answers]) => 
+    //             answers.map(answer => {
+    //                 const user = users.find(u => 
+    //                 u.uid === answer.senderId ||  // DM-Feldname
+    //                 u.uid === answer.user          // Channel-Feldname Fallback
+    //                 );
+    //                 const isUserMissing = !user;
+                    
+    //                 return {
+    //                 id: answer.id,
+    //                 message:  answer.message,  // DM: text, Channel: message
+    //                 time: answer.time,
+    //                 user: answer.senderId || answer.user,
+    //                 userName: isUserMissing ? 'Ehemaliger Nutzer' : user!.name,
+    //                 userImg: user?.img ?? 'default-user',
+    //                 isUserMissing,
+    //                 reactions: answer.reactions || {},
+    //                 reactionArray: this.transformReactionsToArray(answer.reactions || {}, users, currentUserId)
+    //                 } as Answer;
+    //             }).sort((a, b) => a.time - b.time)
     //         )
     //     );
     // }

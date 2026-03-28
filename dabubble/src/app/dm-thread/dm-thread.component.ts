@@ -17,7 +17,7 @@ import { ThreadService } from '../../services/thread.service';
 import { ThreadHelpService } from '../../services/thread-help.service';
 import { User } from '../../models/user.class';
 import { reactionIcons } from '../reaction-icons';
-import { BehaviorSubject, map, Observable, of, take, takeUntil } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, take, takeUntil, tap } from 'rxjs';
 import { Chat } from '../../models/chat.class';
 import { Answer } from '../../models/answer.class';
 import { ChatWithDetails } from '../../models/chat-with-details.class';
@@ -38,7 +38,7 @@ export class DmThreadComponent {
   logoutService = inject(LogoutService);
   uiService = inject(ChatsUiService);
   dataService = inject(ChatsDataService);
-  threadService = inject(ThreadService);
+  // threadService = inject(ThreadService);
   threadHelpService = inject(ThreadHelpService);
   dmService = inject(DirectMessageService);
   dmThreadService = inject(DmThreadService);
@@ -67,8 +67,8 @@ export class DmThreadComponent {
 
   channelName$: Observable<string> = of('');
   participants$: Observable<User[]> = of([]);
-  chat$!: Observable<Chat | undefined>;
-  answers$!: Observable<Answer[]>;
+  dmChat$!: Observable<Chat | undefined>;
+  dmAnswers$!: Observable<Answer[]>;
 
   private chatsSubject = new BehaviorSubject<ChatWithDetails[]>([]);
   public chats$ = this.chatsSubject.asObservable();
@@ -157,12 +157,27 @@ export class DmThreadComponent {
   private initDmData() {
     if (!this.dmChannelId || !this.dmChatId || !this.currentUserId) return;
     this.subscribeToParticipants();
-    this.chat$ = this.dmThreadService.getEnrichedDmChat(
+    this.dmChat$ = this.dmThreadService.getEnrichedDmChat(
       this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId
     );
-    this.answers$ = this.dmThreadService.getEnrichedDmAnswers(
+    this.dmAnswers$ = this.dmThreadService.getEnrichedDmAnswers(
       this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId
     );
+    this.debugAnswersObservable();
+  }
+
+  private debugAnswersObservable() {
+    this.dmAnswers$.pipe(
+      take(10),  // Max 10 Emissions
+      tap(answers => {
+        console.group('🔍 dmAnswers$ EMISSION');
+        console.log('  → Array:', answers);
+        console.log('  → Length:', answers?.length ?? 'NULL');
+        console.log('  → Type:', Array.isArray(answers) ? 'ARRAY' : typeof answers);
+        console.log('  → First 2 Items:', answers?.slice(0, 2));
+        console.groupEnd();
+      })
+    ).subscribe();
   }
 
 
@@ -175,22 +190,25 @@ export class DmThreadComponent {
   // }
 
   /** Loads channel details, participants, chat, and answers for the current dmChannelId. */
-  private loadChannelWithId() {
-    this.threadService.loadChannelWithId(this.dmChannelId).subscribe(({ channelName$, participants$ }) => {
-      this.channelName$ = channelName$;
-      this.participants$ = participants$;
-      this.subscribeToParticipants();
-      this.chat$ = this.threadService.getEnrichedChat(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
-      this.answers$ = this.threadService.getEnrichedAnswers(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
-      this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
-        this.threadService.scrollToBottom();
-      });
-    });
-  }
+  // private loadChannelWithId() {
+  //   this.threadService.loadChannelWithId(this.dmChannelId).subscribe(({ channelName$, participants$ }) => {
+  //     this.channelName$ = channelName$;
+  //     this.participants$ = participants$;
+  //     this.subscribeToParticipants();
+  //     this.dmChat$ = this.threadService.getEnrichedChat(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
+  //     this.dmAnswers$ = this.threadService.getEnrichedAnswers(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
+  //     this.dmAnswers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
+  //       this.threadService.scrollToBottom();
+  //     });
+  //   });
+  // }
   loadDmChannelWithId() {
     this.dmThreadService.loadDmChannelWithId(this.dmChannelId).subscribe(({ channelName$, participants$ }) => {
       this.channelName$ = channelName$;
       this.participants$ = participants$;
+      this.subscribeToParticipants();
+      this.dmChat$ = this.dmThreadService.getEnrichedDmChat(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
+      this.dmAnswers$ = this.dmThreadService.getEnrichedDmAnswers(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
     });
   }
 
@@ -250,9 +268,9 @@ export class DmThreadComponent {
 
   /** Adds a reaction to the current chat and updates the observable if successful. */
   async addReaction(dmChatId: string, reactionType: string) {
-    const updatedChat = await this.threadService.addReaction(this.dmChannelId, this.chat$, reactionType, this.currentUserId, this.participants);
+    const updatedChat = await this.dmThreadService.addReaction(this.dmChannelId, this.dmChat$, reactionType, this.currentUserId, this.participants);
     if (updatedChat) {
-      this.chat$ = of(updatedChat);
+      this.dmChat$ = of(updatedChat);
 
       this.activeReactionDialogueIndex = null;
       this.activeReactionDialogueBelowIndex = null;
@@ -261,7 +279,7 @@ export class DmThreadComponent {
 
   /** Adds a reaction to a specific answer and refreshes the answers list. */
   async addReactionToAnswer(answerId: string, reactionType: string) {
-    const updatedAnswers = await this.threadService.addReactionToAnswer(this.dmChannelId, this.dmChatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants);
+    const updatedAnswers = await this.dmThreadService.addReactionToAnswer(this.dmChannelId, this.dmChatId, this.dmAnswers$, answerId, reactionType, this.currentUserId, this.participants);
     if (updatedAnswers) {
       this.subscribeAnswers();
 
@@ -272,13 +290,13 @@ export class DmThreadComponent {
 
   /** Toggles the current user's reaction on a chat message. */
   async toggleReactionForChat(dmChatId: string, reactionType: string) {
-    const updatedChat = await this.threadService.toggleReactionForChat(this.dmChannelId, this.chat$, reactionType, this.currentUserId, this.participants);
-    if (updatedChat) this.chat$ = of(updatedChat);
+    const updatedChat = await this.dmThreadService.toggleReactionForChat(this.dmChannelId, this.dmChat$, reactionType, this.currentUserId, this.participants);
+    if (updatedChat) this.dmChat$ = of(updatedChat);
   }
 
   /** Toggles the current user's reaction on an answer. */
   async toggleReactionForAnswer(answerId: string, reactionType: string) {
-    const updatedAnswers = await this.threadService.toggleReactionForAnswer(this.dmChannelId, this.dmChatId, this.answers$, answerId, reactionType, this.currentUserId, this.participants);
+    const updatedAnswers = await this.dmThreadService.toggleReactionForAnswer(this.dmChannelId, this.dmChatId, this.dmAnswers$, answerId, reactionType, this.currentUserId, this.participants);
     if (updatedAnswers) {
       this.subscribeAnswers();
     }
@@ -294,12 +312,12 @@ export class DmThreadComponent {
     if (this.isSubmitting || !this.newAnswer.trim()) return;
     this.isSubmitting = true;
     try {
-      const result = await this.threadService.submitAnswer(this.dmChannelId, this.dmChatId, this.newAnswer, this.currentUserId);
+      const result = await this.dmThreadService.submitAnswer(this.dmChannelId, this.dmChatId, this.newAnswer, this.currentUserId);
       if (result.success) {
         this.dmThreadService.notifyAnswerAdded({ dmChatId: this.dmChatId, answerTime: result.answerTime! });
         this.newAnswer = '';
         [0, 50, 150].forEach(delay =>
-          setTimeout(() => this.threadService.scrollToBottomNewMessage(), delay)
+          setTimeout(() => this.dmThreadService.scrollToBottomNewMessage(), delay)
         );
       }
     } finally {
@@ -434,7 +452,7 @@ export class DmThreadComponent {
 
   /** Saves the edited answer and refreshes the answers list if successful. */
   async saveEditedAnswer(answer: Answer) {
-    const result = await this.threadService.saveEditedAnswer(this.dmChannelId, this.dmChatId, answer, answer.editedText ?? '');
+    const result = await this.dmThreadService.saveEditedAnswer(this.dmChannelId, this.dmChatId, answer, answer.editedText ?? '');
     if (result) {
       this.subscribeAnswers();
     }
@@ -442,8 +460,8 @@ export class DmThreadComponent {
 
   /** Reloads enriched answers and scrolls to the bottom. */
   subscribeAnswers() {
-    this.answers$ = this.threadService.getEnrichedAnswers(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
-    this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => { this.threadService.scrollToBottom(); });
+    this.dmAnswers$ = this.dmThreadService.getEnrichedDmAnswers(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
+    this.dmAnswers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => { this.dmThreadService.scrollToBottom(); });
   }
 
   /** Renders formatted message text safely for display. */
