@@ -125,7 +125,7 @@
                 </div>
             </div>
 
-            <div class="hidden-answers-line">
+            <!-- <div class="hidden-answers-line">
                 <div style="background: red; color: white; padding: 4px; font-weight: bold;">
                     DEBUG: {{ (dmAnswers$ | async)?.length ?? 'NULL' }} 
                     | RAW: {{ (dmAnswers$ | async) | json }}
@@ -137,7 +137,7 @@
                     Antworten
                 </div>
                 <div class="line"></div>
-            </div>
+            </div> -->
         </div>
 
         <div *ngIf="dmAnswers$ | async as answers" id="thread-history" class="chat-history">
