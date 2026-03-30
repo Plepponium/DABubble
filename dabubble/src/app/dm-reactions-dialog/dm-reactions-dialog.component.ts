@@ -21,6 +21,7 @@ export class DmReactionsDialogComponent {
   @Output() toggleReactionsEvent = new EventEmitter<string>();
   @Output() startEditEvent = new EventEmitter<string>();
   @Output() saveEditEvent = new EventEmitter<{ messageId: string; newText: string }>();
+  @Output() openThreadEvent = new EventEmitter<void>();
 
   editDialogOpen = false;
   isEditing = false;
@@ -74,5 +75,10 @@ export class DmReactionsDialogComponent {
   cancelEditing() {
     this.isEditing = false;
     this.editedText = '';
+  }
+
+  openThread() {
+    if (!this.messageId) return;
+    this.openThreadEvent.emit();
   }
 }

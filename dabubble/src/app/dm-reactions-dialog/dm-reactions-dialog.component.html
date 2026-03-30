@@ -19,6 +19,11 @@
         </app-reaction-icons-dialog>
     </div>
 
+    <button (click)="openThread()" class="add-reaction-btn">
+        <img class="hover-icon" src="assets/icons/comment.svg" alt="thread öffnen" />
+        <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="thread öffnen" />
+    </button>
+
     <div class="edit-message-container" *ngIf="isOwnMessage">
         <button (click)="toggleEditDialog()" class="add-reaction-btn">
             <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="edit" />

@@ -117,7 +117,7 @@ export class DirectMessageService {
 
 
 
-    async addAnswerToMessage(dmId: string, msgId: string, answer: { text: string; time: number; senderId: string }) {
+    async addAnswerToMessage(dmId: string, msgId: string, answer: { message: string; time: number; user: string }) {
         // 1. Answer in Subcollection schreiben
         await addDoc(
             collection(this.firestore, `dmChats/${dmId}/messages/${msgId}/answers`),
@@ -205,7 +205,7 @@ export class DirectMessageService {
             switchMap(messages => {
                 if (!messages.length) return of([] as any[]);
 
-                const messageWithCounts$ = messages.map(msg => 
+                const messageWithCounts$ = messages.map(msg =>
                     collectionData(
                         query(
                             collection(this.firestore, `dmChats/${dmId}/messages/${msg.id}/answers`) as any,
@@ -217,14 +217,14 @@ export class DirectMessageService {
                         map((answers: any[]) => {
                             // console.log(`🔍 ${msg.id}: ${answers.length} answers gefunden!`);
                             const answersCount = answers.length;
-                            const lastAnswerTime = answers.length > 0 
-                            ? (answers[answers.length - 1] as any).time 
-                            : null;
-                            
+                            const lastAnswerTime = answers.length > 0
+                                ? (answers[answers.length - 1] as any).time
+                                : null;
+
                             return {
-                            ...msg,
-                            answersCount,
-                            lastAnswerTime
+                                ...msg,
+                                answersCount,
+                                lastAnswerTime
                             };
                         })
                     )
@@ -234,5 +234,22 @@ export class DirectMessageService {
             })
         );
     }
+
+    async addReactionToAnswer(dmId: string, messageId: string, answerId: string, type: string, userId: string) {
+        const answerRef = doc(this.firestore, `dmChats/${dmId}/messages/${messageId}/answers/${answerId}`);
+        return updateDoc(answerRef, { [`reactions.${type}`]: arrayUnion(userId) });
+    }
+
+    async removeReactionFromAnswer(dmId: string, messageId: string, answerId: string, type: string, userId: string) {
+        const answerRef = doc(this.firestore, `dmChats/${dmId}/messages/${messageId}/answers/${answerId}`);
+        return updateDoc(answerRef, { [`reactions.${type}`]: arrayRemove(userId) });
+    }
+
+    async deleteReactionTypeFromAnswer(dmId: string, messageId: string, answerId: string, type: string) {
+        const answerRef = doc(this.firestore, `dmChats/${dmId}/messages/${messageId}/answers/${answerId}`);
+        return updateDoc(answerRef, { [`reactions.${type}`]: deleteField() });
+    }
+
+
 
 }

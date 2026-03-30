@@ -149,7 +149,6 @@ export class DmThreadComponent {
       if (this.otherUser) allUsers.push(this.otherUser);
       allUsers.push(currentUser);
       this.participants$ = of(allUsers);
-      console.log('👥 ALLE Users:', allUsers.map(u => ({ uid: u.uid, name: u.name })));
       this.initDmData();
     });
   }
@@ -163,23 +162,7 @@ export class DmThreadComponent {
     this.dmAnswers$ = this.dmThreadService.getEnrichedDmAnswers(
       this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId
     );
-    this.debugAnswersObservable();
   }
-
-  private debugAnswersObservable() {
-    this.dmAnswers$.pipe(
-      take(10),  // Max 10 Emissions
-      tap(answers => {
-        console.group('🔍 dmAnswers$ EMISSION');
-        console.log('  → Array:', answers);
-        console.log('  → Length:', answers?.length ?? 'NULL');
-        console.log('  → Type:', Array.isArray(answers) ? 'ARRAY' : typeof answers);
-        console.log('  → First 2 Items:', answers?.slice(0, 2));
-        console.groupEnd();
-      })
-    ).subscribe();
-  }
-
 
   /** Retrieves the current user ID and available channels from the service. */
   // getCurrentUserAndChannels() {
@@ -215,9 +198,7 @@ export class DmThreadComponent {
 
   /** Subscribes to participant updates and stores them locally. */
   subscribeToParticipants() {
-    console.log('🔗 subscribeToParticipants...');
     this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => {
-      console.log('👥 participants lokal:', users);
       this.participants = users;
     });
   }
@@ -282,7 +263,6 @@ export class DmThreadComponent {
     const updatedAnswers = await this.dmThreadService.addReactionToAnswer(this.dmChannelId, this.dmChatId, this.dmAnswers$, answerId, reactionType, this.currentUserId, this.participants);
     if (updatedAnswers) {
       this.subscribeAnswers();
-
       this.activeReactionDialogueAnswersIndex = null;
       this.activeReactionDialogueBelowAnswersIndex = null;
     }
@@ -296,7 +276,7 @@ export class DmThreadComponent {
 
   /** Toggles the current user's reaction on an answer. */
   async toggleReactionForAnswer(answerId: string, reactionType: string) {
-    const updatedAnswers = await this.dmThreadService.toggleReactionForAnswer(this.dmChannelId, this.dmChatId, this.dmAnswers$, answerId, reactionType, this.currentUserId, this.participants);
+    const updatedAnswers = await this.dmThreadService.toggleReactionForAnswer(this.dmChannelId, this.dmChatId, answerId, this.dmAnswers$, reactionType, this.currentUserId, this.participants);
     if (updatedAnswers) {
       this.subscribeAnswers();
     }
@@ -353,9 +333,8 @@ export class DmThreadComponent {
   /** Inserts selected smiley into the answer input and closes the overlay. */
   onSmileySelected(smiley: string) {
     this.threadHelpService.insertSmiley(this.answerInput.nativeElement, this.newAnswer, smiley);
-    this.newAnswer = this.answerInput.nativeElement.value; // Sync
+    this.newAnswer = this.answerInput.nativeElement.value;
     this.activeSmiley = false;
-    console.log('activeSmiley:', this.activeSmiley);
   }
 
   /** Inserts a mention into the answer input and restores caret position. */

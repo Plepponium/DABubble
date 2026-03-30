@@ -53,10 +53,8 @@
 
                                 <div class="chat-message-row" [class.me]="m.senderId === currentUser?.uid"
                                     [class.edit-mode]="m.isEditing" #chatMessageRow [attr.data-message-id]="m.id">
-
                                     <img class="chat-user-img"
                                         [src]="'assets/user-icons/' + (m.senderImg || 'default-user') + '.svg'" />
-
                                     <ng-container *ngIf="!m.isEditing; else editMode">
                                         <div class="chat-bubble">
                                             <div class="chat-meta">
@@ -77,18 +75,21 @@
                                                 type={{ m.answersCount === undefined ? 'undefined' : typeof m.answersCount }} | 
                                                 >0={{ m.answersCount > 0 }}
                                             </div> -->
-                                            <div class="chat-answered" [ngClass]="{'right': m.senderId === currentUser?.uid}"
+                                            <div class="chat-answered"
+                                                [ngClass]="{'right': m.senderId === currentUser?.uid}"
                                                 [ngClass]="{'has-answers': m.answersCount && m.answersCount > 0}">
-                                                
+
                                                 <div class="answers" *ngIf="m.answersCount && m.answersCount >= 0">
                                                     <div (click)="handleOpenDmThread(m.id)" class="answer t-purple">
-                                                        {{ m.answersCount }} {{ m.answersCount === 1 ? 'Antwort' : 'Antworten' }}
+                                                        {{ m.answersCount }} {{ m.answersCount === 1 ? 'Antwort' :
+                                                        'Antworten' }}
                                                     </div>
                                                     <div class="last-answer font-14 t-gray hide-small">
-                                                        Letzte Antwort {{ m.lastAnswerTime ? (m.lastAnswerTime * 1000 | date: 'HH:mm') : '' }}
+                                                        Letzte Antwort {{ m.lastAnswerTime ? (m.lastAnswerTime * 1000 |
+                                                        date: 'HH:mm') : '' }}
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div class="reactions">
                                                     <div class="reaction-btns">
                                                         <div class="reaction-btn"
@@ -119,7 +120,8 @@
                                                             {{ getReactionArray(m).length - 7 }} weitere
                                                         </div>
                                                         <div (click)="showAllReactions[i] = false"
-                                                            *ngIf="showAllReactions[i]" class="reaction-btn more-reactions">
+                                                            *ngIf="showAllReactions[i]"
+                                                            class="reaction-btn more-reactions">
                                                             Weniger anzeigen
                                                         </div>
                                                     </div>
@@ -150,35 +152,29 @@
                                             <textarea #editTa id="edit-{{m.id}}" class="edit-textarea"
                                                 (input)="autoGrow(editTa);  updateEditCaret(m, editTa)"
                                                 (keyup)=" updateEditCaret(m, editTa)" [(ngModel)]="m.editedText"
-                                                [placeholder]="m.text"></textarea>
-
+                                                [placeholder]="m.text">
+                                            </textarea>
                                             <app-mentions-overlay [text]="m.editedText"
                                                 [currentUserId]="currentUser?.uid" [context]="'DM'"
                                                 [users]="mentionUsers" [channels]="mentionChannels"
                                                 (mentionSelected)="insertMentionInEdit(m, $event)">
                                             </app-mentions-overlay>
-
                                             <app-smiley-overlay [active]="editSmileyActive[m.id]" [emojis]="allSmileys"
                                                 (selected)="insertSmileyInEdit(m, $event, editTa)"
                                                 (activeChange)="editSmileyActive[m.id] = $event">
                                             </app-smiley-overlay>
-
                                             <div class="edit-actions">
-
                                                 <app-round-btn
                                                     iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
                                                     iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
                                                     (click)="toggleEditSmiley(m.id)" class="smiley-edit-btn">
                                                 </app-round-btn>
-
                                                 <div class="btn-wrapper">
                                                     <button class="btn cancel"
                                                         (click)="cancelEditMessage(m)">Abbrechen</button>
                                                     <button class="btn save"
                                                         (click)="saveEditedMessage(m)">Speichern</button>
                                                 </div>
-
-
                                             </div>
                                         </div>
                                     </ng-template>
@@ -190,7 +186,8 @@
                                         [reactionIcons]="reactionIcons" (addReactionEvent)="addReaction($event)"
                                         (toggleReactionsEvent)="toggleReactionDialog($event, 'hover')"
                                         (startEditEvent)="enableEditMessage(m)"
-                                        (saveEditEvent)="updateMessageText($event)">
+                                        (saveEditEvent)="updateMessageText($event)"
+                                        (openThreadEvent)="handleOpenDmThread(m.id)">
                                     </app-dm-reactions-dialog>
                                 </div>
                             </div>

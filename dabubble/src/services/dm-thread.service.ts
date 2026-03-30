@@ -271,33 +271,36 @@ export class DmThreadService {
     }
 
     /** Adds a reaction to an answer and returns the updated answers array. */
-    async addReactionToAnswer(
-        dmChannelId: string,
-        dmChatId: string,
-        answers$: Observable<Answer[]>,
-        answerId: string,
-        reactionType: string,
-        currentUserId: string,
-        participants: User[]
-    ): Promise<Answer[] | undefined> {
+    async addReactionToAnswer(dmChannelId: string, dmChatId: string, answers$: Observable<Answer[]>, answerId: string, reactionType: string, currentUserId: string, participants: User[]): Promise<Answer[] | undefined> {
         const answers = await firstValueFrom(answers$);
         const answer = answers.find(a => a.id === answerId);
         if (!answer) return undefined;
-
         const currentUsers = this.extractUserIds(answer.reactions || {}, reactionType);
-
         if (!currentUsers.includes(currentUserId)) {
             const updatedUsers = [...currentUsers, currentUserId];
-
-            await this.channelService.setAnswerReaction(dmChannelId, dmChatId, answerId, reactionType, updatedUsers);
-
-            const newReactions = { ...answer.reactions, [reactionType]: updatedUsers };
-            const newReactionArray = this.transformReactionsToArray(newReactions, participants, currentUserId);
-            const updatedAnswer: Answer = { ...answer, reactions: newReactions, reactionArray: newReactionArray };
-
+            await this.dmService.addReactionToAnswer(
+                dmChannelId,
+                dmChatId,
+                answerId,
+                reactionType,
+                currentUserId
+            );
+            const newReactions = {
+                ...(answer.reactions || {}),
+                [reactionType]: updatedUsers
+            };
+            const newReactionArray = this.transformReactionsToArray(
+                newReactions,
+                participants,
+                currentUserId
+            );
+            const updatedAnswer: Answer = {
+                ...answer,
+                reactions: newReactions,
+                reactionArray: newReactionArray
+            };
             return answers.map(a => (a.id === answerId ? updatedAnswer : a));
         }
-
         return answers;
     }
 
@@ -325,35 +328,44 @@ export class DmThreadService {
     }
 
     /** Toggles the current user's reaction on an answer and returns updated answers. */
-    async toggleReactionForAnswer(
-        dmChannelId: string,
-        dmChatId: string,
-        answers$: Observable<Answer[]>,
-        answerId: string,
-        reactionType: string,
-        currentUserId: string,
-        participants: User[]
-    ): Promise<Answer[] | undefined> {
+    async toggleReactionForAnswer(dmId: string, messageId: string, answerId: string, answers$: Observable<Answer[]>, reactionType: string, currentUserId: string, participants: User[]): Promise<Answer[] | undefined> {
         const answers = await firstValueFrom(answers$);
         const answer = answers.find(a => a.id === answerId);
         if (!answer) return undefined;
-
-        const currentUsers = this.extractUserIds(answer.reactions || {}, reactionType);
-
-        const updatedUsers = currentUsers.includes(currentUserId)
-            ? currentUsers.filter(u => u !== currentUserId)
+        const currentUsers = answer.reactions?.[reactionType]
+            ? this.parseUserIds(
+                Array.isArray(answer.reactions[reactionType])
+                    ? answer.reactions[reactionType]
+                    : [answer.reactions[reactionType]]
+            )
+            : [];
+        const userHasReacted = currentUsers.includes(currentUserId);
+        const updatedUsers = userHasReacted
+            ? currentUsers.filter(id => id !== currentUserId)
             : [...currentUsers, currentUserId];
-
-        await this.channelService.setAnswerReaction(dmChannelId, dmChatId, answerId, reactionType, updatedUsers);
-        const newReactions =
-            updatedUsers.length === 0
-                ? Object.fromEntries(Object.entries(answer.reactions || {}).filter(([key]) => key !== reactionType))
-                : { ...answer.reactions, [reactionType]: updatedUsers };
-
-        const newReactionArray = this.transformReactionsToArray(newReactions, participants, currentUserId);
-        const updatedAnswer: Answer = { ...answer, reactions: newReactions, reactionArray: newReactionArray };
-
-        return answers.map(a => (a.id === answerId ? updatedAnswer : a));
+        if (userHasReacted) {
+            if (updatedUsers.length === 0) {
+                await this.dmService.deleteReactionTypeFromAnswer(dmId, messageId, answerId, reactionType);
+            } else {
+                await this.dmService.removeReactionFromAnswer(dmId, messageId, answerId, reactionType, currentUserId);
+            }
+        } else {
+            await this.dmService.addReactionToAnswer(dmId, messageId, answerId, reactionType, currentUserId);
+        }
+        return answers.map(a => {
+            if (a.id !== answerId) return a;
+            const newReactions = { ...(a.reactions || {}) };
+            if (updatedUsers.length === 0) {
+                delete newReactions[reactionType];
+            } else {
+                newReactions[reactionType] = updatedUsers;
+            }
+            return {
+                ...a,
+                reactions: newReactions,
+                reactionArray: this.transformReactionsToArray(newReactions, participants, currentUserId)
+            };
+        });
     }
 
     /** Extracts and normalizes user IDs for a specific reaction type. */
@@ -388,16 +400,11 @@ export class DmThreadService {
     //         return { success: false };
     //     }
     // }
-    async submitAnswer(
-        dmId: string,
-        msgId: string,
-        text: string,
-        currentUserId: string
-    ): Promise<{ success: boolean; answerTime?: number }> {
+    async submitAnswer(dmId: string, msgId: string, text: string, currentUserId: string): Promise<{ success: boolean; answerTime?: number }> {
         const trimmed = text.trim();
         if (!trimmed) return { success: false };
         const time = Math.floor(Date.now() / 1000);
-        const answer = { text: trimmed, time, senderId: currentUserId };
+        const answer = { message: trimmed, time, user: currentUserId };
         try {
             await this.dmService.addAnswerToMessage(dmId, msgId, answer);
             return { success: true, answerTime: time };
