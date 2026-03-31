@@ -42,9 +42,8 @@
                     [profileOpen]="showProfileBackdrop">
                 </app-chats>
 
-                <app-thread id="thread" class="thread" *ngIf="threadChatId && currentChannelId" 
-                    [chatId]="threadChatId" [channelId]="currentChannelId" 
-                    [class.open]="threadOpen" [class.closed]="!threadOpen"
+                <app-thread id="thread" class="thread" *ngIf="threadChatId && currentChannelId" [chatId]="threadChatId"
+                    [channelId]="currentChannelId" [class.open]="threadOpen" [class.closed]="!threadOpen"
                     (closeThread)="onThreadClosed()" (openProfile)="openProfileOverlay($event)"
                     (openUserChat)="openUserChat($event)" (openChannel)="openChannel($event)"
                     [class.fullwidth]="!channelOpen" [class.fullwidth-without-menu]="!menuOpen && !channelOpen">
@@ -59,10 +58,11 @@
 
                 <app-dm-thread id="dm-thread" class="dm-thread" *ngIf="dmThreadChatId && currentDmChannelId"
                     [dmChatId]="dmThreadChatId" [dmChannelId]="currentDmChannelId" [otherUser]="threadOtherUser"
-                    [class.open]="dmThreadOpen" [class.closed]="!dmThreadOpen" 
-                    (closeDmThread)="onDmThreadClosed()" (openProfile)="openProfileOverlay($event)" 
-
-                    [class.fullwidth]="!dmChannelOpen" [class.fullwidth-without-menu]="!menuOpen && !dmChannelOpen">
+                    [participantChannels]="participantChannels" [users]="allUsers" [class.open]="dmThreadOpen"
+                    [class.closed]="!dmThreadOpen" (closeDmThread)="onDmThreadClosed()"
+                    (openProfile)="openProfileOverlay($event)" (openUserChat)="openUserChat($event)"
+                    (openChannel)="openChannel($event)" [class.fullwidth]="!dmChannelOpen"
+                    [class.fullwidth-without-menu]="!menuOpen && !dmChannelOpen">
                 </app-dm-thread>
 
                 <app-new-message class="new-message" *ngIf="newMessageOpen" (openChannel)="openChannel($event)"

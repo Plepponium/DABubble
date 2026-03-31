@@ -45,7 +45,8 @@
                         <div class="font-14 t-gray">{{ chat.time * 1000 | date: 'HH:mm' }} Uhr</div>
                     </div>
                     <div class="chat-message" [ngClass]="{'left bg-light-purple': chat.user !== currentUserId, 
-                        'right': chat.user === currentUserId}" [innerHTML]="renderMessage(chat.message)">
+                        'right': chat.user === currentUserId}" [innerHTML]="renderMessage(chat.message)"
+                        (click)="onMentionClick($event)">
                     </div>
                     <div class="chat-answered" [ngClass]="{'right': chat.user === currentUserId}">
 
@@ -177,7 +178,8 @@
                                 <div class="font-14 t-gray">{{ answer.time * 1000 | date: 'HH:mm' }} Uhr</div>
                             </div>
                             <div class="chat-message" [ngClass]="{'left bg-light-purple': answer.user !== currentUserId, 
-                                'right': answer.user === currentUserId}" [innerHTML]="renderMessage(answer.message)">
+                                'right': answer.user === currentUserId}" [innerHTML]="renderMessage(answer.message)"
+                                (click)="onMentionClick($event)">
                             </div>
                             <div class="chat-answered" [ngClass]="{'right': answer.user === currentUserId}">
 
@@ -267,7 +269,7 @@
                                     [placeholder]="answer.message"></textarea>
 
                                 <app-mentions-overlay [text]="answer.editedText" [caretIndex]="answer._caretIndex"
-                                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="participants"
+                                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="users"
                                     [channels]="filteredChannels"
                                     (mentionSelected)="insertMentionInEdit(answer, $event)">
                                 </app-mentions-overlay>
@@ -308,8 +310,8 @@
                     (activeChange)="activeSmiley = $event">
                 </app-smiley-overlay>
                 <app-mentions-overlay [text]="newAnswer" [caretIndex]="mentionCaretIndex"
-                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="(participants$ | async) || []"
-                    [channels]="filteredChannels" (mentionSelected)="insertMention($event)"
+                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="users"
+                    [channels]="participantChannels" (mentionSelected)="insertMention($event)"
                     (overlayStateChange)="overlayActive = $event">
                 </app-mentions-overlay>
 

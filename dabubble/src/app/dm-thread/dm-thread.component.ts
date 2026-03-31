@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostListener, inject, Input, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, inject, input, Input, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,6 +24,8 @@ import { ChatWithDetails } from '../../models/chat-with-details.class';
 import { SafeHtml } from '@angular/platform-browser';
 import { DirectMessageService } from '../../services/direct-messages.service';
 import { DmThreadService } from '../../services/dm-thread.service';
+import { Channel } from '../../models/channel.class';
+import { DirectMessageUtilsService } from '../../services/direct-message-utils.service';
 
 @Component({
   selector: 'app-dm-thread',
@@ -33,15 +35,21 @@ import { DmThreadService } from '../../services/dm-thread.service';
 })
 export class DmThreadComponent {
   @ViewChild('answerInput', { static: false }) answerInput!: ElementRef<HTMLTextAreaElement>;
-  // channelService = inject(ChannelService);
+  @Output() openUserChat = new EventEmitter<User>();
+  @Output() openChannel = new EventEmitter<string>();
+  @Input() participantChannels: Channel[] = [];
+  @Input() users: User[] = [];
+
+  usersMap: Record<string, User> = {};
+
   userService = inject(UserService);
   logoutService = inject(LogoutService);
   uiService = inject(ChatsUiService);
   dataService = inject(ChatsDataService);
-  // threadService = inject(ThreadService);
   threadHelpService = inject(ThreadHelpService);
   dmService = inject(DirectMessageService);
   dmThreadService = inject(DmThreadService);
+  utilsService = inject(DirectMessageUtilsService);
 
   overlayActive: boolean = false;
   editAnswerEditIndex: number | null = null;
@@ -94,18 +102,18 @@ export class DmThreadComponent {
 
   /** Handles input changes and reloads chat and answers when dmChannelId or chatId changes. */
   ngOnChanges(changes: SimpleChanges) {
+    if (changes['users']) {
+      this.usersMap = this.users.reduce((acc, user) => {
+        acc[user.uid] = user;
+        return acc;
+      }, {} as Record<string, User>);
+    }
+
     if (changes['dmChatId'] && !changes['dmChatId'].firstChange) {
-      // this.chat$ = this.threadService.getEnrichedChat(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
-      // this.answers$ = this.threadService.getEnrichedAnswers(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
-      // this.answers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => { this.threadService.scrollToBottom(); });
       this.initDmData();
     }
-    if (changes['dmChannelId'] && !changes['dmChannelId'].firstChange) {
-      // this.getCurrentUserAndChannels();
-      // setTimeout(() =>
-      //   this.loadChannelWithId(), 100,
-      // );
 
+    if (changes['dmChannelId'] && !changes['dmChannelId'].firstChange) {
       this.initDmData();
     }
   }
@@ -445,6 +453,16 @@ export class DmThreadComponent {
 
   /** Renders formatted message text safely for display. */
   renderMessage(text: string): SafeHtml {
-    return this.threadHelpService.renderMessage(text);
+    return this.utilsService.renderMessage(text, this.usersMap, this.participantChannels);
+  }
+
+  onMentionClick(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const target = event.target as HTMLElement;
+    this.utilsService.handleMentionClick(target,
+      (user) => this.openUserChat.emit(user),
+      (channelId) => this.openChannel.emit(channelId)
+    );
   }
 }
