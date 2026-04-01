@@ -71,17 +71,6 @@ export class DmThreadService {
 
 
     /** Loads a channel by ID and returns observables for its name and participants. */
-    // loadChannelWithId(channelId: string): Observable<{ channelName$: Observable<string>; participants$: Observable<User[]> }> {
-    //     return this.channelService.getChannelById(channelId).pipe(
-    //         take(1),
-    //         map(channel => {
-    //             if (!channel) throw new Error('Channel not found');
-    //             const channelName$ = of(channel.name);
-    //             const participants$ = this.userService.getUsersByIds(channel.participants);
-    //             return { channelName$, participants$ };
-    //         })
-    //     );
-    // }
     loadDmChannelWithId(dmChannelId: string): Observable<{ channelName$: Observable<string>; participants$: Observable<User[]> }> {
         return this.channelService.getChannelById(dmChannelId).pipe(
             take(1),
@@ -95,28 +84,6 @@ export class DmThreadService {
     }
 
     /** Retrieves a chat enriched with user metadata and transformed reactions. */
-    // getEnrichedChat(channelId: string, chatId: string, participants$: Observable<User[]>, currentUserId: string): Observable<Chat | undefined> {
-    //     return this.channelService.getChatsForChannel(channelId).pipe(
-    //         switchMap(chats =>
-    //             participants$.pipe(
-    //                 map(users => {
-    //                     const chat = chats.find(c => c.id === chatId);
-    //                     if (!chat) return undefined;
-    //                     const user = users.find(u => u.uid === chat.user);
-    //                     const isUserMissing = !user;
-
-    //                     return {
-    //                         ...chat,
-    //                         userName: isUserMissing ? 'Ehemaliger Nutzer' : user.name,
-    //                         userImg: user?.img ?? 'default-user',
-    //                         isUserMissing,
-    //                         reactionArray: this.transformReactionsToArray(chat.reactions, users, currentUserId)
-    //                     };
-    //                 })
-    //             )
-    //         )
-    //     );
-    // }
     getEnrichedDmChat(dmChannelId: string, dmChatId: string, participants$: Observable<User[]>, currentUserId: string) {
         return this.dmService.getMessages(dmChannelId).pipe(
             switchMap(chats =>
@@ -159,6 +126,7 @@ export class DmThreadService {
                                 reactionArray: this.transformReactionsToArray(answer.reactions, users, currentUserId)
                             };
                         })
+                        .sort((a, b) => (a.time || 0) - (b.time || 0))
                     )
                 )
             )
@@ -278,27 +246,10 @@ export class DmThreadService {
         const currentUsers = this.extractUserIds(answer.reactions || {}, reactionType);
         if (!currentUsers.includes(currentUserId)) {
             const updatedUsers = [...currentUsers, currentUserId];
-            await this.dmService.addReactionToAnswer(
-                dmChannelId,
-                dmChatId,
-                answerId,
-                reactionType,
-                currentUserId
-            );
-            const newReactions = {
-                ...(answer.reactions || {}),
-                [reactionType]: updatedUsers
-            };
-            const newReactionArray = this.transformReactionsToArray(
-                newReactions,
-                participants,
-                currentUserId
-            );
-            const updatedAnswer: Answer = {
-                ...answer,
-                reactions: newReactions,
-                reactionArray: newReactionArray
-            };
+            await this.dmService.addReactionToAnswer(dmChannelId, dmChatId, answerId, reactionType, currentUserId);
+            const newReactions = {...(answer.reactions || {}), [reactionType]: updatedUsers};
+            const newReactionArray = this.transformReactionsToArray(newReactions, participants, currentUserId);
+            const updatedAnswer: Answer = {...answer, reactions: newReactions, reactionArray: newReactionArray};
             return answers.map(a => (a.id === answerId ? updatedAnswer : a));
         }
         return answers;
@@ -318,13 +269,7 @@ export class DmThreadService {
         } else {
             await this.dmService.addReactionToMessage(dmId, chat.id, reactionType, currentUserId);
         }
-        return this.updateReactionForChat(
-            of(chat),
-            participants,
-            currentUserId,
-            reactionType,
-            updatedUsers
-        );
+        return this.updateReactionForChat(of(chat), participants, currentUserId, reactionType, updatedUsers);
     }
 
     /** Toggles the current user's reaction on an answer and returns updated answers. */
@@ -400,13 +345,13 @@ export class DmThreadService {
     //         return { success: false };
     //     }
     // }
-    async submitAnswer(dmId: string, msgId: string, text: string, currentUserId: string): Promise<{ success: boolean; answerTime?: number }> {
+    async submitAnswer(dmChannelId: string, dmChatId: string, text: string, currentUserId: string): Promise<{ success: boolean; answerTime?: number }> {
         const trimmed = text.trim();
         if (!trimmed) return { success: false };
         const time = Math.floor(Date.now() / 1000);
         const answer = { message: trimmed, time, user: currentUserId };
         try {
-            await this.dmService.addAnswerToMessage(dmId, msgId, answer);
+            await this.dmService.addAnswerToMessage(dmChannelId, dmChatId, answer);
             return { success: true, answerTime: time };
         } catch (e) {
             console.error('Fehler beim Senden der DM-Antwort:', e);
@@ -424,9 +369,9 @@ export class DmThreadService {
     }
 
     /** Saves an edited answer message and returns the updated answer object. */
-    async saveEditedAnswer(
-        channelId: string,
-        chatId: string,
+       async saveEditedAnswer(
+        dmChannelId: string,
+        dmChatId: string,
         answer: Answer,
         newText: string
     ): Promise<Answer | undefined> {
@@ -436,7 +381,8 @@ export class DmThreadService {
         }
 
         try {
-            await this.channelService.updateAnswerMessage(channelId, chatId, answer.id, trimmed);
+            await this.dmService.updateAnswerMessage(dmChannelId, dmChatId, answer.id, trimmed);
+            // await this.channelService.updateAnswerMessage(dmChannelId, dmChatId, answer.id, trimmed);
             return { ...answer, message: trimmed, isEditing: false };
         } catch (error) {
             console.error('Fehler beim Speichern der bearbeiteten Antwort:', error);

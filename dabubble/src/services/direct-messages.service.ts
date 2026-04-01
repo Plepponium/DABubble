@@ -116,15 +116,13 @@ export class DirectMessageService {
     }
 
 
-
+    /** Adds new answer to message thread in DM chat. */
     async addAnswerToMessage(dmId: string, msgId: string, answer: { message: string; time: number; user: string }) {
-        // 1. Answer in Subcollection schreiben
         await addDoc(
             collection(this.firestore, `dmChats/${dmId}/messages/${msgId}/answers`),
             answer
         );
 
-        // 2. Message Counter + lastAnswerTime im Message-Dokument aktualisieren
         const messageRef = doc(this.firestore, `dmChats/${dmId}/messages/${msgId}`);
         await updateDoc(messageRef as any, {
             answersCount: increment(1),
@@ -138,60 +136,7 @@ export class DirectMessageService {
         return collectionData(q as any, { idField: 'id' }) as Observable<any[]>;
     }
 
-    // getMessagesWithThreads(dmId: string): Observable<any[]> {
-    //     return collectionData(
-    //         query(
-    //             collection(this.firestore, `directMessages/${dmId}/messages`),
-    //             orderBy('sentAt', 'asc')
-    //         ),
-    //         { idField: 'id' }
-    //     );
-    // }
-    // getMessagesWithThreads(dmId: string): Observable<any[]> {
-    //     return collectionData(
-    //         query(
-    //             collection(this.firestore, `dmChats/${dmId}/messages`) as any,
-    //             orderBy('sentAt', 'asc')
-    //         ),
-    //         { idField: 'id' }
-    //     ) as Observable<any[]>;
-    // }
-    // getMessagesWithThreads(dmId: string): Observable<any[]> {
-    //     const messages$ = collectionData(
-    //         query(
-    //         collection(this.firestore, `dmChats/${dmId}/messages`) as any,
-    //         orderBy('sentAt', 'asc')
-    //         ),
-    //         { idField: 'id' }
-    //     ) as Observable<any[]>;
-
-    //     return messages$.pipe(
-    //         switchMap(messages => {
-    //         if (!messages.length) return of([] as any[]);
-
-    //         // 2. Für JEDEN Message die Answers-Subcollection laden
-    //         const messageWithCounts$ = messages.map(msg => 
-    //             collectionData(
-    //             query(
-    //                 collection(this.firestore, `dmChats/${dmId}/messages/${msg.id}/answers`) as any,
-    //                 orderBy('time', 'asc')
-    //             )
-    //             ).pipe(
-    //             map((answers: any[]) => {
-    //                 // console.log(`🔍 ${msg.id}: ${answers.length} answers gefunden!`);
-    //                 return {
-    //                     ...msg,
-    //                     answersCount: answers.length,
-    //                     lastAnswerTime: answers.length > 0 ? answers[answers.length - 1].time : null
-    //                 };
-    //             })
-    //             )
-    //         );
-
-    //         return forkJoin(messageWithCounts$);
-    //         })
-    //     );
-    // }
+    /** Toggles the current user's reaction on an answer. */
     getMessagesWithThreads(dmId: string): Observable<any[]> {
         const messages$ = collectionData(
             query(
@@ -213,43 +158,47 @@ export class DirectMessageService {
                         ),
                         // { idField: 'id' }
                     ).pipe(
-                        take(1),  // ← EINMALIGER SNAPSHOT, dann complete!
+                        take(1), 
                         map((answers: any[]) => {
-                            // console.log(`🔍 ${msg.id}: ${answers.length} answers gefunden!`);
                             const answersCount = answers.length;
                             const lastAnswerTime = answers.length > 0
                                 ? (answers[answers.length - 1] as any).time
                                 : null;
-
-                            return {
-                                ...msg,
-                                answersCount,
-                                lastAnswerTime
-                            };
+                            return {...msg, answersCount, lastAnswerTime};
                         })
                     )
                 );
-
                 return forkJoin(messageWithCounts$);
             })
         );
     }
 
+    /** Adds user reaction to answer. */
     async addReactionToAnswer(dmId: string, messageId: string, answerId: string, type: string, userId: string) {
         const answerRef = doc(this.firestore, `dmChats/${dmId}/messages/${messageId}/answers/${answerId}`);
         return updateDoc(answerRef, { [`reactions.${type}`]: arrayUnion(userId) });
     }
 
+    /** Removes user reaction from answer. */
     async removeReactionFromAnswer(dmId: string, messageId: string, answerId: string, type: string, userId: string) {
         const answerRef = doc(this.firestore, `dmChats/${dmId}/messages/${messageId}/answers/${answerId}`);
         return updateDoc(answerRef, { [`reactions.${type}`]: arrayRemove(userId) });
     }
 
+    /** Toggles user reaction on answer. */
     async deleteReactionTypeFromAnswer(dmId: string, messageId: string, answerId: string, type: string) {
         const answerRef = doc(this.firestore, `dmChats/${dmId}/messages/${messageId}/answers/${answerId}`);
         return updateDoc(answerRef, { [`reactions.${type}`]: deleteField() });
     }
 
-
-
+    /** Updates answer message text content. */
+      async updateAnswerMessage(dmChannelId: string, dmChatId: string, answerId: string, newText: string) {
+        try {
+          const answerRef = doc(this.firestore, `dmChats/${dmChannelId}/messages/${dmChatId}/answers/${answerId}`);
+          await updateDoc(answerRef, { message: newText });
+        } catch (err) {
+          console.error('Fehler beim Aktualisieren der Antwort:', err);
+          throw err;
+        }
+      }
 }

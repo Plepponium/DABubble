@@ -456,6 +456,7 @@ export class DmThreadComponent {
     return this.utilsService.renderMessage(text, this.usersMap, this.participantChannels);
   }
 
+  /** Handles clicks on mentions within messages, navigating to user profiles or channels. */
   onMentionClick(event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
