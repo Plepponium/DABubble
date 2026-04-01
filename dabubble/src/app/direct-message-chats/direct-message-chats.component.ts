@@ -192,22 +192,12 @@ export class DirectMessageChatsComponent {
     this.utils.setCursorPosition(textarea, this.mentionCaretIndex);
   }
 
-  /** Setup messages$ with enrichMessages pipe */
-  // private setupMessagesObservable(): void {
-  //   if (!this.dmId || !this.users$) return;
-  //   const rawMessages$ = this.dmService.getMessages(this.dmId);
-  //   this.messages$ = combineLatest([rawMessages$, this.users$]).pipe(map(([messages, users]) => this.enrichMessages(messages, users)));
-  //   this.subscribeToMessages();
-  // }
+  /** Setup messages$ with enrichMessages pipe and shareReplay for performance */
   private setupMessagesObservable(): void {
     if (!this.dmChannelId || !this.users$) return;
     const rawMessages$ = this.dmService.getMessagesWithThreads(this.dmChannelId);
-    // this.messages$ = combineLatest([rawMessages$, this.users$]).pipe(
-    //   map(([messages, users]) => this.enrichMessages(messages, users))
-    // );
     this.messages$ = combineLatest([rawMessages$, this.users$]).pipe(
       map(([messages, users]) => this.enrichMessages(messages, users)),
-      // tap(final => console.log('🔍 messages$ emit:', final.map(m => ({id: m.id, answersCount: m.answersCount}))))
     );
     this.subscribeToMessages();
   }
@@ -218,35 +208,17 @@ export class DirectMessageChatsComponent {
     this.subs.add(s);
   }
 
-  /** Enriches messages with senderName, senderImg, reactions */
-  // private enrichMessages(messages: any[], users: Record<string, User>): any[] {
-  //   return messages.map(m => ({ ...m, senderName: users[m.senderId]?.name || 'Unknown', senderImg: users[m.senderId]?.img || 'default-user', reactions: m.reactions || {}, answersCount: m.answersCount || 0,
-  //     lastAnswerTime: m.lastAnswerTime || 0,
-  //     isEditing: m.isEditing || false,
-  //     editedText: m.text }));
-  // }
-  // private enrichMessages(messages: any[], users: Record<string, User>): any[] {
-  //   return messages.map(m => ({
-  //     ...m,
-  //     senderName: users[m.senderId]?.name || 'Unknown',
-  //     senderImg: users[m.senderId]?.img || 'default-user',
-  //     reactions: m.reactions || {},
-  //     answersCount: m.answersCount || 0,
-  //     lastAnswerTime: m.lastAnswerTime || null
-  //   }));
-  // }
+  /** Enriches messages with senderName, answersCount, lastAnswerTime. Reactions are processed in template for better performance. */
   private enrichMessages(messages: any[], users: Record<string, User>): any[] {
     const enriched = messages.map(m => {
       const result = {
         ...m,
         senderName: users[m.senderId]?.name || 'Unknown',
-        answersCount: m.answersCount || 0,  // ← Hier sollte der Wert stehen
+        answersCount: m.answersCount || 0,  
         lastAnswerTime: m.lastAnswerTime || null
       };
-      // console.log(`🔍 enrich ${m.id}: raw=${m.answersCount}, enriched=${result.answersCount}`);
       return result;
     });
-    // console.log('🔍 Final enriched:', enriched.map(m => ({id: m.id, answersCount: m.answersCount})));
     return enriched;
   }
 
@@ -444,23 +416,15 @@ export class DirectMessageChatsComponent {
     );
   }
 
+  /** Template: trackBy for messages. @param index Index (unused) @param message Message object */
   trackByMessageId(index: number, message: any): string {
     return message.id;
   }
 
-  // handleOpenThread(chatId: string) {
-  //   // if (!this.channelId) return;
-  //   // this.openThread.emit({ channelId: this.channelId, chatId });
-  //   // this.openDmThread.emit({ channelId: this.channelId, chatId });
-  //   // this.openDmThread.emit({ dmId: this.dmId!, chatId });
-  // }
+  /** Template: Open DM thread for message. @param messageId ID of message to open thread for */
   handleOpenDmThread(messageId: string): void {
     if (!this.dmChannelId) return;
-    this.openDmThread.emit({
-      dmId: this.dmChannelId,
-      chatId: messageId,
-      otherUser: this.otherUser
-    });
+    this.openDmThread.emit({ dmId: this.dmChannelId, chatId: messageId, otherUser: this.otherUser});
   }
 
   /** Template: Smooth-scroll to message. @param messageId Target ID */

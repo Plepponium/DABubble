@@ -104,24 +104,13 @@ export class MainPageComponent {
   @HostListener('window:resize', [])
   onResize() {
     const previousIsSmall = this.isSmallScreen;
-
     this.isSmallScreen = window.innerWidth < 1512;
     this.isResponsiveScreen = window.innerWidth <= 880;
 
-    if (!previousIsSmall && this.isSmallScreen && this.threadOpen) {
-      this.channelOpen = false;
-    }
-
-    if (!previousIsSmall && this.isSmallScreen && this.dmThreadOpen) {
-      this.dmChannelOpen = false;
-    }
-
-    if (previousIsSmall && !this.isSmallScreen && this.threadOpen) {
-      this.channelOpen = true;
-    }
-    if (previousIsSmall && !this.isSmallScreen && this.dmThreadOpen) {
-      this.dmChannelOpen = true;
-    }
+    if (!previousIsSmall && this.isSmallScreen && this.threadOpen) {this.channelOpen = false;}
+    if (!previousIsSmall && this.isSmallScreen && this.dmThreadOpen) {this.dmChannelOpen = false;}
+    if (previousIsSmall && !this.isSmallScreen && this.threadOpen) {this.channelOpen = true;}
+    if (previousIsSmall && !this.isSmallScreen && this.dmThreadOpen) {this.dmChannelOpen = true;}
   }
 
   /** Initializes component on init. */
@@ -315,7 +304,7 @@ export class MainPageComponent {
   /** Handles thread close event. */
   onThreadClosed() {
     this.threadOpen = false;
-
+    this.threadChatId = '';
     if (this.isSmallScreen) {
       this.channelOpen = true;
     }
@@ -333,12 +322,12 @@ export class MainPageComponent {
     }, 300);
   }
 
-
-
   /** Handles thread close event. */
   onDmThreadClosed() {
     this.dmThreadOpen = false;
-
+    this.dmThreadChatId = '';
+    this.currentDmChannelId = '';
+    // this.threadOtherUser = undefined;
     if (this.isSmallScreen) {
       this.dmChannelOpen = true;
     }

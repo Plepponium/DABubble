@@ -4,9 +4,7 @@
             <div class="headline font-24 font-w-700">Thread</div>
             <div class="channel-name-container">
                 <img src="assets/icons/tag-small-purple.svg" alt="">
-                <!-- <ng-container *ngIf="channelName$ | async as channelName"> -->
                 <div class="channel-name font-14 t-middle-purple">{{ otherUser?.name || 'Direktnachricht' }}</div>
-                <!-- </ng-container> -->
             </div>
         </div>
 
@@ -16,7 +14,7 @@
     </div>
 
     <div *ngIf="(dmChat$ | async) as chat" class="chat-content">
-        <div class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
+        <div class="chat-day-section first-part" [ngClass]="{'reverse': chat.user === currentUserId}">
             <div class="chat-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                 <div class="chat-dialogue top" [ngClass]="{'reverse': chat.user === currentUserId}">
                     <div class="reactions-display-container">

@@ -115,7 +115,6 @@ export class DirectMessageService {
         return snap.docs.map(d => d.id);
     }
 
-
     /** Adds new answer to message thread in DM chat. */
     async addAnswerToMessage(dmId: string, msgId: string, answer: { message: string; time: number; user: string }) {
         await addDoc(
@@ -130,46 +129,57 @@ export class DirectMessageService {
         });
     }
 
+    /** Retrieves answers for specific message in DM chat. */
     getAnswersForMessage(dmId: string, msgId: string): Observable<any[]> {
         const answersCol = collection(this.firestore, `dmChats/${dmId}/messages/${msgId}/answers`);
         const q = query(answersCol as any, orderBy('time', 'asc'));
         return collectionData(q as any, { idField: 'id' }) as Observable<any[]>;
     }
 
-    /** Toggles the current user's reaction on an answer. */
+    /** Retrieves messages for DM chat enriched with answer counts and last answer times. */
     getMessagesWithThreads(dmId: string): Observable<any[]> {
-        const messages$ = collectionData(
+        return this.loadMessages(dmId).pipe(
+            switchMap(messages => this.enrichMessagesWithAnswerStats(dmId, messages))
+        );
+    }
+
+    /** Enriches messages with their answer counts and last answer times. */
+    private loadMessages(dmId: string): Observable<any[]> {
+        return collectionData(
             query(
                 collection(this.firestore, `dmChats/${dmId}/messages`) as any,
                 orderBy('sentAt', 'asc')
             ),
             { idField: 'id' }
         ) as Observable<any[]>;
+    }
 
-        return messages$.pipe(
-            switchMap(messages => {
-                if (!messages.length) return of([] as any[]);
+    /** Enriches messages with their answer counts and last answer times. */
+    private enrichMessagesWithAnswerStats(dmId: string, messages: any[]): Observable<any[]> {
+        if (!messages.length) return of([]);
 
-                const messageWithCounts$ = messages.map(msg =>
-                    collectionData(
-                        query(
-                            collection(this.firestore, `dmChats/${dmId}/messages/${msg.id}/answers`) as any,
-                            orderBy('time', 'asc')
-                        ),
-                        // { idField: 'id' }
-                    ).pipe(
-                        take(1), 
-                        map((answers: any[]) => {
-                            const answersCount = answers.length;
-                            const lastAnswerTime = answers.length > 0
-                                ? (answers[answers.length - 1] as any).time
-                                : null;
-                            return {...msg, answersCount, lastAnswerTime};
-                        })
-                    )
-                );
-                return forkJoin(messageWithCounts$);
-            })
+        const requests = messages.map(msg =>
+            this.getAnswerStatsForMessage(dmId, msg).pipe(
+            map(stats => ({ ...msg, ...stats }))
+            )
+        );
+
+        return forkJoin(requests);
+    }
+
+    /** Retrieves answer count and last answer time for a specific message. */
+    private getAnswerStatsForMessage(dmId: string, msg: any): Observable<{ answersCount: number; lastAnswerTime: number | null }> {
+        return collectionData(
+            query(
+                collection(this.firestore, `dmChats/${dmId}/messages/${msg.id}/answers`) as any,
+                orderBy('time', 'asc')
+            )
+        ).pipe(
+            take(1),
+            map((answers: any[]) => ({
+                answersCount: answers.length,
+                lastAnswerTime: answers.length ? answers[answers.length - 1].time : null
+            }))
         );
     }
 
@@ -192,13 +202,13 @@ export class DirectMessageService {
     }
 
     /** Updates answer message text content. */
-      async updateAnswerMessage(dmChannelId: string, dmChatId: string, answerId: string, newText: string) {
+    async updateAnswerMessage(dmChannelId: string, dmChatId: string, answerId: string, newText: string) {
         try {
-          const answerRef = doc(this.firestore, `dmChats/${dmChannelId}/messages/${dmChatId}/answers/${answerId}`);
-          await updateDoc(answerRef, { message: newText });
+            const answerRef = doc(this.firestore, `dmChats/${dmChannelId}/messages/${dmChatId}/answers/${answerId}`);
+            await updateDoc(answerRef, { message: newText });
         } catch (err) {
-          console.error('Fehler beim Aktualisieren der Antwort:', err);
-          throw err;
+            console.error('Fehler beim Aktualisieren der Antwort:', err);
+            throw err;
         }
-      }
+    }
 }

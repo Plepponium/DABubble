@@ -97,7 +97,8 @@ export class DmThreadComponent {
   ngOnInit() {
     this.updateIsResponsive();
     this.initCurrentUser();
-    setTimeout(() => this.focusInputOnStart(), 200);
+    setTimeout(() => this.focusInputOnStart(), 200 );
+    
   }
 
   /** Handles input changes and reloads chat and answers when dmChannelId or chatId changes. */
@@ -108,14 +109,8 @@ export class DmThreadComponent {
         return acc;
       }, {} as Record<string, User>);
     }
-
-    if (changes['dmChatId'] && !changes['dmChatId'].firstChange) {
-      this.initDmData();
-    }
-
-    if (changes['dmChannelId'] && !changes['dmChannelId'].firstChange) {
-      this.initDmData();
-    }
+    if (changes['dmChatId'] && !changes['dmChatId'].firstChange) {this.initDmData();}
+    if (changes['dmChannelId'] && !changes['dmChannelId'].firstChange) {this.initDmData();}
   }
 
   @HostListener('window:resize')
@@ -146,7 +141,7 @@ export class DmThreadComponent {
     this.answerInput?.nativeElement?.focus();
   }
 
-
+  /** Initializes the current user, sets up participants, and loads DM chat and answers. */
   private initCurrentUser() {
     this.userService.getCurrentUser().pipe(
       take(1),
@@ -161,38 +156,19 @@ export class DmThreadComponent {
     });
   }
 
+  /** Initializes DM chat and answers observables based on the current dmChannelId, dmChatId, and participants. */
   private initDmData() {
     if (!this.dmChannelId || !this.dmChatId || !this.currentUserId) return;
     this.subscribeToParticipants();
-    this.dmChat$ = this.dmThreadService.getEnrichedDmChat(
-      this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId
-    );
-    this.dmAnswers$ = this.dmThreadService.getEnrichedDmAnswers(
-      this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId
-    );
+    this.dmChat$ = this.dmThreadService.getEnrichedDmChat(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
+    this.dmAnswers$ = this.dmThreadService.getEnrichedDmAnswers(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
+    // setTimeout(() => this.dmThreadService.scrollToBottom(), 0);
+    this.dmAnswers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
+      this.dmThreadService.scrollToBottom();
+    });
   }
 
-  /** Retrieves the current user ID and available channels from the service. */
-  // getCurrentUserAndChannels() {
-  //   this.threadService.getCurrentUserAndChannels().subscribe(result => {
-  //     this.currentUserId = result.userId;
-  //     this.filteredChannels = result.channels;
-  //   });
-  // }
-
   /** Loads channel details, participants, chat, and answers for the current dmChannelId. */
-  // private loadChannelWithId() {
-  //   this.threadService.loadChannelWithId(this.dmChannelId).subscribe(({ channelName$, participants$ }) => {
-  //     this.channelName$ = channelName$;
-  //     this.participants$ = participants$;
-  //     this.subscribeToParticipants();
-  //     this.dmChat$ = this.threadService.getEnrichedChat(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
-  //     this.dmAnswers$ = this.threadService.getEnrichedAnswers(this.dmChannelId, this.dmChatId, this.participants$, this.currentUserId);
-  //     this.dmAnswers$.pipe(take(1), takeUntil(this.destroy$)).subscribe(() => {
-  //       this.threadService.scrollToBottom();
-  //     });
-  //   });
-  // }
   loadDmChannelWithId() {
     this.dmThreadService.loadDmChannelWithId(this.dmChannelId).subscribe(({ channelName$, participants$ }) => {
       this.channelName$ = channelName$;
@@ -203,12 +179,9 @@ export class DmThreadComponent {
     });
   }
 
-
   /** Subscribes to participant updates and stores them locally. */
   subscribeToParticipants() {
-    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => {
-      this.participants = users;
-    });
+    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => {this.participants = users;});
   }
 
   /** Toggles the reactions dialog visibility for a specific chat message. */
@@ -260,7 +233,6 @@ export class DmThreadComponent {
     const updatedChat = await this.dmThreadService.addReaction(this.dmChannelId, this.dmChat$, reactionType, this.currentUserId, this.participants);
     if (updatedChat) {
       this.dmChat$ = of(updatedChat);
-
       this.activeReactionDialogueIndex = null;
       this.activeReactionDialogueBelowIndex = null;
     }
@@ -440,9 +412,7 @@ export class DmThreadComponent {
   /** Saves the edited answer and refreshes the answers list if successful. */
   async saveEditedAnswer(answer: Answer) {
     const result = await this.dmThreadService.saveEditedAnswer(this.dmChannelId, this.dmChatId, answer, answer.editedText ?? '');
-    if (result) {
-      this.subscribeAnswers();
-    }
+    if (result) {this.subscribeAnswers();}
   }
 
   /** Reloads enriched answers and scrolls to the bottom. */

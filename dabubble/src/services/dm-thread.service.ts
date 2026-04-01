@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { combineLatest, firstValueFrom, map, Observable, of, Subject, switchMap, take } from 'rxjs';
+import { firstValueFrom, map, Observable, of, Subject, switchMap, take } from 'rxjs';
 import { ChannelService } from './channel.service';
 import { UserService } from './user.service';
 import { User } from '../models/user.class';
@@ -7,7 +7,6 @@ import { Chat } from '../models/chat.class';
 import { Answer } from '../models/answer.class';
 import { RawReactionsMap, TransformedReaction } from '../models/reaction.types';
 import { DirectMessageService } from './direct-messages.service';
-import { collection, collectionData, Firestore } from '@angular/fire/firestore';
 
 @Injectable({ providedIn: 'root' })
 export class DmThreadService {
@@ -15,7 +14,6 @@ export class DmThreadService {
     private userService = inject(UserService);
     private dmService = inject(DirectMessageService);
     private answerAddedSubject = new Subject<{ dmChatId: string; answerTime: number }>();
-    // private firestore = inject(Firestore);
 
     /** Scrolls the thread history container to the bottom after a short delay. */
     scrollToBottom() {
@@ -32,43 +30,6 @@ export class DmThreadService {
         const threadHistory = document.getElementById('thread-history');
         threadHistory?.scrollTo({ top: threadHistory.scrollHeight, behavior: 'smooth' });
     }
-
-    /** Retrieves the current user ID and filters channels where the user is a participant. */
-    // getCurrentUserAndChannels(): Observable<{ userId: string; channels: any[] }> {
-    //     return this.userService.getCurrentUser().pipe(
-    //         take(1),
-    //         switchMap(user => {
-    //             if (!user) return of({ userId: '', channels: [] }); // kein User angemeldet
-    //             return this.channelService.getChannels().pipe(
-    //                 take(1),
-    //                 map(channels => ({
-    //                     userId: user.uid,
-    //                     channels: channels.filter(
-    //                         c => Array.isArray(c.participants) && c.participants.includes(user.uid)
-    //                     )
-    //                 }))
-    //             );
-    //         })
-    //     );
-    // }
-    // getCurrentUserAndDmChannels(): Observable<{ userId: string; dmChannels: any[] }> {
-    //     return this.userService.getCurrentUser().pipe(
-    //         take(1),
-    //         switchMap(user => {
-    //             if (!user) return of({ userId: '', dmChannels: [] }); // kein User angemeldet
-    //             return this.dmService.getDmChannels().pipe(
-    //                 take(1),
-    //                 map(channels => ({
-    //                     userId: user.uid,
-    //                     dmChannels: channels.filter(
-    //                         c => Array.isArray(c.participants) && c.participants.includes(user.uid)
-    //                     )
-    //                 }))
-    //             );
-    //         })
-    //     );
-    // }
-
 
     /** Loads a channel by ID and returns observables for its name and participants. */
     loadDmChannelWithId(dmChannelId: string): Observable<{ channelName$: Observable<string>; participants$: Observable<User[]> }> {
@@ -134,18 +95,6 @@ export class DmThreadService {
     }
 
     /** Converts a raw reactions map into a sorted array with metadata and user context. */
-    // transformReactionsToArray(reactionsMap: RawReactionsMap | undefined, participants: User[], currentUserId: string): TransformedReaction[] {
-    //     if (!reactionsMap) return [];
-    //     return Object.entries(reactionsMap).map(([type, usersRaw]) => {
-    //         const userIds = this.parseUserIds(Array.isArray(usersRaw) ? usersRaw : [usersRaw]);
-    //         const currentUserReacted = userIds.includes(currentUserId);
-    //         const otherUserName = this.findOtherUserName(userIds, currentUserId, participants);
-    //         const otherUserReacted = userIds.filter(id => id !== currentUserId).length > 1;
-    //         return { type, count: userIds.length, userIds, currentUserReacted, otherUserName, otherUserReacted };
-    //     })
-    //         .sort((a, b) => a.type.localeCompare(b.type));
-    // }
-
     transformReactionsToArray(reactionsMap: RawReactionsMap | undefined, participants: User[], currentUserId: string): TransformedReaction[] {
         if (!reactionsMap) return [];
         return Object.entries(reactionsMap).map(([type, usersRaw]) => {
@@ -322,29 +271,6 @@ export class DmThreadService {
     }
 
     /** Submits a new answer to a chat and returns submission status and timestamp. */
-    // async submitAnswer(
-    //     channelId: string,
-    //     chatId: string,
-    //     messageText: string,
-    //     currentUserId: string
-    // ): Promise<{ success: boolean; answerTime?: number }> {
-    //     const trimmed = messageText.trim();
-    //     if (!trimmed) return { success: false };
-
-    //     const answer = {
-    //         message: trimmed,
-    //         time: Math.floor(Date.now() / 1000),
-    //         user: currentUserId
-    //     };
-
-    //     try {
-    //         await this.channelService.addAnswerToChat(channelId, chatId, answer);
-    //         return { success: true, answerTime: answer.time };
-    //     } catch (error) {
-    //         console.error('Fehler beim Senden der Antwort:', error);
-    //         return { success: false };
-    //     }
-    // }
     async submitAnswer(dmChannelId: string, dmChatId: string, text: string, currentUserId: string): Promise<{ success: boolean; answerTime?: number }> {
         const trimmed = text.trim();
         if (!trimmed) return { success: false };
@@ -369,20 +295,14 @@ export class DmThreadService {
     }
 
     /** Saves an edited answer message and returns the updated answer object. */
-       async saveEditedAnswer(
-        dmChannelId: string,
-        dmChatId: string,
-        answer: Answer,
-        newText: string
-    ): Promise<Answer | undefined> {
+       async saveEditedAnswer(dmChannelId: string, dmChatId: string, answer: Answer, newText: string): Promise<Answer | undefined> {
         const trimmed = newText.trim();
         if (!trimmed || trimmed === answer.message) {
-            return { ...answer, isEditing: false }; // keine Änderung
+            return { ...answer, isEditing: false }; 
         }
 
         try {
             await this.dmService.updateAnswerMessage(dmChannelId, dmChatId, answer.id, trimmed);
-            // await this.channelService.updateAnswerMessage(dmChannelId, dmChatId, answer.id, trimmed);
             return { ...answer, message: trimmed, isEditing: false };
         } catch (error) {
             console.error('Fehler beim Speichern der bearbeiteten Antwort:', error);
