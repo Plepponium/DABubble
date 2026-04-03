@@ -16,9 +16,9 @@
                         autocomplete="email">
                 </div>
                 @if (email?.invalid && (email?.touched || submitted)) {
-                <span class="error">
-                    *Diese E-Mail-Adresse ist leider ungültig.
-                </span>
+                    <span class="error">
+                        *Diese E-Mail-Adresse ist leider ungültig.
+                    </span>
                 }
             </div>
             <div class="input-wrapper">
@@ -28,9 +28,9 @@
                         autocomplete="current-password">
                 </div>
                 @if (password?.invalid && (password?.touched || submitted)) {
-                <span class="error pw">
-                    Falsches Passwort oder E-Mail.. Bitte noch einmal versuchen.
-                </span>
+                    <span class="error pw">
+                        Falsches Passwort oder E-Mail.. Bitte noch einmal versuchen.
+                    </span>
                 }
             </div>
         </div>

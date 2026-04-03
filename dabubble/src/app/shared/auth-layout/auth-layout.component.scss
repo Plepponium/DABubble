@@ -73,8 +73,10 @@
 }
 
 .background {
-  width: 100vw;
+  max-width: calc(100vw - 10px);
+  width: 100%;
   height: 100vh;
+  // overflow-x: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -240,6 +242,7 @@
   justify-content: center;
   gap: 32px;
   padding: 35px 20px;
+  box-sizing: border-box;
 }
 
 .login.privacy {
@@ -350,12 +353,8 @@
   }
 
   .login {
-    height: auto;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    // height: auto;
     justify-content: flex-start;
-    align-items: center;
     gap: 24px;
     padding: 20px 16px 16px;
 
@@ -370,7 +369,7 @@
 
   .logo {
     position: static;
-    margin: 0 auto 0 auto;
+    // margin: 0 auto 0 auto;
     width: 205px;
     height: auto;
     transform: none;
@@ -384,7 +383,7 @@
 
   .register {
     position: static;
-    margin: 0 auto 0 auto;
+    // margin: 0 auto 0 auto;
     font-size: 16px;
     align-items: center;
 
