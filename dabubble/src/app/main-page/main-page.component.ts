@@ -327,7 +327,6 @@ export class MainPageComponent {
     this.dmThreadOpen = false;
     this.dmThreadChatId = '';
     this.currentDmChannelId = '';
-    // this.threadOtherUser = undefined;
     if (this.isSmallScreen) {
       this.dmChannelOpen = true;
     }

@@ -8,12 +8,10 @@ import { MatInputModule } from '@angular/material/input';
 import { RoundBtnComponent } from '../round-btn/round-btn.component';
 import { MentionsOverlayComponent } from '../shared/mentions-overlay/mentions-overlay.component';
 import { SmileyOverlayComponent } from '../shared/smiley-overlay/smiley-overlay.component';
-// import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 import { LogoutService } from '../../services/logout.service';
 import { ChatsUiService } from '../../services/chats-ui.service';
 import { ChatsDataService } from '../../services/chats-data.service';
-import { ThreadService } from '../../services/thread.service';
 import { ThreadHelpService } from '../../services/thread-help.service';
 import { User } from '../../models/user.class';
 import { reactionIcons } from '../reaction-icons';
@@ -98,7 +96,6 @@ export class DmThreadComponent {
     this.updateIsResponsive();
     this.initCurrentUser();
     setTimeout(() => this.focusInputOnStart(), 200 );
-    
   }
 
   /** Handles input changes and reloads chat and answers when dmChannelId or chatId changes. */

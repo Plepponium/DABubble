@@ -30,7 +30,6 @@ export class LoginComponent implements OnInit {
   showOverlay = false;
   overlayVariant: 'login' | 'created' | 'sent' = 'login';
 
-
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private firestore = inject(Firestore);

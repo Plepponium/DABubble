@@ -71,6 +71,7 @@ export class DmThreadService {
         );
     }
 
+    /** Retrieves answers for a chat enriched with user metadata and transformed reactions. */
     getEnrichedDmAnswers(dmChannelId: string, dmChatId: string, participants$: Observable<User[]>, currentUserId: string): Observable<Answer[]> {
         return this.dmService.getAnswersForMessage(dmChannelId, dmChatId).pipe(
             switchMap(answers =>
@@ -144,13 +145,7 @@ export class DmThreadService {
     }
 
     /** Updates reaction data locally for a chat without persisting changes. */
-    updateLocalReaction(
-        dmChat: Chat,
-        reactionType: string,
-        updatedUsers: string[],
-        participants: User[],
-        currentUserId: string
-    ): Chat {
+    updateLocalReaction( dmChat: Chat, reactionType: string, updatedUsers: string[], participants: User[], currentUserId: string ): Chat {
         const newReactions = { ...dmChat.reactions };
 
         if (updatedUsers.length === 0) {
@@ -221,22 +216,43 @@ export class DmThreadService {
         return this.updateReactionForChat(of(chat), participants, currentUserId, reactionType, updatedUsers);
     }
 
-    /** Toggles the current user's reaction on an answer and returns updated answers. */
-    async toggleReactionForAnswer(dmId: string, messageId: string, answerId: string, answers$: Observable<Answer[]>, reactionType: string, currentUserId: string, participants: User[]): Promise<Answer[] | undefined> {
+    /** Toggles the current user's reaction on an answer and returns the updated answers array. */
+    async toggleReactionForAnswer( dmId: string, messageId: string, answerId: string, answers$: Observable<Answer[]>, reactionType: string, currentUserId: string, participants: User[] ): Promise<Answer[] | undefined> {
         const answers = await firstValueFrom(answers$);
-        const answer = answers.find(a => a.id === answerId);
+        const answer = this.findAnswerById(answers, answerId);
         if (!answer) return undefined;
+
+        const { updatedUsers, userHasReacted } = this.toggleUserInReaction(answer, reactionType, currentUserId);
+        await this.persistAnswerReactionToggle( dmId, messageId, answerId, reactionType, currentUserId, userHasReacted, updatedUsers );
+
+        return this.updateAnswersLocally( answers, answerId, reactionType, updatedUsers, participants, currentUserId );
+    }
+
+    /** Finds an answer by its ID from a list of answers. */
+    private findAnswerById(answers: Answer[], answerId: string): Answer | undefined {
+        return answers.find(a => a.id === answerId);
+    }
+
+    /** Toggles the current user's presence in a reaction's user list and returns updated users and reaction status. */
+    private toggleUserInReaction( answer: Answer, reactionType: string, currentUserId: string ): { updatedUsers: string[]; userHasReacted: boolean } {
         const currentUsers = answer.reactions?.[reactionType]
             ? this.parseUserIds(
                 Array.isArray(answer.reactions[reactionType])
-                    ? answer.reactions[reactionType]
-                    : [answer.reactions[reactionType]]
+                ? answer.reactions[reactionType]
+                : [answer.reactions[reactionType]]
             )
             : [];
+
         const userHasReacted = currentUsers.includes(currentUserId);
         const updatedUsers = userHasReacted
             ? currentUsers.filter(id => id !== currentUserId)
             : [...currentUsers, currentUserId];
+
+        return { updatedUsers, userHasReacted };
+    }
+
+    /** Persists the reaction toggle for an answer by adding or removing the current user's reaction. */
+    private async persistAnswerReactionToggle( dmId: string, messageId: string, answerId: string, reactionType: string, currentUserId: string, userHasReacted: boolean, updatedUsers: string[] ): Promise<void> {
         if (userHasReacted) {
             if (updatedUsers.length === 0) {
                 await this.dmService.deleteReactionTypeFromAnswer(dmId, messageId, answerId, reactionType);
@@ -246,14 +262,20 @@ export class DmThreadService {
         } else {
             await this.dmService.addReactionToAnswer(dmId, messageId, answerId, reactionType, currentUserId);
         }
+    }
+
+    /** Updates the reactions for an answer locally and returns the updated answers array. */
+    private updateAnswersLocally( answers: Answer[], answerId: string, reactionType: string, updatedUsers: string[], participants: User[], currentUserId: string ): Answer[] {
         return answers.map(a => {
             if (a.id !== answerId) return a;
             const newReactions = { ...(a.reactions || {}) };
+
             if (updatedUsers.length === 0) {
                 delete newReactions[reactionType];
             } else {
                 newReactions[reactionType] = updatedUsers;
             }
+
             return {
                 ...a,
                 reactions: newReactions,

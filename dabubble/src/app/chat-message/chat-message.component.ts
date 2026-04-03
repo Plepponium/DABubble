@@ -165,7 +165,7 @@ export class ChatMessageComponent {
     return this.textService.renderMessage(text, this.allUsers, this.filteredChannels);
   }
 
-
+  /** Handles clicks on mentions within message text to open user or channel. */
   onMentionClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     this.textService.handleMentionClick(target,
@@ -173,7 +173,6 @@ export class ChatMessageComponent {
       (channelId) => this.openChannel.emit(channelId)
     );
   }
-
 
   /** Emits event to open thread for current chat message. */
   handleOpenThread() {
