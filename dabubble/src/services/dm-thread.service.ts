@@ -18,17 +18,18 @@ export class DmThreadService {
     /** Scrolls the thread history container to the bottom after a short delay. */
     scrollToBottom() {
         setTimeout(() => {
-            const threadHistory = document.getElementById('thread-history');
-            if (threadHistory) {
-                threadHistory.scrollTop = threadHistory.scrollHeight;
+            // const threadHistory = document.getElementById('thread-history');
+            const chatScrollContainer = document.getElementById('chat-scroll-container');
+            if (chatScrollContainer) {
+                chatScrollContainer.scrollTop = chatScrollContainer.scrollHeight;
             }
         }, 100);
     }
 
     /** Smoothly scrolls the thread history container to the bottom. */
     scrollToBottomNewMessage() {
-        const threadHistory = document.getElementById('thread-history');
-        threadHistory?.scrollTo({ top: threadHistory.scrollHeight, behavior: 'smooth' });
+        const chatScrollContainer = document.getElementById('chat-scroll-container');
+        chatScrollContainer?.scrollTo({ top: chatScrollContainer.scrollHeight, behavior: 'smooth' });
     }
 
     /** Loads a channel by ID and returns observables for its name and participants. */
