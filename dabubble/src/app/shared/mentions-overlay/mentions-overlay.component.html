@@ -11,7 +11,7 @@
                         <img class="user-img" [src]="'assets/user-icons/' + (item.img || 'default-user') + '.svg'" />
                         <div [class]="'online-signal ' + (item.presence || 'offline')"></div>
                     </div>
-                    <span class="font-w-400 font-18">
+                    <span class="font-w-400 font-18 item-name">
                         {{ item.name }} <span *ngIf="item.uid === currentUserId">(Du)</span>
                     </span>
                 </div>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { ReactionIconsDialogComponent } from '../reaction-icons-dialog/reaction-icons-dialog.component';
 
 
@@ -26,6 +26,18 @@ export class DmReactionsDialogComponent {
   editDialogOpen = false;
   isEditing = false;
   editedText = '';
+
+  @ViewChild('editContainer') editContainer?: ElementRef;
+
+  @HostListener('document:click', ['$event.target'])
+  onDocumentClick(target: EventTarget | null) {
+    if (!this.editDialogOpen || !this.editContainer) return;
+    if (!(target instanceof Node)) return;
+
+    if (!this.editContainer.nativeElement.contains(target)) {
+      this.editDialogOpen = false;
+    }
+  }
 
   /**
   * Adds a reaction emoji to the message.

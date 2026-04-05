@@ -13,6 +13,10 @@
   opacity: 0;
   animation: slideIn 200ms ease forwards;
 
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
   &.over {
     top: -100%;
   }
@@ -32,6 +36,7 @@
       border-radius: 0 25px 25px 25px;
     }
   }
+
   &.right {
     right: 20px;
     left: auto;
@@ -77,4 +82,28 @@
 
 .reaction-icons-container.right {
   --slide-start: 20px;
+}
+
+@media (max-width: 430px) {
+  .reaction-icons-container {
+    &.left {
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      right: auto;
+
+      &.under {
+        border-radius: 25px;
+      }
+    }
+
+    &.right {
+      right: 50% !important;
+      transform: translateX(50%) !important;
+      left: auto;
+
+      &.under {
+        border-radius: 25px;
+      }
+    }
+  }
 }

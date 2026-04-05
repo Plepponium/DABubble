@@ -71,3 +71,25 @@
     }
   }
 }
+
+@media (max-width: 880px) {
+  .edit-dialog {
+    top: 100% !important;
+    right: 50%;
+    left: unset !important;
+    transform: translateX(50%);
+    border-radius: 30px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .edit-dialog {
+    right: 30%;
+    transform: translateX(30%);
+    padding: 5px 5px !important;
+
+    .btn {
+      font-size: 16px !important;
+    }
+  }
+}

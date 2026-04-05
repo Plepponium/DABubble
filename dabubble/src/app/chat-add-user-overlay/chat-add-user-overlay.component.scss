@@ -172,7 +172,7 @@
 }
 
 .dialogue-overlay-responsive.open {
-  transform: translate(-50%, 0); 
+  transform: translate(-50%, 0);
 }
 
 .line-container {
@@ -188,15 +188,7 @@
   border-radius: 23px;
 }
 
-// .show-responsive-small {
-//   display: none;
-// }
-
-@media(max-width: 880px) {
-  // .hide-responsive {
-  //   display: none;
-  // }
-
+@media (max-width: 880px) {
   .dialogue-overlay {
     width: 398px;
     position: fixed;
@@ -204,8 +196,6 @@
     left: 50%;
     transform: translate(-50%, -50%);
     padding: 30px 16px;
-    // border-radius: 30px;
-    border-top-right-radius: unset;
   }
 
   .input-with-chips {
@@ -213,17 +203,13 @@
   }
 }
 
-@media(max-width: 430px) {
-  // .show-responsive-small {
-  //   display: flex;
-  // }
-
-  // .hide-responsive-small {
-  //   display: none;
-  // }
-
+@media (max-width: 430px) {
   .dialogue-overlay {
-    width: 100%;
+    width: auto;
+    left: 3px;
+    right: 3px;
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   .dialogue-overlay-responsive {

@@ -24,7 +24,7 @@
         <img class="hover-icon-purple" src="assets/icons/comment-purple.svg" alt="thread öffnen" />
     </button>
 
-    <div class="edit-message-container" *ngIf="isOwnMessage">
+    <div class="edit-message-container" *ngIf="isOwnMessage" #editContainer>
         <button (click)="toggleEditDialog()" class="add-reaction-btn">
             <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="edit" />
             <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg" alt="edit" />

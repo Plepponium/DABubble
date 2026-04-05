@@ -180,10 +180,10 @@
 
 @media (max-width: 430px) {
   .dialogue-overlay {
-    left: 0;
-    right: 0;
+    left: 3px;
+    right: 3px;
     transform: translateY(-50%);
-    width: unset;
+    width: auto;
   }
 
   .dialogue-overlay-header {
