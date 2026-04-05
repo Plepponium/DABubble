@@ -340,6 +340,7 @@ export class MentionsOverlayComponent {
     if (el) el.scrollIntoView({ block: 'nearest' });
   }
 
+  /** Returns the short name (first letter of each word) for a given full name. */
   getShortName(fullName: string) {
     return fullName.split(' ').map(n => n[0]).join('');
   }

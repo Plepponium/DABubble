@@ -29,7 +29,9 @@
     right: auto;
 
     &.over {
-      border-radius: 25px 25px 25px 0px;
+      border-radius: 25px 25px 0 25px;
+      left: unset !important;
+      right: 20px !important;
     }
 
     &.under {
@@ -94,6 +96,10 @@
       &.under {
         border-radius: 25px;
       }
+
+      &.over {
+        transform: none !important;
+      }
     }
 
     &.right {
@@ -102,7 +108,13 @@
       left: auto;
 
       &.under {
+        right: 0 !important;
+        transform: none !important;
+      }
+
+      &.over {
         border-radius: 25px;
+        right: 70px !important;
       }
     }
   }
