@@ -65,6 +65,10 @@ body.intro-active {
   vertical-align: baseline;
   pointer-events: auto;
   user-select: none;
+  max-width: 200px;
+  overflow: clip;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   &:hover {
     background: #e0f0ff;

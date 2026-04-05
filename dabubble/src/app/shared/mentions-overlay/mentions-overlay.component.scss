@@ -201,6 +201,10 @@
       left: 0;
       max-height: 120px;
     }
+
+    &.add-recipient {
+      left: 0 !important;
+    }
   }
 
   .mentions-overlay.menu-searchbar {
