@@ -339,4 +339,9 @@ export class MentionsOverlayComponent {
     const el = items[this.activeIndex]?.nativeElement as HTMLElement;
     if (el) el.scrollIntoView({ block: 'nearest' });
   }
+
+  getShortName(fullName: string) {
+    return fullName.split(' ').map(n => n[0]).join('');
+  }
 }
+

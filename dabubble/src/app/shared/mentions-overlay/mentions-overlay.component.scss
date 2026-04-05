@@ -79,20 +79,20 @@
 .info {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
   width: 100%;
+  min-width: 0;
+}
 
-  .snippet {
-    flex: 1;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
+.snippet {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 
-  .flag {
-    margin-left: 10px;
-    flex-shrink: 0;
-  }
+.flag {
+  margin-left: 10px;
+  flex-shrink: 0;
 }
 
 .user {
