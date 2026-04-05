@@ -66,7 +66,7 @@
                             <img class="hover-icon" src="assets/icons/tag.svg" alt="">
                             <img class="hover-icon-purple" src="assets/icons/tag-purple.svg" alt="">
                         </div>
-                        <div>{{ channel.name }}</div>
+                        <span>{{ channel.name }}</span>
                     </div>
                 </div>
 
@@ -97,12 +97,15 @@
             <div class="user-list" *ngIf="usersExpanded">
                 <div (click)="handleOpenUserChat(user)" class="user"
                     *ngFor="let user of sortedUsers$ | async; trackBy: trackByUserId"
-                    [class.active]="user.uid === activeUserId">
+                    [class.active]="user.uid === activeUserId"
+                    title="{{ user.name }}{{ (currentUser$ | async)?.uid === user.uid ? ' (Du)' : '' }}">
                     <div class="img-container">
                         <img class="user-img" [src]="'assets/user-icons/' + user.img + '.svg'" [alt]="user.name">
                         <div class="online-signal" [ngClass]="user.presence"></div>
                     </div>
-                    {{ user.name }}{{ (currentUser$ | async)?.uid === user.uid ? ' (Du)' : '' }}
+                    <span>
+                        {{ user.name }}{{ (currentUser$ | async)?.uid === user.uid ? ' (Du)' : '' }}
+                    </span>
                 </div>
             </div>
         </div>

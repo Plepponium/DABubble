@@ -144,6 +144,7 @@ mat-toolbar {
 .channel,
 .user {
   width: fit-content;
+  max-width: 240px;
   display: flex;
   align-items: center;
   gap: 15px;
@@ -154,6 +155,12 @@ mat-toolbar {
 
   &:hover {
     background-color: #eceefe;
+  }
+
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -358,5 +365,10 @@ mat-toolbar {
 
   .search-header {
     padding-bottom: 8px;
+  }
+
+  .channel-list,
+  .user-list {
+    padding-left: 0;
   }
 }

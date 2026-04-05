@@ -54,6 +54,7 @@ export class UserService {
     if (!userId) return of(undefined);
     const userRef = this.getUserDocRef(userId);
     return docData(userRef, { idField: 'uid' }).pipe(
+      takeUntil(this.logoutService.logout$),
       map(data => (data as User | undefined)),
       this.catchErrorsToUndefined()
     );
@@ -63,6 +64,7 @@ export class UserService {
   getUsers(): Observable<User[]> {
     const usersCollection = collection(this.firestore, 'users');
     return collectionData(usersCollection, { idField: 'uid' }).pipe(
+      takeUntil(this.logoutService.logout$),
       map((data: any[]) => data as User[]),
       this.catchErrorsToEmptyArray()
     );
@@ -86,6 +88,7 @@ export class UserService {
   private createUserObservable(uid: string): Observable<User> {
     const userDocRef = this.getUserDocRef(uid);
     return docData(userDocRef, { idField: 'uid' }).pipe(
+      takeUntil(this.logoutService.logout$),
       map((data: any) => {
         if (!data) throw new Error(`No user found with uid ${uid}`);
         return new User(data);
@@ -97,13 +100,11 @@ export class UserService {
   /** Performs complete logout with status update. */
   async logout(): Promise<void> {
     this.logoutService.triggerLogout();
-    await this.delay(300);
     const user = this.auth.currentUser;
     if (user) {
       await this.updateUserPresence(user.uid);
     }
     await signOut(this.auth);
-    this.logoutService.complete();
   }
 
   /** Delays execution by specified milliseconds. */

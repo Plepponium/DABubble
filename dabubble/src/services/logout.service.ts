@@ -12,11 +12,4 @@ export class LogoutService {
     triggerLogout(): void {
         this._logout$.next();
     }
-
-    /**
-    * Completes the logout$ observable, indicating that no more logout events will be emitted.
-    */
-    complete(): void {
-        this._logout$.complete();
-    }
 }

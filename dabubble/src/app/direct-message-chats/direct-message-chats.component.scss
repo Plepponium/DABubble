@@ -44,6 +44,13 @@
   border-radius: 30px;
 }
 
+.user-name {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .dm-chat-container {
   display: flex;
   flex-direction: column;
@@ -179,7 +186,6 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 0 45px;
   padding-top: 16px;
   margin-top: auto;
 }
@@ -189,10 +195,7 @@
   gap: 30px;
   align-items: flex-start;
   padding: 12px 45px;
-  // box-sizing: border-box;
-  margin: 0 -45px;
   position: relative;
-  // z-index: 1;
   transition: background-color 125ms ease-in-out;
 
   .dm-reactions-dialog-hover {
@@ -443,9 +446,9 @@
 .chat-edit-wrapper {
   background: #ffffff;
   border-radius: 20px;
-  padding: 20px;
+  padding: 10px;
   border: 1px solid #adb0d9;
-  width: 100%;
+  width: fit-content;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -459,7 +462,6 @@
     min-height: 40px;
     max-height: 300px;
     width: 100%;
-    min-width: 300px;
     border: none;
     border-radius: 8px;
     padding: 0;
@@ -477,22 +479,18 @@
     justify-content: space-between;
     align-items: center;
 
-    .smiley-edit-btn {
-      flex-shrink: 0;
-    }
-
     .btn-wrapper {
       display: flex;
       gap: 8px;
     }
 
     .btn {
-      padding: 12px 25px;
+      padding: 6px 12px;
       border-radius: 50px;
       border: 1px solid #797ef3;
       cursor: pointer;
       font-family: "Nunito";
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       transition: all 0.2s ease;
 
@@ -575,7 +573,6 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 0 16px;
     padding-top: 16px;
     margin-top: auto;
   }
@@ -587,20 +584,85 @@
 
   .chat-message-row {
     gap: 16px;
-    padding: 10px 30px 10px 0px;
+    padding: 10px 20px 10px 20px;
     margin: 0;
-
-    &.me {
-      padding: 10px 0px 10px 30px;
-    }
   }
 
   .form-field-wrapper {
     padding: 0 16px;
   }
+
+  .empty-conversation {
+    padding: 0px 16px;
+  }
+
+  .sender-name {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
-@media(max-width: 380px) {
+@media (max-width: 430px) {
+  .recipient {
+    gap: 15px;
+  }
+
+  .recipient-img {
+    width: 64px;
+    height: 64px;
+  }
+
+  .conversation-notice {
+    font-size: 16px;
+    text-align: justify;
+  }
+
+  .chat-text {
+    font-size: 16px;
+    text-align: justify;
+  }
+
+  .sender-name {
+    max-width: 100px;
+  }
+
+  .chat-message-row {
+    gap: 16px;
+    padding: 10px 10px;
+    margin: 0;
+  }
+
+  .chat-user-img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .edit-textarea {
+    min-width: 0 !important;
+    font-size: 16px !important;
+
+    &::placeholder {
+      font-size: 16px;
+    }
+  }
+
+  .chat-edit-wrapper {
+    width: 220px;
+  }
+
+  .btn-wrapper {
+    gap: 4px !important;
+
+    .btn {
+      padding: 4px 8px !important;
+      font-size: 14px !important;
+    }
+  }
+}
+
+@media (max-width: 380px) {
   .hide-small {
     display: none;
   }

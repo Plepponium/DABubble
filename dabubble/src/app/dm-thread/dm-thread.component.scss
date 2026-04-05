@@ -29,6 +29,13 @@
   gap: 5px;
 }
 
+.channel-name {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .tag-purple {
   display: none;
 }
@@ -66,15 +73,17 @@
 }
 
 .chat-content {
-  // height: calc(100% - 140px);
+  height: calc(100% - 140px);
   display: flex;
   flex-direction: column;
   justify-content: start;
 }
 
 .chat-scroll-container {
-  height: calc(100% - 140px);
   overflow-y: auto;
+  scrollbar-width: none;
+  padding-top: 20px;
+  flex: 1;
 }
 
 .chat-history {
@@ -82,9 +91,6 @@
   flex-direction: column;
   gap: 20px;
   padding-top: 20px;
-  // overflow-y: auto;
-  scrollbar-width: none;
-  flex-grow: 1;
 }
 
 .chat-history::-webkit-scrollbar {
@@ -151,12 +157,6 @@
     }
   }
 }
-
-// .chat-section.first-part {
-//   height: 150px;
-//   overflow-y: scroll;
-//   margin-bottom: 10px;
-// }
 
 .chat-section.reverse {
   flex-direction: row-reverse;
@@ -473,8 +473,7 @@
 .form {
   width: 100%;
   box-sizing: border-box;
-  padding: 0 20px;
-  margin-top: 20px;
+  padding: 20px 20px 0 20px;
 }
 
 .form-field {
@@ -538,6 +537,11 @@
 
 .user-name {
   cursor: pointer;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
   &:hover {
     color: #535af1;
   }
@@ -557,7 +561,7 @@
   border-radius: 20px;
   padding: 10px;
   border: 1px solid #adb0d9;
-  width: 100%;
+  width: fit-content;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -571,7 +575,6 @@
     min-height: 40px;
     max-height: 300px;
     width: 100%;
-    min-width: 300px;
     border: none;
     border-radius: 8px;
     padding: 0;
@@ -678,5 +681,50 @@
     box-sizing: border-box;
     padding: 0 16px;
     margin-top: 20px;
+  }
+}
+
+@media (max-width: 430px) {
+  .user-name {
+    max-width: 100px;
+  }
+
+  .chat-message {
+    font-size: 16px;
+  }
+
+  .channel-name {
+    max-width: 100px;
+  }
+
+  .chat-user-img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .edit-textarea {
+    min-width: 0 !important;
+    font-size: 16px !important;
+
+    &::placeholder {
+      font-size: 16px;
+    }
+  }
+
+  .chat-section {
+    gap: 8px;
+  }
+
+  .chat-edit-wrapper {
+    width: 220px;
+  }
+
+  .btn-wrapper {
+    gap: 4px !important;
+
+    .btn {
+      padding: 4px 8px !important;
+      font-size: 14px !important;
+    }
   }
 }

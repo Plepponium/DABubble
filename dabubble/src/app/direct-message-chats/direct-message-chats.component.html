@@ -1,12 +1,12 @@
 <div class="dm-chats" *ngIf="otherUser as u">
 
     <div class="header">
-        <div class="dm-user" (click)="openProfile.emit(u)">
+        <div class="dm-user" (click)="openProfile.emit(u)" title="{{ u.name }}">
             <div class="img-container">
                 <img class="user-img" [src]="'assets/user-icons/' + (u.img || 'default-user') + '.svg'" />
                 <div [class]="'online-signal ' + (u.presence || 'offline')"></div>
             </div>
-            <span class="font-w-700 font-24">
+            <span class="font-w-700 font-24 user-name">
                 {{ u.name }} <span *ngIf="isSelf()">(Du)</span>
             </span>
         </div>
@@ -20,12 +20,12 @@
                     <div class="recipient">
                         <img class="recipient-img" (click)="openProfile.emit(u)"
                             [src]="'assets/user-icons/' + (u.img || 'default-user') + '.svg'" />
-                        <span class="font-w-700 font-24" (click)="openProfile.emit(u)">
+                        <span class="font-w-700 font-24 user-name" (click)="openProfile.emit(u)">
                             {{ u.name }} <span *ngIf="isSelf()">(Du)</span>
                         </span>
                     </div>
 
-                    <span class="t-gray" *ngIf="!isSelf()">
+                    <span class="t-gray conversation-notice" *ngIf="!isSelf()">
                         Diese Unterhaltung findet nur zwischen
                         <span class="t-purple at-name">&#64;{{ u.name }}</span>
                         und dir statt.
@@ -58,7 +58,7 @@
                                     <ng-container *ngIf="!m.isEditing; else editMode">
                                         <div class="chat-bubble">
                                             <div class="chat-meta">
-                                                <span class="sender-name font-w-700 font-18"
+                                                <span class="sender-name font-w-700 font-18 user-name"
                                                     (click)="onUserNameClick(m.senderId)">{{ m.senderName }}
                                                 </span>
                                                 <span class="time t-gray font-14">
@@ -145,7 +145,7 @@
                                     <ng-template #editMode>
                                         <div class="chat-edit-wrapper">
                                             <textarea #editTa id="edit-{{m.id}}" class="edit-textarea"
-                                                (input)="autoGrow(editTa);  updateEditCaret(m, editTa)"
+                                                (input)="updateEditCaret(m, editTa)"
                                                 (keyup)=" updateEditCaret(m, editTa)" [(ngModel)]="m.editedText"
                                                 [placeholder]="m.text">
                                             </textarea>
