@@ -11,7 +11,7 @@
     </div>
 
     <div class="name-container">
-        <div class="user-name">{{ user.name }}</div>
+        <div class="user-name" title="{{ user.name }}">{{ user.name }}</div>
         <div class="online-info">
             <div class="online-signal-solo" [ngClass]="user.presence"></div>
             <div class="online-status">{{ user.presence }}</div>

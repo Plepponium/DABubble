@@ -35,12 +35,15 @@
 
 .name-container {
   width: 420px;
-  pointer-events: none;
 }
 
 .user-name {
   font-size: 32px;
   font-weight: 700;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .online-info {
@@ -96,16 +99,27 @@
   }
 }
 
-@media(max-width: 880px) {
+@media (max-width: 880px) {
   .dialogue-overlay {
-    width: 398px;
-    gap: 45px;
+    width: 100%;
+    max-width: 400px;
+    gap: 38px;
     padding: 40px 20px;
+  }
+
+  .name-container {
+    width: 100%;
   }
 }
 
-@media(max-width: 430px) {
+@media (max-width: 430px) {
   .dialogue-overlay {
-    width: 100%;
+    top: 50%;
+    left: 3px;
+    right: 3px;
+    width: auto;
+    max-width: unset;
+    transform: translateY(-50%);
+    padding: 32px 16px;
   }
 }

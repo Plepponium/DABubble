@@ -646,12 +646,11 @@
 
   .chat-section {
     gap: 16px;
-    padding: 10px 50px 10px 16px;
+    padding: 10px 16px;
   }
 
   .chat-section.reverse {
     flex-direction: row-reverse;
-    padding: 10px 16px 10px 50px;
   }
 
   .chat-user-img {
@@ -691,6 +690,7 @@
 
   .chat-message {
     font-size: 16px;
+    text-align: justify;
   }
 
   .channel-name {
@@ -713,6 +713,7 @@
 
   .chat-section {
     gap: 8px;
+    padding: 10px 10px;
   }
 
   .chat-edit-wrapper {
