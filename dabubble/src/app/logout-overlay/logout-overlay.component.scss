@@ -39,7 +39,6 @@
 
 .dialogue-overlay-responsive {
   width: 430px;
-  // height: 200px;
   padding: 30px 26px;
   box-sizing: border-box;
   position: fixed;
@@ -58,7 +57,17 @@
 }
 
 .dialogue-overlay-responsive.open {
-  transform: translate(-50%, 0); 
+  transform: translate(-50%, 0);
+}
+
+.dialogue-overlay,
+.dialogue-overlay-responsive {
+  z-index: 7;
+}
+
+.dialogue-overlay.behind-backdrop,
+.dialogue-overlay-responsive.behind-backdrop {
+  z-index: 6;
 }
 
 .line-container {
@@ -99,7 +108,7 @@
 .responsive-btn.active {
   background-color: #eceefe;
   color: #535af1;
-  
+
   .non-active-icon {
     display: none;
   }

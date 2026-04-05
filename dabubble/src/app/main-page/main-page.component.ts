@@ -107,10 +107,10 @@ export class MainPageComponent {
     this.isSmallScreen = window.innerWidth < 1512;
     this.isResponsiveScreen = window.innerWidth <= 880;
 
-    if (!previousIsSmall && this.isSmallScreen && this.threadOpen) {this.channelOpen = false;}
-    if (!previousIsSmall && this.isSmallScreen && this.dmThreadOpen) {this.dmChannelOpen = false;}
-    if (previousIsSmall && !this.isSmallScreen && this.threadOpen) {this.channelOpen = true;}
-    if (previousIsSmall && !this.isSmallScreen && this.dmThreadOpen) {this.dmChannelOpen = true;}
+    if (!previousIsSmall && this.isSmallScreen && this.threadOpen) { this.channelOpen = false; }
+    if (!previousIsSmall && this.isSmallScreen && this.dmThreadOpen) { this.dmChannelOpen = false; }
+    if (previousIsSmall && !this.isSmallScreen && this.threadOpen) { this.channelOpen = true; }
+    if (previousIsSmall && !this.isSmallScreen && this.dmThreadOpen) { this.dmChannelOpen = true; }
   }
 
   /** Initializes component on init. */
@@ -339,6 +339,7 @@ export class MainPageComponent {
 
   /** Opens user profile. */
   openUserProfile() {
+    this.showLogoutOverlay = false;
     this.showUserProfile = true;
   }
 
