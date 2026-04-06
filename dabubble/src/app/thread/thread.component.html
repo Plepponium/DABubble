@@ -16,7 +16,7 @@
     </div>
 
     <div *ngIf="(chat$ | async) as chat" class="chat-content">
-        
+
         <div class="chat-scroll-container">
             <div class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                 <div class="chat-section  chat-section-message" [ngClass]="{'reverse': chat.user === currentUserId}">
@@ -32,13 +32,14 @@
                             </div>
                             <button (click)="openReactionsDialogue(chat.id)" class="add-reaction-btn">
                                 <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
-                                <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg" alt="">
+                                <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg"
+                                    alt="">
                             </button>
                         </div>
                     </div>
 
-                    <img class="chat-user-img" [src]="'assets/user-icons/' + chat.userImg + '.svg'" [alt]="chat.userName"
-                        [ngClass]="{'grayscale': chat.isUserMissing}">
+                    <img class="chat-user-img" [src]="'assets/user-icons/' + chat.userImg + '.svg'"
+                        [alt]="chat.userName" [ngClass]="{'grayscale': chat.isUserMissing}">
                     <div class="chat-info-container" [ngClass]="{'reverse': chat.user === currentUserId}">
                         <div class="chat-start" [ngClass]="{'reverse': chat.user === currentUserId}">
                             <div class="font-w-700 user-name" [ngClass]="{'missing': chat.isUserMissing}"
@@ -82,9 +83,11 @@
                                                         class="font-w-700">
                                                         Du
                                                     </div>
-                                                    <span *ngIf="reaction.count === 1 && reaction.currentUserReacted">hast
+                                                    <span
+                                                        *ngIf="reaction.count === 1 && reaction.currentUserReacted">hast
                                                         reagiert</span>
-                                                    <span *ngIf="reaction.count === 1 && !reaction.currentUserReacted">hat
+                                                    <span
+                                                        *ngIf="reaction.count === 1 && !reaction.currentUserReacted">hat
                                                         reagiert</span>
                                                     <span
                                                         *ngIf="reaction.count - (reaction.currentUserReacted ? 1 : 0) >= 2"
@@ -140,7 +143,8 @@
                     [ngClass]="{'reverse': answer.user === currentUserId}">
 
                     <div *ngIf="threadHelpService.shouldShowDateForAnswer(answers, i, chat)" class="chat-date-section">
-                        <div class="chat-date">{{ threadHelpService.getDisplayDate(threadHelpService.getChatDate(answer)) }}
+                        <div class="chat-date">{{
+                            threadHelpService.getDisplayDate(threadHelpService.getChatDate(answer)) }}
                         </div>
                     </div>
 
@@ -165,11 +169,13 @@
 
                             <div class="edit-comment-container">
                                 <div class="edit-comment-dialogue" *ngIf="answer.showEditMenu">
-                                    <div class="edit-comment" (click)="enableEditAnswer(answer)">Nachricht bearbeiten</div>
+                                    <div class="edit-comment" (click)="enableEditAnswer(answer)">Nachricht bearbeiten
+                                    </div>
                                 </div>
                                 <button (click)="toggleEditMenu(answer)" class="add-reaction-btn reverse">
                                     <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="">
-                                    <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg" alt="">
+                                    <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg"
+                                        alt="">
                                 </button>
                             </div>
                         </div>
@@ -186,8 +192,8 @@
                                     <div class="font-14 t-gray">{{ answer.time * 1000 | date: 'HH:mm' }} Uhr</div>
                                 </div>
                                 <div class="chat-message" [ngClass]="{'left bg-light-purple': answer.user !== currentUserId, 
-                                    'right': answer.user === currentUserId}" [innerHTML]="renderMessage(answer.message)"
-                                    (click)="onMentionClick($event)">
+                                    'right': answer.user === currentUserId}"
+                                    [innerHTML]="renderMessage(answer.message)" (click)="onMentionClick($event)">
                                 </div>
                                 <div class="chat-answered" [ngClass]="{'right': answer.user === currentUserId}">
 
@@ -195,7 +201,8 @@
                                         <div class="reaction-btns">
                                             <div (click)="toggleReactionForAnswer(answer.id, reaction.type)"
                                                 *ngFor="let reaction of (showAllReactionsForAnswer[answer.id] ? answer.reactionArray : (answer.reactionArray | slice:0:(isResponsive ? 3 : 7)))"
-                                                class="reaction-btn" [ngClass]="{'reacted': reaction.currentUserReacted}">
+                                                class="reaction-btn"
+                                                [ngClass]="{'reacted': reaction.currentUserReacted}">
                                                 <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
                                                     [alt]="reaction.type">
                                                 <div>{{ reaction.count }}</div>
@@ -255,7 +262,8 @@
                                                     <button (click)="addReactionToAnswer(answer.id, icon)"
                                                         class="add-reaction-btn">
                                                         <img class="smiley-img"
-                                                            [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
+                                                            [src]="'assets/reaction-icons/' + icon + '.svg'"
+                                                            [alt]="icon">
                                                     </button>
                                                 </div>
                                             </div>
@@ -272,7 +280,7 @@
                             <ng-template #editMode>
                                 <div class="chat-edit-wrapper">
                                     <textarea #editTa id="edit-{{answer.id}}" class="edit-textarea"
-                                        (input)="updateEditCaret(answer, editTa); threadHelpService.autoGrow(editTa)"
+                                        (input)="updateEditCaret(answer, editTa)"
                                         (keyup)="updateEditCaret(answer, editTa)" [(ngModel)]="answer.editedText"
                                         [placeholder]="answer.message"></textarea>
 
@@ -295,8 +303,10 @@
                                         </app-round-btn>
 
                                         <div class="btn-wrapper">
-                                            <button class="btn cancel" (click)="cancelEditAnswer(answer)">Abbrechen</button>
-                                            <button class="btn save" (click)="saveEditedAnswer(answer)">Speichern</button>
+                                            <button class="btn cancel"
+                                                (click)="cancelEditAnswer(answer)">Abbrechen</button>
+                                            <button class="btn save"
+                                                (click)="saveEditedAnswer(answer)">Speichern</button>
                                         </div>
                                     </div>
                                 </div>

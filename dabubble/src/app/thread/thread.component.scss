@@ -66,15 +66,17 @@
 }
 
 .chat-content {
-  // height: calc(100% - 140px);
+  height: calc(100% - 140px);
   display: flex;
   flex-direction: column;
   justify-content: start;
 }
 
 .chat-scroll-container {
-  height: calc(100% - 140px);
   overflow-y: scroll;
+  scrollbar-width: none;
+  padding-top: 20px;
+  flex: 1;
 }
 
 .chat-history {
@@ -259,6 +261,7 @@
   white-space: nowrap;
   display: flex;
   z-index: 10;
+  scrollbar-width: none;
 }
 
 .add-reaction-dialogue.below {
@@ -534,6 +537,11 @@
 
 .user-name {
   cursor: pointer;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
   &:hover {
     color: #535af1;
   }
@@ -678,5 +686,60 @@
     box-sizing: border-box;
     padding: 0 16px;
     margin-top: 20px;
+  }
+}
+
+@media (max-width: 430px) {
+  .chat-section {
+    padding: 10px 16px;
+  }
+
+  .chat-section.reverse {
+    padding: 10px 16px;
+  }
+
+  .chat-user-img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .user-name {
+    max-width: 100px;
+  }
+
+  .chat-message {
+    font-size: 16px;
+    text-align: justify;
+  }
+
+  .edit-textarea {
+    min-width: 0 !important;
+    font-size: 16px !important;
+
+    &::placeholder {
+      font-size: 16px;
+    }
+  }
+
+  .chat-edit-wrapper {
+    width: 220px;
+  }
+
+  .btn-wrapper {
+    gap: 4px !important;
+
+    .btn {
+      padding: 4px 8px !important;
+      font-size: 14px !important;
+    }
+  }
+
+  .edit-comment-dialogue {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 30px;
+    padding: 5px;
   }
 }
