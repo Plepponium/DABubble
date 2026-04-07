@@ -156,22 +156,52 @@ export class ChatsComponent implements OnInit, OnChanges {
   }
 
   /** Opens the reactions dialogue for a specific chat message. */
+  // openReactionsDialogue(event: { index: number; below: boolean }) {
+  //   const index = event.index;
+  //   const below = event.below;
+  //   const currentIndex = below ? this.activeReactionDialogueBelowIndex : this.activeReactionDialogueIndex;
+  //   const newIndex = currentIndex === index ? null : index;
+  //   if (below) {
+  //     this.activeReactionDialogueBelowIndex = newIndex;
+  //     if (newIndex !== null) {
+  //       this.activeReactionDialogueIndex = null;
+  //     }
+  //   } else {
+  //     this.activeReactionDialogueIndex = newIndex;
+  //     if (newIndex !== null) {
+  //       this.activeReactionDialogueBelowIndex = null;
+  //     }
+  //   }
+  // }
   openReactionsDialogue(event: { index: number; below: boolean }) {
-    const index = event.index;
-    const below = event.below;
-    const currentIndex = below ? this.activeReactionDialogueBelowIndex : this.activeReactionDialogueIndex;
-    const newIndex = currentIndex === index ? null : index;
-    if (below) {
-      this.activeReactionDialogueBelowIndex = newIndex;
-      if (newIndex !== null) {
+    if (event.below) {
+      this.activeReactionDialogueBelowIndex =
+        this.activeReactionDialogueBelowIndex === event.index ? null : event.index;
+      if (this.activeReactionDialogueBelowIndex !== null) {
         this.activeReactionDialogueIndex = null;
       }
     } else {
-      this.activeReactionDialogueIndex = newIndex;
-      if (newIndex !== null) {
+      this.activeReactionDialogueIndex =
+        this.activeReactionDialogueIndex === event.index ? null : event.index;
+      if (this.activeReactionDialogueIndex !== null) {
         this.activeReactionDialogueBelowIndex = null;
       }
     }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const clickedInside = !!target.closest('[data-reactions-root]');
+
+    if (!clickedInside) {
+      this.closeReactionDialogs();
+    }
+  }
+
+  private closeReactionDialogs() {
+    this.activeReactionDialogueIndex = null;
+    this.activeReactionDialogueBelowIndex = null;
   }
 
   /** Adds a reaction if the user hasn't reacted yet. */

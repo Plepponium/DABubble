@@ -12,7 +12,7 @@
             <img class="smiley-img" src="assets/reaction-icons/thumb.svg" alt="">
         </button>
 
-        <div class="reactions-display-container">
+        <div class="reactions-display-container" data-reactions-root>
             <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === index">
                 <div *ngFor="let icon of reactionIcons" class="reactions-container">
                     <button (click)="addReaction.emit({index: index, type: icon})" class="add-reaction-btn">
