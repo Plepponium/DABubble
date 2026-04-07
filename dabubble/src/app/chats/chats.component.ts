@@ -155,24 +155,7 @@ export class ChatsComponent implements OnInit, OnChanges {
     return chat.time ? new Date(chat.time * 1000) : undefined;
   }
 
-  /** Opens the reactions dialogue for a specific chat message. */
-  // openReactionsDialogue(event: { index: number; below: boolean }) {
-  //   const index = event.index;
-  //   const below = event.below;
-  //   const currentIndex = below ? this.activeReactionDialogueBelowIndex : this.activeReactionDialogueIndex;
-  //   const newIndex = currentIndex === index ? null : index;
-  //   if (below) {
-  //     this.activeReactionDialogueBelowIndex = newIndex;
-  //     if (newIndex !== null) {
-  //       this.activeReactionDialogueIndex = null;
-  //     }
-  //   } else {
-  //     this.activeReactionDialogueIndex = newIndex;
-  //     if (newIndex !== null) {
-  //       this.activeReactionDialogueBelowIndex = null;
-  //     }
-  //   }
-  // }
+  /** Determines if two dates are on the same calendar day. */
   openReactionsDialogue(event: { index: number; below: boolean }) {
     if (event.below) {
       this.activeReactionDialogueBelowIndex =
