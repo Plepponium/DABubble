@@ -21,7 +21,7 @@
             <div class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                 <div class="chat-section  chat-section-message" [ngClass]="{'reverse': chat.user === currentUserId}">
                     <div class="chat-dialogue top" [ngClass]="{'reverse': chat.user === currentUserId}">
-                        <div class="reactions-display-container">
+                        <div class="reactions-display-container" data-reactions-root>
                             <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueIndex === chat.id">
                                 <div *ngFor="let icon of reactionIcons" class="reactions-container">
                                     <button (click)="addReaction(chat.id, icon)" class="add-reaction-btn">
@@ -110,7 +110,7 @@
                                     </div>
                                 </div>
 
-                                <div class="reactions-display-container-below">
+                                <div class="reactions-display-container-below" data-reactions-root>
                                     <div class="add-reaction-dialogue below"
                                         *ngIf="activeReactionDialogueBelowIndex === chat.id">
                                         <div *ngFor="let icon of reactionIcons" class="reactions-container">
@@ -151,7 +151,7 @@
                     <div class="chat-section"
                         [ngClass]="{'reverse': answer.user === currentUserId, 'editing': answer.isEditing}">
                         <div class="chat-dialogue" [ngClass]="{'reverse': answer.user === currentUserId}">
-                            <div class="reactions-display-container">
+                            <div class="reactions-display-container" data-reactions-root>
                                 <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueAnswersIndex === i">
                                     <div *ngFor="let icon of reactionIcons" class="reactions-container">
                                         <button (click)="addReactionToAnswer(answer.id, icon)" class="add-reaction-btn">
@@ -255,7 +255,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="reactions-display-container-below">
+                                        <div class="reactions-display-container-below" data-reactions-root>
                                             <div class="add-reaction-dialogue below"
                                                 *ngIf="activeReactionDialogueBelowAnswersIndex === i">
                                                 <div *ngFor="let icon of reactionIcons" class="reactions-container">

@@ -194,6 +194,23 @@ export class ThreadComponent implements OnInit {
     }
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const clickedInsideReactions = !!target.closest('[data-reactions-root]');
+
+    if (!clickedInsideReactions) {
+      this.closeReactionDialogs();
+    }
+  }
+
+  private closeReactionDialogs() {
+    this.activeReactionDialogueIndex = null;
+    this.activeReactionDialogueBelowIndex = null;
+    this.activeReactionDialogueAnswersIndex = null;
+    this.activeReactionDialogueBelowAnswersIndex = null;
+  }
+
   /** Adds a reaction to the current chat and updates the observable if successful. */
   async addReaction(chatId: string, reactionType: string) {
     const updatedChat = await this.threadService.addReaction(this.channelId, this.chat$, reactionType, this.currentUserId, this.participants);
