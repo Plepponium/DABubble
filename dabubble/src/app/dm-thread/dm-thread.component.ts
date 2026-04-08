@@ -239,10 +239,6 @@ export class DmThreadComponent {
     }
   }
 
-  getReactionHoverData(userIds: string[]) {
-    return this.utilsService.getReactionHoverData(userIds, this.currentUserId, this.otherUser);
-  }
-
   /** Adds a reaction to the current chat and updates the observable if successful. */
   async addReaction(dmChatId: string, reactionType: string) {
     const updatedChat = await this.dmThreadService.addReaction(this.dmChannelId, this.dmChat$, reactionType, this.currentUserId, this.participants);

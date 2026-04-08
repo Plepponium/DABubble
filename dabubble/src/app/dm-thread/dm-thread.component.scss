@@ -745,4 +745,17 @@
       font-size: 14px !important;
     }
   }
+
+  .edit-comment-dialogue {
+    top: 100% !important;
+    right: 50%;
+    transform: translateX(50%);
+    padding: 5px 5px !important;
+    left: unset !important;
+    border-radius: 30px;
+
+    .edit-comment {
+      font-size: 16px !important;
+    }
+  }
 }
