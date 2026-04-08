@@ -214,7 +214,7 @@ export class DirectMessageChatsComponent {
       const result = {
         ...m,
         senderName: users[m.senderId]?.name || 'Unknown',
-        answersCount: m.answersCount || 0,  
+        answersCount: m.answersCount || 0,
         lastAnswerTime: m.lastAnswerTime || null
       };
       return result;
@@ -424,7 +424,7 @@ export class DirectMessageChatsComponent {
   /** Template: Open DM thread for message. @param messageId ID of message to open thread for */
   handleOpenDmThread(messageId: string): void {
     if (!this.dmChannelId) return;
-    this.openDmThread.emit({ dmId: this.dmChannelId, chatId: messageId, otherUser: this.otherUser});
+    this.openDmThread.emit({ dmId: this.dmChannelId, chatId: messageId, otherUser: this.otherUser });
   }
 
   /** Template: Smooth-scroll to message. @param messageId Target ID */
