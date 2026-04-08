@@ -225,6 +225,20 @@ export class DmThreadComponent {
     }
   }
 
+  /** Closes any open reactions dialog when clicking outside of them. */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const clickedInsideReactions = !!target.closest('[data-reactions-root]');
+    
+    if (!clickedInsideReactions) {
+      this.activeReactionDialogueIndex = null;
+      this.activeReactionDialogueBelowIndex = null;
+      this.activeReactionDialogueAnswersIndex = null;
+      this.activeReactionDialogueBelowAnswersIndex = null;
+    }
+  }
+
   /** Adds a reaction to the current chat and updates the observable if successful. */
   async addReaction(dmChatId: string, reactionType: string) {
     const updatedChat = await this.dmThreadService.addReaction(this.dmChannelId, this.dmChat$, reactionType, this.currentUserId, this.participants);

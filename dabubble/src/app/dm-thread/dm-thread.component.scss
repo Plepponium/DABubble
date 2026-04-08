@@ -249,7 +249,8 @@
 .add-reaction-dialogue {
   width: fit-content;
   max-width: 200px;
-  overflow-x: auto;
+  max-height: 120px;
+  overflow-y: auto;
   position: absolute;
   top: 20px;
   right: 28px;
@@ -262,7 +263,10 @@
   font-size: 20px;
   white-space: nowrap;
   display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   z-index: 10;
+  scrollbar-width: none;
 }
 
 .add-reaction-dialogue.below {
