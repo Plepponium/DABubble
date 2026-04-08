@@ -294,9 +294,9 @@ export class DirectMessageChatsComponent {
     }
   }
 
-  /** Template: Hover text for reactions (You/Partner reacted). @param userIds Array of UIDs */
-  getReactionHoverText(userIds: string[]): string {
-    return this.utils.getReactionHoverText(userIds, this.currentUser?.uid, this.otherUser);
+  /** Gets hover data for reactions tooltip. @param userIds Array of user IDs who reacted */
+  getReactionHoverData(userIds: string[]) {
+    return this.utils.getReactionHoverData(userIds, this.currentUser?.uid, this.otherUser);
   }
 
   /** Toggle reaction dialog for message. @param messageId Target message ID @param source 'chat' | 'hover' */

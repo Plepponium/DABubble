@@ -33,7 +33,6 @@ export class DmReactionsDialogComponent {
   onDocumentClick(target: EventTarget | null) {
     if (!this.editDialogOpen || !this.editContainer) return;
     if (!(target instanceof Node)) return;
-
     if (!this.editContainer.nativeElement.contains(target)) {
       this.editDialogOpen = false;
     }

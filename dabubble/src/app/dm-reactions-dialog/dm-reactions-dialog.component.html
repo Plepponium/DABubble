@@ -15,7 +15,7 @@
 
         <app-reaction-icons-dialog [reactionIcons]="reactionIcons" [isOpen]="isOpen" [messageId]="messageId"
             [position]="isOwnMessage ? 'left' : 'right'" [source]="'hover'"
-            (addReactionEvent)="addReactionEvent.emit($event)">
+            (addReactionEvent)="addReactionEvent.emit($event)" (toggleEvent)="toggleReactionsEvent.emit($event)">
         </app-reaction-icons-dialog>
     </div>
 

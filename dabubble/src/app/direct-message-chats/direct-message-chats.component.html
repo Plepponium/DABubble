@@ -100,9 +100,26 @@
                                                                     <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
                                                                         alt="reaction.type" />
                                                                     <div class="reaction-btn-t-box">
-                                                                        <div class="font-w-700">{{
-                                                                            getReactionHoverText(m.reactions[reaction.type])
-                                                                            }}
+                                                                        <div class="font-w-700"
+                                                                            *ngIf="getReactionHoverData(m.reactions[reaction.type]) as data">
+                                                                            <ng-container [ngSwitch]="data.type">
+                                                                                <span *ngSwitchCase="'self'">
+                                                                                    Du hast reagiert
+                                                                                </span>
+                                                                                <ng-container *ngSwitchCase="'other'">
+                                                                                    <span class="reactor-name"
+                                                                                        [title]="data.name">
+                                                                                        {{ data.name }}
+                                                                                    </span>
+                                                                                    <span> hat reagiert</span>
+                                                                                </ng-container>
+                                                                                <ng-container *ngSwitchCase="'both'">
+                                                                                    <span class="reactor-name"
+                                                                                        [title]="data.name">{{ data.name
+                                                                                        }}</span>
+                                                                                    <span> und Du haben reagiert</span>
+                                                                                </ng-container>
+                                                                            </ng-container>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -121,7 +138,8 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="reaction-display-container">
+                                                    <div class="reaction-display-container"
+                                                        (click)="$event.stopPropagation()">
                                                         <app-round-btn iconSrc="assets/message-icons/add_reaction.svg"
                                                             iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
                                                             (click)="toggleReactionDialog(m.id, 'chat')">

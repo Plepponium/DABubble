@@ -194,32 +194,18 @@ export class DirectMessageUtilsService {
         return showAll ? all : all.slice(0, 7);
     }
 
-    /**
-  * Generates hover tooltip text for reactions based on reacting users.
-  * Always in German. Self-chat shows only "Du hast reagiert".
-  * @param userIds Array of user IDs who reacted
-  * @param currentUserUid Current user's UID
-  * @param otherUser Chat partner {uid, name}
-  * @returns German descriptive hover text
-  */
-    getReactionHoverText(
-        userIds: string[],
-        currentUserUid: string | undefined,
-        otherUser: { uid: string; name: string } | undefined
-    ): string {
-        if (!userIds?.length) return '';
+    /** Determines hover data for reactions based on user IDs who reacted. */
+    getReactionHoverData(userIds: string[], currentUserUid: string | undefined, otherUser: { uid: string; name: string } | undefined): { type: 'self' | 'other' | 'both'; name?: string } | null {
+        if (!userIds?.length) return null;
         const current = userIds.includes(currentUserUid || '');
         const other = userIds.includes(otherUser?.uid || '');
-        if (currentUserUid === otherUser?.uid && current) {
-            return 'Du hast reagiert';
-        }
+        if (currentUserUid === otherUser?.uid && current) { return { type: 'self' }; }
         const name = otherUser?.name || 'Unbekannt';
-        if (current && !other) return 'Du hast reagiert';
-        if (!current && other) return `${name} hat reagiert`;
-        if (current && other) return `${name} und Du haben reagiert`;
-        return '';
+        if (current && !other) return { type: 'self' };
+        if (!current && other) return { type: 'other', name };
+        if (current && other) return { type: 'both', name };
+        return null;
     }
-
 
     /** Renders message text by replacing smileys, mentions, and channel references with HTML. */
     renderMessage(text: string, users: Record<string, User>, channels: Channel[] = []): SafeHtml {

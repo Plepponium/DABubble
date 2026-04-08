@@ -404,6 +404,7 @@
 
   .r-btn-hover-display-content {
     min-width: 158px;
+    max-width: 200px;
     width: fit-content;
     height: 112px;
     background-color: #444df2;
@@ -411,10 +412,8 @@
     box-sizing: border-box;
     position: absolute;
     bottom: 33px;
-    left: 32px;
-    border-top-left-radius: 30px;
-    border-top-right-radius: 30px;
-    border-bottom-right-radius: 30px;
+    right: 32px;
+    border-radius: 30px 30px 0 30px;
     color: #ffffff;
     font-size: 16px;
     display: flex;
@@ -435,6 +434,21 @@
       white-space: nowrap;
     }
   }
+}
+
+.chat-message-row.me .r-btn-hover-display-content {
+  left: 32px;
+  right: auto;
+  border-radius: 30px 30px 30px 0;
+}
+
+.reactor-name {
+  display: block;
+  width: fit-content;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .more-reactions {

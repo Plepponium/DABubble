@@ -95,7 +95,7 @@ export class DmThreadComponent {
   ngOnInit() {
     this.updateIsResponsive();
     this.initCurrentUser();
-    setTimeout(() => this.focusInputOnStart(), 200 );
+    setTimeout(() => this.focusInputOnStart(), 200);
   }
 
   /** Handles input changes and reloads chat and answers when dmChannelId or chatId changes. */
@@ -106,8 +106,8 @@ export class DmThreadComponent {
         return acc;
       }, {} as Record<string, User>);
     }
-    if (changes['dmChatId'] && !changes['dmChatId'].firstChange) {this.initDmData();}
-    if (changes['dmChannelId'] && !changes['dmChannelId'].firstChange) {this.initDmData();}
+    if (changes['dmChatId'] && !changes['dmChatId'].firstChange) { this.initDmData(); }
+    if (changes['dmChannelId'] && !changes['dmChannelId'].firstChange) { this.initDmData(); }
   }
 
   @HostListener('window:resize')
@@ -178,7 +178,7 @@ export class DmThreadComponent {
 
   /** Subscribes to participant updates and stores them locally. */
   subscribeToParticipants() {
-    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => {this.participants = users;});
+    this.participants$.pipe(takeUntil(this.destroy$)).subscribe(users => { this.participants = users; });
   }
 
   /** Toggles the reactions dialog visibility for a specific chat message. */
@@ -230,13 +230,17 @@ export class DmThreadComponent {
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
     const clickedInsideReactions = !!target.closest('[data-reactions-root]');
-    
+
     if (!clickedInsideReactions) {
       this.activeReactionDialogueIndex = null;
       this.activeReactionDialogueBelowIndex = null;
       this.activeReactionDialogueAnswersIndex = null;
       this.activeReactionDialogueBelowAnswersIndex = null;
     }
+  }
+
+  getReactionHoverData(userIds: string[]) {
+    return this.utilsService.getReactionHoverData(userIds, this.currentUserId, this.otherUser);
   }
 
   /** Adds a reaction to the current chat and updates the observable if successful. */
@@ -423,7 +427,7 @@ export class DmThreadComponent {
   /** Saves the edited answer and refreshes the answers list if successful. */
   async saveEditedAnswer(answer: Answer) {
     const result = await this.dmThreadService.saveEditedAnswer(this.dmChannelId, this.dmChatId, answer, answer.editedText ?? '');
-    if (result) {this.subscribeAnswers();}
+    if (result) { this.subscribeAnswers(); }
   }
 
   /** Reloads enriched answers and scrolls to the bottom. */
