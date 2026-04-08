@@ -17,7 +17,7 @@
 
     <div *ngIf="(chat$ | async) as chat" class="chat-content">
 
-        <div class="chat-scroll-container">
+        <div id="chat-scroll-container" class="chat-scroll-container">
             <div class="chat-day-section" [ngClass]="{'reverse': chat.user === currentUserId}">
                 <div class="chat-section  chat-section-message" [ngClass]="{'reverse': chat.user === currentUserId}">
                     <div class="chat-dialogue top" [ngClass]="{'reverse': chat.user === currentUserId}">
