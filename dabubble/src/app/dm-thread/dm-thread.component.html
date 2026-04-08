@@ -167,7 +167,8 @@
                             </div>
 
                             <div class="edit-comment-container">
-                                <div class="edit-comment-dialogue" *ngIf="answer.showEditMenu">
+                                <div class="edit-comment-dialogue"
+                                    *ngIf="answer.showEditMenu && activeEditAnswerId === answer.id">
                                     <div class="edit-comment" (click)="enableEditAnswer(answer)">Nachricht bearbeiten
                                     </div>
                                 </div>

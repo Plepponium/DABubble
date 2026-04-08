@@ -83,6 +83,7 @@ export class DmThreadComponent {
   activeSmiley = false;
   allSmileys = reactionIcons;
   editSmileyActive: { [messageId: string]: boolean } = {};
+  activeEditAnswerId: string | null = null;
 
   @Input() dmChannelId!: string;
   @Input() dmChatId!: string;
@@ -237,6 +238,11 @@ export class DmThreadComponent {
       this.activeReactionDialogueAnswersIndex = null;
       this.activeReactionDialogueBelowAnswersIndex = null;
     }
+
+    const clickedInsideEditContainer = !!target.closest('.edit-comment-container');
+    if (!clickedInsideEditContainer) {
+      this.activeEditAnswerId = null;
+    }
   }
 
   /** Adds a reaction to the current chat and updates the observable if successful. */
@@ -355,11 +361,17 @@ export class DmThreadComponent {
 
   /** Toggles the edit menu visibility for an answer. */
   toggleEditMenu(answer: Answer) {
-    answer.showEditMenu = !answer.showEditMenu;
+    if (this.activeEditAnswerId !== answer.id) {
+      this.activeEditAnswerId = answer.id;
+    } else {
+      this.activeEditAnswerId = null;
+    }
+    answer.showEditMenu = this.activeEditAnswerId === answer.id;
   }
 
   /** Enables editing mode for an answer and initializes edited text. */
   enableEditAnswer(answer: Answer) {
+    this.activeEditAnswerId = answer.id;
     answer.showEditMenu = false;
     answer.isEditing = true;
     answer.editedText = answer.message;
