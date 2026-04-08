@@ -211,32 +211,41 @@
                                                         <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
                                                             [alt]="reaction.type">
                                                         <div class="reaction-btn-t-box no-wrap">
+
                                                             <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count <= 2"
                                                                 class="font-w-700">
-                                                                {{ reaction.otherUserName }} und Du
+                                                                <span class="reactor-name"
+                                                                    [title]="reaction.otherUserName">
+                                                                    {{ reaction.otherUserName }}
+                                                                </span>
+                                                                <span>und Du</span>
                                                             </div>
-                                                            <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count > 2"
-                                                                class="font-w-700">
-                                                                {{ reaction.otherUserName }}, Du
-                                                            </div>
+
                                                             <div *ngIf="!reaction.currentUserReacted && reaction.otherUserName"
                                                                 class="font-w-700">
-                                                                {{ reaction.otherUserName }}
+                                                                <span class="reactor-name"
+                                                                    [title]="reaction.otherUserName">
+                                                                    {{ reaction.otherUserName }}
+                                                                </span>
                                                             </div>
+
                                                             <div *ngIf="reaction.currentUserReacted && !reaction.otherUserName"
                                                                 class="font-w-700">
-                                                                Du
+                                                                <span>Du</span>
                                                             </div>
+
                                                             <span
                                                                 *ngIf="reaction.count === 1 && reaction.currentUserReacted">hast
-                                                                reagiert</span>
+                                                                reagiert
+                                                            </span>
                                                             <span
                                                                 *ngIf="reaction.count === 1 && !reaction.currentUserReacted">hat
-                                                                reagiert</span>
-                                                            <span
-                                                                *ngIf="reaction.count - (reaction.currentUserReacted ? 1 : 0) >= 2"
-                                                                class="font-w-700">und andere</span>
-                                                            <span *ngIf="reaction.count > 1">haben reagiert</span>
+                                                                reagiert
+                                                            </span>
+
+                                                            <span *ngIf="reaction.count > 1">
+                                                                haben reagiert
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>
