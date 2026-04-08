@@ -16,9 +16,9 @@
   top: 20px;
   right: 28px;
   background-color: #ffffff;
-  border-top-left-radius: 30px;
-  border-bottom-left-radius: 30px;
-  border-bottom-right-radius: 30px;
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
   box-sizing: border-box;
   padding: 10px 20px;
   box-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.2);
@@ -34,7 +34,7 @@
 .add-reaction-dialogue.below {
   top: unset;
   bottom: 20px;
-  border-top-right-radius: 30px;
+  border-top-right-radius: 25px;
   border-bottom-right-radius: 0px;
 }
 
