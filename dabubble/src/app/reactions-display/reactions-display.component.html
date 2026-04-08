@@ -14,15 +14,26 @@
                     <div class="reaction-btn-t-box no-wrap">
                         <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count <= 2"
                             class="font-w-700">
-                            {{ reaction.otherUserName }} und Du
+                            <span class="reactor-name" [title]="reaction.otherUserName">
+                                {{ reaction.otherUserName }}
+                            </span>
+                            <!-- {{ reaction.otherUserName }}  -->
+                            und Du
                         </div>
                         <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count > 2"
                             class="font-w-700">
-                            {{ reaction.otherUserName }}, Du
+                            <span class="reactor-name" [title]="reaction.otherUserName">
+                                {{ reaction.otherUserName }}
+                            </span>
+                            <!-- {{ reaction.otherUserName }} -->
+                            , Du
                         </div>
                         <div *ngIf="!reaction.currentUserReacted && reaction.otherUserName"
                             class="font-w-700">
-                            {{ reaction.otherUserName }}
+                            <span class="reactor-name" [title]="reaction.otherUserName">
+                                {{ reaction.otherUserName }}
+                            </span>
+                            <!-- {{ reaction.otherUserName }} -->
                         </div>
                         <div *ngIf="reaction.currentUserReacted && !reaction.otherUserName"
                             class="font-w-700">
