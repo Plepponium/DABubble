@@ -64,277 +64,293 @@
                                             <div class="r-btn-hover-display-content">
                                                 <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
                                                     [alt]="reaction.type">
-                                                <div class="reaction-btn-t-box">
-                                                    <div class="font-w-700"
-                                                        *ngIf="getReactionHoverData(reaction.userIds) as data">
-                                                        <ng-container [ngSwitch]="data.type">
-                                                            <span *ngSwitchCase="'self'">
-                                                                Du hast reagiert
-                                                            </span>
-                                                            <ng-container *ngSwitchCase="'other'">
-                                                                <span class="reactor-name" [title]="data.name">
-                                                                    {{ data.name }}
-                                                                </span>
-                                                                <span> hat reagiert</span>
-                                                            </ng-container>
-                                                            <ng-container *ngSwitchCase="'both'">
-                                                                <span class="reactor-name" [title]="data.name">{{
-                                                                    data.name
-                                                                    }}</span>
-                                                                <span> und Du haben reagiert</span>
-                                                            </ng-container>
-                                                        </ng-container>
+                                                <div class="reaction-btn-t-box no-wrap">
+
+                                                    <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count <= 2"
+                                                        class="font-w-700">
+                                                        <span class="reactor-name" [title]="reaction.otherUserName">
+                                                            {{ reaction.otherUserName }}
+                                                        </span>
+                                                        <span>und Du</span>
                                                     </div>
+
+                                                    <div *ngIf="!reaction.currentUserReacted && reaction.otherUserName"
+                                                        class="font-w-700">
+                                                        <span class="reactor-name" [title]="reaction.otherUserName">
+                                                            {{ reaction.otherUserName }}
+                                                        </span>
+                                                    </div>
+
+                                                    <div *ngIf="reaction.currentUserReacted && !reaction.otherUserName"
+                                                        class="font-w-700">
+                                                        <span>Du</span>
+                                                    </div>
+
+                                                    <span
+                                                        *ngIf="reaction.count === 1 && reaction.currentUserReacted">hast
+                                                        reagiert
+                                                    </span>
+                                                    <span
+                                                        *ngIf="reaction.count === 1 && !reaction.currentUserReacted">hat
+                                                        reagiert
+                                                    </span>
+
+                                                    <span *ngIf="reaction.count > 1">
+                                                        haben reagiert
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <div (click)="showAllReactionsForChat[chat.id] = true"
-                                            *ngIf="chat.reactionArray!.length > (isResponsive ? 3 : 7) && !showAllReactionsForChat[chat.id]"
-                                            class="reaction-btn more-reactions">
-                                            {{chat.reactionArray!.length - (isResponsive ? 3 : 7)}} weitere
-                                        </div>
-                                        <div (click)="showAllReactionsForChat[chat.id] = false"
-                                            *ngIf="showAllReactionsForChat[chat.id]"
-                                            class="reaction-btn more-reactions no-wrap">
-                                            Weniger anzeigen
-                                        </div>
                                     </div>
 
-                                    <div class="reactions-display-container-below" data-reactions-root>
-                                        <div class="add-reaction-dialogue below"
-                                            *ngIf="activeReactionDialogueBelowIndex === chat.id">
-                                            <div *ngFor="let icon of reactionIcons" class="reactions-container">
-                                                <button (click)="addReaction(chat.id, icon)" class="add-reaction-btn">
-                                                    <img class="smiley-img"
-                                                        [src]="'assets/reaction-icons/' + icon + '.svg'" [alt]="icon">
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <app-round-btn (click)="openReactionsDialogueBelow(chat.id)"
-                                            iconSrc="assets/message-icons/add_reaction.svg"
-                                            iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
-                                            altText="Reaktion hinzufügen">
-                                        </app-round-btn>
+                                    <div (click)="showAllReactionsForChat[chat.id] = true"
+                                        *ngIf="chat.reactionArray!.length > (isResponsive ? 3 : 7) && !showAllReactionsForChat[chat.id]"
+                                        class="reaction-btn more-reactions">
+                                        {{chat.reactionArray!.length - (isResponsive ? 3 : 7)}} weitere
+                                    </div>
+                                    <div (click)="showAllReactionsForChat[chat.id] = false"
+                                        *ngIf="showAllReactionsForChat[chat.id]"
+                                        class="reaction-btn more-reactions no-wrap">
+                                        Weniger anzeigen
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div *ngIf="dmAnswers$ | async as answers" id="thread-history" class="chat-history">
-                    <div *ngFor="let answer of answers; let i = index" class="chat-day-section"
-                        [ngClass]="{'reverse': answer.user === currentUserId}">
-
-                        <div *ngIf="threadHelpService.shouldShowDateForAnswer(answers, i, chat)"
-                            class="chat-date-section">
-                            <div class="chat-date">{{
-                                threadHelpService.getDisplayDate(threadHelpService.getChatDate(answer)) }}
-                            </div>
-                        </div>
-
-                        <div class="chat-section"
-                            [ngClass]="{'reverse': answer.user === currentUserId, 'editing': answer.isEditing}">
-                            <div class="chat-dialogue" [ngClass]="{'reverse': answer.user === currentUserId}">
-                                <div class="reactions-display-container" data-reactions-root>
-                                    <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueAnswersIndex === i">
+                                <div class="reactions-display-container-below" data-reactions-root>
+                                    <div class="add-reaction-dialogue below"
+                                        *ngIf="activeReactionDialogueBelowIndex === chat.id">
                                         <div *ngFor="let icon of reactionIcons" class="reactions-container">
-                                            <button (click)="addReactionToAnswer(answer.id, icon)"
-                                                class="add-reaction-btn">
+                                            <button (click)="addReaction(chat.id, icon)" class="add-reaction-btn">
                                                 <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'"
                                                     [alt]="icon">
                                             </button>
                                         </div>
                                     </div>
-                                    <button (click)="openReactionsDialogueAnswers(i)" class="add-reaction-btn">
-                                        <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
-                                        <img class="hover-icon-purple"
-                                            src="assets/message-icons/add_reaction-purple.svg" alt="">
-                                    </button>
+                                    <app-round-btn (click)="openReactionsDialogueBelow(chat.id)"
+                                        iconSrc="assets/message-icons/add_reaction.svg"
+                                        iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
+                                        altText="Reaktion hinzufügen">
+                                    </app-round-btn>
                                 </div>
-
-                                <div class="edit-comment-container">
-                                    <div class="edit-comment-dialogue" *ngIf="answer.showEditMenu">
-                                        <div class="edit-comment" (click)="enableEditAnswer(answer)">Nachricht
-                                            bearbeiten</div>
-                                    </div>
-                                    <button (click)="toggleEditMenu(answer)" class="add-reaction-btn reverse">
-                                        <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="">
-                                        <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg"
-                                            alt="">
-                                    </button>
-                                </div>
-                            </div>
-
-                            <img class="chat-user-img" [src]="'assets/user-icons/' + answer.userImg + '.svg'"
-                                [alt]="answer.userName" [ngClass]="{'grayscale': answer.isUserMissing}">
-
-                            <div class="chat-info-container" [ngClass]="{'reverse': answer.user === currentUserId}">
-                                <ng-container *ngIf="!answer.isEditing; else editMode">
-                                    <div class="chat-start" [ngClass]="{'reverse': answer.user === currentUserId}">
-                                        <div class="font-w-700 user-name" [ngClass]="{'missing': answer.isUserMissing}"
-                                            (click)="onUserNameClick(answer.user)">
-                                            {{ answer.userName}}</div>
-                                        <div class="font-14 t-gray">{{ answer.time * 1000 | date: 'HH:mm' }} Uhr</div>
-                                    </div>
-                                    <div class="chat-message" [ngClass]="{'left bg-light-purple': answer.user !== currentUserId, 
-                                    'right': answer.user === currentUserId}"
-                                        [innerHTML]="renderMessage(answer.message)" (click)="onMentionClick($event)">
-                                    </div>
-                                    <div class="chat-answered" [ngClass]="{'right': answer.user === currentUserId}">
-
-                                        <div class="reactions">
-                                            <div class="reaction-btns">
-                                                <div (click)="toggleReactionForAnswer(answer.id, reaction.type)"
-                                                    *ngFor="let reaction of (showAllReactionsForAnswer[answer.id] ? answer.reactionArray : (answer.reactionArray | slice:0:(isResponsive ? 3 : 7)))"
-                                                    class="reaction-btn"
-                                                    [ngClass]="{'reacted': reaction.currentUserReacted}">
-                                                    <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
-                                                        [alt]="reaction.type">
-                                                    <div>{{ reaction.count }}</div>
-
-                                                    <div class="r-btn-hover-display">
-                                                        <div class="r-btn-hover-display-content">
-                                                            <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
-                                                                [alt]="reaction.type">
-                                                            <div class="reaction-btn-t-box">
-                                                                <div class="font-w-700"
-                                                                    *ngIf="getReactionHoverData(reaction.userIds) as data">
-                                                                    <ng-container [ngSwitch]="data.type">
-                                                                        <span *ngSwitchCase="'self'">
-                                                                            Du hast reagiert
-                                                                        </span>
-                                                                        <ng-container *ngSwitchCase="'other'">
-                                                                            <span class="reactor-name"
-                                                                                [title]="data.name">
-                                                                                {{ data.name }}
-                                                                            </span>
-                                                                            <span> hat reagiert</span>
-                                                                        </ng-container>
-                                                                        <ng-container *ngSwitchCase="'both'">
-                                                                            <span class="reactor-name"
-                                                                                [title]="data.name">{{
-                                                                                data.name
-                                                                                }}</span>
-                                                                            <span> und Du haben reagiert</span>
-                                                                        </ng-container>
-                                                                    </ng-container>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div (click)="showAllReactionsForAnswer[answer.id] = true"
-                                                    *ngIf="answer.reactionArray!.length > (isResponsive ? 3 : 7) && !showAllReactionsForAnswer[answer.id]"
-                                                    class="reaction-btn more-reactions">
-                                                    {{answer.reactionArray!.length - (isResponsive ? 3 : 7)}} weitere
-                                                </div>
-                                                <div (click)="showAllReactionsForAnswer[answer.id] = false"
-                                                    *ngIf="showAllReactionsForAnswer[answer.id]"
-                                                    class="reaction-btn more-reactions no-wrap">
-                                                    Weniger anzeigen
-                                                </div>
-                                            </div>
-
-                                            <div class="reactions-display-container-below" data-reactions-root>
-                                                <div class="add-reaction-dialogue below"
-                                                    *ngIf="activeReactionDialogueBelowAnswersIndex === i">
-                                                    <div *ngFor="let icon of reactionIcons" class="reactions-container">
-                                                        <button (click)="addReactionToAnswer(answer.id, icon)"
-                                                            class="add-reaction-btn">
-                                                            <img class="smiley-img"
-                                                                [src]="'assets/reaction-icons/' + icon + '.svg'"
-                                                                [alt]="icon">
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <app-round-btn (click)="openReactionsDialogueBelowAnswers(i)"
-                                                    iconSrc="assets/message-icons/add_reaction.svg"
-                                                    iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
-                                                    altText="Reaktion hinzufügen">
-                                                </app-round-btn>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </ng-container>
-
-                                <ng-template #editMode>
-                                    <div class="chat-edit-wrapper">
-                                        <textarea #editTa id="edit-{{answer.id}}" class="edit-textarea"
-                                            (input)="updateEditCaret(answer, editTa); threadHelpService.autoGrow(editTa)"
-                                            (keyup)="updateEditCaret(answer, editTa)" [(ngModel)]="answer.editedText"
-                                            [placeholder]="answer.message"></textarea>
-
-                                        <app-mentions-overlay [text]="answer.editedText"
-                                            [caretIndex]="answer._caretIndex" [currentUserId]="currentUserId"
-                                            [context]="'Channel'" [users]="users" [channels]="filteredChannels"
-                                            (mentionSelected)="insertMentionInEdit(answer, $event)">
-                                        </app-mentions-overlay>
-
-                                        <app-smiley-overlay [active]="editSmileyActive[answer.id]" [emojis]="allSmileys"
-                                            (selected)="insertSmileyInEdit(answer, $event, editTa)"
-                                            (activeChange)="editSmileyActive[answer.id] = $event">
-                                        </app-smiley-overlay>
-
-                                        <div class="edit-actions">
-
-                                            <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
-                                                iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
-                                                (click)="toggleEditSmiley(answer.id)" class="smiley-edit-btn">
-                                            </app-round-btn>
-
-                                            <div class="btn-wrapper">
-                                                <button class="btn cancel"
-                                                    (click)="cancelEditAnswer(answer)">Abbrechen</button>
-                                                <button class="btn save"
-                                                    (click)="saveEditedAnswer(answer)">Speichern</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </ng-template>
-
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <form class="form" (ngSubmit)="submitAnswer()" #answerForm="ngForm">
-                <div class="form-field full-width" (click)="focusInput($event)">
-                    <textarea #answerInput id="answer-message" class="input" name="answer" [(ngModel)]="newAnswer"
-                        (keydown.enter)="onEnterPress($any($event))" type="text" [placeholder]="'Antworten...'"
-                        (input)="updateCaretPosition(); threadHelpService.autoGrow(answerInput)"
-                        (keyup)="updateCaretPosition()"></textarea>
+            <div *ngIf="dmAnswers$ | async as answers" id="thread-history" class="chat-history">
+                <div *ngFor="let answer of answers; let i = index" class="chat-day-section"
+                    [ngClass]="{'reverse': answer.user === currentUserId}">
 
-                    <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys"
-                        (selected)="onSmileySelected($event)" (activeChange)="activeSmiley = $event">
-                    </app-smiley-overlay>
-                    <app-mentions-overlay [text]="newAnswer" [caretIndex]="mentionCaretIndex"
-                        [currentUserId]="currentUserId" [context]="'Channel'" [users]="users"
-                        [channels]="participantChannels" (mentionSelected)="insertMention($event)"
-                        (overlayStateChange)="overlayActive = $event">
-                    </app-mentions-overlay>
+                    <div *ngIf="threadHelpService.shouldShowDateForAnswer(answers, i, chat)" class="chat-date-section">
+                        <div class="chat-date">{{
+                            threadHelpService.getDisplayDate(threadHelpService.getChatDate(answer)) }}
+                        </div>
+                    </div>
 
-                    <div class="input-icon-bar">
-                        <div class="icon-bar t-gray">
-                            <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
-                                iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
-                                altText="Reaktion hinzufügen" [type]="'button'" (click)="openSmileyOverlay()">
-                            </app-round-btn>
-                            <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
-                                iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
-                                altText="Empfänger hinzufügen" [type]="'button'" (click)="insertAtCursor('@')">
-                            </app-round-btn>
+                    <div class="chat-section"
+                        [ngClass]="{'reverse': answer.user === currentUserId, 'editing': answer.isEditing}">
+                        <div class="chat-dialogue" [ngClass]="{'reverse': answer.user === currentUserId}">
+                            <div class="reactions-display-container" data-reactions-root>
+                                <div class="add-reaction-dialogue" *ngIf="activeReactionDialogueAnswersIndex === i">
+                                    <div *ngFor="let icon of reactionIcons" class="reactions-container">
+                                        <button (click)="addReactionToAnswer(answer.id, icon)" class="add-reaction-btn">
+                                            <img class="smiley-img" [src]="'assets/reaction-icons/' + icon + '.svg'"
+                                                [alt]="icon">
+                                        </button>
+                                    </div>
+                                </div>
+                                <button (click)="openReactionsDialogueAnswers(i)" class="add-reaction-btn">
+                                    <img class="hover-icon" src="assets/message-icons/add_reaction.svg" alt="">
+                                    <img class="hover-icon-purple" src="assets/message-icons/add_reaction-purple.svg"
+                                        alt="">
+                                </button>
+                            </div>
+
+                            <div class="edit-comment-container">
+                                <div class="edit-comment-dialogue" *ngIf="answer.showEditMenu">
+                                    <div class="edit-comment" (click)="enableEditAnswer(answer)">Nachricht bearbeiten
+                                    </div>
+                                </div>
+                                <button (click)="toggleEditMenu(answer)" class="add-reaction-btn reverse">
+                                    <img class="hover-icon" src="assets/message-icons/more_vert.svg" alt="">
+                                    <img class="hover-icon-purple" src="assets/message-icons/more_vert-purple.svg"
+                                        alt="">
+                                </button>
+                            </div>
                         </div>
 
-                        <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
-                            iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden" type="submit">
-                        </app-round-btn>
+                        <img class="chat-user-img" [src]="'assets/user-icons/' + answer.userImg + '.svg'"
+                            [alt]="answer.userName" [ngClass]="{'grayscale': answer.isUserMissing}">
+
+                        <div class="chat-info-container" [ngClass]="{'reverse': answer.user === currentUserId}">
+                            <ng-container *ngIf="!answer.isEditing; else editMode">
+                                <div class="chat-start" [ngClass]="{'reverse': answer.user === currentUserId}">
+                                    <div class="font-w-700 user-name" [ngClass]="{'missing': answer.isUserMissing}"
+                                        (click)="onUserNameClick(answer.user)">
+                                        {{ answer.userName}}</div>
+                                    <div class="font-14 t-gray">{{ answer.time * 1000 | date: 'HH:mm' }} Uhr</div>
+                                </div>
+                                <div class="chat-message" [ngClass]="{'left bg-light-purple': answer.user !== currentUserId, 
+                                    'right': answer.user === currentUserId}"
+                                    [innerHTML]="renderMessage(answer.message)" (click)="onMentionClick($event)">
+                                </div>
+                                <div class="chat-answered" [ngClass]="{'right': answer.user === currentUserId}">
+
+                                    <div class="reactions">
+                                        <div class="reaction-btns">
+                                            <div (click)="toggleReactionForAnswer(answer.id, reaction.type)"
+                                                *ngFor="let reaction of (showAllReactionsForAnswer[answer.id] ? answer.reactionArray : (answer.reactionArray | slice:0:(isResponsive ? 3 : 7)))"
+                                                class="reaction-btn"
+                                                [ngClass]="{'reacted': reaction.currentUserReacted}">
+                                                <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
+                                                    [alt]="reaction.type">
+                                                <div>{{ reaction.count }}</div>
+
+                                                <div class="r-btn-hover-display">
+                                                    <div class="r-btn-hover-display-content">
+                                                        <img [src]="'assets/reaction-icons/' + reaction.type + '.svg'"
+                                                            [alt]="reaction.type">
+                                                        <div class="reaction-btn-t-box no-wrap">
+                                                            <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count <= 2"
+                                                                class="font-w-700">
+                                                                {{ reaction.otherUserName }} und Du
+                                                            </div>
+                                                            <div *ngIf="reaction.currentUserReacted && reaction.otherUserName && reaction.count > 2"
+                                                                class="font-w-700">
+                                                                {{ reaction.otherUserName }}, Du
+                                                            </div>
+                                                            <div *ngIf="!reaction.currentUserReacted && reaction.otherUserName"
+                                                                class="font-w-700">
+                                                                {{ reaction.otherUserName }}
+                                                            </div>
+                                                            <div *ngIf="reaction.currentUserReacted && !reaction.otherUserName"
+                                                                class="font-w-700">
+                                                                Du
+                                                            </div>
+                                                            <span
+                                                                *ngIf="reaction.count === 1 && reaction.currentUserReacted">hast
+                                                                reagiert</span>
+                                                            <span
+                                                                *ngIf="reaction.count === 1 && !reaction.currentUserReacted">hat
+                                                                reagiert</span>
+                                                            <span
+                                                                *ngIf="reaction.count - (reaction.currentUserReacted ? 1 : 0) >= 2"
+                                                                class="font-w-700">und andere</span>
+                                                            <span *ngIf="reaction.count > 1">haben reagiert</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div (click)="showAllReactionsForAnswer[answer.id] = true"
+                                                *ngIf="answer.reactionArray!.length > (isResponsive ? 3 : 7) && !showAllReactionsForAnswer[answer.id]"
+                                                class="reaction-btn more-reactions">
+                                                {{answer.reactionArray!.length - (isResponsive ? 3 : 7)}} weitere
+                                            </div>
+                                            <div (click)="showAllReactionsForAnswer[answer.id] = false"
+                                                *ngIf="showAllReactionsForAnswer[answer.id]"
+                                                class="reaction-btn more-reactions no-wrap">
+                                                Weniger anzeigen
+                                            </div>
+                                        </div>
+
+                                        <div class="reactions-display-container-below" data-reactions-root>
+                                            <div class="add-reaction-dialogue below"
+                                                *ngIf="activeReactionDialogueBelowAnswersIndex === i">
+                                                <div *ngFor="let icon of reactionIcons" class="reactions-container">
+                                                    <button (click)="addReactionToAnswer(answer.id, icon)"
+                                                        class="add-reaction-btn">
+                                                        <img class="smiley-img"
+                                                            [src]="'assets/reaction-icons/' + icon + '.svg'"
+                                                            [alt]="icon">
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <app-round-btn (click)="openReactionsDialogueBelowAnswers(i)"
+                                                iconSrc="assets/message-icons/add_reaction.svg"
+                                                iconHoverSrc="assets/message-icons/add_reaction-purple.svg"
+                                                altText="Reaktion hinzufügen">
+                                            </app-round-btn>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+
+                            <ng-template #editMode>
+                                <div class="chat-edit-wrapper">
+                                    <textarea #editTa id="edit-{{answer.id}}" class="edit-textarea"
+                                        (input)="updateEditCaret(answer, editTa); threadHelpService.autoGrow(editTa)"
+                                        (keyup)="updateEditCaret(answer, editTa)" [(ngModel)]="answer.editedText"
+                                        [placeholder]="answer.message"></textarea>
+
+                                    <app-mentions-overlay [text]="answer.editedText" [caretIndex]="answer._caretIndex"
+                                        [currentUserId]="currentUserId" [context]="'Channel'" [users]="users"
+                                        [channels]="filteredChannels"
+                                        (mentionSelected)="insertMentionInEdit(answer, $event)">
+                                    </app-mentions-overlay>
+
+                                    <app-smiley-overlay [active]="editSmileyActive[answer.id]" [emojis]="allSmileys"
+                                        (selected)="insertSmileyInEdit(answer, $event, editTa)"
+                                        (activeChange)="editSmileyActive[answer.id] = $event">
+                                    </app-smiley-overlay>
+
+                                    <div class="edit-actions">
+
+                                        <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
+                                            iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
+                                            (click)="toggleEditSmiley(answer.id)" class="smiley-edit-btn">
+                                        </app-round-btn>
+
+                                        <div class="btn-wrapper">
+                                            <button class="btn cancel"
+                                                (click)="cancelEditAnswer(answer)">Abbrechen</button>
+                                            <button class="btn save"
+                                                (click)="saveEditedAnswer(answer)">Speichern</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+
+                        </div>
                     </div>
                 </div>
-            </form>
-
+            </div>
         </div>
+
+        <form class="form" (ngSubmit)="submitAnswer()" #answerForm="ngForm">
+            <div class="form-field full-width" (click)="focusInput($event)">
+                <textarea #answerInput id="answer-message" class="input" name="answer" [(ngModel)]="newAnswer"
+                    (keydown.enter)="onEnterPress($any($event))" type="text" [placeholder]="'Antworten...'"
+                    (input)="updateCaretPosition(); threadHelpService.autoGrow(answerInput)"
+                    (keyup)="updateCaretPosition()"></textarea>
+
+                <app-smiley-overlay [active]="activeSmiley" [emojis]="allSmileys" (selected)="onSmileySelected($event)"
+                    (activeChange)="activeSmiley = $event">
+                </app-smiley-overlay>
+                <app-mentions-overlay [text]="newAnswer" [caretIndex]="mentionCaretIndex"
+                    [currentUserId]="currentUserId" [context]="'Channel'" [users]="users"
+                    [channels]="participantChannels" (mentionSelected)="insertMention($event)"
+                    (overlayStateChange)="overlayActive = $event">
+                </app-mentions-overlay>
+
+                <div class="input-icon-bar">
+                    <div class="icon-bar t-gray">
+                        <app-round-btn iconSrc="assets/message-icons/sentiment_satisfied-gray.svg"
+                            iconHoverSrc="assets/message-icons/sentiment_satisfied-purple.svg"
+                            altText="Reaktion hinzufügen" [type]="'button'" (click)="openSmileyOverlay()">
+                        </app-round-btn>
+                        <app-round-btn iconSrc="assets/message-icons/alternate_email-gray.svg"
+                            iconHoverSrc="assets/message-icons/alternate_email-purple.svg"
+                            altText="Empfänger hinzufügen" [type]="'button'" (click)="insertAtCursor('@')">
+                        </app-round-btn>
+                    </div>
+
+                    <app-round-btn style="--btn-bg-hover: #ffffff;" iconSrc="assets/message-icons/send-purple.svg"
+                        iconHoverSrc="assets/message-icons/send-purple2.svg" altText="Senden" type="submit">
+                    </app-round-btn>
+                </div>
+            </div>
+        </form>
+
     </div>
+</div>
