@@ -469,4 +469,13 @@
     width: auto;
     padding: 48px 28px;
   }
+
+  .overlay-panel:has(h2.created) {
+    padding: 20px;
+
+    h2 {
+      font-size: 16px;
+      text-align: center;
+    }
+  }
 }

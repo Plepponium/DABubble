@@ -17,24 +17,22 @@ const shouldIgnoreMessage = (message: string): boolean => {
 };
 
 // Globale Warning-Filter
-if (isDevMode) {
-  const originalWarn = console.warn;
-  console.warn = (...args: any[]) => {
-    const message = args.join(' ');
-    if (!shouldIgnoreMessage(message)) {
-      originalWarn(...args);
-    }
-  };
+const originalWarn = console.warn;
+console.warn = (...args: any[]) => {
+  const message = args.join(' ');
+  if (!shouldIgnoreMessage(message)) {
+    originalWarn(...args);
+  }
+};
 
-  // Globale Error-Filter
-  const originalError = console.error;
-  console.error = (...args: any[]) => {
-    const message = args.join(' ');
-    if (!shouldIgnoreMessage(message)) {
-      originalError(...args);
-    }
-  };
-}
+// Globale Error-Filter
+const originalError = console.error;
+console.error = (...args: any[]) => {
+  const message = args.join(' ');
+  if (!shouldIgnoreMessage(message)) {
+    originalError(...args);
+  }
+};
 
 bootstrapApplication(AppComponent, appConfig)
   .catch((err) => console.error(err));
